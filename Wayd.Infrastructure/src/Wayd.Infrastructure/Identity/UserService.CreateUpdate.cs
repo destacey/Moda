@@ -449,14 +449,20 @@ internal partial class UserService
             // External employee records are keyed by the Entra oid, which lives in
             // the user's active MicrosoftEntraId UserIdentity row.
             var entraSubjectsByUserId = await _userIdentityStore.GetActiveSubjectsByProvider(LoginProviders.MicrosoftEntraId, cancellationToken);
+            // Pre-index by EmployeeNumber so per-user lookup is O(1) instead of scanning
+            // the full employees list for every user. Last-wins on duplicate numbers —
+            // matches the old FirstOrDefault behavior since duplicates would have been
+            // unreachable anyway.
+            var employeeIdByNumber = employees
+                .GroupBy(e => e.EmployeeNumber)
+                .ToDictionary(g => g.Key, g => g.Last().Id);
 
             foreach (var user in users)
             {
                 if (!entraSubjectsByUserId.TryGetValue(user.Id, out var entraSubject))
                     continue;
 
-                var employeeId = employees.Where(e => e.EmployeeNumber == entraSubject).Select(e => (Guid?)e.Id ?? null).FirstOrDefault();
-                if (!employeeId.HasValue)
+                if (!employeeIdByNumber.TryGetValue(entraSubject, out var employeeId))
                     continue;
 
                 user.EmployeeId = employeeId;
@@ -478,26 +484,45 @@ internal partial class UserService
     public async Task<Result> SyncUsersFromEmployeeRecords(List<IExternalEmployee> externalEmployees, CancellationToken cancellationToken)
     {
         // Only sync users who have an active Entra identity — that's what pairs them
-        // with an external employee record (keyed by Entra oid).
-        var entraSubjectsByUserId = await _userIdentityStore.GetActiveSubjectsByProvider(LoginProviders.MicrosoftEntraId, cancellationToken);
-        if (entraSubjectsByUserId.Count == 0)
-            return Result.Success();
-
+        // with an external employee record (keyed by Entra oid). Filter server-side
+        // via an EXISTS subquery against UserIdentities so we don't have to round-
+        // trip user IDs in an IN (...) list, which hits the 2100-parameter SQL
+        // Server limit past a few thousand users.
         var users = await _userManager.Users
-            .Where(u => entraSubjectsByUserId.Keys.Contains(u.Id))
+            .Where(u => _db.UserIdentities.Any(ui =>
+                ui.UserId == u.Id &&
+                ui.IsActive &&
+                ui.Provider == LoginProviders.MicrosoftEntraId))
             .ToListAsync(cancellationToken);
 
         _logger.LogDebug("{UserCount} users found with an active Entra identity.", users.Count);
         if (users.Count == 0)
             return Result.Success();
 
+        // Second query — just the subject map for the users we actually need to
+        // correlate. Still cheap because it's filtered by active + provider.
+        var entraSubjectsByUserId = await _userIdentityStore.GetActiveSubjectsByProvider(LoginProviders.MicrosoftEntraId, cancellationToken);
+
+        // Pre-index by EmployeeNumber so per-user correlation is O(1) instead of
+        // scanning the full externalEmployees list for every user.
+        var employeesByNumber = externalEmployees
+            .GroupBy(e => e.EmployeeNumber)
+            .ToDictionary(g => g.Key, g => g.Last());
+
         foreach (var user in users)
         {
-            var entraSubject = entraSubjectsByUserId[user.Id];
-            var employee = externalEmployees.FirstOrDefault(e => e.EmployeeNumber == entraSubject);
+            if (!entraSubjectsByUserId.TryGetValue(user.Id, out var entraSubject))
+            {
+                // Edge case: user's identity was deactivated between the two queries.
+                continue;
+            }
+
+            var employee = employeesByNumber.GetValueOrDefault(entraSubject);
             if (employee is null)
             {
-                _logger.LogWarning("Employee with Id {EmployeeId} not found.", user.EmployeeId);
+                _logger.LogWarning(
+                    "No external employee record matched Entra subject {EntraSubject} for user {UserId}.",
+                    entraSubject, user.Id);
                 continue;
             }
 
