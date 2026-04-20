@@ -91,8 +91,24 @@ internal partial class UserService
         }
 
         var row = pending[0];
-        row.ProviderTenantId = tenantId;
-        await _userIdentityStore.Update(row);
+
+        // Conditional UPDATE guards against a concurrent login racing us. If another
+        // login populated the tenant first, TryPopulateTenant returns false and we
+        // re-resolve — the other login may have set a tenant that matches ours (fine,
+        // both users converge on the same row) or a different one (our token has no
+        // matching active row, so we fall into the create path).
+        var won = await _userIdentityStore.TryPopulateTenant(row.Id, tenantId);
+        if (!won)
+        {
+            _logger.LogInformation(
+                "Tenant upgrade for Entra subject {ObjectId} lost the race to a concurrent login; re-resolving.",
+                objectId);
+            return await _userIdentityStore.FindActive(LoginProviders.MicrosoftEntraId, tenantId, objectId)
+                is { } winnerIdentity
+                ? winnerIdentity.User
+                : null;
+        }
+
         return row.User;
     }
 
@@ -181,14 +197,17 @@ internal partial class UserService
 
     private async Task EnsureEntraIdentityRowAsync(string userId, string tenantId, string objectId)
     {
-        // Idempotent: inserts an active Entra UserIdentity row if one doesn't already
-        // exist for this user. Covers both new-user creation and the "existing local
-        // user is being linked to Entra" path.
+        // Idempotent for the new-user case, and enforces the "exactly one active
+        // identity per user" invariant when an existing user is being linked to
+        // Entra (e.g., a Wayd-local user moving to SSO). Any prior active row —
+        // including a Wayd identity — is marked inactive with reason ProviderRelinked.
         var exists = await _userIdentityStore.ExistsActive(userId, LoginProviders.MicrosoftEntraId);
         if (exists)
         {
             return;
         }
+
+        await _userIdentityStore.DeactivateAllActive(userId, _dateTimeProvider.Now, UserIdentityUnlinkReasons.ProviderRelinked);
 
         await _userIdentityStore.Add(new UserIdentity
         {
@@ -223,41 +242,72 @@ internal partial class UserService
             MustChangePassword = command.LoginProvider == LoginProviders.Wayd,
         };
 
-        IdentityResult result = command.LoginProvider == LoginProviders.Wayd
-            ? await _userManager.CreateAsync(user, command.Password!)
-            : await _userManager.CreateAsync(user);
-
-        if (!result.Succeeded)
+        // User creation, role assignment, and the Wayd identity row must land
+        // together. Partial failure — user exists with no active Wayd identity —
+        // would leave a local user who cannot log in (TokenService gates on the
+        // identity row). Run the whole thing in a transaction so any failure rolls
+        // back the user.
+        IdentityResult? result = null;
+        try
         {
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            await _userIdentityStore.ExecuteInTransaction(async ct =>
+            {
+                result = command.LoginProvider == LoginProviders.Wayd
+                    ? await _userManager.CreateAsync(user, command.Password!)
+                    : await _userManager.CreateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    // Throw to force rollback. Outer catch swallows this sentinel;
+                    // `result` carries the validation errors back to the caller.
+                    throw new UserCreationRollbackException();
+                }
+
+                await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
+
+                // Wayd (local) users get an identity row immediately, keyed by the
+                // stable ApplicationUser.Id (usernames are mutable). Entra users
+                // created by an admin have no oid/tid yet — the row is inserted on
+                // their first SSO login via EnsureEntraIdentityRowAsync.
+                if (command.LoginProvider == LoginProviders.Wayd)
+                {
+                    await _userIdentityStore.Add(new UserIdentity
+                    {
+                        Id = Guid.NewGuid(),
+                        UserId = user.Id,
+                        Provider = LoginProviders.Wayd,
+                        ProviderTenantId = null,
+                        ProviderSubject = user.Id,
+                        IsActive = true,
+                        LinkedAt = _dateTimeProvider.Now,
+                    }, ct);
+                }
+            }, cancellationToken);
+        }
+        catch (UserCreationRollbackException)
+        {
+            // Expected when UserManager.CreateAsync returned a failing IdentityResult
+            // inside the transaction. Fall through — the block below formats the
+            // error response from `result`.
+        }
+
+        if (result is null || !result.Succeeded)
+        {
+            var errors = result is null
+                ? "User creation failed."
+                : string.Join(", ", result.Errors.Select(e => e.Description));
             _logger.LogError("Error creating user: {Errors}", errors);
             return Result.Failure<string>(errors);
         }
 
-        await _userManager.AddToRoleAsync(user, ApplicationRoles.Basic);
+        // Publish after commit so subscribers don't see events for rolled-back users.
         await _events.PublishAsync(new ApplicationUserCreatedEvent(user.Id, _dateTimeProvider.Now));
-
-        // Wayd (local) users get an identity row immediately, keyed by the stable
-        // ApplicationUser.Id (usernames are mutable). Entra users created by an admin
-        // have no oid/tid yet — the row is inserted on their first SSO login via
-        // EnsureEntraIdentityRowAsync.
-        if (command.LoginProvider == LoginProviders.Wayd)
-        {
-            await _userIdentityStore.Add(new UserIdentity
-            {
-                Id = Guid.NewGuid(),
-                UserId = user.Id,
-                Provider = LoginProviders.Wayd,
-                ProviderTenantId = null,
-                ProviderSubject = user.Id,
-                IsActive = true,
-                LinkedAt = _dateTimeProvider.Now,
-            }, cancellationToken);
-        }
 
         _logger.LogInformation("User {UserId} created successfully.", user.Id);
         return Result.Success(user.Id);
     }
+
+    private sealed class UserCreationRollbackException : Exception { }
 
     public async Task UpdateAsync(UpdateUserCommand command, string userId)
     {

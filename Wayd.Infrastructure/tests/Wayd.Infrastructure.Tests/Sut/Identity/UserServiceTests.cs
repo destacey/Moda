@@ -55,6 +55,12 @@ public class UserServiceTests
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockCurrentUser.Setup(x => x.GetUserId()).Returns("current-user-id");
         _mockUserIdentityStore = new Mock<IUserIdentityStore>();
+
+        // Pass-through: tests don't exercise transaction semantics. Invoke the
+        // action directly so CreateAsync behaves as if the transaction succeeded.
+        _mockUserIdentityStore
+            .Setup(s => s.ExecuteInTransaction(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>((action, ct) => action(ct));
     }
 
     private UserService CreateSut()

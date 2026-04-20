@@ -61,15 +61,7 @@ internal class TokenService(
             throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
         }
 
-        // Require an active UserIdentity row for the Wayd provider. Uniform with
-        // the Entra flow and enables "disable local login for this user" without
-        // a new flag — an admin can deactivate the identity row instead.
-        var hasActiveIdentity = await _userIdentityStore.ExistsActive(user.Id, LoginProviders.Wayd, cancellationToken);
-        if (!hasActiveIdentity)
-        {
-            _logger.LogWarning("Login failed: user {UserName} has no active Wayd identity.", command.UserName);
-            throw new UnauthorizedException("Invalid credentials.");
-        }
+        await EnsureActiveWaydIdentityAsync(user, command.UserName, cancellationToken);
 
         return await GenerateTokensAndUpdateUser(user);
     }
@@ -99,7 +91,27 @@ internal class TokenService(
             throw new UnauthorizedException("Invalid or expired refresh token.");
         }
 
+        // Deactivating a UserIdentity must also stop in-flight sessions, not just new
+        // logins. Without this check a user whose local identity was revoked could
+        // keep minting fresh access tokens via refresh until the refresh-token TTL
+        // (days) elapsed.
+        await EnsureActiveWaydIdentityAsync(user, user.UserName ?? userId, cancellationToken);
+
         return await GenerateTokensAndUpdateUser(user);
+    }
+
+    private async Task EnsureActiveWaydIdentityAsync(ApplicationUser user, string usernameForLogging, CancellationToken cancellationToken)
+    {
+        // Requires an active UserIdentity row for the Wayd provider. Enables
+        // "disable local login for this user" by deactivating the identity row —
+        // no new flag needed. Applied on both login and refresh so revocation takes
+        // effect immediately on the next refresh, not when the refresh token expires.
+        var hasActiveIdentity = await _userIdentityStore.ExistsActive(user.Id, LoginProviders.Wayd, cancellationToken);
+        if (!hasActiveIdentity)
+        {
+            _logger.LogWarning("Authentication failed: user {UserName} has no active Wayd identity.", usernameForLogging);
+            throw new UnauthorizedException("Invalid credentials.");
+        }
     }
 
     private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user)

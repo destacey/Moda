@@ -399,6 +399,38 @@ public class TokenServiceTests
             .WithMessage("User account is inactive.");
     }
 
+    [Fact]
+    public async Task RefreshTokenAsync_ShouldThrowUnauthorized_WhenWaydIdentityDeactivatedAfterLogin()
+    {
+        // Simulates admin revocation of the user's local login between issuing the
+        // initial token and the refresh. The refresh must fail — otherwise a revoked
+        // user could keep minting access tokens until the refresh-token TTL elapses.
+        var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
+
+        _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var tokenResponse = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
+        var currentRefreshToken = user.RefreshToken;
+
+        _mockUserManager.Setup(x => x.FindByIdAsync("user-1")).ReturnsAsync(user);
+
+        // Deactivate the Wayd identity after the initial token was issued.
+        _mockUserIdentityStore
+            .Setup(s => s.ExistsActive(user.Id, LoginProviders.Wayd, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(false);
+
+        var refreshCommand = new RefreshTokenCommand(tokenResponse.Token, currentRefreshToken!);
+
+        var act = () => _sut.RefreshTokenAsync(refreshCommand, TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<UnauthorizedException>()
+            .WithMessage("Invalid credentials.");
+    }
+
     #endregion
 
     #region GetSettings

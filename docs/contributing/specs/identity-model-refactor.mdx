@@ -18,28 +18,25 @@ The work is sequenced across several PRs so each is independently shippable and 
 
 ## Background
 
-### Today's model
+### The pre-refactor model (motivation)
 
-Identity linkage lives as flat columns on [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs):
+Before this spec's work began, identity linkage lived as flat columns on `ApplicationUser`:
 
 - `ObjectId` — nullable string, populated from the Entra `oid` claim. Unused by the local (Wayd) provider.
-- `LoginProvider` — `"MicrosoftEntraId"` or `"Wayd"` (see [`LoginProviders`](../../../Wayd.Common/src/Wayd.Common.Application/Identity/LoginProviders.cs)).
+- `LoginProvider` — `"MicrosoftEntraId"` or `"Wayd"`.
 
-Lookups diverge by provider:
+Lookups diverged by provider — the Entra path resolved users via `u.ObjectId == oid`, and the local path via `UserManager.FindByNameAsync(username)`. Those two call sites (in `UserService.CreateUpdate.cs` and `TokenService.cs` respectively) are the anchors PR 1 converts to the unified `UserIdentity` lookup.
 
-- Entra: [`UserService.CreateUpdate.cs:35`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs#L35) — `u.ObjectId == objectId`.
-- Local: [`TokenService.cs:28`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs#L28) — `FindByNameAsync(username)`.
+### Why that shape didn't generalize
 
-### Why this shape doesn't generalize
-
-- No uniqueness guarantee per provider. `ObjectId` has no index; nothing prevents an Auth0 `sub` colliding with an Entra `oid`.
-- No tenant dimension. Multi-tenant Entra works today by accident (Entra `oid`s are globally unique within Entra). A second OIDC provider breaks that assumption.
+- No uniqueness guarantee per provider. `ObjectId` had no index; nothing prevented an Auth0 `sub` from colliding with an Entra `oid`.
+- No tenant dimension. Multi-tenant Entra worked only by accident (Entra `oid`s are globally unique within Entra). A second OIDC provider would break that assumption.
 - `ObjectId` is Entra's word. In an OIDC-generic world the field is the `sub` claim.
-- A tenant migration (same human, new tenant → new `tid` + new `oid`) has no clean representation. Overwriting the flat columns loses audit history.
+- A tenant migration (same human, new tenant → new `tid` + new `oid`) had no clean representation. Overwriting the flat columns loses audit history.
 
-### What's changing
+### What this spec introduces
 
-Introduce a `UserIdentity` table — one row per (user, provider-identity) pair — with columns `(Provider, ProviderTenantId, ProviderSubject)`. Every authentication path resolves through the same lookup. History is preserved by marking old rows inactive rather than deleting them.
+A `UserIdentity` table — one row per (user, provider-identity) pair — with columns `(Provider, ProviderTenantId, ProviderSubject)`. Every authentication path resolves through the same lookup. History is preserved by marking old rows inactive rather than deleting them.
 
 ## Target model
 
@@ -69,7 +66,9 @@ erDiagram
 ### Invariants
 
 - Unique filtered index: `(Provider, ProviderTenantId, ProviderSubject) WHERE IsActive = 1`. `NULL` tenant values are distinct under SQL Server's filtered unique index semantics.
-- Every `ApplicationUser` has **exactly one** active `UserIdentity` at rest. (Transient second rows may exist mid-transaction during a rebind.)
+- **At most one** active `UserIdentity` per `ApplicationUser` at rest. Every user whose account is authenticable has **exactly one**; the general rule allows zero for pre-provisioned-but-not-yet-linked cases (e.g., an admin-created Entra user who has not yet signed in via SSO).
+- The invariant is enforced in application code — not at the schema level — via `IUserIdentityStore.DeactivateAllActive`. Any write path that adds a new active row for a user must first deactivate any prior active rows (setting `UnlinkedAt` + `UnlinkReason = ProviderRelinked` for the relink case, or `TenantMigration` for PR 4's rebind). A database-level check constraint (unique index on `UserId WHERE IsActive = 1`) is an option but has not been added in PR 1 — the store-level enforcement is load-bearing.
+- This deliberately does **not** support multi-provider account linking (one user, multiple active identities). If that becomes a requirement, relaxing the invariant is a forward-compatible schema change; retrofitting the invariant once multiple-active rows exist in prod is much harder.
 - Local users get a row with `Provider = "Wayd"`, `ProviderTenantId = NULL`, `ProviderSubject = ApplicationUser.Id.ToString()`. The stable Wayd user id is the subject — not the username, which is mutable.
 - `ApplicationUser.LoginProvider` is retained as a "default/primary" indicator to avoid churn in code that reads it today. It mirrors the active `UserIdentity.Provider`.
 
@@ -104,8 +103,8 @@ Four PRs, landing in order. Each is independently shippable and reversible.
     - Local users (`LoginProvider = "Wayd"`) → `Provider = "Wayd"`, `ProviderSubject = ApplicationUser.Id`, `ProviderTenantId = NULL`.
   - Leave `ApplicationUser.ObjectId` in place (rollback safety net).
 - Update lookup sites:
-  - [`UserService.CreateUpdate.cs:35`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs#L35) — query `UserIdentity` by `(Provider, ProviderTenantId, ProviderSubject)`.
-  - [`TokenService.cs:28`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs#L28) — resolve by username → `ApplicationUser`, then assert an active `Wayd` `UserIdentity` row exists. Deactivated row ⇒ deny login.
+  - `UserService.CreateUpdate.cs:35` — query `UserIdentity` by `(Provider, ProviderTenantId, ProviderSubject)`.
+  - `TokenService.cs:28` — resolve by username → `ApplicationUser`, then assert an active `Wayd` `UserIdentity` row exists. Deactivated row ⇒ deny login.
 - **Null-`tid` upgrade path on Entra login:**
   - If no match on `(provider, tid, sub)`, fall back to `(provider, sub)` where `ProviderTenantId IS NULL`.
   - If exactly one row matches, write `tid` into it and proceed.
@@ -144,8 +143,8 @@ Tiny cleanup PR once PR 1 has been stable in prod for a release cycle (a week or
 
 **Scope:**
 
-- Remove `ObjectId` property from [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs).
-- Remove from [`ApplicationUserConfig`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/IdentityConfiguration.cs).
+- Remove `ObjectId` property from `ApplicationUser`.
+- Remove from `ApplicationUserConfig` (`IdentityConfiguration.cs`).
 - Migration: drop the column.
 - Clean up references (e.g., `SyncUsersFromEmployeeRecords`, `UpdateMissingEmployeeIds` which read `ObjectId` today — they need to read from the `UserIdentity` row instead, or be rewritten to use a different employee correlation).
 
@@ -290,9 +289,9 @@ This is called out here because it's often the spark for discussing this work, a
 
 ## References
 
-- [`ApplicationUser`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs) — current user entity.
-- [`LoginProviders`](../../../Wayd.Common/src/Wayd.Common.Application/Identity/LoginProviders.cs) — provider constants.
-- [`UserService.CreateUpdate.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs) — Entra lookup + create/update from principal.
-- [`TokenService.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs) — local JWT issuance.
-- [`IdentityConfiguration.cs`](../../../Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/IdentityConfiguration.cs) — EF Core mapping.
+- `Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/ApplicationUser.cs` — current user entity.
+- `Wayd.Common/src/Wayd.Common.Application/Identity/LoginProviders.cs` — provider constants.
+- `Wayd.Infrastructure/src/Wayd.Infrastructure/Identity/UserService.CreateUpdate.cs` — Entra lookup + create/update from principal.
+- `Wayd.Infrastructure/src/Wayd.Infrastructure/Auth/Local/TokenService.cs` — local JWT issuance.
+- `Wayd.Infrastructure/src/Wayd.Infrastructure/Persistence/Configuration/IdentityConfiguration.cs` — EF Core mapping.
 - [Configuration > Authentication](../configuration.mdx#authentication) — dev-side auth setup.

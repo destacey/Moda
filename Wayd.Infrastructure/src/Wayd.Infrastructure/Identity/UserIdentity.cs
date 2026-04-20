@@ -30,4 +30,5 @@ public static class UserIdentityUnlinkReasons
     public const string TenantMigration = "TenantMigration";
     public const string AdminRevoked = "AdminRevoked";
     public const string UserUnlinked = "UserUnlinked";
+    public const string ProviderRelinked = "ProviderRelinked";
 }
