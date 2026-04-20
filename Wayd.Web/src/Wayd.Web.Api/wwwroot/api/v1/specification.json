@@ -205,6 +205,49 @@
         }
       }
     },
+    "/api/auth/exchange": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Exchange an external identity-provider token (e.g., Microsoft Entra ID) for a Wayd JWT.",
+        "operationId": "Auth_Exchange",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeTokenCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user-management/permissions": {
       "get": {
         "tags": [
@@ -20911,6 +20954,22 @@
             "type": "string"
           },
           "refreshToken": {
+            "type": "string"
+          }
+        }
+      },
+      "ExchangeTokenCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "idToken"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "idToken": {
             "type": "string"
           }
         }

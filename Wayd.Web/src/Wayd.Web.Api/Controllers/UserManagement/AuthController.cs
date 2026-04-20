@@ -30,4 +30,14 @@ public class AuthController(ITokenService tokenService) : ControllerBase
         var response = await _tokenService.RefreshTokenAsync(command, cancellationToken);
         return Ok(response);
     }
+
+    [HttpPost("exchange")]
+    [OpenApiOperation("Exchange an external identity-provider token (e.g., Microsoft Entra ID) for a Wayd JWT.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    public async Task<ActionResult<TokenResponse>> Exchange(ExchangeTokenCommand command, CancellationToken cancellationToken)
+    {
+        var response = await _tokenService.ExchangeTokenAsync(command, cancellationToken);
+        return Ok(response);
+    }
 }

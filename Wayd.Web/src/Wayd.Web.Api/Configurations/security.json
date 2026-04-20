@@ -22,6 +22,14 @@
             "TokenExpirationInMinutes": 60,
             "RefreshTokenExpirationInDays": 7
         },
+        "Providers": {
+            "Entra": {
+                "Authority": "https://login.microsoftonline.com/common/v2.0",
+                "Audience": "api://<Your ClientId of the AzureAd Server App Registration>/access_as_user",
+                "AllowedTenantIds": [ "<Your AzureAd TenantId>" ],
+                "ClockSkewSeconds": 60
+            }
+        },
         "Swagger": {
             "AuthorizationUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/authorize",
             "TokenUrl": "https://login.microsoftonline.com/<Your TenantId of the AzureAd Server App Registration>/oauth2/v2.0/token",
