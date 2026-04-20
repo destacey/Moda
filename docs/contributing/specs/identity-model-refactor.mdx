@@ -139,16 +139,17 @@ WHERE LoginProvider = 'MicrosoftEntraId' AND ObjectId IS NULL;
 
 ### PR 2 — Drop `ObjectId` from `ApplicationUser`
 
-Tiny cleanup PR once PR 1 has been stable in prod for a release cycle (a week or two).
+Removes the now-unused `ObjectId` column and rewires the remaining callers that still referenced it. Safe to ship in the same release as PR 1, or in a follow-up release after a soak period — the code paths are independent.
 
 **Scope:**
 
-- Remove `ObjectId` property from `ApplicationUser`.
-- Remove from `ApplicationUserConfig` (`IdentityConfiguration.cs`).
-- Migration: drop the column.
-- Clean up references (e.g., `SyncUsersFromEmployeeRecords`, `UpdateMissingEmployeeIds` which read `ObjectId` today — they need to read from the `UserIdentity` row instead, or be rewritten to use a different employee correlation).
+- Remove `ObjectId` property from `ApplicationUser` and the mapping in `ApplicationUserConfig` (`IdentityConfiguration.cs`).
+- Migration `Drop-ApplicationUser-ObjectId`: drops the column; `Down` re-adds the column and rehydrates it from the active `MicrosoftEntraId` `UserIdentity` rows so rollback is non-destructive.
+- Rewire the username/email-taken guards in `CreateOrUpdateFromPrincipalAsync` to check `IUserIdentityStore.ExistsActive(userId, MicrosoftEntraId)` instead of inspecting `ObjectId`.
+- Remove the three `user.ObjectId = ...` writes in the principal-link path — the `UserIdentity` row is written by `EnsureEntraIdentityRowAsync` downstream.
+- Rewire `UpdateMissingEmployeeIds` and `SyncUsersFromEmployeeRecords` (which correlated external employee records by matching `ObjectId` to `EmployeeNumber`) to use a new `IUserIdentityStore.GetActiveSubjectsByProvider(provider)` batch lookup. Pulls the Entra subject from the user's active identity row.
 
-**Rollback:** harder. Restoring the column requires re-backfilling from `UserIdentity`. Hence the one-release gap after PR 1 to be sure.
+**Rollback:** revert the code. The migration's `Down` re-creates the column and re-populates it from `UserIdentity.ProviderSubject` for active Entra identities, so the old `ObjectId`-based lookups would work unchanged if PR 1 were also reverted.
 
 ### PR 3 — Token exchange + Wayd JWT with permission claims (multi-PR effort on its own)
 
