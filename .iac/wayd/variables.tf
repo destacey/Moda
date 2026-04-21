@@ -48,6 +48,18 @@ variable "aad_tenant_id" {
   description = "The Azure AD tenant ID."
 }
 
+variable "allowed_entra_tenant_ids" {
+  type        = list(string)
+  description = "Entra tenant IDs allowed to authenticate via /api/auth/exchange. Defaults to the single app tenant; add more to onboard external orgs."
+  default     = null
+}
+
+variable "entra_enabled" {
+  type        = bool
+  description = "Enable the Microsoft Entra token-exchange endpoint. Local-only deployments leave this false — the API boots without Entra config and the login page hides the Microsoft button."
+  default     = false
+}
+
 variable "aad_domain" {
   type        = string
   description = "The Azure AD tenant primary domain (e.g. contoso.onmicrosoft.com)."

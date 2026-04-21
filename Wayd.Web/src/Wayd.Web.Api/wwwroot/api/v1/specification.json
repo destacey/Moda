@@ -205,6 +205,80 @@
         }
       }
     },
+    "/api/auth/exchange": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Exchange an external identity-provider token (e.g., Microsoft Entra ID) for a Wayd JWT.",
+        "operationId": "Auth_Exchange",
+        "requestBody": {
+          "x-name": "command",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExchangeTokenCommand"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/providers": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "List the authentication providers enabled on this deployment.",
+        "operationId": "Auth_GetProviders",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthProvidersResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user-management/permissions": {
       "get": {
         "tags": [
@@ -20912,6 +20986,38 @@
           },
           "refreshToken": {
             "type": "string"
+          }
+        }
+      },
+      "ExchangeTokenCommand": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "provider",
+          "subjectToken"
+        ],
+        "properties": {
+          "provider": {
+            "type": "string"
+          },
+          "subjectToken": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthProvidersResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "local",
+          "entra"
+        ],
+        "properties": {
+          "local": {
+            "type": "boolean"
+          },
+          "entra": {
+            "type": "boolean"
           }
         }
       },

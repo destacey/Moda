@@ -4,9 +4,13 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
+using Wayd.Common.Application.Identity.Users;
+using Wayd.Common.Domain.Authorization;
+using Wayd.Infrastructure.Auth.Entra;
 using Wayd.Infrastructure.Identity;
 
 namespace Wayd.Infrastructure.Auth.Local;
@@ -17,6 +21,9 @@ internal class TokenService(
     IConfiguration config,
     IDateTimeProvider dateTimeProvider,
     IUserIdentityStore userIdentityStore,
+    IUserService userService,
+    IEntraIdTokenValidator entraIdTokenValidator,
+    IOptions<EntraSettings> entraSettings,
     ILogger<TokenService> logger) : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -24,6 +31,9 @@ internal class TokenService(
     private readonly IConfiguration _config = config;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
+    private readonly IUserService _userService = userService;
+    private readonly IEntraIdTokenValidator _entraIdTokenValidator = entraIdTokenValidator;
+    private readonly EntraSettings _entraSettings = entraSettings.Value;
     private readonly ILogger<TokenService> _logger = logger;
 
     public async Task<TokenResponse> GetTokenAsync(LoginCommand command, CancellationToken cancellationToken)
@@ -61,9 +71,9 @@ internal class TokenService(
             throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
         }
 
-        await EnsureActiveWaydIdentityAsync(user, command.UserName, cancellationToken);
+        await EnsureActiveIdentityAsync(user, LoginProviders.Wayd, command.UserName, cancellationToken);
 
-        return await GenerateTokensAndUpdateUser(user);
+        return await GenerateTokensAndUpdateUser(user, cancellationToken);
     }
 
     public async Task<TokenResponse> RefreshTokenAsync(RefreshTokenCommand command, CancellationToken cancellationToken)
@@ -92,32 +102,83 @@ internal class TokenService(
         }
 
         // Deactivating a UserIdentity must also stop in-flight sessions, not just new
-        // logins. Without this check a user whose local identity was revoked could
-        // keep minting fresh access tokens via refresh until the refresh-token TTL
-        // (days) elapsed.
-        await EnsureActiveWaydIdentityAsync(user, user.UserName ?? userId, cancellationToken);
+        // logins. Without this check a user whose identity was revoked could keep
+        // minting fresh access tokens via refresh until the refresh-token TTL
+        // (days) elapsed. Provider is whatever the user is currently linked to —
+        // an Entra-exchanged user requires an active Entra identity; a local user
+        // requires an active Wayd identity.
+        await EnsureActiveIdentityAsync(user, user.LoginProvider, user.UserName ?? userId, cancellationToken);
 
-        return await GenerateTokensAndUpdateUser(user);
+        return await GenerateTokensAndUpdateUser(user, cancellationToken);
     }
 
-    private async Task EnsureActiveWaydIdentityAsync(ApplicationUser user, string usernameForLogging, CancellationToken cancellationToken)
+    public async Task<TokenResponse> ExchangeTokenAsync(ExchangeTokenCommand command, CancellationToken cancellationToken)
     {
-        // Requires an active UserIdentity row for the Wayd provider. Enables
-        // "disable local login for this user" by deactivating the identity row —
-        // no new flag needed. Applied on both login and refresh so revocation takes
-        // effect immediately on the next refresh, not when the refresh token expires.
-        var hasActiveIdentity = await _userIdentityStore.ExistsActive(user.Id, LoginProviders.Wayd, cancellationToken);
+        if (command.Provider != LoginProviders.MicrosoftEntraId)
+        {
+            // Auth0 and other providers are out of scope for PR 3.1 — the shape
+            // generalizes cleanly when they're added, but we reject unknown
+            // providers explicitly rather than silently falling through.
+            _logger.LogWarning("Token exchange rejected: unsupported provider {Provider}.", command.Provider);
+            throw new UnauthorizedException("Invalid token.");
+        }
+
+        if (!_entraSettings.Enabled)
+        {
+            // Local-only deployment — the feature exists but isn't configured here.
+            // 503 distinguishes this from 401 (bad token) and 404 (no route): the
+            // endpoint is discoverable, just turned off for this tenant.
+            throw new ServiceUnavailableException("Entra token exchange is not enabled on this deployment.");
+        }
+
+        var principal = await _entraIdTokenValidator.Validate(command.SubjectToken, cancellationToken);
+
+        // Reuse the existing principal-based user resolution. That path handles
+        // UserIdentity lookup, the null-tid upgrade, new-user creation, and the
+        // first-user-is-admin case — all unchanged from the MSAL middleware flow
+        // this endpoint is replacing.
+        var (userId, _) = await _userService.GetOrCreateFromPrincipalAsync(principal);
+
+        var user = await _userManager.FindByIdAsync(userId)
+            ?? throw new UnauthorizedException("Invalid token.");
+
+        if (!user.IsActive)
+        {
+            _logger.LogWarning("Exchange failed: user {UserId} is inactive.", user.Id);
+            throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
+        }
+
+        await EnsureActiveIdentityAsync(user, LoginProviders.MicrosoftEntraId, user.UserName ?? user.Id, cancellationToken);
+
+        return await GenerateTokensAndUpdateUser(user, cancellationToken);
+    }
+
+    private async Task EnsureActiveIdentityAsync(ApplicationUser user, string provider, string usernameForLogging, CancellationToken cancellationToken)
+    {
+        // Requires an active UserIdentity row for the given provider. Enables
+        // "disable login for this user" by deactivating the identity row — no new
+        // flag needed. Applied on login, refresh, and exchange so revocation takes
+        // effect on the user's next refresh, not when the refresh token expires.
+        var hasActiveIdentity = await _userIdentityStore.ExistsActive(user.Id, provider, cancellationToken);
         if (!hasActiveIdentity)
         {
-            _logger.LogWarning("Authentication failed: user {UserName} has no active Wayd identity.", usernameForLogging);
+            _logger.LogWarning("Authentication failed: user {UserName} has no active {Provider} identity.", usernameForLogging, provider);
             throw new UnauthorizedException("Invalid credentials.");
         }
     }
 
-    private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user)
+    private async Task<TokenResponse> GenerateTokensAndUpdateUser(ApplicationUser user, CancellationToken cancellationToken)
     {
         var settings = GetSettings();
-        var token = GenerateJwt(user, settings);
+
+        // Permissions are embedded in the JWT as claims so the frontend doesn't
+        // need a separate /permissions fetch on load. Re-read on every issuance
+        // (including refresh), so an admin permission change takes effect on the
+        // user's next refresh — no version tracking needed, TTL is the revocation
+        // clock.
+        var permissions = await _userService.GetPermissionsAsync(user.Id, cancellationToken);
+
+        var token = GenerateJwt(user, permissions, settings);
         var refreshToken = GenerateRefreshToken();
         var refreshTokenExpiry = _dateTimeProvider.Now.ToDateTimeUtc().AddDays(settings.RefreshTokenExpirationInDays);
 
@@ -130,7 +191,7 @@ internal class TokenService(
         return new TokenResponse(token, refreshToken, tokenExpiry, user.MustChangePassword);
     }
 
-    private string GenerateJwt(ApplicationUser user, LocalJwtSettings settings)
+    private string GenerateJwt(ApplicationUser user, IReadOnlyList<string> permissions, LocalJwtSettings settings)
     {
         var key = ConfigureServices.CreateSigningKey(settings.Secret);
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -146,6 +207,14 @@ internal class TokenService(
         if (user.EmployeeId.HasValue)
         {
             claims.Add(new Claim("EmployeeId", user.EmployeeId.Value.ToString()));
+        }
+
+        // One claim per permission (ASP.NET Core idiom). Enables both
+        // ClaimsPrincipal.HasClaim("permission", ...) on the server and a
+        // uniform token shape across all login providers.
+        foreach (var permission in permissions)
+        {
+            claims.Add(new Claim(ApplicationClaims.Permission, permission));
         }
 
         var token = new JwtSecurityToken(
@@ -203,4 +272,7 @@ internal class TokenService(
 
         return settings;
     }
+
+    public AuthProvidersResponse GetAuthProviders() =>
+        new(Local: true, Entra: _entraSettings.Enabled);
 }

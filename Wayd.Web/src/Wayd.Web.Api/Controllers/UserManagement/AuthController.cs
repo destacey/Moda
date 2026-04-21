@@ -30,4 +30,26 @@ public class AuthController(ITokenService tokenService) : ControllerBase
         var response = await _tokenService.RefreshTokenAsync(command, cancellationToken);
         return Ok(response);
     }
+
+    [HttpPost("exchange")]
+    [OpenApiOperation("Exchange an external identity-provider token (e.g., Microsoft Entra ID) for a Wayd JWT.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
+    public async Task<ActionResult<TokenResponse>> Exchange(ExchangeTokenCommand command, CancellationToken cancellationToken)
+    {
+        var response = await _tokenService.ExchangeTokenAsync(command, cancellationToken);
+        return Ok(response);
+    }
+
+    [HttpGet("providers")]
+    [OpenApiOperation("List the authentication providers enabled on this deployment.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public ActionResult<AuthProvidersResponse> GetProviders()
+    {
+        // Anonymous and cheap — the frontend calls this before rendering the
+        // login page to decide which provider buttons to show. No auth data
+        // leaked: knowing "this deployment accepts Entra tokens" is not sensitive.
+        return Ok(_tokenService.GetAuthProviders());
+    }
 }
