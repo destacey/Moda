@@ -24,9 +24,9 @@ internal sealed class EntraIdTokenValidator : IEntraIdTokenValidator
         _logger = logger;
     }
 
-    public async Task<ClaimsPrincipal> Validate(string idToken, CancellationToken cancellationToken)
+    public async Task<ClaimsPrincipal> Validate(string subjectToken, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(idToken))
+        if (string.IsNullOrWhiteSpace(subjectToken))
         {
             throw new UnauthorizedException("Invalid token.");
         }
@@ -83,7 +83,7 @@ internal sealed class EntraIdTokenValidator : IEntraIdTokenValidator
         try
         {
             var handler = new JwtSecurityTokenHandler();
-            principal = handler.ValidateToken(idToken, validationParameters, out _);
+            principal = handler.ValidateToken(subjectToken, validationParameters, out _);
         }
         catch (SecurityTokenException ex)
         {
@@ -92,9 +92,14 @@ internal sealed class EntraIdTokenValidator : IEntraIdTokenValidator
         }
 
         // Tenant allowlist — this is the multi-tenant guard. Without an entry here,
-        // an otherwise-valid Entra token from any other org is rejected.
+        // an otherwise-valid Entra token from any other org is rejected. Case-
+        // insensitive compare because operators occasionally enter tenant IDs with
+        // mixed case (copy-paste from scripts, docs, etc.); Entra itself always
+        // issues them lowercase, so normalizing to OrdinalIgnoreCase here just
+        // makes misconfiguration debuggable rather than silently broken.
         var tid = principal.FindFirstValue("tid");
-        if (string.IsNullOrWhiteSpace(tid) || !settings.AllowedTenantIds.Contains(tid))
+        if (string.IsNullOrWhiteSpace(tid) ||
+            !settings.AllowedTenantIds.Contains(tid, StringComparer.OrdinalIgnoreCase))
         {
             _logger.LogWarning("Entra id token rejected: tenant {Tid} not in allowlist.", tid ?? "<missing>");
             throw new UnauthorizedException("Invalid token.");

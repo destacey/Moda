@@ -20994,13 +20994,13 @@
         "additionalProperties": false,
         "required": [
           "provider",
-          "idToken"
+          "subjectToken"
         ],
         "properties": {
           "provider": {
             "type": "string"
           },
-          "idToken": {
+          "subjectToken": {
             "type": "string"
           }
         }

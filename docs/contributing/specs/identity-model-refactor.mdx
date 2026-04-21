@@ -166,13 +166,13 @@ sequenceDiagram
     participant A as Wayd API
 
     U->>F: Opens app
-    F->>E: Silent login / redirect
-    E-->>F: IdP id token (iss, tid, sub, email)
-    F->>X: POST /auth/exchange { provider, idToken }
+    F->>E: Silent login / acquireTokenSilent
+    E-->>F: IdP subject token (access token for Entra, iss, tid, sub, email)
+    F->>X: POST /auth/exchange { provider, subjectToken }
     X->>X: Validate signature via provider's JWKS
     X->>X: Lookup UserIdentity (provider, tid, sub)
     X->>X: Load permissions
-    X-->>F: Wayd JWT (sub=userId, roles, permissions, permissionsVersion)
+    X-->>F: Wayd JWT (sub=userId, permissions) + Wayd refresh token
     F->>A: API call with Wayd JWT
     A->>A: Validate Wayd JWT only
     A-->>F: Response
@@ -194,7 +194,7 @@ One config row per onboarded external tenant. Multi-tenant Entra = N rows, one p
 3. Resolve the user via the existing `UserIdentity` lookup (same path as today's principal-based flow).
 4. Load the user's flattened permission set.
 5. Mint a Wayd JWT with permission claims embedded, plus a Wayd refresh token.
-6. Return `{ token, refreshToken, tokenExpiresAt, mustChangePassword }` — same shape as the existing local-JWT `/auth/token` response.
+6. Return `{ token, refreshToken, tokenExpiresAt, mustChangePassword }` — same shape as the existing local-JWT `POST /api/auth/login` response. Refresh on expiry is handled by the shared `POST /api/auth/refresh-token` endpoint, same as local-JWT sessions today.
 
 **Sub-PRs:**
 
@@ -204,7 +204,7 @@ Delivers the Entra exchange endpoint, the Wayd JWT changes (permission claims, u
 
 **Backend:**
 
-- New `POST /api/auth/exchange` on `AuthController` accepting `{ provider, idToken }`.
+- New `POST /api/auth/exchange` on `AuthController` accepting `{ provider, subjectToken }`. For Entra the subject token is the access token MSAL acquires via `acquireTokenSilent` with the API scope — the same token a non-exchange flow would present to the API directly. Using the access token (not the id token) is the mainstream pattern and keeps audience validation simple: `aud` naturally matches the API app registration.
 - `EntraIdTokenValidator` does OIDC-discovery-based signature validation (via `Microsoft.IdentityModel.Protocols.OpenIdConnect`'s long-lived `ConfigurationManager`), audience pinning, and multi-tenant enforcement by explicit `tid` allowlist check after signature validation. `ValidateIssuer = false` because multi-tenant `/common/` authorities issue per-tenant issuers; the allowlist is the real gatekeeper. Algorithm pinned to `RS256` to prevent alg-confusion.
 - `TokenService.ExchangeTokenAsync` orchestrates: validator → `IUserService.GetOrCreateFromPrincipalAsync` → active-identity check → mint Wayd JWT.
 - Permissions embedded as individual claims (`permission: "Permissions.Projects.View"`, etc.) — ASP.NET Core idiom, works with policy-based authorization. Embedded on **all** JWT issuance paths (login, refresh, exchange) so the frontend has a uniform token shape regardless of provider.

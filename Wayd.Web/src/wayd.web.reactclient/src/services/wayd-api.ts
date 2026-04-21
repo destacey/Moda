@@ -23628,7 +23628,7 @@ export interface RefreshTokenCommand {
 
 export interface ExchangeTokenCommand {
     provider: string;
-    idToken: string;
+    subjectToken: string;
 }
 
 export interface AuthProvidersResponse {

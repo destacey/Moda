@@ -131,7 +131,7 @@ internal class TokenService(
             throw new ServiceUnavailableException("Entra token exchange is not enabled on this deployment.");
         }
 
-        var principal = await _entraIdTokenValidator.Validate(command.IdToken, cancellationToken);
+        var principal = await _entraIdTokenValidator.Validate(command.SubjectToken, cancellationToken);
 
         // Reuse the existing principal-based user resolution. That path handles
         // UserIdentity lookup, the null-tid upgrade, new-user creation, and the

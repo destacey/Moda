@@ -44,7 +44,7 @@ API_BASE_URL='https://localhost:5001'
             "Entra": {
                 "Enabled": true,
                 "Authority": "https://login.microsoftonline.com/common/v2.0",
-                "Audience": "api://{your API client ID}/access_as_user",
+                "Audience": "{exact token aud claim — see note below}",
                 "AllowedTenantIds": [ "{your AAD tenant ID}" ],
                 "ClockSkewSeconds": 60
             }
@@ -57,16 +57,23 @@ API_BASE_URL='https://localhost:5001'
 | --- | --- | --- |
 | `Enabled` | — | Gates `POST /api/auth/exchange`. Returns HTTP 503 when false. |
 | `Authority` | yes | OIDC discovery URL. `/common/v2.0` is the multi-tenant endpoint. |
-| `Audience` | yes | Token `aud` claim must match. Same scope the frontend uses. |
+| `Audience` | yes | Must equal the token's `aud` claim exactly. See **Finding your Audience** below. |
 | `AllowedTenantIds` | yes | Multi-tenant allowlist — tokens from other tenants are rejected even when Entra is enabled. Empty array fails startup. |
 | `ClockSkewSeconds` | no | Defaults to 60. Tolerance for expiry/not-before checks. |
+
+**Finding your Audience.** The `aud` claim shape depends on the token version your app registration issues:
+
+- **v2.0 tokens** (`accessTokenAcceptedVersion: 2` in the app manifest): `aud` is typically just the `<ClientId>` GUID.
+- **v1.0 tokens** (the default for many older registrations): `aud` is typically `api://<ClientId>` or `api://<ClientId>/access_as_user`.
+
+Don't guess — decode a real token at [jwt.ms](https://jwt.ms) and copy the `aud` value verbatim. A mismatch here rejects every exchange attempt with a 401, which is hard to diagnose after the fact.
 
 Setting via User Secrets (preferred for local dev — `security.json` is committed with placeholders):
 
 ```bash
 cd Wayd.Web/src/Wayd.Web.Api
 dotnet user-secrets set "SecuritySettings:Providers:Entra:Enabled" "true"
-dotnet user-secrets set "SecuritySettings:Providers:Entra:Audience" "api://{your API client ID}/access_as_user"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:Audience" "{exact aud claim from a real token}"
 dotnet user-secrets set "SecuritySettings:Providers:Entra:AllowedTenantIds:0" "{your AAD tenant ID}"
 ```
 

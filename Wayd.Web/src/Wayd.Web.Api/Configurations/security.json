@@ -27,7 +27,7 @@
                 "//Enabled": "Set to true to enable the /api/auth/exchange endpoint. Local-only deployments leave this false.",
                 "Enabled": false,
                 "Authority": "https://login.microsoftonline.com/common/v2.0",
-                "//Audience": "Required when Enabled=true. Format: api://<ClientId>/access_as_user",
+                "//Audience": "Required when Enabled=true. Must match the token's 'aud' claim exactly. For v1.0 tokens typically 'api://<ClientId>'; for v2.0 tokens typically just '<ClientId>'. Decode a real token at jwt.ms to confirm before setting.",
                 "Audience": "",
                 "//AllowedTenantIds": "Required when Enabled=true. Array of allowed tenant IDs.",
                 "AllowedTenantIds": [],
