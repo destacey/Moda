@@ -15,6 +15,7 @@ import {
   LOCAL_AUTH_TOKEN_EXPIRY_KEY,
   LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY,
 } from '@/src/services/clients'
+import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -493,7 +494,21 @@ function LocalLoginTab() {
 export default function LoginPage() {
   const isAuthenticated = useIsAuthenticated()
   const router = useRouter()
-  const [activeTab, setActiveTab] = useState<'microsoft' | 'local'>('microsoft')
+  const { data: providers } = useGetAuthProvidersQuery()
+
+  // Entra is considered enabled only when the capabilities query has resolved
+  // with entra=true. Defaulting to false while loading keeps a broken button
+  // from flashing on local-only deployments.
+  const entraEnabled = providers?.entra === true
+  const localEnabled = providers?.local !== false
+
+  // User's explicit tab selection. Null means "use the default for the current
+  // provider set" — derived below. Tracking overrides separately avoids the
+  // setState-in-effect anti-pattern; the default is computed, not stored.
+  const [tabOverride, setTabOverride] = useState<'microsoft' | 'local' | null>(
+    null,
+  )
+  const activeTab = tabOverride ?? (entraEnabled ? 'microsoft' : 'local')
 
   useEffect(() => {
     if (isAuthenticated || isLocalAuthActive()) {
@@ -504,6 +519,8 @@ export default function LoginPage() {
   if (isAuthenticated) {
     return null
   }
+
+  const showTabs = entraEnabled && localEnabled
 
   return (
     <div className={styles.pageBackground}>
@@ -553,25 +570,28 @@ export default function LoginPage() {
 
             <h1 className={styles.title}>Welcome</h1>
 
-            {/* Auth method tabs */}
-            <div className={styles.tabs}>
-              <button
-                type="button"
-                className={`${styles.tab} ${activeTab === 'microsoft' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('microsoft')}
-              >
-                Microsoft
-              </button>
-              <button
-                type="button"
-                className={`${styles.tab} ${activeTab === 'local' ? styles.tabActive : ''}`}
-                onClick={() => setActiveTab('local')}
-              >
-                Email &amp; Password
-              </button>
-            </div>
+            {/* Auth method tabs. Hidden when only one provider is enabled —
+                there's no choice to offer. */}
+            {showTabs && (
+              <div className={styles.tabs}>
+                <button
+                  type="button"
+                  className={`${styles.tab} ${activeTab === 'microsoft' ? styles.tabActive : ''}`}
+                  onClick={() => setTabOverride('microsoft')}
+                >
+                  Microsoft
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.tab} ${activeTab === 'local' ? styles.tabActive : ''}`}
+                  onClick={() => setTabOverride('local')}
+                >
+                  Email &amp; Password
+                </button>
+              </div>
+            )}
 
-            {activeTab === 'microsoft' ? (
+            {entraEnabled && activeTab === 'microsoft' ? (
               <MicrosoftLoginTab />
             ) : (
               <LocalLoginTab />

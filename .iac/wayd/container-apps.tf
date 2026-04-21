@@ -264,6 +264,38 @@ resource "azurerm_container_app" "wayd_backend" {
         value = tostring(var.local_jwt_refresh_token_expiration_days)
       }
 
+      # Entra token-exchange config (PR 3.1). /common/v2.0 is the multi-tenant
+      # authority; the AllowedTenantIds list below is the actual gatekeeper for
+      # which orgs we accept tokens from. Startup validation in the API fails
+      # fast if Enabled=true and any of the required fields are missing.
+      # Local-only deployments leave Enabled=false and can omit the other keys.
+      env {
+        name  = "SecuritySettings__Providers__Entra__Enabled"
+        value = tostring(var.entra_enabled)
+      }
+
+      env {
+        name  = "SecuritySettings__Providers__Entra__Authority"
+        value = "https://login.microsoftonline.com/common/v2.0"
+      }
+
+      env {
+        name  = "SecuritySettings__Providers__Entra__Audience"
+        value = var.app_reg_api_scope
+      }
+
+      # Array binding via env vars uses __0, __1, etc. The dynamic block below
+      # generates one env var per tenant. When onboarding a new org (e.g., for
+      # PR 4's tenant-migration flow), just append to var.allowed_entra_tenant_ids.
+      # Defaults to the single app tenant when the variable is not set.
+      dynamic "env" {
+        for_each = coalesce(var.allowed_entra_tenant_ids, [var.aad_tenant_id])
+        content {
+          name  = "SecuritySettings__Providers__Entra__AllowedTenantIds__${env.key}"
+          value = env.value
+        }
+      }
+
       env {
         name = "CorsSettings__WebClient"
         # Frontend FQDN computed from the name pattern (matches wayd_frontend definition

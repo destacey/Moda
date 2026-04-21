@@ -25,7 +25,7 @@ The identity model that links users to their login providers is being generalize
 
 ### Microsoft Entra ID (Azure AD)
 
-Create a `.env` file in the repository root:
+**Frontend (MSAL)** — create a `.env` file in the repository root:
 
 ```env
 AAD_CLIENT_ID='{your AAD client ID}'
@@ -34,6 +34,43 @@ AAD_LOGON_AUTHORITY='https://login.microsoftonline.com/{your AAD tenant ID}'
 API_SCOPE='{scope, usually api://{client ID}/access_as_user}'
 API_BASE_URL='https://localhost:5001'
 ```
+
+**Backend (token-exchange endpoint)** — configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Secrets. Only required when your deployment accepts Entra logins; local-only deployments leave `Enabled: false` and the other fields can be omitted.
+
+```json
+{
+    "SecuritySettings": {
+        "Providers": {
+            "Entra": {
+                "Enabled": true,
+                "Authority": "https://login.microsoftonline.com/common/v2.0",
+                "Audience": "api://{your API client ID}/access_as_user",
+                "AllowedTenantIds": [ "{your AAD tenant ID}" ],
+                "ClockSkewSeconds": 60
+            }
+        }
+    }
+}
+```
+
+| Key | Required when `Enabled: true` | Purpose |
+| --- | --- | --- |
+| `Enabled` | — | Gates `POST /api/auth/exchange`. Returns HTTP 503 when false. |
+| `Authority` | yes | OIDC discovery URL. `/common/v2.0` is the multi-tenant endpoint. |
+| `Audience` | yes | Token `aud` claim must match. Same scope the frontend uses. |
+| `AllowedTenantIds` | yes | Multi-tenant allowlist — tokens from other tenants are rejected even when Entra is enabled. Empty array fails startup. |
+| `ClockSkewSeconds` | no | Defaults to 60. Tolerance for expiry/not-before checks. |
+
+Setting via User Secrets (preferred for local dev — `security.json` is committed with placeholders):
+
+```bash
+cd Wayd.Web/src/Wayd.Web.Api
+dotnet user-secrets set "SecuritySettings:Providers:Entra:Enabled" "true"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:Audience" "api://{your API client ID}/access_as_user"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:AllowedTenantIds:0" "{your AAD tenant ID}"
+```
+
+Array elements bind by index (`:0`, `:1`, ...). Add more tenants as you onboard them.
 
 ### Local Authentication
 

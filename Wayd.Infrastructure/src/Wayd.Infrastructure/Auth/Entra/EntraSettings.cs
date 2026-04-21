@@ -13,6 +13,15 @@ public sealed class EntraSettings
     public const string SectionName = "SecuritySettings:Providers:Entra";
 
     /// <summary>
+    /// Whether Entra token exchange is enabled on this deployment. Off by default
+    /// so a local-only installation doesn't need to configure Authority/Audience/
+    /// AllowedTenantIds. When <c>false</c>, the <c>/api/auth/exchange</c> endpoint
+    /// responds with HTTP 503 and <see cref="EntraSettings"/> validation is skipped
+    /// at startup.
+    /// </summary>
+    public bool Enabled { get; set; } = false;
+
+    /// <summary>
     /// Multi-tenant authority URL used for OIDC discovery and signature validation.
     /// Use <c>https://login.microsoftonline.com/common/v2.0</c> for multi-tenant —
     /// any tenant can issue a token, and we enforce which tenants we accept via

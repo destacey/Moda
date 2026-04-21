@@ -244,6 +244,37 @@
                 }
               }
             }
+          },
+          "503": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/providers": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "List the authentication providers enabled on this deployment.",
+        "operationId": "Auth_GetProviders",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthProvidersResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -20971,6 +21002,22 @@
           },
           "idToken": {
             "type": "string"
+          }
+        }
+      },
+      "AuthProvidersResponse": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "local",
+          "entra"
+        ],
+        "properties": {
+          "local": {
+            "type": "boolean"
+          },
+          "entra": {
+            "type": "boolean"
           }
         }
       },

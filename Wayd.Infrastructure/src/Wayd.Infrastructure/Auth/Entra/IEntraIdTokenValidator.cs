@@ -8,7 +8,7 @@ namespace Wayd.Infrastructure.Auth.Entra;
 /// enforces the tenant allowlist. Returns the validated principal on success;
 /// throws <see cref="UnauthorizedException"/> on any validation failure.
 /// </summary>
-internal interface IEntraIdTokenValidator : IScopedService
+internal interface IEntraIdTokenValidator
 {
     Task<ClaimsPrincipal> Validate(string idToken, CancellationToken cancellationToken);
 }

@@ -78,6 +78,7 @@ public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsSer
             NotFoundException => StatusCodes.Status404NotFound,
             ConflictException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status422UnprocessableEntity,
+            ServiceUnavailableException => StatusCodes.Status503ServiceUnavailable,
             _ => StatusCodes.Status418ImATeapot
         };
     }
@@ -91,6 +92,7 @@ public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsSer
             NotFoundException => LogEventLevel.Information,
             ConflictException => LogEventLevel.Warning,
             ValidationException => LogEventLevel.Information,
+            ServiceUnavailableException => LogEventLevel.Warning,
             _ => LogEventLevel.Error
         };
     }

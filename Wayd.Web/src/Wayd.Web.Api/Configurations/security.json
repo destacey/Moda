@@ -24,9 +24,13 @@
         },
         "Providers": {
             "Entra": {
+                "//Enabled": "Set to true to enable the /api/auth/exchange endpoint. Local-only deployments leave this false.",
+                "Enabled": false,
                 "Authority": "https://login.microsoftonline.com/common/v2.0",
-                "Audience": "api://<Your ClientId of the AzureAd Server App Registration>/access_as_user",
-                "AllowedTenantIds": [ "<Your AzureAd TenantId>" ],
+                "//Audience": "Required when Enabled=true. Format: api://<ClientId>/access_as_user",
+                "Audience": "",
+                "//AllowedTenantIds": "Required when Enabled=true. Array of allowed tenant IDs.",
+                "AllowedTenantIds": [],
                 "ClockSkewSeconds": 60
             }
         },

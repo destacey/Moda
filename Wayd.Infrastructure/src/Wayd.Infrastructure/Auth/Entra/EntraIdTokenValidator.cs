@@ -35,10 +35,12 @@ internal sealed class EntraIdTokenValidator : IEntraIdTokenValidator
 
         if (settings.AllowedTenantIds.Count == 0)
         {
-            // Fail-safe default: empty allowlist means no tenant is accepted. This
-            // mirrors the spec's multi-tenant guard — unknown tenants are rejected
-            // at the door — rather than defaulting to "accept any authenticated user".
-            _logger.LogError("SecuritySettings:Providers:Entra:AllowedTenantIds is empty; no Entra tokens will be accepted.");
+            // Defense-in-depth. Startup validation in AddEntraTokenExchange already
+            // rejects an empty allowlist, so this branch only fires if config is
+            // mutated at runtime (e.g., reload from a configuration provider) to
+            // an invalid state. Warning, not Error — the startup guard is the
+            // primary defense and surfaces the real misconfiguration.
+            _logger.LogWarning("SecuritySettings:Providers:Entra:AllowedTenantIds is empty at runtime; rejecting exchange.");
             throw new UnauthorizedException("Invalid token.");
         }
 

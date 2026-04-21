@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Wayd.Common.Application.Exceptions;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
@@ -29,6 +30,7 @@ public class TokenServiceTests
     private readonly Mock<IUserIdentityStore> _mockUserIdentityStore;
     private readonly Mock<IUserService> _mockUserService;
     private readonly Mock<IEntraIdTokenValidator> _mockEntraIdTokenValidator;
+    private readonly EntraSettings _entraSettings;
     private readonly TokenService _sut;
 
     public TokenServiceTests()
@@ -65,6 +67,10 @@ public class TokenServiceTests
             .Setup(s => s.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<string>());
 
+        // Default: Entra is enabled so the majority of exchange tests exercise the
+        // full flow. Tests that care about the disabled path mutate this directly.
+        _entraSettings = new EntraSettings { Enabled = true };
+
         _sut = new TokenService(
             _mockUserManager.Object,
             _mockSignInManager.Object,
@@ -73,6 +79,7 @@ public class TokenServiceTests
             _mockUserIdentityStore.Object,
             _mockUserService.Object,
             _mockEntraIdTokenValidator.Object,
+            Options.Create(_entraSettings),
             _mockLogger.Object);
     }
 
@@ -662,6 +669,48 @@ public class TokenServiceTests
 
     #endregion
 
+    #region AuthProviders + disabled Entra
+
+    [Fact]
+    public async Task ExchangeTokenAsync_ShouldThrow503_WhenEntraIsDisabled()
+    {
+        // Local-only deployment — Enabled=false means the endpoint returns 503
+        // rather than 401. Distinguishes "feature off" from "bad token".
+        _entraSettings.Enabled = false;
+
+        var act = () => _sut.ExchangeTokenAsync(
+            new ExchangeTokenCommand(LoginProviders.MicrosoftEntraId, "any-token"),
+            TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<ServiceUnavailableException>()
+            .WithMessage("*not enabled*");
+        _mockEntraIdTokenValidator.Verify(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public void GetAuthProviders_ShouldReportLocalTrueAndEntraFalse_WhenEntraDisabled()
+    {
+        _entraSettings.Enabled = false;
+
+        var result = _sut.GetAuthProviders();
+
+        result.Local.Should().BeTrue();
+        result.Entra.Should().BeFalse();
+    }
+
+    [Fact]
+    public void GetAuthProviders_ShouldReportBothTrue_WhenEntraEnabled()
+    {
+        _entraSettings.Enabled = true;
+
+        var result = _sut.GetAuthProviders();
+
+        result.Local.Should().BeTrue();
+        result.Entra.Should().BeTrue();
+    }
+
+    #endregion
+
     #region GetSettings
 
     [Fact]
@@ -677,6 +726,7 @@ public class TokenServiceTests
             _mockUserIdentityStore.Object,
             _mockUserService.Object,
             _mockEntraIdTokenValidator.Object,
+            Options.Create(_entraSettings),
             _mockLogger.Object);
 
         var user = CreateLocalUser();

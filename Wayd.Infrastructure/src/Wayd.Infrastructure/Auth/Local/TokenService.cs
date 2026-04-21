@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
@@ -22,6 +23,7 @@ internal class TokenService(
     IUserIdentityStore userIdentityStore,
     IUserService userService,
     IEntraIdTokenValidator entraIdTokenValidator,
+    IOptions<EntraSettings> entraSettings,
     ILogger<TokenService> logger) : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -31,6 +33,7 @@ internal class TokenService(
     private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
     private readonly IUserService _userService = userService;
     private readonly IEntraIdTokenValidator _entraIdTokenValidator = entraIdTokenValidator;
+    private readonly EntraSettings _entraSettings = entraSettings.Value;
     private readonly ILogger<TokenService> _logger = logger;
 
     public async Task<TokenResponse> GetTokenAsync(LoginCommand command, CancellationToken cancellationToken)
@@ -118,6 +121,14 @@ internal class TokenService(
             // providers explicitly rather than silently falling through.
             _logger.LogWarning("Token exchange rejected: unsupported provider {Provider}.", command.Provider);
             throw new UnauthorizedException("Invalid token.");
+        }
+
+        if (!_entraSettings.Enabled)
+        {
+            // Local-only deployment — the feature exists but isn't configured here.
+            // 503 distinguishes this from 401 (bad token) and 404 (no route): the
+            // endpoint is discoverable, just turned off for this tenant.
+            throw new ServiceUnavailableException("Entra token exchange is not enabled on this deployment.");
         }
 
         var principal = await _entraIdTokenValidator.Validate(command.IdToken, cancellationToken);
@@ -261,4 +272,7 @@ internal class TokenService(
 
         return settings;
     }
+
+    public AuthProvidersResponse GetAuthProviders() =>
+        new(Local: true, Entra: _entraSettings.Enabled);
 }
