@@ -88,14 +88,63 @@ Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Se
     "SecuritySettings": {
         "LocalJwt": {
             "Secret": "<strong-random-secret-at-least-32-chars>",
-            "Issuer": "Wayd",
-            "Audience": "WaydApi",
+            "Issuer": "https://wayd.dev",
+            "Audience": "https://api.wayd.dev",
             "TokenExpirationInMinutes": 60,
             "RefreshTokenExpirationInDays": 7
         }
     }
 }
 ```
+
+Only `Secret` needs to be set per deploy — the rest have sensible defaults and in particular `Issuer` / `Audience` are JWT claim identifiers, not environment-specific config. Don't override them per environment.
+
+### Auth flow (high level)
+
+Every login path produces a **Wayd JWT + Wayd refresh token** stored in `localStorage`/`sessionStorage`. The API only ever validates Wayd JWTs — MSAL tokens are exchanged for a Wayd JWT at login and never presented to the API directly.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant F as Frontend
+    participant M as MSAL
+    participant E as Microsoft Entra
+    participant W as Wayd API
+    participant A as Any API endpoint
+
+    Note over U,A: Local (username/password) login
+    U->>F: Submit credentials
+    F->>W: POST /api/auth/login
+    W-->>F: { token, refreshToken }
+    F->>F: storeWaydAuth(...)
+
+    Note over U,A: Entra (SSO) login
+    U->>F: Click "Sign in with Microsoft"
+    F->>M: loginRedirect
+    M->>E: OIDC auth flow
+    E-->>M: ID token + access token
+    F->>M: acquireTokenSilent(apiScope)
+    M-->>F: Entra access token
+    F->>W: POST /api/auth/exchange<br/>{ provider, subjectToken }
+    W->>W: Validate signature via JWKS<br/>Check tenant allowlist
+    W->>W: Resolve UserIdentity<br/>Load permissions
+    W-->>F: { token (Wayd JWT), refreshToken }
+    F->>F: storeWaydAuth(...)
+
+    Note over U,A: Subsequent API calls (both providers)
+    F->>A: Request + Authorization: Bearer wayd-jwt
+    A-->>F: Response
+
+    Note over U,A: Token refresh
+    F->>W: POST /api/auth/refresh-token<br/>{ token, refreshToken }
+    W-->>F: New { token, refreshToken }
+```
+
+Permissions travel as `permission` claims inside the Wayd JWT — no separate `/permissions` round-trip. An admin permission change takes effect on the user's next refresh (within the access-token TTL).
+
+The login page consults `GET /api/auth/providers` to decide which provider buttons to show; a deployment with `SecuritySettings:Providers:Entra:Enabled = false` hides the Microsoft button entirely.
+
+See [Identity Model Refactor](./specs/identity-model-refactor.mdx) for the full design rationale.
 
 ## Environment Variables
 

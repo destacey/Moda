@@ -16,39 +16,66 @@ The Wayd API is a RESTful ASP.NET Core Web API.
 
 ## Authentication
 
-All API requests require authentication via Bearer token. Wayd supports three authentication methods:
+All API requests require a **Wayd JWT** in the `Authorization: Bearer` header, regardless of which login provider the user authenticated with. The JWT carries the user's identity and permission claims and is minted by one of two login flows:
 
-### Azure AD (Microsoft Entra ID)
+### Username / password
 
-Include the access token from MSAL in the Authorization header:
+Authenticate with the local login endpoint:
+
 ```
-Authorization: Bearer {access_token}
-```
-
-### Local JWT (Username/Password)
-
-Authenticate via the login endpoint to receive a JWT token:
-```
-POST /api/account/login
+POST /api/auth/login
 {
   "userName": "your-username",
   "password": "your-password"
 }
 ```
 
-The response includes an `accessToken` and `refreshToken`. Include the access token in subsequent requests:
-```
-Authorization: Bearer {accessToken}
-```
+The response is the same shape for every login flow:
 
-When the access token expires, use the refresh endpoint to get a new one:
 ```
-POST /api/account/refresh
 {
-  "accessToken": "your-expired-token",
-  "refreshToken": "your-refresh-token"
+  "token": "<wayd-jwt>",
+  "refreshToken": "<wayd-refresh-token>",
+  "tokenExpiresAt": "2026-04-21T19:00:00Z",
+  "mustChangePassword": false
 }
 ```
+
+Include the Wayd JWT in subsequent requests:
+
+```
+Authorization: Bearer {token}
+```
+
+### Microsoft Entra ID (token exchange)
+
+For users authenticating via Microsoft Entra ID, the frontend obtains an access token from MSAL for the API scope and exchanges it for a Wayd JWT:
+
+```
+POST /api/auth/exchange
+{
+  "provider": "MicrosoftEntraId",
+  "subjectToken": "<entra-access-token-from-MSAL>"
+}
+```
+
+The response shape is identical to `/login`. The MSAL token is only used during the exchange — all subsequent API calls use the Wayd JWT.
+
+Deployments can disable Entra exchange (e.g., local-only customers); the endpoint returns HTTP 503 when disabled. Use `GET /api/auth/providers` (anonymous) to discover which providers are enabled.
+
+### Refreshing tokens
+
+When the Wayd JWT expires, exchange the refresh token for a new JWT:
+
+```
+POST /api/auth/refresh-token
+{
+  "token": "<expired-wayd-jwt>",
+  "refreshToken": "<wayd-refresh-token>"
+}
+```
+
+Same response shape. Refresh works uniformly for both login providers — the refresh flow doesn't need to know how the user originally authenticated.
 
 ### Personal Access Tokens (PATs)
 
@@ -77,7 +104,8 @@ PATs inherit the permissions of the user who created them. See [Your Profile](..
 | Planning | `/api/planning/` | Planning intervals, iterations |
 | Portfolio Management | `/api/portfolio-management/` | Projects, portfolios |
 | Settings | `/api/settings/` | Configuration, feature flags |
-| Account | `/api/account/` | Authentication, profile |
+| Auth | `/api/auth/` | Login, refresh, exchange, providers |
+| User Management | `/api/user-management/` | Profile, roles, permissions, PATs |
 
 ## OpenAPI Specification
 

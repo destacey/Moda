@@ -226,17 +226,20 @@ Delivers the Entra exchange endpoint, the Wayd JWT changes (permission claims, u
 
 #### PR 3.2 — Auth-context cutover (replace MSAL-direct-to-API)
 
-- auth-context calls `/api/auth/exchange` after MSAL login instead of passing the Entra token straight to the API.
-- Frontend stores the Wayd JWT + refresh token (same storage shape as local login today). All API calls use the Wayd JWT.
-- Permissions decoded from Wayd JWT claims; `useGetUserPermissionsQuery` and the separate `/permissions` round-trip are removed.
-- "Loading Permissions" screen goes away.
-- Logout routing: dispatches to the right IdP end-session endpoint based on the user's active `UserIdentity.Provider`.
+- `auth-context` calls `POST /api/auth/exchange` after an MSAL login succeeds, passing the access token MSAL acquires with the API scope. The returned Wayd JWT + refresh token are stored in localStorage/sessionStorage — the same shape local login has used since PR 1. No provider-specific branches for storage, token attachment, or refresh.
+- `axios` interceptors collapsed to a single path: the request interceptor reads `getWaydAuthToken()` and attaches it; the response interceptor retries on 401 using the Wayd refresh token. MSAL logic removed from `clients.ts` entirely.
+- `authenticatedFetch` simplified accordingly — now a thin wrapper that attaches the Wayd JWT.
+- Permissions decoded directly from the Wayd JWT's `permission` claims on mount via a lazy `useState` initializer. `useGetUserPermissionsQuery` endpoint removed from `profile-api.ts`, the separate `/permissions` round-trip is gone, and **the "Loading Permissions" 10-second delay disappears**.
+- Storage helpers renamed `LOCAL_AUTH_*` → `WAYD_AUTH_*` (keys preserved as `moda.local.*` for session continuity). `isLocalAuthActive` → `isWaydAuthActive`, etc.
+- `authMethod` is derived from the `loginProvider` claim inside the Wayd JWT, not from which storage key is set. Enables provider-aware logout (Entra users redirect to `/logout` for MSAL cleanup; local users clear storage and go to `/login`).
+- **Legacy-session migration:** on first load after the PR 3.2 deploy, a user with an active MSAL session but no Wayd JWT triggers an automatic exchange, producing a Wayd JWT in place. Users don't notice the cutover.
+- `auth-context` shrinks meaningfully — the dual MSAL/local paths, the RTK Query permissions hook, the 401-triggers-loginRedirect flow, and the MSAL event callbacks that mirrored login/logout state all go away. Tests rewritten from scratch to cover the new state machine (~200 lines replacing ~1,500 lines of tests for behavior that no longer exists).
 
-#### PR 3.3 (deferred; post-Auth0) — Multi-provider frontend
+#### PR 3.3 (deferred; post-Auth0) — Multi-provider frontend + legacy cleanup
 
 - Home-realm discovery (email domain → which provider SDK to initialize).
-- Auth0 registered as a second provider in the config registry.
-- Remove the legacy `AzureAd` middleware-based API validation once no code path uses it.
+- Auth0 registered as a second provider in the config registry and in the capabilities endpoint.
+- Remove the legacy `AzureAd` middleware-based API validation on the backend once no code path uses it (after PR 3.2 has baked).
 
 **Refresh strategy (confirmed):** Wayd-owned refresh token, uniform across providers. The frontend stores `{ wayd JWT, wayd refresh token }`; on access-token expiry it calls `/api/auth/refresh` with the refresh token and gets a new Wayd JWT. No re-exchange with the external IdP on every refresh. Matches RFC 8693's framing (exchanged token lives in the issuing authority's lifecycle) and what most SaaS products do (Slack, Linear, GitHub, Atlassian Cloud).
 

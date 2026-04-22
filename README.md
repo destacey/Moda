@@ -330,11 +330,11 @@ SecuritySettings__LocalJwt__Secret={strong random secret, at least 32 chars}
 Optional local JWT settings (with defaults):
 
 ```env
-SecuritySettings__LocalJwt__Issuer=Moda
-SecuritySettings__LocalJwt__Audience=ModaApi
 SecuritySettings__LocalJwt__TokenExpirationInMinutes=60
 SecuritySettings__LocalJwt__RefreshTokenExpirationInDays=7
 ```
+
+`Issuer` and `Audience` are JWT claim identifiers sourced from `security.json` — they're not environment-specific and shouldn't be overridden per deploy.
 
 Additionally, by default Wayd logs to the console via Serilog. If you wish to configure any of the other supported sinks (currently Seq, Datadog and Application Insights), provide the appropriate Serilog**Using**x and Serilog**WriteTo**x settings as env vars for your wayd-api container. An example with DataDog (taken from some TF for the `azurerm_container_app` resource type):
 
