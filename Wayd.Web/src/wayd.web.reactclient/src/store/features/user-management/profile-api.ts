@@ -1,8 +1,11 @@
 import { getProfileClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { ChangePasswordRequest, UserDetailsDto, UserPermissionsResponse, UserPreferencesDto } from '@/src/services/wayd-api'
+import { ChangePasswordRequest, UserDetailsDto, UserPreferencesDto } from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
 
+// Note: permissions are no longer fetched via a separate endpoint — they're
+// embedded as claims in the Wayd JWT and decoded by AuthProvider. The old
+// getUserPermissions query was removed as part of PR 3.2.
 export const profileApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getProfile: builder.query<UserDetailsDto, void>({
@@ -15,30 +18,6 @@ export const profileApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-    }),
-    getUserPermissions: builder.query<UserPermissionsResponse, void>({
-      queryFn: async () => {
-        try {
-          const data = await getProfileClient().getPermissions()
-          return { data }
-        } catch (error: any) {
-          console.error('Error fetching permissions:', error)
-          // Extract status code from axios error or API exception
-          const status = error?.status || error?.response?.status || 500
-          return {
-            error: {
-              status,
-              error:
-                error instanceof Error
-                  ? error.message
-                  : 'Failed to load permissions',
-            },
-          }
-        }
-      },
-      providesTags: () => [{ type: QueryTags.UserPermission, id: 'USER' }],
-      // Cache current user permissions for 1 minute since they don't change often
-      keepUnusedDataFor: 60,
     }),
     getUserPreferences: builder.query<UserPreferencesDto, void>({
       queryFn: async () => {
@@ -80,7 +59,6 @@ export const profileApi = apiSlice.injectEndpoints({
 
 export const {
   useGetProfileQuery,
-  useGetUserPermissionsQuery,
   useGetUserPreferencesQuery,
   useUpdateUserPreferencesMutation,
   useChangePasswordMutation,

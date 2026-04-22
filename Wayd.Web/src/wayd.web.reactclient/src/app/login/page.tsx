@@ -1,21 +1,23 @@
 'use client'
 
 import { useMsal, useIsAuthenticated } from '@azure/msal-react'
-import { InteractionStatus } from '@azure/msal-browser'
-import { useEffect, useState } from 'react'
+import {
+  InteractionRequiredAuthError,
+  InteractionStatus,
+} from '@azure/msal-browser'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { tokenRequest } from '@/auth-config'
 import styles from './page.module.css'
 import {
-  isLocalAuthActive,
   getAuthClient,
-  getAuthStorage,
+  isAuthActive,
   setRememberMe as persistRememberMe,
-  LOCAL_AUTH_TOKEN_KEY,
-  LOCAL_AUTH_REFRESH_TOKEN_KEY,
-  LOCAL_AUTH_TOKEN_EXPIRY_KEY,
-  LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY,
+  storeAuth,
 } from '@/src/services/clients'
 import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
+import { LoadingAccount } from '@/src/components/common'
+import { useDocumentTitle } from '@/src/hooks'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -409,18 +411,9 @@ function LocalLoginTab() {
         password,
       })
       persistRememberMe(rememberMe)
-      const storage = getAuthStorage()
-      storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-      storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
-      storage.setItem(
-        LOCAL_AUTH_TOKEN_EXPIRY_KEY,
-        new Date(tokenResponse.tokenExpiresAt).toISOString(),
-      )
-      if (tokenResponse.mustChangePassword) {
-        storage.setItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
-      }
-      // Reload to trigger LocalOrMsalAuthGate to pick up the local token.
-      // AppContent will handle redirecting to any stored return URL.
+      storeAuth(tokenResponse)
+      // Full reload so AuthProvider hydrates from the freshly-stored token
+      // and the layout transitions from unauthenticated view to app shell.
       window.location.href = '/'
     } catch (err: any) {
       const message =
@@ -492,7 +485,9 @@ function LocalLoginTab() {
 }
 
 export default function LoginPage() {
-  const isAuthenticated = useIsAuthenticated()
+  useDocumentTitle('Moda Login')
+  const isMsalAuthenticated = useIsAuthenticated()
+  const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()
   const { data: providers } = useGetAuthProvidersQuery()
 
@@ -510,17 +505,96 @@ export default function LoginPage() {
   )
   const activeTab = tabOverride ?? (entraEnabled ? 'microsoft' : 'local')
 
+  // Exchange flow state. The login page owns the MSAL-redirect handling:
+  // when we land here with an active MSAL session but no Wayd JWT, we grab
+  // the access token and POST it to /api/auth/exchange. This is the standard
+  // OIDC callback-route pattern (we just fold it into /login rather than
+  // splitting into /auth/callback).
+  const [exchangeState, setExchangeState] = useState<
+    'idle' | 'running' | 'failed'
+  >('idle')
+  const [exchangeError, setExchangeError] = useState<string | null>(null)
+  const exchangeStartedRef = useRef(false)
+
+  // Already authenticated — bail back to the app. Runs whenever a Wayd JWT
+  // appears in storage (after exchange succeeds, after local login succeeds,
+  // or on fresh page load when a stored token already exists).
   useEffect(() => {
-    if (isAuthenticated || isLocalAuthActive()) {
+    if (isAuthActive()) {
       router.replace('/')
     }
-  }, [isAuthenticated, router])
+  }, [router])
 
-  if (isAuthenticated) {
-    return null
-  }
+  // Exchange-on-MSAL-redirect. When MSAL has an account and we don't have a
+  // Wayd JWT, silently acquire the access token and exchange it. Succeeds →
+  // stores Wayd JWT → effect above navigates away. Fails → shows retry UI.
+  useEffect(() => {
+    if (exchangeStartedRef.current) return
+    if (inProgress !== InteractionStatus.None) return
+    if (isAuthActive()) return
+    if (!isMsalAuthenticated || accounts.length === 0) return
+
+    exchangeStartedRef.current = true
+    // Legitimate side-effect: kicking off the exchange in response to MSAL
+    // returning a usable session. The state updates mark "we're actively
+    // exchanging" for the UI, not an auto-memoizable derivation.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setExchangeState('running')
+    setExchangeError(null)
+
+    const run = async () => {
+      try {
+        const account = instance.getActiveAccount() ?? accounts[0]
+        instance.setActiveAccount(account)
+        const msalResponse = await instance.acquireTokenSilent({
+          ...tokenRequest,
+          account,
+        })
+        const tokenResponse = await getAuthClient().exchange({
+          provider: 'MicrosoftEntraId',
+          subjectToken: msalResponse.accessToken,
+        })
+        storeAuth(tokenResponse)
+        // Full reload so the layout gate re-reads storage and mounts the app.
+        window.location.href = '/'
+      } catch (error) {
+        console.error('[Login] Entra token exchange failed:', error)
+        if (error instanceof InteractionRequiredAuthError) {
+          // A silent acquisition failed because interaction is required.
+          // Signal to the user to click the Microsoft button again; that
+          // triggers a full loginRedirect.
+          setExchangeError(
+            'Sign-in needs to be completed interactively. Please click Sign in with Microsoft again.',
+          )
+        } else {
+          setExchangeError(
+            error instanceof Error
+              ? error.message
+              : 'Sign-in failed. Please try again.',
+          )
+        }
+        setExchangeState('failed')
+      }
+    }
+    run()
+  }, [accounts, inProgress, instance, isMsalAuthenticated])
 
   const showTabs = entraEnabled && localEnabled
+
+  // During exchange, show the shared LoadingAccount screen (spinner + logo +
+  // message) so the transition from Entra redirect → Wayd app matches the
+  // visual language of other loading states in the app.
+  if (exchangeState === 'running') {
+    return <LoadingAccount message="Completing sign-in…" />
+  }
+
+  if (exchangeState === 'failed') {
+    // Show the login UI with an error banner. User can click the Microsoft
+    // button (which triggers loginRedirect) or use email/password.
+    // Note: we deliberately clear MSAL's cached account via a reset so a
+    // subsequent click runs a fresh loginRedirect rather than silent-acquire.
+    // (Left to Microsoft button's natural flow for now — not critical.)
+  }
 
   return (
     <div className={styles.pageBackground}>
@@ -569,6 +643,12 @@ export default function LoginPage() {
             </div>
 
             <h1 className={styles.title}>Welcome</h1>
+
+            {exchangeError && (
+              <div className={styles.errorMessage} role="alert">
+                {exchangeError}
+              </div>
+            )}
 
             {/* Auth method tabs. Hidden when only one provider is enabled —
                 there's no choice to offer. */}

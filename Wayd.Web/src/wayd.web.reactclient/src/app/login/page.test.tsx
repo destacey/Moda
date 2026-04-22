@@ -16,14 +16,10 @@ jest.mock('next/navigation', () => ({
 }))
 
 jest.mock('@/src/services/clients', () => ({
-  isLocalAuthActive: () => false,
+  isAuthActive: () => false,
   getAuthClient: jest.fn(),
-  getAuthStorage: () => ({ setItem: jest.fn() }),
   setRememberMe: jest.fn(),
-  LOCAL_AUTH_TOKEN_KEY: 'localAuthToken',
-  LOCAL_AUTH_REFRESH_TOKEN_KEY: 'localAuthRefreshToken',
-  LOCAL_AUTH_TOKEN_EXPIRY_KEY: 'localAuthTokenExpiry',
-  LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY: 'localAuthMustChangePassword',
+  storeAuth: jest.fn(),
 }))
 
 // Controlled return for the capabilities hook — each test sets the response it
