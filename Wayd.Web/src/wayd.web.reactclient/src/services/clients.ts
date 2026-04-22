@@ -37,21 +37,20 @@ import {
   PersonalAccessTokensClient,
   SearchClient,
 } from './wayd-api'
-import { tokenRequest } from '@/auth-config'
-import { InteractionRequiredAuthError } from '@azure/msal-browser'
-import { msalInstance, getMsalReady } from '../components/contexts/auth/msal-instance'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
 
-// Local auth storage keys
-export const LOCAL_AUTH_TOKEN_KEY = 'moda.local.token'
-export const LOCAL_AUTH_REFRESH_TOKEN_KEY = 'moda.local.refreshToken'
-export const LOCAL_AUTH_TOKEN_EXPIRY_KEY = 'moda.local.tokenExpiry'
-export const LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY = 'moda.local.mustChangePassword'
-const LOCAL_AUTH_REMEMBER_KEY = 'moda.local.rememberMe'
+// Storage keys for the Wayd JWT session. The same keys are used for every
+// login provider — local JWT and Entra-exchanged sessions are indistinguishable
+// at the storage layer.
+export const AUTH_TOKEN_KEY = 'wayd.local.token'
+export const AUTH_REFRESH_TOKEN_KEY = 'wayd.local.refreshToken'
+export const AUTH_TOKEN_EXPIRY_KEY = 'wayd.local.tokenExpiry'
+export const AUTH_MUST_CHANGE_PASSWORD_KEY = 'wayd.local.mustChangePassword'
+const AUTH_REMEMBER_KEY = 'wayd.local.rememberMe'
 
 /**
- * Returns the storage backend for local auth tokens.
+ * Returns the storage backend for the auth session.
  * The routing flag in localStorage determines whether tokens live in
  * localStorage (remember me) or sessionStorage (ephemeral session).
  */
@@ -59,48 +58,75 @@ export function getAuthStorage(): Storage {
   if (typeof window === 'undefined') {
     throw new Error('getAuthStorage() cannot be called during SSR')
   }
-  return localStorage.getItem(LOCAL_AUTH_REMEMBER_KEY) === 'false'
+  return localStorage.getItem(AUTH_REMEMBER_KEY) === 'false'
     ? sessionStorage
     : localStorage
 }
 
 /** Sets the remember-me routing flag (always in localStorage). */
 export function setRememberMe(remember: boolean): void {
-  localStorage.setItem(LOCAL_AUTH_REMEMBER_KEY, remember ? 'true' : 'false')
+  localStorage.setItem(AUTH_REMEMBER_KEY, remember ? 'true' : 'false')
 }
 
-export function getLocalAuthToken(): string | null {
+export function getAuthToken(): string | null {
   if (typeof window === 'undefined') return null
-  return getAuthStorage().getItem(LOCAL_AUTH_TOKEN_KEY)
+  return getAuthStorage().getItem(AUTH_TOKEN_KEY)
 }
 
-export function isLocalAuthActive(): boolean {
+export function getAuthRefreshToken(): string | null {
+  if (typeof window === 'undefined') return null
+  return getAuthStorage().getItem(AUTH_REFRESH_TOKEN_KEY)
+}
+
+export function isAuthActive(): boolean {
   if (typeof window === 'undefined') return false
-  // Check both storages since we don't know which was used until we read the flag
+  // Check both storages since we don't know which was used until we read the flag.
   return !!(
-    localStorage.getItem(LOCAL_AUTH_TOKEN_KEY) ||
-    sessionStorage.getItem(LOCAL_AUTH_TOKEN_KEY)
+    localStorage.getItem(AUTH_TOKEN_KEY) ||
+    sessionStorage.getItem(AUTH_TOKEN_KEY)
   )
 }
 
-export function clearLocalAuth(): void {
-  // Clear from both storages to ensure clean state
+export function clearAuth(): void {
+  // Clear from both storages to ensure clean state.
   for (const storage of [localStorage, sessionStorage]) {
-    storage.removeItem(LOCAL_AUTH_TOKEN_KEY)
-    storage.removeItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
-    storage.removeItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY)
-    storage.removeItem(LOCAL_AUTH_MUST_CHANGE_PASSWORD_KEY)
+    storage.removeItem(AUTH_TOKEN_KEY)
+    storage.removeItem(AUTH_REFRESH_TOKEN_KEY)
+    storage.removeItem(AUTH_TOKEN_EXPIRY_KEY)
+    storage.removeItem(AUTH_MUST_CHANGE_PASSWORD_KEY)
   }
-  localStorage.removeItem(LOCAL_AUTH_REMEMBER_KEY)
+  localStorage.removeItem(AUTH_REMEMBER_KEY)
 }
 
-// Unauthenticated axios client for login/refresh (no token interceptors)
+/** Persists a token response from /api/auth/login, /exchange, or /refresh-token. */
+export function storeAuth(tokenResponse: {
+  token: string
+  refreshToken: string
+  tokenExpiresAt: Date | string
+  mustChangePassword: boolean
+}): void {
+  const storage = getAuthStorage()
+  storage.setItem(AUTH_TOKEN_KEY, tokenResponse.token)
+  storage.setItem(AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
+  storage.setItem(
+    AUTH_TOKEN_EXPIRY_KEY,
+    new Date(tokenResponse.tokenExpiresAt).toISOString(),
+  )
+  if (tokenResponse.mustChangePassword) {
+    storage.setItem(AUTH_MUST_CHANGE_PASSWORD_KEY, 'true')
+  } else {
+    storage.removeItem(AUTH_MUST_CHANGE_PASSWORD_KEY)
+  }
+}
+
+// Unauthenticated axios client for login/refresh/exchange (no token interceptors).
 const unauthAxiosClient = axios.create({
   baseURL: apiUrl,
   timeout: 30000,
 })
 
-// Auth client uses unauthenticated axios (login endpoints are [AllowAnonymous])
+// Auth client uses unauthenticated axios — login, refresh, exchange, and
+// getProviders are all [AllowAnonymous] on the backend.
 export const getAuthClient = () => new AuthClient('', unauthAxiosClient)
 
 const axiosClient = axios.create({
@@ -108,7 +134,10 @@ const axiosClient = axios.create({
   timeout: 30000, // 30 second timeout
 })
 
-// Response interceptor with automatic 401 token refresh and retry.
+// Response interceptor: automatic Wayd refresh-token retry on 401.
+// One path for every provider because every provider ends up with the same
+// Wayd JWT shape in storage after login/exchange. No MSAL involvement — the
+// Wayd refresh token is the sole mechanism for extending the session.
 axiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -121,46 +150,21 @@ axiosClient.interceptors.response.use(
     ) {
       ;(originalRequest as any)._retry = true
 
-      // Try local JWT refresh first
-      const storage = getAuthStorage()
-      const localRefreshToken = storage.getItem(LOCAL_AUTH_REFRESH_TOKEN_KEY)
-      const localToken = getLocalAuthToken()
-      if (localToken && localRefreshToken) {
+      const refreshToken = getAuthRefreshToken()
+      const currentToken = getAuthToken()
+      if (currentToken && refreshToken) {
         try {
-          const authClient = getAuthClient()
-          const tokenResponse = await authClient.refreshToken({
-            token: localToken,
-            refreshToken: localRefreshToken,
+          const tokenResponse = await getAuthClient().refreshToken({
+            token: currentToken,
+            refreshToken,
           })
-          storage.setItem(LOCAL_AUTH_TOKEN_KEY, tokenResponse.token)
-          storage.setItem(LOCAL_AUTH_REFRESH_TOKEN_KEY, tokenResponse.refreshToken)
-          storage.setItem(LOCAL_AUTH_TOKEN_EXPIRY_KEY, new Date(tokenResponse.tokenExpiresAt).toISOString())
+          storeAuth(tokenResponse)
           originalRequest.headers = originalRequest.headers || {}
           originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
           return axiosClient(originalRequest)
         } catch (refreshError) {
-          console.error('Local token refresh on 401 failed:', refreshError)
-          clearLocalAuth()
-        }
-      }
-
-      // Fall back to MSAL refresh
-      if (msalInstance) {
-        try {
-          await getMsalReady()
-          const accounts = msalInstance.getAllAccounts()
-          if (accounts.length > 0) {
-            const response = await msalInstance.acquireTokenSilent({
-              ...tokenRequest,
-              account: accounts[0],
-              forceRefresh: true,
-            })
-            originalRequest.headers = originalRequest.headers || {}
-            originalRequest.headers.Authorization = `Bearer ${response.accessToken}`
-            return axiosClient(originalRequest)
-          }
-        } catch (refreshError) {
-          console.error('MSAL token refresh on 401 failed:', refreshError)
+          console.error('Token refresh on 401 failed:', refreshError)
+          clearAuth()
         }
       }
     }
@@ -170,45 +174,10 @@ axiosClient.interceptors.response.use(
   },
 )
 
-// Request interceptor: attach auth token (local JWT or MSAL) to outgoing requests.
+// Request interceptor: attach the Wayd JWT to outgoing requests.
 axiosClient.interceptors.request.use(
-  async (config) => {
-    // Check for local JWT first
-    const localToken = getLocalAuthToken()
-    if (localToken) {
-      config.headers.Authorization = `Bearer ${localToken}`
-      return config
-    }
-
-    // Fall back to MSAL token acquisition.
-    // Wait for MSAL to finish initializing and processing any pending redirect
-    // before attempting silent token acquisition, otherwise acquireTokenSilent
-    // throws block_iframe_reload during the startup window.
-    let token: string | null = null
-    try {
-      await getMsalReady()
-      const accounts = msalInstance?.getAllAccounts() ?? []
-
-      if (accounts.length > 0) {
-        const response = await msalInstance.acquireTokenSilent({
-          ...tokenRequest,
-          account: accounts[0],
-        })
-        token = response.accessToken
-      }
-    } catch (error: any) {
-      if (error instanceof InteractionRequiredAuthError) {
-        try {
-          const response = await msalInstance.acquireTokenPopup(tokenRequest)
-          token = response.accessToken
-        } catch (popupError) {
-          console.error('Token popup failed:', popupError)
-        }
-      } else {
-        console.error('Token acquisition error:', error)
-      }
-    }
-
+  (config) => {
+    const token = getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -293,66 +262,26 @@ export const getPersonalAccessTokensClient = () =>
   new PersonalAccessTokensClient('', axiosClient)
 
 /**
- * Performs an authenticated fetch request with automatic token acquisition.
- * Use this for custom API calls that need authentication but can't use the generated clients.
- *
- * @param url - The URL to fetch (relative to API base URL or absolute)
- * @param options - Standard fetch RequestInit options
- * @returns Promise<Response>
- *
- * @example
- * const response = await authenticatedFetch('/api/ppm/projects/123/tasks/456', {
- *   method: 'PATCH',
- *   headers: { 'Content-Type': 'application/json-patch+json' },
- *   body: JSON.stringify(patchOperations)
- * })
+ * Performs an authenticated fetch request.
+ * Use this for custom API calls that need authentication but can't use the
+ * generated clients (e.g., JSON Patch endpoints that NSwag doesn't generate).
  */
 export async function authenticatedFetch(
   url: string,
   options: RequestInit = {},
 ): Promise<Response> {
-  // Acquire auth token — check local JWT first, then fall back to MSAL
-  let token: string | null = getLocalAuthToken()
+  const token = getAuthToken()
 
-  if (!token) {
-    try {
-      const accounts = msalInstance?.getAllAccounts() ?? []
-      if (accounts.length > 0) {
-        const response = await msalInstance.acquireTokenSilent({
-          ...tokenRequest,
-          account: accounts[0],
-        })
-        token = response.accessToken
-      }
-    } catch (error: any) {
-      if (error instanceof InteractionRequiredAuthError) {
-        try {
-          const response = await msalInstance.acquireTokenPopup(tokenRequest)
-          token = response.accessToken
-        } catch (popupError) {
-          console.error('Token popup failed:', popupError)
-        }
-      } else {
-        console.error('Token acquisition error:', error)
-      }
-    }
-  }
-
-  // Merge headers
   const headers = new Headers(options.headers)
   if (token) {
     headers.set('Authorization', `Bearer ${token}`)
   }
-
-  // Add Accept header if not present
   if (!headers.has('Accept')) {
     headers.set('Accept', 'application/json')
   }
 
-  // Prepend base URL if the URL is relative
   const fullUrl = url.startsWith('http') ? url : `${apiUrl}${url}`
 
-  // Make the fetch call
   return fetch(fullUrl, {
     ...options,
     headers,

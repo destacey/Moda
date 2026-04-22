@@ -112,8 +112,6 @@ Override these in the TFC workspace only if the defaults don't fit:
 | `signalr_capacity` | `1` | |
 | `log_analytics_sku` | `PerGB2018` | |
 | `log_analytics_retention_in_days` | `30` | 30 days = free tier; longer incurs cost |
-| `jwt_issuer` | `Wayd` | Local JWT issuer claim |
-| `jwt_audience` | `WaydApi` | Local JWT audience claim |
 | `client_url` | `""` | Optional additional CORS origin |
 | `local_jwt_token_expiration_minutes` | `60` | |
 | `local_jwt_refresh_token_expiration_days` | `7` | |

@@ -129,18 +129,6 @@ variable "sql_admin_login" {
   default     = "waydadmin"
 }
 
-variable "jwt_issuer" {
-  type        = string
-  description = "JWT Issuer claim value used by the backend for local (non-AAD) tokens."
-  default     = "Wayd"
-}
-
-variable "jwt_audience" {
-  type        = string
-  description = "JWT Audience claim value used by the backend for local (non-AAD) tokens."
-  default     = "WaydApi"
-}
-
 variable "allow_azure_services_sql_access" {
   type        = bool
   description = "Whether to create a SQL firewall rule allowing all Azure services (0.0.0.0-0.0.0.0) to connect. Useful for dev where the container apps need access; consider disabling for prod in favor of VNet integration."

@@ -244,15 +244,10 @@ resource "azurerm_container_app" "wayd_backend" {
         secret_name = "local-jwt-secret"
       }
 
-      env {
-        name  = "SecuritySettings__LocalJwt__Issuer"
-        value = var.jwt_issuer
-      }
-
-      env {
-        name  = "SecuritySettings__LocalJwt__Audience"
-        value = var.jwt_audience
-      }
+      # Issuer and Audience come from security.json baked into the image.
+      # They're JWT claim identifiers — not environment-specific config — and
+      # making them per-env variables invited the kind of defaults-drift bug
+      # that the URI rename caught.
 
       env {
         name  = "SecuritySettings__LocalJwt__TokenExpirationInMinutes"
@@ -279,9 +274,13 @@ resource "azurerm_container_app" "wayd_backend" {
         value = "https://login.microsoftonline.com/common/v2.0"
       }
 
+      # For v2.0 Entra tokens, `aud` is the bare client ID (not the App ID URI
+      # or scope). v1.0 registrations put `api://<clientId>` in `aud` instead.
+      # The value here must match whatever the access token actually carries —
+      # decode a real token at jwt.ms if in doubt.
       env {
         name  = "SecuritySettings__Providers__Entra__Audience"
-        value = var.app_reg_api_scope
+        value = var.api_app_reg_client_id
       }
 
       # Array binding via env vars uses __0, __1, etc. The dynamic block below
