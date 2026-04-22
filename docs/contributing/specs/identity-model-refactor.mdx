@@ -12,9 +12,22 @@ This spec coordinates a multi-PR effort to generalize Wayd's identity model so i
 1. Multiple OIDC providers side-by-side (Microsoft Entra ID today, Auth0 soon).
 2. Multi-tenant Entra logins where different orgs' tenants are onboarded independently.
 3. History-preserving tenant migrations (e.g., an org moves their users from one Entra tenant to another).
-4. A future token-exchange flow that mints a Wayd JWT carrying permission claims, eliminating the "Loading Permissions" wait on first load after inactivity.
+4. A token-exchange flow that mints a Wayd JWT carrying permission claims, eliminating the "Loading Permissions" wait on first load after inactivity.
 
 The work is sequenced across several PRs so each is independently shippable and reversible.
+
+**Status** (as of PR 3.2 merge):
+
+| PR | Status |
+|---|---|
+| PR 1 — `UserIdentity` table + cutover | ✅ Shipped |
+| PR 2 — Drop `ObjectId` from `ApplicationUser` | ✅ Shipped |
+| PR 3.1 — Backend exchange endpoint + login-page provider gating | ✅ Shipped |
+| PR 3.2 — Auth-context cutover | ✅ Shipped (this PR) |
+| PR 3.3 — Auth0 + legacy `AzureAd` middleware cleanup | Not started |
+| PR 4 — Admin-initiated tenant migration | Not started |
+
+The shipped sections below are retained as design context — they document *why* the current architecture looks the way it does, not what to go build.
 
 ## Background
 
@@ -88,7 +101,7 @@ Every provider — Entra, Auth0, Wayd local — uses the same query. Provider-sp
 
 Four PRs, landing in order. Each is independently shippable and reversible.
 
-### PR 1 — Introduce `UserIdentity` table + cutover (invisible)
+### PR 1 — Introduce `UserIdentity` table + cutover (invisible) ✅ Shipped
 
 **Goal:** replace the flat `ObjectId` column with a proper identity table. No behavior changes, no new features. If done right, no user notices.
 
@@ -137,9 +150,9 @@ WHERE LoginProvider = 'MicrosoftEntraId' AND ObjectId IS NULL;
 
 **Merge criteria:** logs show the null-`tid` upgrade path populating tenants on normal logins for at least a few days, across both providers. Zero duplicate-user creations. Zero login failures attributable to the new lookup.
 
-### PR 2 — Drop `ObjectId` from `ApplicationUser`
+### PR 2 — Drop `ObjectId` from `ApplicationUser` ✅ Shipped
 
-Removes the now-unused `ObjectId` column and rewires the remaining callers that still referenced it. Safe to ship in the same release as PR 1, or in a follow-up release after a soak period — the code paths are independent.
+Removed the now-unused `ObjectId` column and rewired the remaining callers that still referenced it.
 
 **Scope:**
 
@@ -151,9 +164,9 @@ Removes the now-unused `ObjectId` column and rewires the remaining callers that 
 
 **Rollback:** revert the code. The migration's `Down` re-creates the column and re-populates it from `UserIdentity.ProviderSubject` for active Entra identities, so the old `ObjectId`-based lookups would work unchanged if PR 1 were also reverted.
 
-### PR 3 — Token exchange + Wayd JWT with permission claims (multi-PR effort on its own)
+### PR 3 — Token exchange + Wayd JWT with permission claims (multi-PR effort)
 
-This is the architectural shift that also fixes the 10-second "Loading Permissions" screen. It will likely span several PRs internally.
+The architectural shift that also fixed the 10-second "Loading Permissions" screen. Split into three sub-PRs (3.1 and 3.2 shipped; 3.3 deferred).
 
 **Premise:** treat external IdP tokens (Entra, Auth0) as *identity assertions*, not API credentials. The API only ever validates Wayd JWTs.
 
@@ -198,9 +211,9 @@ One config row per onboarded external tenant. Multi-tenant Entra = N rows, one p
 
 **Sub-PRs:**
 
-#### PR 3.1 — Backend exchange endpoint + login-page provider gating
+#### PR 3.1 — Backend exchange endpoint + login-page provider gating ✅ Shipped
 
-Delivers the Entra exchange endpoint, the Wayd JWT changes (permission claims, uniform shape across providers), and a small frontend piece: the login page asks which providers are enabled and hides buttons for disabled ones. The exchange endpoint itself still runs dark for actual authentication — auth-context keeps using MSAL-direct-to-API until PR 3.2.
+Delivered the Entra exchange endpoint, the Wayd JWT changes (permission claims, uniform shape across providers), and a small frontend piece: the login page asks which providers are enabled and hides buttons for disabled ones. The exchange endpoint ran dark for actual authentication until PR 3.2 cut the frontend over.
 
 **Backend:**
 
@@ -224,18 +237,23 @@ Delivers the Entra exchange endpoint, the Wayd JWT changes (permission claims, u
 - New `useGetAuthProvidersQuery` RTK Query hook wrapping `getAuthClient().getProviders()`.
 - Login page hides the Microsoft tab + button when `entra: false`; hides the tab bar entirely when only one provider is enabled. No flash of a broken Microsoft button on local-only deployments. Default active tab is derived (`tabOverride ?? (entraEnabled ? 'microsoft' : 'local')`) rather than stored, avoiding `setState` in `useEffect`.
 
-#### PR 3.2 — Auth-context cutover (replace MSAL-direct-to-API)
+#### PR 3.2 — Auth-context cutover (replace MSAL-direct-to-API) ✅ Shipped
 
-- `auth-context` calls `POST /api/auth/exchange` after an MSAL login succeeds, passing the access token MSAL acquires with the API scope. The returned Wayd JWT + refresh token are stored in localStorage/sessionStorage — the same shape local login has used since PR 1. No provider-specific branches for storage, token attachment, or refresh.
-- `axios` interceptors collapsed to a single path: the request interceptor reads `getWaydAuthToken()` and attaches it; the response interceptor retries on 401 using the Wayd refresh token. MSAL logic removed from `clients.ts` entirely.
+- **The login page owns the exchange**, not `auth-context`. When MSAL returns an authenticated session with no Wayd JWT in storage, the login page silently acquires the access token, `POST`s it to `/api/auth/exchange`, stores the returned Wayd JWT + refresh token, and reloads the app. This is the standard OIDC callback-route pattern — we just fold it into `/login` rather than splitting into `/auth/callback`.
+- **`auth-context` becomes a pure session reader.** It decodes whatever Wayd JWT is in storage into a `User` + permissions set and exposes them. No MSAL watching, no exchange logic, no auto-redirects. No provider-specific branches for storage, token attachment, or refresh — everything reads the single Wayd JWT.
+- `axios` interceptors collapsed to a single path: the request interceptor reads `getAuthToken()` and attaches it; the response interceptor retries on 401 using the Wayd refresh token. MSAL logic removed from `clients.ts` entirely.
 - `authenticatedFetch` simplified accordingly — now a thin wrapper that attaches the Wayd JWT.
 - Permissions decoded directly from the Wayd JWT's `permission` claims on mount via a lazy `useState` initializer. `useGetUserPermissionsQuery` endpoint removed from `profile-api.ts`, the separate `/permissions` round-trip is gone, and **the "Loading Permissions" 10-second delay disappears**.
-- Storage helpers renamed `LOCAL_AUTH_*` → `WAYD_AUTH_*` (keys preserved as `moda.local.*` for session continuity). `isLocalAuthActive` → `isWaydAuthActive`, etc.
-- `authMethod` is derived from the `loginProvider` claim inside the Wayd JWT, not from which storage key is set. Enables provider-aware logout (Entra users redirect to `/logout` for MSAL cleanup; local users clear storage and go to `/login`).
-- **Legacy-session migration:** on first load after the PR 3.2 deploy, a user with an active MSAL session but no Wayd JWT triggers an automatic exchange, producing a Wayd JWT in place. Users don't notice the cutover.
-- `auth-context` shrinks meaningfully — the dual MSAL/local paths, the RTK Query permissions hook, the 401-triggers-loginRedirect flow, and the MSAL event callbacks that mirrored login/logout state all go away. Tests rewritten from scratch to cover the new state machine (~200 lines replacing ~1,500 lines of tests for behavior that no longer exists).
+- **Storage keys renamed `moda.local.*` → `wayd.local.*`; helper constants renamed `WAYD_AUTH_*` → `AUTH_*`** (the `WAYD_` prefix is redundant in a Wayd file). Accessor functions are `getAuthToken`, `getAuthRefreshToken`, `isAuthActive`, `storeAuth`, `clearAuth`. All currently-issued sessions invalidate on deploy — users re-log-in once. Acceptable pre-production; we'd want a dual-read window for prod traffic.
+- `authMethod` is derived from the `loginProvider` claim inside the Wayd JWT, not from which storage key is set.
+- **Provider-aware logout clears the MSAL cache too.** `logout` calls `clearAuth()` + `instance.setActiveAccount(null)` + `instance.clearCache()` before navigating to `/login`. Without the MSAL clear, the login page's exchange-on-mount effect sees a live MSAL session and silently re-auths — the "logged out and right back in" race PR 3.2's earlier revisions hit. This only wipes MSAL's *local* cache; the user's Entra SSO cookie on `login.microsoftonline.com` stays intact (standard "sign out of this app, stay signed in to Microsoft" behavior).
+- **Root-layout gate flattened.** Replaced the nested `AuthenticatedTemplate` / `UnauthenticatedTemplate` / `MsalInitializingView` branches with a single `useSyncExternalStore` check on `isAuthActive()`. MSAL state is deliberately **not** part of the gate decision — conflating "has Entra cookie" with "logged into Wayd" was the source of the logout race.
+- **Hydration fix.** `layout.tsx` uses a `mounted` state so server and first client render emit the same `SsrFallback`, then swap to the MsalProvider tree after the mount effect fires. Previously the server emitted `<SsrFallback/>` (MSAL null during SSR) and the client emitted the full app (MSAL available), causing a visible hydration error.
+- `auth-context` shrinks meaningfully — the dual MSAL/local paths, the RTK Query permissions hook, the 401-triggers-loginRedirect flow, and the MSAL event callbacks that mirrored login/logout state all go away. Tests rewritten from scratch to cover the new state machine (~450 lines replacing ~1,700 lines of tests for behavior that no longer exists).
+- **Bonus fixes discovered while writing Entra validator tests:** `JwtSecurityTokenHandler.MapInboundClaims = false` added to `EntraIdTokenValidator` (default mapping was rewriting `tid` to a schema URL, so `principal.FindFirstValue("tid")` silently returned null for org tokens — the `iss`-fallback was masking it); malformed non-JWT input's `ArgumentException` now caught alongside `SecurityTokenException` so it returns 401 instead of 500.
+- **JWT `iss` / `aud` renamed to URI form:** `Wayd` → `https://wayd.dev`, `WaydApi` → `https://api.wayd.dev`. Matches mainstream OIDC convention (Entra, Auth0, Okta all use URIs), globally unique so they can't collide once we federate, and naturally expresses "which resource is this token for." Redundant `jwt_issuer` / `jwt_audience` Terraform variables removed in the same change — they were JWT claim identifiers, not per-environment config, with no legitimate operator override story.
 
-#### PR 3.3 (deferred; post-Auth0) — Multi-provider frontend + legacy cleanup
+#### PR 3.3 (not started; blocked on Auth0 onboarding) — Multi-provider frontend + legacy cleanup
 
 - Home-realm discovery (email domain → which provider SDK to initialize).
 - Auth0 registered as a second provider in the config registry and in the capabilities endpoint.
@@ -243,9 +261,9 @@ Delivers the Entra exchange endpoint, the Wayd JWT changes (permission claims, u
 
 **Refresh strategy (confirmed):** Wayd-owned refresh token, uniform across providers. The frontend stores `{ wayd JWT, wayd refresh token }`; on access-token expiry it calls `/api/auth/refresh` with the refresh token and gets a new Wayd JWT. No re-exchange with the external IdP on every refresh. Matches RFC 8693's framing (exchanged token lives in the issuing authority's lifecycle) and what most SaaS products do (Slack, Linear, GitHub, Atlassian Cloud).
 
-### PR 4 — Admin-initiated tenant migration
+### PR 4 — Admin-initiated tenant migration (not started)
 
-Land this just before the org's migration window. Builds on PR 3's exchange endpoint — the rebind lives naturally in the exchange handler.
+Land this just before the org's migration window. Builds on PR 3's shipped exchange endpoint — the rebind lives naturally in the exchange handler.
 
 **Scope:**
 
@@ -303,20 +321,20 @@ Every rebind preserves the old `UserIdentity` row (inactive, with `UnlinkedAt` +
 ### What this does *not* address
 
 - **Account linking** (one Wayd user authenticating via multiple providers simultaneously — e.g., both Entra and Auth0). The schema supports it — multiple active rows per user — but no flow creates that state today. Defer until there's a concrete need.
-- **Auth0 onboarding itself.** PR 1 makes Auth0 a config/provider-registry problem rather than a schema problem; the actual Auth0 integration is downstream of PR 3.
+- **Auth0 onboarding itself.** PR 1 made Auth0 a config/provider-registry problem rather than a schema problem; the actual Auth0 integration is PR 3.3 (not yet started).
 - **Personal Microsoft accounts.** Out of scope for all four PRs. The email-trust assumptions in migration (PR 4) rely on org-controlled tenants.
 
-## Impact on the "Loading Permissions" delay
+## "Loading Permissions" delay — fixed by PR 3 ✅
 
-The 10-second "Loading Permissions" screen users see on first load after ~24 hours of inactivity is caused by a sequential waterfall in the frontend:
+The 10-second "Loading Permissions" screen users used to see on first load after ~24 hours of inactivity was caused by a sequential waterfall in the frontend:
 
-1. MSAL forces a silent token refresh (3–8s when the access token has expired).
-2. RTK Query's permissions fetch (60-second cache, long-gone after 24h) waits for the token refresh.
-3. User profile assembly waits for permissions.
+1. MSAL forced a silent token refresh (3–8s when the access token had expired).
+2. RTK Query's permissions fetch (60-second cache, long-gone after 24h) waited for the token refresh.
+3. User profile assembly waited for permissions.
 
-The perf problem is fixed by **PR 3**, not PR 1 or PR 2. Embedding permissions as Wayd JWT claims eliminates step 2 entirely; silent refresh returns a token that already carries everything auth-context needs.
+PR 3 eliminated this entirely. Embedding permissions as Wayd JWT claims removed step 2; silent refresh now returns a token that already carries everything `auth-context` needs. As of PR 3.2, there is no separate permissions fetch — the screen is gone.
 
-This is called out here because it's often the spark for discussing this work, and it's useful to know which PR actually delivers the fix.
+Preserved here because the delay was often the spark for discussing this work, and "that's what PR 3 actually delivered" is worth recording.
 
 ## References
 

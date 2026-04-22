@@ -131,17 +131,24 @@ internal sealed class EntraIdTokenValidator : IEntraIdTokenValidator
     /// shapes:
     ///   v1: https://sts.windows.net/{tid}/
     ///   v2: https://login.microsoftonline.com/{tid}/v2.0
-    /// Returns null for issuers that don't match either shape (e.g., the
-    /// personal-accounts issuer, or anything we don't recognize).
+    /// Returns the first path segment if it parses as a GUID, otherwise null.
+    /// <para>
+    /// This is a shape check, not a trust decision — the MSA (personal accounts)
+    /// pseudo-tenant <c>9188040d-6c67-4c5b-b112-36a304b66dad</c> is a real GUID
+    /// and <em>is</em> returned. Keeping personal accounts out is the
+    /// allowlist's job, not this function's. Non-GUID path segments like
+    /// <c>common</c> and <c>organizations</c> return null because they aren't
+    /// tenant IDs in the first place.
+    /// </para>
     /// </summary>
     internal static string? ExtractTenantFromIssuer(string? issuer)
     {
         if (string.IsNullOrWhiteSpace(issuer)) return null;
         if (!Uri.TryCreate(issuer, UriKind.Absolute, out var uri)) return null;
 
-        // The first path segment is the tenant GUID (or 'common' / 'organizations'
-        // / '9188040d-6c67-4c5b-b112-36a304b66dad' for the pseudo-tenants we
-        // don't want to accept).
+        // First path segment is the tenant ID. Filter to GUIDs so non-tenant
+        // authority markers (common, organizations, consumers) don't leak
+        // through as "tenants" the allowlist then has to special-case.
         var segments = uri.Segments
             .Select(s => s.Trim('/'))
             .Where(s => s.Length > 0)

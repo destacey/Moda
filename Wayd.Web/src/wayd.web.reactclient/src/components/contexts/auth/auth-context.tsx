@@ -61,11 +61,28 @@ function firstDefined(
   return null
 }
 
+// RFC 7515 §2: JWT segments are base64url-encoded (URL-safe alphabet, padding
+// stripped). atob only speaks standard base64, so any segment containing `-`
+// or `_`, or one whose length isn't a multiple of 4, fails to decode. Convert
+// to standard base64 before handing it to atob.
+function base64UrlDecode(input: string): string {
+  const normalized = input.replace(/-/g, '+').replace(/_/g, '/')
+  const padded = normalized.padEnd(
+    normalized.length + ((4 - (normalized.length % 4)) % 4),
+    '=',
+  )
+  return atob(padded)
+}
+
 function decodeWaydJwt(token: string): DecodedClaims | null {
   try {
     const payloadPart = token.split('.')[1]
     if (!payloadPart) return null
-    const payload = JSON.parse(atob(payloadPart)) as Record<string, unknown>
+    const payload = JSON.parse(base64UrlDecode(payloadPart)) as Record<
+      string,
+      unknown
+    >
+
 
     const rawPermissions = payload[PERMISSION_CLAIM]
     const permissions = Array.isArray(rawPermissions)

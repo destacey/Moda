@@ -17,6 +17,7 @@ import {
 } from '@/src/services/clients'
 import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 import { LoadingAccount } from '@/src/components/common'
+import { useDocumentTitle } from '@/src/hooks'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -484,6 +485,7 @@ function LocalLoginTab() {
 }
 
 export default function LoginPage() {
+  useDocumentTitle('Moda Login')
   const isMsalAuthenticated = useIsAuthenticated()
   const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()

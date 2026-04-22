@@ -95,9 +95,16 @@ import { clearAuth, storeAuth } from '@/src/services/clients'
 
 // --- Test helpers ---
 
+// JWT segments are base64url, not standard base64 — convert btoa's output so
+// tests exercise the same decode path real Wayd tokens hit (`-`/`_` instead of
+// `+`/`/`, stripped padding).
+function base64UrlEncode(value: string): string {
+  return btoa(value).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+}
+
 function makeWaydJwt(claims: Record<string, unknown>): string {
-  const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
-  const payload = btoa(JSON.stringify(claims))
+  const header = base64UrlEncode(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))
+  const payload = base64UrlEncode(JSON.stringify(claims))
   return `${header}.${payload}.signature`
 }
 
