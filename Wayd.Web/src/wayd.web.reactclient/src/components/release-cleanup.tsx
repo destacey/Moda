@@ -75,11 +75,15 @@ export default function ReleaseCleanup({ onReload }: ReleaseCleanupProps = {}) {
       try {
         if ('serviceWorker' in navigator) {
           const registrations = await navigator.serviceWorker.getRegistrations()
-          await Promise.all(registrations.map((r) => r.unregister()))
+          // allSettled, not all: if one registration's unregister() rejects,
+          // we still want to try the others AND keep going through caches +
+          // storage migrations below. Otherwise a single failed SW leaves the
+          // user half-cleaned but marked-done, with no retry path.
+          await Promise.allSettled(registrations.map((r) => r.unregister()))
         }
         if ('caches' in window) {
           const keys = await caches.keys()
-          await Promise.all(keys.map((k) => caches.delete(k)))
+          await Promise.allSettled(keys.map((k) => caches.delete(k)))
         }
         for (const { from, to } of STORAGE_KEY_MIGRATIONS) {
           const existing = localStorage.getItem(from)

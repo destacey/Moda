@@ -208,19 +208,32 @@ describe('ReleaseCleanup', () => {
     expect(mockLocalStorage.getItem(RELEASE_MARKER_KEY)).toBe(RELEASE_MARKER_VALUE)
   })
 
-  it('recovers when service worker unregister rejects — still marks + reloads', async () => {
+  it('continues cleanup when one service worker unregister rejects (uses allSettled)', async () => {
+    // Rationale: if SW unregister throws and aborts the cleanup pipeline, the
+    // user still gets the marker written (finally block) and the reload — but
+    // none of the migrations/deletions after the SW step ran, and now the
+    // marker prevents a retry. allSettled keeps the pipeline going so the
+    // downstream steps (caches, migrations, legacy deletions) complete.
     const reload = jest.fn()
-    const swUnregister = jest.fn().mockRejectedValue(new Error('sw failure'))
-    mockServiceWorker([{ unregister: swUnregister }])
-    mockCaches([])
-    // Swallow the expected console.warn so test output stays clean.
-    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {})
+    const failingUnregister = jest.fn().mockRejectedValue(new Error('sw failure'))
+    const succeedingUnregister = jest.fn().mockResolvedValue(true)
+    mockServiceWorker([
+      { unregister: failingUnregister },
+      { unregister: succeedingUnregister },
+    ])
+    mockCaches(['old-cache'])
+    mockLocalStorage.setItem('modaTheme', '"dark"')
 
     render(<ReleaseCleanup onReload={reload} />)
 
     await waitFor(() => expect(reload).toHaveBeenCalled())
+
+    // Both unregisters were attempted — the failing one didn't short-circuit.
+    expect(failingUnregister).toHaveBeenCalledTimes(1)
+    expect(succeedingUnregister).toHaveBeenCalledTimes(1)
+    // Downstream cleanup also ran: migration moved theme, marker is set.
+    expect(mockLocalStorage.getItem('modaTheme')).toBeNull()
+    expect(mockLocalStorage.getItem('appTheme')).toBe('"dark"')
     expect(mockLocalStorage.getItem(RELEASE_MARKER_KEY)).toBe(RELEASE_MARKER_VALUE)
-    expect(warnSpy).toHaveBeenCalled()
-    warnSpy.mockRestore()
   })
 })
