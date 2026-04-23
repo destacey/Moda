@@ -14,10 +14,11 @@ import { useEffect } from 'react'
  *   1. Unregister every service worker (nukes the stale cached app shell).
  *   2. Delete every Cache Storage entry (nukes stale chunks + runtime-cached
  *      API responses the old SW populated).
- *   3. Remove pre-rename `moda.local.*` storage entries — harmless noise once
- *      `wayd.local.*` is the active key prefix, but worth clearing so DevTools
- *      doesn't suggest two parallel sessions.
- *   4. Mark the cleanup done (localStorage flag) and hard-reload so the fresh
+ *   3. Migrate any renamed localStorage keys (copy value to new key), then
+ *      drop the old entries — preserves user preferences across renames.
+ *   4. Remove pre-rename storage entries that we're not preserving (auth
+ *      tokens, etc. — they need to be reacquired anyway).
+ *   5. Mark the cleanup done (localStorage flag) and hard-reload so the fresh
  *      app boots without the old SW intercepting.
  *
  * Gated by a per-release marker so it runs at most once per browser per
@@ -25,8 +26,27 @@ import { useEffect } from 'react'
  * pass; the marker key itself stays stable so we don't leak flags.
  */
 const RELEASE_MARKER_KEY = 'wayd.release.cleanup'
-const RELEASE_MARKER_VALUE = 'pr-3.2'
+// Bump this value whenever the legacy-key list or the required-cleanup scope
+// changes — a new value re-runs the cleanup once per browser without leaking
+// a separate marker per release.
+const RELEASE_MARKER_VALUE = 'pr-3.2.2'
 
+/**
+ * Storage keys to migrate. For each entry, if `from` exists in localStorage,
+ * its raw string value is copied to `to` (if `to` doesn't already exist), and
+ * `from` is removed either way. Values are copied verbatim so
+ * `useLocalStorageState`'s JSON shape is preserved across the rename.
+ */
+const STORAGE_KEY_MIGRATIONS: Array<{ from: string; to: string }> = [
+  { from: 'modaTheme', to: 'appTheme' },
+  { from: 'modaMenuCollapsed', to: 'appMenuCollapsed' },
+]
+
+/**
+ * Storage keys to delete outright. Auth-related entries from the Moda era —
+ * they're invalid under the new identity model anyway, so preserving them
+ * would just leak stale sessions.
+ */
 const LEGACY_STORAGE_KEYS = [
   'moda.local.token',
   'moda.local.refreshToken',
@@ -60,6 +80,19 @@ export default function ReleaseCleanup({ onReload }: ReleaseCleanupProps = {}) {
         if ('caches' in window) {
           const keys = await caches.keys()
           await Promise.all(keys.map((k) => caches.delete(k)))
+        }
+        for (const { from, to } of STORAGE_KEY_MIGRATIONS) {
+          const existing = localStorage.getItem(from)
+          if (existing !== null) {
+            // Only write if the destination is empty — don't overwrite a
+            // value the user already set against the new key (e.g., someone
+            // who logged in on one device, set theme to dark, and now the
+            // cleanup fires on a different device with an older `from` value).
+            if (localStorage.getItem(to) === null) {
+              localStorage.setItem(to, existing)
+            }
+            localStorage.removeItem(from)
+          }
         }
         for (const key of LEGACY_STORAGE_KEYS) {
           localStorage.removeItem(key)

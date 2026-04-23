@@ -3,7 +3,7 @@ import '@testing-library/jest-dom'
 import ReleaseCleanup from './release-cleanup'
 
 const RELEASE_MARKER_KEY = 'wayd.release.cleanup'
-const RELEASE_MARKER_VALUE = 'pr-3.2'
+const RELEASE_MARKER_VALUE = 'pr-3.2.2'
 
 // --- In-memory localStorage/sessionStorage mocks ---
 //
@@ -117,6 +117,64 @@ describe('ReleaseCleanup', () => {
     expect(mockLocalStorage.getItem('moda.local.token')).toBeNull()
     expect(mockLocalStorage.getItem('moda.local.refreshToken')).toBeNull()
     expect(mockSessionStorage.getItem('moda.local.tokenExpiry')).toBeNull()
+  })
+
+  it('migrates modaTheme → appTheme, preserving the user preference', async () => {
+    const reload = jest.fn()
+    mockServiceWorker()
+    mockCaches()
+    mockLocalStorage.setItem('modaTheme', '"dark"')
+
+    render(<ReleaseCleanup onReload={reload} />)
+
+    await waitFor(() => expect(reload).toHaveBeenCalled())
+
+    expect(mockLocalStorage.getItem('modaTheme')).toBeNull()
+    expect(mockLocalStorage.getItem('appTheme')).toBe('"dark"')
+  })
+
+  it('migrates modaMenuCollapsed → appMenuCollapsed, preserving the user preference', async () => {
+    const reload = jest.fn()
+    mockServiceWorker()
+    mockCaches()
+    mockLocalStorage.setItem('modaMenuCollapsed', 'false')
+
+    render(<ReleaseCleanup onReload={reload} />)
+
+    await waitFor(() => expect(reload).toHaveBeenCalled())
+
+    expect(mockLocalStorage.getItem('modaMenuCollapsed')).toBeNull()
+    expect(mockLocalStorage.getItem('appMenuCollapsed')).toBe('false')
+  })
+
+  it('does not overwrite an already-populated destination key during migration', async () => {
+    // Edge case: another device / tab already seeded the new key.
+    // Preserve the new value, drop the old one.
+    const reload = jest.fn()
+    mockServiceWorker()
+    mockCaches()
+    mockLocalStorage.setItem('modaTheme', '"light"') // stale old value
+    mockLocalStorage.setItem('appTheme', '"dark"') // fresh new value
+
+    render(<ReleaseCleanup onReload={reload} />)
+
+    await waitFor(() => expect(reload).toHaveBeenCalled())
+
+    expect(mockLocalStorage.getItem('modaTheme')).toBeNull()
+    expect(mockLocalStorage.getItem('appTheme')).toBe('"dark"')
+  })
+
+  it('leaves the destination key alone when the source key is absent', async () => {
+    const reload = jest.fn()
+    mockServiceWorker()
+    mockCaches()
+    // No modaTheme; user has never touched the theme on this browser.
+
+    render(<ReleaseCleanup onReload={reload} />)
+
+    await waitFor(() => expect(reload).toHaveBeenCalled())
+
+    expect(mockLocalStorage.getItem('appTheme')).toBeNull()
   })
 
   it('is a no-op when the marker is already set (already cleaned this release)', async () => {
