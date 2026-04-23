@@ -113,6 +113,22 @@ describe('sortProjects', () => {
     expect(sorted.map((p) => p.name)).toEqual(['Active', 'Unknown'])
   })
 
+  it('sorts embedded numbers in natural order', () => {
+    const projects = [
+      createProject({ name: 'Project 10', status: { name: 'Active' } as any }),
+      createProject({ name: 'Project 2', status: { name: 'Active' } as any }),
+      createProject({ name: 'Project 1', status: { name: 'Active' } as any }),
+    ]
+
+    const sorted = sortProjects(projects)
+
+    expect(sorted.map((p) => p.name)).toEqual([
+      'Project 1',
+      'Project 2',
+      'Project 10',
+    ])
+  })
+
   it('handles all five statuses in correct order', () => {
     const projects = [
       createProject({
