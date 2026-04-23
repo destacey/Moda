@@ -141,16 +141,19 @@ const axiosClient = axios.create({
 // the rotation. Without this, whichever response wrote to storage last wins and
 // the others' rotated refresh tokens are orphaned — which breaks as soon as the
 // backend adopts one-shot refresh semantics.
+//
+// Returns null when there are no tokens to refresh with. Callers distinguish
+// this from a refresh-attempt failure: no tokens means "not a session" (don't
+// wipe state, just reject), whereas a failure means "session invalidated by
+// the server" (clear it).
 let inFlightRefresh: Promise<TokenResponse> | null = null
 
-function refreshOnce(): Promise<TokenResponse> {
+function refreshOnce(): Promise<TokenResponse> | null {
   if (inFlightRefresh) return inFlightRefresh
 
   const currentToken = getAuthToken()
   const refreshToken = getAuthRefreshToken()
-  if (!currentToken || !refreshToken) {
-    return Promise.reject(new Error('No auth tokens to refresh'))
-  }
+  if (!currentToken || !refreshToken) return null
 
   inFlightRefresh = getAuthClient()
     .refreshToken({ token: currentToken, refreshToken })
@@ -181,15 +184,24 @@ axiosClient.interceptors.response.use(
     ) {
       ;(originalRequest as any)._retry = true
 
-      try {
-        const tokenResponse = await refreshOnce()
-        originalRequest.headers = originalRequest.headers || {}
-        originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
-        return axiosClient(originalRequest)
-      } catch (refreshError) {
-        console.error('Token refresh on 401 failed:', refreshError)
-        clearAuth()
+      const refresh = refreshOnce()
+      if (refresh) {
+        try {
+          const tokenResponse = await refresh
+          originalRequest.headers = originalRequest.headers || {}
+          originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
+          return axiosClient(originalRequest)
+        } catch (refreshError) {
+          // Server rejected the refresh — the session is invalid. Wipe it so
+          // the app falls through to /login on the next protected route.
+          console.error('Token refresh on 401 failed:', refreshError)
+          clearAuth()
+        }
       }
+      // No tokens to refresh with: the caller was already unauthenticated.
+      // Fall through to the default reject without touching storage — we
+      // don't want to clobber the remember-me preference on every anonymous
+      // 401 a page might trigger.
     }
 
     console.error('API Error:', error.message, error.config?.url)
