@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using NSwag;
 using NSwag.Generation.AspNetCore;
@@ -17,10 +16,9 @@ internal static class ObjectExtensions
 }
 
 /// <summary>
-/// The default NSwag AspNetCoreOperationProcessor doesn't take .RequireAuthorization() calls into account
-/// Unless the AllowAnonymous attribute is defined, this processor will always add the security schemes
-/// when they're not already there, so effectively adding "Global Auth".
-/// Supports multiple authentication schemes (JWT Bearer and API Key).
+/// The default NSwag AspNetCoreOperationProcessor doesn't take .RequireAuthorization() calls into account.
+/// Unless the AllowAnonymous attribute is defined, this processor attaches the API Key (PAT) security
+/// requirement to every operation, effectively adding "Global Auth" to the generated spec.
 /// </summary>
 public class SwaggerGlobalAuthProcessor : IOperationProcessor
 {
@@ -36,17 +34,8 @@ public class SwaggerGlobalAuthProcessor : IOperationProcessor
 
             if (context.OperationDescription.Operation.Security?.Any() != true)
             {
-                // Add both authentication schemes as alternatives
-                // Each security requirement in the array represents an OR relationship
-                // Users can authenticate with either JWT Bearer OR API Key
                 context.OperationDescription.Operation.Security =
                 [
-                    // Option 1: JWT Bearer (OAuth2)
-                    new OpenApiSecurityRequirement
-                    {
-                        { JwtBearerDefaults.AuthenticationScheme, Array.Empty<string>() }
-                    },
-                    // Option 2: API Key (Personal Access Token)
                     new OpenApiSecurityRequirement
                     {
                         { "ApiKey", Array.Empty<string>() }

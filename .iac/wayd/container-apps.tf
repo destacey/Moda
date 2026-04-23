@@ -220,26 +220,6 @@ resource "azurerm_container_app" "wayd_backend" {
       }
 
       env {
-        name  = "SecuritySettings__Swagger__ApiScope"
-        value = var.app_reg_api_scope
-      }
-
-      env {
-        name  = "SecuritySettings__Swagger__AuthorizationUrl"
-        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/authorize"
-      }
-
-      env {
-        name  = "SecuritySettings__Swagger__OpenIdClientId"
-        value = var.swagger_openid_client_id
-      }
-
-      env {
-        name  = "SecuritySettings__Swagger__TokenUrl"
-        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/oauth2/v2.0/token"
-      }
-
-      env {
         name        = "SecuritySettings__LocalJwt__Secret"
         secret_name = "local-jwt-secret"
       }

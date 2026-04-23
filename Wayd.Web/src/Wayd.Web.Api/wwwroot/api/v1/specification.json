@@ -20,9 +20,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -51,9 +48,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -110,9 +104,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -313,9 +304,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -354,9 +342,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -414,9 +399,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -477,9 +459,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -554,9 +533,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -608,9 +584,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -666,9 +639,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -704,9 +674,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -757,9 +724,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -801,9 +765,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -840,9 +801,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -878,9 +836,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -921,9 +876,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -963,9 +915,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1004,9 +953,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1053,9 +999,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1114,9 +1057,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1164,9 +1104,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1225,9 +1162,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1277,9 +1211,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1331,9 +1262,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1381,9 +1309,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1443,9 +1368,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1482,9 +1404,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1542,9 +1461,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1616,9 +1532,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1688,9 +1601,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1751,9 +1661,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1804,9 +1711,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1870,9 +1774,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -1922,9 +1823,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -1976,9 +1874,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2028,9 +1923,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2088,9 +1980,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2136,9 +2025,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2186,9 +2072,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2255,9 +2138,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2298,9 +2178,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2355,9 +2232,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2411,9 +2285,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2464,9 +2335,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2505,9 +2373,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2560,9 +2425,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2608,9 +2470,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2658,9 +2517,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2727,9 +2583,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2771,9 +2624,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2812,9 +2662,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2867,9 +2714,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -2915,9 +2759,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -2965,9 +2806,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3034,9 +2872,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3077,9 +2912,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3134,9 +2966,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3190,9 +3019,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3232,9 +3058,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3273,9 +3096,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3324,9 +3144,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3374,9 +3191,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3439,9 +3253,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3480,9 +3291,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3535,9 +3343,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3589,9 +3394,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3641,9 +3443,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3701,9 +3500,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3749,9 +3545,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3799,9 +3592,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3868,9 +3658,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -3911,9 +3698,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -3968,9 +3752,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4024,9 +3805,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4079,9 +3857,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4158,9 +3933,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4236,9 +4008,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4304,9 +4073,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4346,9 +4112,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4387,9 +4150,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4468,9 +4228,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4516,9 +4273,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4566,9 +4320,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4635,9 +4386,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4678,9 +4426,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4735,9 +4480,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4790,9 +4532,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4847,9 +4586,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -4888,9 +4624,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -4967,9 +4700,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5024,9 +4754,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5076,9 +4803,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5125,9 +4849,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5194,9 +4915,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5237,9 +4955,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5294,9 +5009,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5349,9 +5061,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5417,9 +5126,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5498,9 +5204,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5553,9 +5256,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5621,9 +5321,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5717,9 +5414,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5766,9 +5460,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5811,9 +5502,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5873,9 +5561,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -5922,9 +5607,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -5991,9 +5673,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6034,9 +5713,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6103,9 +5779,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6171,9 +5844,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6226,9 +5896,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6283,9 +5950,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6338,9 +6002,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6395,9 +6056,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6436,9 +6094,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6489,9 +6144,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6556,9 +6208,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6613,9 +6262,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6682,9 +6328,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6738,9 +6381,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6790,9 +6430,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6851,9 +6488,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -6917,9 +6551,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -6981,9 +6612,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7049,9 +6677,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7138,9 +6763,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7211,9 +6833,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7281,9 +6900,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7339,9 +6955,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7416,9 +7029,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7503,9 +7113,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7565,9 +7172,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7643,9 +7247,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7699,9 +7300,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7778,9 +7376,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7846,9 +7441,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7887,9 +7479,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -7930,9 +7519,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -7971,9 +7557,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8042,9 +7625,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8090,9 +7670,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8140,9 +7717,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8209,9 +7783,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8252,9 +7823,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8309,9 +7877,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8364,9 +7929,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8421,9 +7983,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8477,9 +8036,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8518,9 +8074,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8571,9 +8124,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8635,9 +8185,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8693,9 +8240,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -8772,9 +8316,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8838,9 +8379,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8900,9 +8438,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -8961,9 +8496,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9040,9 +8572,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9101,9 +8630,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9179,9 +8705,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9260,9 +8783,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9322,9 +8842,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9391,9 +8908,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9444,9 +8958,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9493,9 +9004,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9544,9 +9052,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9609,9 +9114,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9650,9 +9152,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9707,9 +9206,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9748,9 +9244,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9798,9 +9291,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9847,9 +9337,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -9908,9 +9395,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -9967,9 +9451,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10036,9 +9517,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10088,9 +9566,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10153,9 +9628,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10211,9 +9683,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10268,9 +9737,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10331,9 +9797,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10401,9 +9864,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10442,9 +9902,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10517,9 +9974,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10599,9 +10053,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10667,9 +10118,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10740,9 +10188,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -10803,9 +10248,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10872,9 +10314,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -10957,9 +10396,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11048,9 +10484,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11103,9 +10536,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11182,9 +10612,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11245,9 +10672,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11314,9 +10738,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11386,9 +10807,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11476,9 +10894,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11568,9 +10983,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11609,9 +11021,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11683,9 +11092,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11744,9 +11150,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11792,9 +11195,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11842,9 +11242,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11901,9 +11298,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -11944,9 +11338,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -11990,9 +11381,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12056,9 +11444,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12113,9 +11498,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12172,9 +11554,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12229,9 +11608,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12300,9 +11676,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12369,9 +11742,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12440,9 +11810,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12496,9 +11863,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12549,9 +11913,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12597,9 +11958,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12648,9 +12006,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12689,9 +12044,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12757,9 +12109,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12835,9 +12184,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12876,9 +12222,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -12919,9 +12262,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -12960,9 +12300,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13020,9 +12357,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13068,9 +12402,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13119,9 +12450,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13169,9 +12497,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13238,9 +12563,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13281,9 +12603,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13328,9 +12647,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13373,9 +12689,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13427,9 +12740,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13479,9 +12789,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13541,9 +12848,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13606,9 +12910,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13686,9 +12987,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13776,9 +13074,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13831,9 +13126,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -13912,9 +13204,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -13982,9 +13271,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14024,9 +13310,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14065,9 +13348,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14121,9 +13401,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14170,9 +13447,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14224,9 +13498,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14274,9 +13545,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14315,9 +13583,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14368,9 +13633,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14429,9 +13691,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14475,9 +13734,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14520,9 +13776,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14587,9 +13840,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14639,9 +13889,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14700,9 +13947,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14758,9 +14002,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14810,9 +14051,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -14880,9 +14118,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -14948,9 +14183,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15019,9 +14251,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15080,9 +14309,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15153,9 +14379,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15214,9 +14437,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15277,9 +14497,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15318,9 +14535,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15372,9 +14586,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15421,9 +14632,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15482,9 +14690,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15547,9 +14752,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15588,9 +14790,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15638,9 +14837,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15699,9 +14895,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15764,9 +14957,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15818,9 +15008,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15871,9 +15058,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -15920,9 +15104,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -15981,9 +15162,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16046,9 +15224,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16087,9 +15262,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16141,9 +15313,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16189,9 +15358,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16250,9 +15416,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16308,9 +15471,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16348,9 +15508,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16405,9 +15562,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16450,9 +15604,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16504,9 +15655,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16553,9 +15701,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16604,9 +15749,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16670,9 +15812,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16739,9 +15878,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16794,9 +15930,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16860,9 +15993,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -16941,9 +16071,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -16997,9 +16124,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17049,9 +16173,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17137,9 +16258,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17202,9 +16320,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17277,9 +16392,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17364,9 +16476,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17435,9 +16544,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17516,9 +16622,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17580,9 +16683,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17669,9 +16769,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17735,9 +16832,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17790,9 +16884,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -17877,9 +16968,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -17939,9 +17027,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18010,9 +17095,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18062,9 +17144,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18119,9 +17198,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18172,9 +17248,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18212,9 +17285,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18266,9 +17336,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18315,9 +17382,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18366,9 +17430,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18432,9 +17493,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18501,9 +17559,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18556,9 +17611,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18622,9 +17674,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18703,9 +17752,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18758,9 +17804,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18833,9 +17876,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -18920,9 +17960,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -18991,9 +18028,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19072,9 +18106,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19128,9 +18159,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19180,9 +18208,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19254,9 +18279,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19297,9 +18319,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19352,9 +18371,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19404,9 +18420,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19478,9 +18491,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19544,9 +18554,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19598,9 +18605,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19639,9 +18643,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19694,9 +18695,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19739,9 +18737,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19798,9 +18793,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19855,9 +18847,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -19923,9 +18912,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -19979,9 +18965,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20022,9 +19005,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20067,9 +19047,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20109,9 +19086,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20163,9 +19137,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20194,9 +19165,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20248,9 +19216,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20306,9 +19271,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20361,9 +19323,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20403,9 +19362,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20444,9 +19400,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20488,9 +19441,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20531,9 +19481,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20585,9 +19532,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20635,9 +19579,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -20700,9 +19641,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20756,9 +19694,6 @@
         },
         "security": [
           {
-            "Bearer": []
-          },
-          {
             "ApiKey": []
           }
         ]
@@ -20799,9 +19734,6 @@
           }
         },
         "security": [
-          {
-            "Bearer": []
-          },
           {
             "ApiKey": []
           }
@@ -33151,19 +32083,6 @@
       }
     },
     "securitySchemes": {
-      "Bearer": {
-        "type": "oauth2",
-        "description": "OAuth2.0 Auth Code with PKCE",
-        "flows": {
-          "authorizationCode": {
-            "authorizationUrl": "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/authorize",
-            "tokenUrl": "https://login.microsoftonline.com/f399216f-be6b-4062-8700-54952e44e7ef/oauth2/v2.0/token",
-            "scopes": {
-              "api://fdca5e6f-46a2-455c-b2f3-06a9a6877190/access_as_user": "access the api"
-            }
-          }
-        }
-      },
       "ApiKey": {
         "type": "apiKey",
         "description": "Personal Access Token - Enter your PAT directly without any prefix",
