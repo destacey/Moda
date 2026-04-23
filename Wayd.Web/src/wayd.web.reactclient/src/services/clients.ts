@@ -36,6 +36,7 @@ import {
   FeatureFlagsClient,
   PersonalAccessTokensClient,
   SearchClient,
+  TokenResponse,
 } from './wayd-api'
 
 const apiUrl = process.env.NEXT_PUBLIC_API_BASE_URL
@@ -134,6 +135,36 @@ const axiosClient = axios.create({
   timeout: 30000, // 30 second timeout
 })
 
+// Single-flight guard for refresh. When multiple requests 401 concurrently
+// (typical after an idle period: every in-flight call fails at once), they all
+// share one refresh call instead of each minting a new refresh token and racing
+// the rotation. Without this, whichever response wrote to storage last wins and
+// the others' rotated refresh tokens are orphaned — which breaks as soon as the
+// backend adopts one-shot refresh semantics.
+let inFlightRefresh: Promise<TokenResponse> | null = null
+
+function refreshOnce(): Promise<TokenResponse> {
+  if (inFlightRefresh) return inFlightRefresh
+
+  const currentToken = getAuthToken()
+  const refreshToken = getAuthRefreshToken()
+  if (!currentToken || !refreshToken) {
+    return Promise.reject(new Error('No auth tokens to refresh'))
+  }
+
+  inFlightRefresh = getAuthClient()
+    .refreshToken({ token: currentToken, refreshToken })
+    .then((tokenResponse) => {
+      storeAuth(tokenResponse)
+      return tokenResponse
+    })
+    .finally(() => {
+      inFlightRefresh = null
+    })
+
+  return inFlightRefresh
+}
+
 // Response interceptor: automatic Wayd refresh-token retry on 401.
 // One path for every provider because every provider ends up with the same
 // Wayd JWT shape in storage after login/exchange. No MSAL involvement — the
@@ -150,22 +181,14 @@ axiosClient.interceptors.response.use(
     ) {
       ;(originalRequest as any)._retry = true
 
-      const refreshToken = getAuthRefreshToken()
-      const currentToken = getAuthToken()
-      if (currentToken && refreshToken) {
-        try {
-          const tokenResponse = await getAuthClient().refreshToken({
-            token: currentToken,
-            refreshToken,
-          })
-          storeAuth(tokenResponse)
-          originalRequest.headers = originalRequest.headers || {}
-          originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
-          return axiosClient(originalRequest)
-        } catch (refreshError) {
-          console.error('Token refresh on 401 failed:', refreshError)
-          clearAuth()
-        }
+      try {
+        const tokenResponse = await refreshOnce()
+        originalRequest.headers = originalRequest.headers || {}
+        originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
+        return axiosClient(originalRequest)
+      } catch (refreshError) {
+        console.error('Token refresh on 401 failed:', refreshError)
+        clearAuth()
       }
     }
 
