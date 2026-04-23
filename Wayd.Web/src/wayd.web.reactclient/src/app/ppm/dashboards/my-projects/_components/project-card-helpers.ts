@@ -27,7 +27,10 @@ export function sortProjects(projects: ProjectListDto[]): ProjectListDto[] {
   return [...projects].sort((a, b) => {
     const statusDiff = getStatusSortOrder(a) - getStatusSortOrder(b)
     if (statusDiff !== 0) return statusDiff
-    return a.name.localeCompare(b.name)
+    return a.name.localeCompare(b.name, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    })
   })
 }
 

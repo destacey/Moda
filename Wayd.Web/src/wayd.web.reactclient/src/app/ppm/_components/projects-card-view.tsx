@@ -113,11 +113,18 @@ const ProjectsCardView: FC<ProjectsCardViewProps> = ({
     )
   }
 
+  const sortedProjects = [...(projects ?? [])].sort((a, b) =>
+    a.name.localeCompare(b.name, undefined, {
+      numeric: true,
+      sensitivity: 'base',
+    }),
+  )
+
   return (
     <Flex vertical gap="small">
       {viewSelector && <Flex justify="flex-end">{viewSelector}</Flex>}
       <div className={styles.grid}>
-        {(projects ?? []).map((project) => (
+        {sortedProjects.map((project) => (
           <ProjectCard
             key={project.key}
             project={project}
