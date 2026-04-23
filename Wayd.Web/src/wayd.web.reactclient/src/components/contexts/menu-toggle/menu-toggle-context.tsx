@@ -10,7 +10,7 @@ export const MenuToggleContext = createContext<MenuToggleContextType | null>(
 
 export const MenuToggleProvider = ({ children }) => {
   const [menuCollapsed, setMenuCollapsed] = useLocalStorageState<boolean>(
-    'modaMenuCollapsed',
+    'appMenuCollapsed',
     true,
   )
 

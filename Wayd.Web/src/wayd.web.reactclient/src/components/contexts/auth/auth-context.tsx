@@ -50,6 +50,18 @@ const USERNAME_CLAIMS = [
   'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
 ]
 
+// Claims we surface as dedicated fields on User (or as a separate permissions
+// set). We skip them in the generic sweep so the Claims tab doesn't show them
+// twice — once in the sweep and once in the explicit promotion.
+const PROMOTED_CLAIM_KEYS = new Set<string>([
+  PERMISSION_CLAIM,
+  EMPLOYEE_ID_CLAIM,
+  ...LOGIN_PROVIDER_CLAIMS,
+  ...GIVEN_NAME_CLAIMS,
+  ...SURNAME_CLAIMS,
+  ...USERNAME_CLAIMS,
+])
+
 function firstDefined(
   payload: Record<string, unknown>,
   keys: readonly string[],
@@ -103,6 +115,7 @@ function decodeWaydJwt(token: string): DecodedClaims | null {
 
     const genericClaims: Claim[] = []
     for (const [key, value] of Object.entries(payload)) {
+      if (PROMOTED_CLAIM_KEYS.has(key)) continue
       if (typeof value === 'string') {
         genericClaims.push({ type: key, value })
       }

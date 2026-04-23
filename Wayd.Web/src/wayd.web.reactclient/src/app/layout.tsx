@@ -24,6 +24,7 @@ import LoginPage from './login/page'
 import LogoutPage from './logout/page'
 import { usePathname, useRouter } from 'next/navigation'
 import { isAuthActive } from '../services/clients'
+import ReleaseCleanup from '../components/release-cleanup'
 
 const { Content } = Layout
 const { useBreakpoint } = Grid
@@ -147,6 +148,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
       </head>
       <body className={inter.className}>
+        <ReleaseCleanup />
         {mounted && msalInstance ? (
           <AntdRegistry>
             <Provider store={store}>

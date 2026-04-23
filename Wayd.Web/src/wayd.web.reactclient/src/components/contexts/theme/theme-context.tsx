@@ -23,7 +23,7 @@ const agGridDarkTheme = themeBalham.withPart(colorSchemeDark)
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [currentThemeName, setCurrentThemeName] =
-    useLocalStorageState<ThemeName>('modaTheme', 'light')
+    useLocalStorageState<ThemeName>('appTheme', 'light')
   const hasMountedRef = useRef(false)
   const transitionTimeoutRef = useRef<number | null>(null)
 

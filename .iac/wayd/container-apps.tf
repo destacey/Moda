@@ -287,8 +287,18 @@ resource "azurerm_container_app" "wayd_backend" {
       # generates one env var per tenant. When onboarding a new org (e.g., for
       # PR 4's tenant-migration flow), just append to var.allowed_entra_tenant_ids.
       # Defaults to the single app tenant when the variable is not set.
+      #
+      # The `{ for idx, tid in … : idx => tid }` comprehension is deliberate:
+      # passing a raw list to `for_each` coerces it to a set, and for sets
+      # `env.key == env.value` — which produced env vars like
+      # `…AllowedTenantIds__04c1bf98-…` instead of `…AllowedTenantIds__0`.
+      # The configuration binder wants numeric indices, so we build a map
+      # keyed by index and use `env.key` as the index.
       dynamic "env" {
-        for_each = coalesce(var.allowed_entra_tenant_ids, [var.aad_tenant_id])
+        for_each = {
+          for idx, tid in coalesce(var.allowed_entra_tenant_ids, [var.aad_tenant_id]) :
+          idx => tid
+        }
         content {
           name  = "SecuritySettings__Providers__Entra__AllowedTenantIds__${env.key}"
           value = env.value

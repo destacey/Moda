@@ -25,6 +25,10 @@ The identity model that links users to their login providers is being generalize
 
 ### Microsoft Entra ID (Azure AD)
 
+:::tip Setting up a new environment
+If you don't yet have an Entra app registration for this deployment, follow [Entra App Registration Setup](./entra-app-registration.mdx) first. That walks through creating the two app registrations (API + client), choosing the right token version, and collecting the GUIDs referenced below.
+:::
+
 **Frontend (MSAL)** — create a `.env` file in the repository root:
 
 ```env
@@ -63,10 +67,10 @@ API_BASE_URL='https://localhost:5001'
 
 **Finding your Audience.** The `aud` claim shape depends on the token version your app registration issues:
 
-- **v2.0 tokens** (`accessTokenAcceptedVersion: 2` in the app manifest): `aud` is typically just the `<ClientId>` GUID.
-- **v1.0 tokens** (the default for many older registrations): `aud` is typically `api://<ClientId>` or `api://<ClientId>/access_as_user`.
+- **v2.0 tokens** (`api.requestedAccessTokenVersion: 2` in the app manifest): `aud` is the bare `<ClientId>` GUID. This is what Wayd expects.
+- **v1.0 tokens** (the default for older registrations, or when `api.requestedAccessTokenVersion` is `null`/`1`): `aud` is `api://<ClientId>` or `api://<ClientId>/access_as_user`.
 
-Don't guess — decode a real token at [jwt.ms](https://jwt.ms) and copy the `aud` value verbatim. A mismatch here rejects every exchange attempt with a 401, which is hard to diagnose after the fact.
+Don't guess — decode a real token at [jwt.ms](https://jwt.ms) and copy the `aud` value verbatim. A mismatch here rejects every exchange attempt with a 401, which is hard to diagnose after the fact. If you're seeing `api://` in a token you expected to be v2-shaped, flip `api.requestedAccessTokenVersion: 2` per the [app registration guide](./entra-app-registration.mdx#set-the-token-version-to-v2).
 
 Setting via User Secrets (preferred for local dev — `security.json` is committed with placeholders):
 
