@@ -31,11 +31,10 @@ An Azure subscription with permission to create resource groups, SQL, container 
 
 ### Azure AD app registrations
 
-Three app registrations must exist in your AAD tenant before `terraform apply`:
+Two app registrations must exist in your AAD tenant before `terraform apply`:
 
 1. **Client (frontend SPA)** — public client with redirect URIs for the deployed frontend hostname. Collect: client ID.
 2. **API (backend)** — exposes an API scope (typically `access_as_user`). Has a client secret. Collect: client ID, tenant ID, primary domain, API scope URI (`api://<client-id>/<scope>`), client secret.
-3. **Swagger OpenID** — public client used for the Swagger UI "Try it out" auth flow. Collect: client ID.
 
 ### Azure AD SQL admin group
 
@@ -64,7 +63,6 @@ Set these as **Terraform variables** in the TFC workspace:
 | `app_reg_client_id` | `<guid>` | Frontend SPA client ID |
 | `api_app_reg_client_id` | `<guid>` | Backend API client ID |
 | `app_reg_api_scope` | `api://<api-client-id>/access_as_user` | Full API scope URI |
-| `swagger_openid_client_id` | `<guid>` | Swagger UI OpenID client ID |
 | `sql_ad_admin_object_id` | `<guid>` | AAD group object ID for SQL admin |
 
 Set these as **Terraform variables (sensitive)** in the TFC workspace (or pass them via `-var` flags as the workflow does):
@@ -149,7 +147,7 @@ Triggering:
 For a brand-new environment:
 
 1. Create the TFC workspace (tag `wayd`) and set the required variables above
-2. Create the three AAD app registrations and collect their IDs
+2. Create the two AAD app registrations and collect their IDs
 3. Create the AAD SQL admin group and collect its object ID
 4. Configure the Terraform service principal on the TFC workspace
 5. Trigger the workflow via `workflow_dispatch` against your branch to verify auth

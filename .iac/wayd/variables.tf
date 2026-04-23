@@ -65,11 +65,6 @@ variable "aad_domain" {
   description = "The Azure AD tenant primary domain (e.g. contoso.onmicrosoft.com)."
 }
 
-variable "swagger_openid_client_id" {
-  type        = string
-  description = "The client ID for the Swagger OpenID app registration (used for the Swagger UI 'Try it out' auth flow)."
-}
-
 variable "sql_ad_admin_object_id" {
   type        = string
   description = "The Azure AD object ID of the group or user configured as the SQL Server AD administrator."

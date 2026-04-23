@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NJsonSchema.Generation.TypeMappers;
 using NSwag;
-using NSwag.AspNetCore;
 using ZymLabs.NSwag.FluentValidation;
 
 namespace Wayd.Infrastructure.OpenApi;
@@ -39,26 +37,6 @@ internal static class ConfigureServices
                         Url = settings.LicenseUrl
                     };
                 };
-
-                // OAuth2 (Azure AD) Authentication
-                document.AddSecurity(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
-                {
-                    Type = OpenApiSecuritySchemeType.OAuth2,
-                    Flow = OpenApiOAuth2Flow.AccessCode,
-                    Description = "OAuth2.0 Auth Code with PKCE",
-                    Flows = new()
-                    {
-                        AuthorizationCode = new()
-                        {
-                            AuthorizationUrl = config["SecuritySettings:Swagger:AuthorizationUrl"],
-                            TokenUrl = config["SecuritySettings:Swagger:TokenUrl"],
-                            Scopes = new Dictionary<string, string>
-                            {
-                                { config["SecuritySettings:Swagger:ApiScope"]!, "access the api" }
-                            }
-                        }
-                    }
-                });
 
                 // Personal Access Token (API Key) Authentication
                 document.AddSecurity("ApiKey", new OpenApiSecurityScheme
@@ -116,15 +94,6 @@ internal static class ConfigureServices
                 options.DefaultModelsExpandDepth = -1;
                 options.DocExpansion = "none";
                 options.TagsSorter = "alpha";
-                options.OAuth2Client = new OAuth2ClientSettings
-                {
-                    AppName = "Wayd API Client",
-                    ClientId = config["SecuritySettings:Swagger:OpenIdClientId"],
-                    ClientSecret = null,
-                    UsePkceWithAuthorizationCodeGrant = true,
-                    ScopeSeparator = " "
-                };
-                options.OAuth2Client.Scopes.Add(config["SecuritySettings:Swagger:ApiScope"]);
             });
             app.UseReDoc(options => options.Path = "/redoc");
         }
