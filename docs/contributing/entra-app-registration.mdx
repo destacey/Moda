@@ -1,0 +1,263 @@
+---
+title: Entra App Registration Setup
+description: How to set up Microsoft Entra ID app registrations for Wayd's token-exchange auth flow.
+sidebar_position: 6.5
+audience: [developer, operator]
+---
+
+# Entra App Registration Setup
+
+This guide walks through the Azure / Entra-side configuration required to let users sign in to Wayd with Microsoft Entra ID. It covers:
+
+- Creating the **API** app registration (the OAuth2 *resource* — what tokens are issued *for*)
+- Creating the **client** app registration (the OAuth2 *client* — what the frontend uses to log in)
+- Wiring them together (scope, permissions, consent)
+- Getting the right values into Wayd's configuration
+
+## Before you start
+
+Decide two things first:
+
+1. **Single Entra tenant vs multiple Entra tenants.** Pick **single-tenant** on the app registration if this deployment only accepts users from one Entra tenant — the common case. Pick **multi-tenant** if users from more than one Entra tenant need to sign in. The multi-tenant label just tells Entra *it's allowed to issue tokens* for other tenants' users; Wayd still restricts which specific tenants are accepted via the runtime `AllowedTenantIds` allowlist.
+
+   (Note: "tenant" here means an **Entra tenant** — the directory a user belongs to in Microsoft's identity system. Wayd has no separate app-level tenant concept today.)
+2. **Who will consent.** The first time a user from a given tenant signs in, someone with admin rights in that tenant must grant consent for Wayd to read basic profile info. Plan for that.
+
+You need two app registrations because that's the standard OAuth2 shape: a **client** (the SPA, which never holds secrets) and a **protected resource** (the API, which declares scopes and validates incoming tokens). Microsoft recommends this split even when both apps are "yours" — do not collapse them into one.
+
+## Step 1 — Create the API app registration
+
+This is the backend. It defines what "being authenticated to Wayd's API" means.
+
+1. Azure Portal → **Microsoft Entra ID** → **App registrations** → **New registration**.
+2. Name it something like `Wayd API ({env})` — e.g., `Wayd API (prod)`.
+3. **Supported account types**:
+   - **Single tenant only - Default Directory** — the common choice. Use this when Wayd only accepts users from this Entra tenant.
+   - **Multiple Entra ID tenants** — use this only when Wayd needs to accept users from more than one Entra tenant. Select the **Allow only certain tenants (Preview)** sub-option and list each tenant ID you intend to onboard. You'll also mirror that list in Wayd's `AllowedTenantIds` config — see the note below on why we want both.
+   - ❌ **Any Entra ID Tenant + Personal Microsoft accounts** — do not pick this. Wayd always rejects personal Microsoft accounts (MSA) via the allowlist, so tokens issued under this setting fail validation. The option misrepresents the app's intent.
+   - ❌ **Personal accounts only** — do not pick this. Every sign-in will be rejected.
+4. **Redirect URI**: leave blank. The API never receives redirects.
+5. Click **Register**.
+
+:::note Why both Entra-side and Wayd-side tenant restriction?
+When you pick **Multiple Entra ID tenants**, Entra offers an **Allow only certain tenants (Preview)** sub-option that restricts which tenants it will even issue tokens for. Use it, and *also* keep Wayd's `AllowedTenantIds` allowlist populated — defense in depth.
+
+**Why restrict at Entra.** With *Allow all tenants*, a user in any Entra tenant can successfully acquire a valid, signed Entra access token with `aud` = Wayd's API client ID. Wayd rejects it at `/api/auth/exchange` (401, `tid` not in allowlist), so they can't use it — but they *got issued a real signed credential naming your resource*. Narrow exposure, but non-zero, and easy to close: set Entra to refuse the token in the first place.
+
+**Why also keep `AllowedTenantIds`.** It's the runtime allowlist Wayd's exchange handler actually enforces, and startup fails if `Enabled: true` and the list is empty (fail-safe default). Treat the Entra-side restriction as the outer perimeter and `AllowedTenantIds` as the inner one.
+
+**Trade-offs to accept.**
+
+- **Two places to update.** Onboarding a new tenant means an Azure portal trip *and* a config change. Put both in your onboarding runbook so they can't drift.
+- **Preview dependency.** *Allow only certain tenants* is still marked Preview. If Microsoft changes or removes it, you fall back to `AllowedTenantIds` as the sole gate — recoverable, not catastrophic.
+:::
+
+Copy the **Application (client) ID** shown on the Overview page — you'll need it everywhere. We'll call it `{api-client-id}`.
+
+### Set the token version to v2
+
+By default, new app registrations issue **v1** access tokens. Wayd expects **v2**. Change it:
+
+1. Open the registration → **Manage** section → **Manifest**.
+2. In the JSON editor, find the `api` object (near the top) and its `requestedAccessTokenVersion` field:
+   ```json
+   {
+     "api": {
+       "requestedAccessTokenVersion": null,
+       ...
+     }
+   }
+   ```
+3. Change `null` to `2`:
+   ```json
+   {
+     "api": {
+       "requestedAccessTokenVersion": 2,
+       ...
+     }
+   }
+   ```
+4. **Save**.
+
+:::warning Field name
+The field is `api.requestedAccessTokenVersion` in the current Microsoft manifest schema. Older tutorials and blog posts reference `accessTokenAcceptedVersion` at the root of the manifest — that name belongs to a deprecated schema and will not take effect on current app registrations. See the [Microsoft app manifest reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-app-manifest).
+:::
+
+**Why v2:** v2 tokens put the bare client-ID GUID in the `aud` claim (e.g., `2fcc0e63-...`) and the v2.0 URL in the `iss` claim. v1 tokens use `api://{clientId}` for `aud` and a `sts.windows.net` issuer. Wayd's validator expects v2 shape. Mixing the two produces a hard-to-diagnose `401 Invalid token` on every exchange attempt.
+
+### Expose an API scope
+
+The client app needs a named scope to request access to. Create one:
+
+1. Registration → **Expose an API**.
+2. **Application ID URI** → click **Add** → accept the default (`api://{api-client-id}`) → **Save**.
+3. **Scopes defined by this API** → **Add a scope**:
+   - **Scope name**: `access_as_user`
+   - **Who can consent**: *Admins and users*
+   - **Admin consent display name**: `Access Wayd as the signed-in user`
+   - **Admin consent description**: `Allows the app to call Wayd's API as the signed-in user.`
+   - **State**: *Enabled*
+   - **Add scope**
+
+The full scope string is `api://{api-client-id}/access_as_user`. Copy it — the frontend needs it as `API_SCOPE`.
+
+### Create a client secret (only if Graph integration is enabled)
+
+Wayd's **token-exchange auth flow does not need a client secret** — it validates incoming user tokens against Entra's public JWKS, which is public-key-only. You can skip this step if you don't use the Microsoft Graph integration.
+
+A secret **is** needed if `SecuritySettings:GraphApi:Enabled` is `true` in your deployment. Graph is used for the employee-sync feature, which calls Microsoft Graph *as the API itself* (client-credentials flow) to read directory data. That flow is confidential-client and requires a secret.
+
+To create one:
+
+1. Registration → **Certificates & secrets** → **Client secrets** → **New client secret**.
+2. Description: `Graph integration - {env}` (e.g., `Graph integration - prod`).
+3. Expires: pick a policy that matches your rotation cadence (Azure defaults to 180 days; 12 or 24 months is more manageable).
+4. **Add**.
+5. **Copy the secret `Value` immediately** — the portal shows it once and never again. If you lose it you'll have to delete this credential and create a new one.
+
+Store the secret as:
+
+- **Local dev**: `dotnet user-secrets set "SecuritySettings:AzureAd:ClientSecret" "{the-secret}"` in `Wayd.Web/src/Wayd.Web.Api`.
+- **Prod / container**: Terraform's `aad_api_client_secret` variable (stored as a container-app secret, surfaced as the `SecuritySettings__AzureAd__ClientSecret` env var).
+
+**Rotation reminder.** Put the secret's expiry on a calendar. Graph calls start failing silently (well — with a 401 from Graph, logged at Warning level) once the secret expires; Wayd itself keeps running.
+
+:::info Why not use the same credential for both?
+Token exchange validates public JWKS → no secret. Graph client-credentials flow authenticates the API → needs a secret. They're conceptually different: one is Wayd-as-resource accepting user tokens, the other is Wayd-as-client calling another API. Separating them would let you disable Graph without touching auth, at the cost of a second app registration. Current design uses one registration for both — a reasonable simplification as long as you remember the secret only matters for Graph.
+:::
+
+## Step 2 — Create the client (SPA) app registration
+
+This is the frontend. It's what MSAL identifies as when acquiring tokens.
+
+1. Azure Portal → **App registrations** → **New registration**.
+2. Name: `Wayd Client ({env})` — e.g., `Wayd Client (prod)`.
+3. **Supported account types**: pick the same option as the API registration — **Single tenant only** or **Multiple Entra ID tenants**. Never the personal-accounts variants (see Step 1).
+4. **Redirect URI**:
+   - Platform: **Single-page application (SPA)**
+   - URL: your frontend's origin, with no path — e.g., `https://wayd.ahstech.com` for prod, `http://localhost:3000` for dev
+5. **Register**.
+
+Copy the **Application (client) ID** from the Overview page — we'll call it `{client-id}`.
+
+### Add the API permission
+
+The client registration needs permission to request tokens for the API registration.
+
+1. Client registration → **API permissions** → **Add a permission**.
+2. Tab **APIs my organization uses** → search for your API registration name → select it.
+3. **Delegated permissions** → check `access_as_user` → **Add permissions**.
+4. Back on the API permissions list, click **Grant admin consent for `{tenant name}`** → **Yes**.
+
+Admin consent pre-authorizes every user in your Entra tenant so they don't see a consent prompt on first login. If you're accepting users from multiple Entra tenants, each onboarded tenant's admin will need to grant this consent for their users.
+
+### (Optional) Pre-authorize the client in the API registration
+
+This is a nice-to-have that avoids separate user consent when clients outside your tenant sign in:
+
+1. API registration → **Expose an API** → **Authorized client applications** → **Add a client application**.
+2. Client ID: `{client-id}`.
+3. Check the `access_as_user` scope.
+4. **Add application**.
+
+Skip this if everything stays in one Entra tenant; it's only relevant if clients in other Entra tenants need to call the API.
+
+## Step 3 — Wire the values into Wayd
+
+You now have two GUIDs and one scope string. Here's where each goes.
+
+### Frontend
+
+Create a `.env` file at the repo root (or set the equivalents in your container app / hosting platform):
+
+```env
+AAD_CLIENT_ID='{client-id}'
+AAD_TENANT_ID='{your tenant ID}'
+AAD_LOGON_AUTHORITY='https://login.microsoftonline.com/{your tenant ID}'
+API_SCOPE='api://{api-client-id}/access_as_user'
+API_BASE_URL='https://localhost:5001'
+```
+
+#### Authority values by account type
+
+Pick the authority that matches the **Supported account types** you chose in Step 1/Step 2:
+
+| Authority | Who can sign in | Use when |
+|---|---|---|
+| `https://login.microsoftonline.com/{your tenant ID}` | Users in this one Entra tenant | Single-tenant deployment (common case) |
+| `https://login.microsoftonline.com/organizations` | Any Entra ID (work/school) tenant | Multi-tenant deployment — **recommended** |
+| `https://login.microsoftonline.com/common` | Any Entra tenant **+ personal Microsoft accounts** | Avoid — Wayd rejects personal accounts, so those sign-ins fail at token validation |
+
+For a multi-tenant deployment, use `/organizations`. MSAL picks the user's home tenant automatically, and Wayd's `AllowedTenantIds` allowlist still controls which specific Entra tenants are accepted. Do not use `/common` unless you have a reason to let MSAL issue personal-account tokens that Wayd will then reject.
+
+### Backend
+
+Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Secrets:
+
+```json
+{
+    "SecuritySettings": {
+        "Providers": {
+            "Entra": {
+                "Enabled": true,
+                "Authority": "https://login.microsoftonline.com/common/v2.0",
+                "Audience": "{api-client-id}",
+                "AllowedTenantIds": [ "{your tenant ID}" ],
+                "ClockSkewSeconds": 60
+            }
+        }
+    }
+}
+```
+
+Three things to note:
+
+- **`Authority`**: use `/common/v2.0` even when only one Entra tenant is in play. The `v2.0` suffix is what matches v2 tokens; the `AllowedTenantIds` allowlist is what restricts which Entra tenants are accepted.
+- **`Audience`**: bare GUID of the **API** registration (not the client, not `api://...`). This is why Step 1's v2 switch matters — with v1 tokens this value would need to be `api://{api-client-id}` instead.
+- **`AllowedTenantIds`**: must be non-empty. Startup fails if `Enabled: true` and this list is empty — that's a deliberate fail-safe default.
+
+For Terraform-driven deploys, see [the IaC README](https://github.com/destacey/Wayd/tree/main/.iac/wayd) for the `allowed_entra_tenant_ids` variable and how the `dynamic "env"` block emits `AllowedTenantIds__0`, `__1`, etc.
+
+## Step 4 — Verify
+
+Sign in to the frontend. Then:
+
+1. **Decode the access token** that the frontend sends to `/api/auth/exchange`. Open DevTools → Network → find the `POST /api/auth/exchange` request → copy the `subjectToken` field from the body → paste into [jwt.ms](https://jwt.ms) (it decodes locally; nothing is sent anywhere).
+2. Confirm:
+   - `aud` = `{api-client-id}` (bare GUID, no `api://` prefix — if you see the prefix, token version is wrong)
+   - `iss` = `https://login.microsoftonline.com/{your tenant ID}/v2.0`
+   - `ver` = `"2.0"`
+   - `tid` = `{your tenant ID}`
+3. The exchange should return a Wayd JWT; the app should load without a "Loading Permissions" screen.
+
+## Troubleshooting
+
+**`401 Invalid token` on `/api/auth/exchange`.** Decode the token at jwt.ms and compare:
+
+| Token field | Must equal |
+|---|---|
+| `aud` | `SecuritySettings:Providers:Entra:Audience` (bare client-ID GUID for v2) |
+| `tid` | One of `SecuritySettings:Providers:Entra:AllowedTenantIds` |
+| `iss` | `https://login.microsoftonline.com/{tid}/v2.0` for v2 |
+| `ver` | `"2.0"` |
+| `exp` | In the future |
+
+If `aud` has `api://` in it but your config expects a bare GUID, the API registration is still issuing v1 tokens. Redo Step 1's v2 switch. **Users will need to get a fresh token** — cached v1 tokens in MSAL's localStorage stay v1 until they expire or the user signs out and back in.
+
+**`503 Service Unavailable` on `/api/auth/exchange`.** `Enabled: false` on the backend. Either flip it to `true` or remove the Entra login button from the frontend.
+
+**Startup fails with `AllowedTenantIds must be non-empty`.** Exactly what it says. Fail-safe default — add at least one tenant ID.
+
+**User signs in, immediately redirects back to `/login`.** Usually means the exchange succeeded but the login page's storage write raced a redirect. Check browser console for the precise error; most commonly it's a CORS failure or a mismatched `API_BASE_URL`.
+
+**User from a new Entra tenant gets rejected.** Add their tenant ID to `AllowedTenantIds`. The tenant's admin also needs to admin-consent the `access_as_user` permission (see Step 2) — otherwise users see Microsoft's consent prompt on first sign-in, and individual users may not be allowed to consent depending on the tenant's policies.
+
+**Employee sync / Graph calls fail with 401.** The API's client secret has expired, was never set, or is wrong. Check `SecuritySettings:AzureAd:ClientSecret`. This is independent of the token-exchange flow — login still works, only Graph-backed features break. See [Create a client secret](#create-a-client-secret-only-if-graph-integration-is-enabled).
+
+## References
+
+- [App manifest reference](https://learn.microsoft.com/en-us/entra/identity-platform/reference-app-manifest) — authoritative on `requestedAccessTokenVersion`.
+- [Access tokens](https://learn.microsoft.com/en-us/entra/identity-platform/access-tokens) — v1 vs v2 differences.
+- [Access token claims reference](https://learn.microsoft.com/en-us/entra/identity-platform/access-token-claims-reference) — meaning of `aud`, `iss`, `tid`, `ver`, etc.
+- [Configuration](./configuration.mdx) — full Wayd-side auth config reference.
+- [Identity Model Refactor](./specs/identity-model-refactor.mdx) — design context for the exchange flow.
