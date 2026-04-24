@@ -3,7 +3,7 @@
 import { IterationStateTag } from '@/src/components/common/planning'
 import { IterationState } from '@/src/components/types'
 import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
-import { Flex, Menu, Typography } from 'antd'
+import { Divider, Flex, Menu, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -104,6 +104,7 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
         />
       )}
       <PlanningIntervalSwitcher piKey={piKey} />
+      <Divider orientation="vertical" />
       <Menu
         selectedKeys={selectedKey ? [selectedKey] : []}
         style={{

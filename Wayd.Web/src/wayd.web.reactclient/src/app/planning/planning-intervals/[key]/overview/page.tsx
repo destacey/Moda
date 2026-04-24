@@ -2,7 +2,6 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
-import useAuth from '@/src/components/contexts/auth'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
@@ -10,6 +9,8 @@ import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import PlanningIntervalDetailsLoading from '../loading'
 import { use, useEffect } from 'react'
 import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
+import { Flex } from 'antd'
+import IterationsStrip from '../_components/iterations-strip'
 
 const PlanningIntervalOverviewPage = (props: {
   params: Promise<{ key: string }>
@@ -40,7 +41,12 @@ const PlanningIntervalOverviewPage = (props: {
     return notFound()
   }
 
-  return <PageTitle title="PI Overview" />
+  return (
+    <Flex vertical gap="middle">
+      <PageTitle title="PI Overview" />
+      <IterationsStrip piKey={piKey} />
+    </Flex>
+  )
 }
 
 const PlanningIntervalOverviewPageWithAuthorization = authorizePage(
