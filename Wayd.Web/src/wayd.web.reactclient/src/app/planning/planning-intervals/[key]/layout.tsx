@@ -1,4 +1,4 @@
-import PlanningIntervalNav from './planning-interval-nav'
+import PlanningIntervalNav from './_components/planning-interval-nav'
 
 const PlanningIntervalLayout = async (props: {
   params: Promise<{ key: string }>

@@ -16,7 +16,10 @@ export interface IconMenuProps {
   tooltip?: string
   selectedKeys?: string[]
   maxHeight?: number
+  /** Render the trigger even when `items` is empty (e.g. data is lazily loaded on open). */
+  alwaysRender?: boolean
   onChange?: (value: string | number) => void
+  onOpenChange?: (open: boolean) => void
 }
 
 const IconMenu: FC<IconMenuProps> = ({
@@ -25,7 +28,9 @@ const IconMenu: FC<IconMenuProps> = ({
   tooltip,
   selectedKeys,
   maxHeight = 400,
+  alwaysRender = false,
   onChange,
+  onOpenChange,
 }: IconMenuProps) => {
   const { token } = useTheme()
 
@@ -46,6 +51,7 @@ const IconMenu: FC<IconMenuProps> = ({
   }
 
   const handleOpenChange = (open: boolean) => {
+    onOpenChange?.(open)
     if (open && selectedKeys?.length) {
       // Use setTimeout to wait for the dropdown to render
       setTimeout(() => {
@@ -57,7 +63,8 @@ const IconMenu: FC<IconMenuProps> = ({
     }
   }
 
-  if (!icon || !items || items.length === 0) return null
+  if (!icon) return null
+  if (!alwaysRender && (!items || items.length === 0)) return null
 
   return (
     <WaydTooltip title={tooltip}>
