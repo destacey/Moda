@@ -3,7 +3,7 @@
 import { IterationStateTag } from '@/src/components/common/planning'
 import { IterationState } from '@/src/components/types'
 import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
-import { Menu, Typography } from 'antd'
+import { Flex, Menu, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -17,7 +17,8 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
 
   const basePath = `/planning/planning-intervals/${piKey}`
   const selectedKey = (() => {
-    if (pathname === basePath) return 'pi-details'
+    if (pathname.startsWith(`${basePath}/overview`)) return 'pi-overview'
+    if (pathname.startsWith(`${basePath}/details`)) return 'pi-details'
     if (pathname.startsWith(`${basePath}/plan-review`)) return 'pi-plan-review'
     if (pathname.startsWith(`${basePath}/objectives/health-report`))
       return 'pi-reports-health-report'
@@ -29,7 +30,17 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
   const items: ItemType[] = [
     {
       label: (
-        <Link href={`/planning/planning-intervals/${piKey}`}>PI Details</Link>
+        <Link href={`/planning/planning-intervals/${piKey}/overview`}>
+          Overview
+        </Link>
+      ),
+      key: 'pi-overview',
+    },
+    {
+      label: (
+        <Link href={`/planning/planning-intervals/${piKey}/details`}>
+          Details
+        </Link>
       ),
       key: 'pi-details',
     },
@@ -74,11 +85,10 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
   ]
 
   return (
-    <div
+    <Flex
+      align="center"
+      gap={16}
       style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: 16,
         margin: '0 -24px 12px',
         padding: '0 24px',
         background: 'var(--ant-color-bg-container)',
@@ -86,7 +96,7 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
       }}
     >
       <Text type="secondary" style={{ whiteSpace: 'nowrap' }}>
-        PI: {planningIntervalData?.name}
+        Planning Interval: {planningIntervalData?.name}
       </Text>
       {planningIntervalData?.state && (
         <IterationStateTag
@@ -104,7 +114,7 @@ const PlanningIntervalNav = ({ piKey }: { piKey: number }) => {
         mode="horizontal"
         items={items}
       />
-    </div>
+    </Flex>
   )
 }
 

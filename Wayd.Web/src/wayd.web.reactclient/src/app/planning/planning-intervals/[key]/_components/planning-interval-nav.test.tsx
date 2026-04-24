@@ -62,7 +62,9 @@ describe('PlanningIntervalNav', () => {
   it('renders the planning interval name label', () => {
     renderNav('/planning/planning-intervals/42')
 
-    expect(screen.getByText(/PI:\s*2026 PI 1/)).toBeInTheDocument()
+    expect(
+      screen.getByText(/Planning Interval:\s*2026 PI 1/),
+    ).toBeInTheDocument()
   })
 
   it('renders the PI switcher', () => {
@@ -89,9 +91,13 @@ describe('PlanningIntervalNav', () => {
   it('renders links to each nav destination', () => {
     renderNav('/planning/planning-intervals/42')
 
-    expect(screen.getByRole('link', { name: 'PI Details' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Overview' })).toHaveAttribute(
       'href',
-      '/planning/planning-intervals/42',
+      '/planning/planning-intervals/42/overview',
+    )
+    expect(screen.getByRole('link', { name: 'Details' })).toHaveAttribute(
+      'href',
+      '/planning/planning-intervals/42/details',
     )
     expect(screen.getByRole('link', { name: 'Plan Review' })).toHaveAttribute(
       'href',
@@ -111,7 +117,8 @@ describe('PlanningIntervalNav', () => {
     document.querySelector('.ant-menu-item-selected')
 
   it.each([
-    ['/planning/planning-intervals/42', 'PI Details'],
+    ['/planning/planning-intervals/42/overview', 'Overview'],
+    ['/planning/planning-intervals/42/details', 'Details'],
     ['/planning/planning-intervals/42/plan-review', 'Plan Review'],
     ['/planning/planning-intervals/42/objectives', 'Objectives'],
     ['/planning/planning-intervals/42/objectives/5', 'Objectives'],
@@ -123,6 +130,12 @@ describe('PlanningIntervalNav', () => {
     const selected = findSelectedMenuItem()
     expect(selected).not.toBeNull()
     expect(selected?.textContent).toContain(label)
+  })
+
+  it('does not highlight any tab on the root route before redirect', () => {
+    renderNav('/planning/planning-intervals/42')
+
+    expect(findSelectedMenuItem()).toBeNull()
   })
 
   it('does not highlight any tab for unknown routes', () => {
