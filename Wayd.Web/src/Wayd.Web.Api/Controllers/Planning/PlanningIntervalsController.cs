@@ -271,6 +271,77 @@ public class PlanningIntervalsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpGet("{idOrKey}/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get PI-level metrics aggregated across all mapped sprints in every iteration.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlanningIntervalMetricsResponse>> GetMetrics(string idOrKey, CancellationToken cancellationToken)
+    {
+        // Pull the PI itself for identity fields.
+        var planningInterval = await _sender.Send(
+            new GetPlanningIntervalQuery(idOrKey),
+            cancellationToken);
+
+        if (planningInterval is null)
+            return NotFound();
+
+        // Pull sprint mappings for every iteration in the PI in one shot.
+        var iterationSprints = await _sender.Send(
+            new GetPlanningIntervalIterationSprintsQuery(idOrKey, null),
+            cancellationToken);
+
+        if (iterationSprints is null)
+            return NotFound();
+
+        // Flatten across iterations and de-dupe sprint ids — the same sprint
+        // could in theory be mapped to multiple iterations and we don't want
+        // to double-count its metrics.
+        var sprintIds = iterationSprints
+            .SelectMany(i => i.Sprints.Select(s => s.Id))
+            .Distinct()
+            .ToList();
+
+        if (sprintIds.Count == 0)
+        {
+            return Ok(new PlanningIntervalMetricsResponse
+            {
+                PlanningIntervalId = planningInterval.Id,
+                PlanningIntervalKey = planningInterval.Key,
+                PlanningIntervalName = planningInterval.Name,
+                TeamCount = 0,
+                SprintCount = 0,
+                AverageCycleTimeDays = null,
+            });
+        }
+
+        var sprintMetrics = await _sender.Send(
+            new GetSprintsWorkItemMetricsQuery(sprintIds),
+            cancellationToken);
+
+        var cycleTimes = sprintMetrics
+            .Where(m => m.AverageCycleTimeDays.HasValue)
+            .Select(m => m.AverageCycleTimeDays!.Value)
+            .ToList();
+        var avgCycleTime = cycleTimes.Count > 0 ? cycleTimes.Average() : (double?)null;
+
+        var teamCount = iterationSprints
+            .SelectMany(i => i.Sprints.Select(s => s.Team.Id))
+            .Distinct()
+            .Count();
+
+        return Ok(new PlanningIntervalMetricsResponse
+        {
+            PlanningIntervalId = planningInterval.Id,
+            PlanningIntervalKey = planningInterval.Key,
+            PlanningIntervalName = planningInterval.Name,
+            TeamCount = teamCount,
+            SprintCount = sprintIds.Count,
+            AverageCycleTimeDays = avgCycleTime,
+        });
+    }
+
     [HttpGet("{idOrKey}/iterations/{iterationIdOrKey}/metrics")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get metrics for a PI iteration aggregated across all mapped sprints.", "")]

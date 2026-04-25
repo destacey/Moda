@@ -10058,6 +10058,63 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{idOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get PI-level metrics aggregated across all mapped sprints in every iteration.",
+        "operationId": "PlanningIntervals_GetMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalMetricsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics": {
       "get": {
         "tags": [
@@ -25917,6 +25974,47 @@
               "nullable": true,
               "example": "00000000-0000-0000-0000-000000000000"
             }
+          }
+        }
+      },
+      "PlanningIntervalMetricsResponse": {
+        "type": "object",
+        "description": "Response containing PI-level metrics aggregated across all mapped sprints in\nevery iteration of the Planning Interval. Intended as a thin, extensible\nrollup; per-iteration breakdowns remain on the iteration-level endpoint.",
+        "additionalProperties": false,
+        "required": [
+          "planningIntervalName",
+          "planningIntervalId",
+          "planningIntervalKey",
+          "teamCount",
+          "sprintCount"
+        ],
+        "properties": {
+          "planningIntervalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "planningIntervalKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "planningIntervalName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "teamCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
           }
         }
       },

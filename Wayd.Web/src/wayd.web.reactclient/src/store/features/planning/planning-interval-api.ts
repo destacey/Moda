@@ -12,6 +12,7 @@ import {
   PlanningIntervalIterationMetricsResponse,
   PlanningIntervalIterationSprintsDto,
   PlanningIntervalListDto,
+  PlanningIntervalMetricsResponse,
   PlanningIntervalObjectiveDetailsDto,
   PlanningIntervalObjectiveHealthCheckDto,
   PlanningIntervalObjectiveListDto,
@@ -162,6 +163,25 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.PlanningIntervalPredictability, id: arg }, // typically arg is the key
+      ],
+    }),
+    getPlanningIntervalMetrics: builder.query<
+      PlanningIntervalMetricsResponse,
+      number
+    >({
+      queryFn: async (key) => {
+        try {
+          const data = await getPlanningIntervalsClient().getMetrics(
+            key.toString(),
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, arg) => [
+        { type: QueryTags.PlanningIntervalMetrics, id: arg },
       ],
     }),
     getPlanningIntervalIterations: builder.query<
@@ -738,6 +758,7 @@ export const {
   useUpdatePlanningIntervalDatesMutation,
   useGetPlanningIntervalCalendarQuery,
   useGetPlanningIntervalPredictabilityQuery,
+  useGetPlanningIntervalMetricsQuery,
   useGetPlanningIntervalIterationsQuery,
   useGetPlanningIntervalIterationQuery,
   useGetPlanningIntervalIterationMetricsQuery,

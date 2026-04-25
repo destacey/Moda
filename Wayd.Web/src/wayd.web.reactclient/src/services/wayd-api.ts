@@ -12494,6 +12494,74 @@ export class PlanningIntervalsClient {
     }
 
     /**
+     * Get PI-level metrics aggregated across all mapped sprints in every iteration.
+     */
+    getMetrics(idOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalMetricsResponse> {
+        let url_ = this.baseUrl + "/api/planning/planning-intervals/{idOrKey}/metrics";
+        if (idOrKey === undefined || idOrKey === null)
+            throw new globalThis.Error("The parameter 'idOrKey' must be defined.");
+        url_ = url_.replace("{idOrKey}", encodeURIComponent("" + idOrKey));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetMetrics(_response);
+        });
+    }
+
+    protected processGetMetrics(response: AxiosResponse): Promise<PlanningIntervalMetricsResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<PlanningIntervalMetricsResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 404) {
+            const _responseText = response.data;
+            let result404: any = null;
+            let resultData404  = _responseText;
+            result404 = resultData404;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result404);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<PlanningIntervalMetricsResponse>(null as any);
+    }
+
+    /**
      * Get metrics for a PI iteration aggregated across all mapped sprints.
      */
     getIterationMetrics(idOrKey: string, iterationIdOrKey: string, cancelToken?: CancelToken): Promise<PlanningIntervalIterationMetricsResponse> {
@@ -25099,6 +25167,16 @@ This is a sync/replace operation - any team sprints currently mapped but not inc
 - Null value: Explicitly unmaps any sprint from that iteration for this team.
 - Omitted iteration: No change to that iteration's mappings. */
     iterationSprintMappings: { [key: string]: string; };
+}
+
+/** Response containing PI-level metrics aggregated across all mapped sprints in every iteration of the Planning Interval. Intended as a thin, extensible rollup; per-iteration breakdowns remain on the iteration-level endpoint. */
+export interface PlanningIntervalMetricsResponse {
+    planningIntervalId: string;
+    planningIntervalKey: number;
+    planningIntervalName: string;
+    teamCount: number;
+    sprintCount: number;
+    averageCycleTimeDays?: number | undefined;
 }
 
 /** Response containing PI Iteration metrics aggregated across all mapped sprints. */

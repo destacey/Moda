@@ -1,10 +1,11 @@
 'use client'
 
-import { MetricCard } from '@/src/components/common/metrics'
+import { CycleTimeMetric, MetricCard } from '@/src/components/common/metrics'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { IterationState } from '@/src/components/types'
 import { PlanningIntervalDetailsDto } from '@/src/services/wayd-api'
 import {
+  useGetPlanningIntervalMetricsQuery,
   useGetPlanningIntervalObjectivesQuery,
   useGetPlanningIntervalPredictabilityQuery,
   useGetPlanningIntervalTeamsQuery,
@@ -31,6 +32,15 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
   const { data: teamsData } = useGetPlanningIntervalTeamsQuery(
     planningInterval.key,
     { skip: !planningInterval.key },
+  )
+
+  const { data: piMetricsData } = useGetPlanningIntervalMetricsQuery(
+    planningInterval.key,
+    {
+      skip:
+        !planningInterval.key ||
+        planningInterval.state.id === IterationState.Future,
+    },
   )
 
   const { data: objectivesData } = useGetPlanningIntervalObjectivesQuery(
@@ -97,14 +107,14 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
             A 2-up step would always leave the 3rd chart alone on its own row.
         */}
         <Row gutter={[16, 16]} align="stretch">
-          <Col xs={24} sm={12} md={12} lg={8}>
+          <Col xs={24} sm={12} md={12} lg={6}>
             <TimelineProgress
               start={new Date(planningInterval.start)}
               end={new Date(planningInterval.end)}
               style={{ height: '100%', width: '100%', minWidth: 0 }}
             />
           </Col>
-          <Col xs={12} sm={6} md={6} lg={8}>
+          <Col xs={12} sm={6} md={6} lg={6}>
             <MetricCard
               title="Teams"
               value={teamsData?.filter((t) => t.type === 'Team').length ?? 0}
@@ -112,13 +122,21 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
             />
           </Col>
           {hasObjectives && (
-            <Col xs={12} sm={6} md={6} lg={8}>
+            <Col xs={12} sm={6} md={6} lg={6}>
               <MetricCard
                 title="PI Predictability"
                 value={planningInterval.predictability ?? 0}
                 precision={0}
                 suffix="%"
                 tooltip="The percentage of completed objectives compared to the number of non-stretched objectives in this planning interval."
+              />
+            </Col>
+          )}
+          {piMetricsData?.averageCycleTimeDays != null && (
+            <Col xs={12} sm={6} md={6} lg={6}>
+              <CycleTimeMetric
+                value={piMetricsData.averageCycleTimeDays}
+                tooltip="Average cycle time of completed (Done) work items across all team sprints in every iteration of this planning interval."
               />
             </Col>
           )}
