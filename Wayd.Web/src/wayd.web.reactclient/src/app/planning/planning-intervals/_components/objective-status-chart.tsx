@@ -43,8 +43,8 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
     data: props.data,
     angleField: 'count',
     colorField: 'type',
-    height: 350,
-    width: 425,
+    autoFit: true,
+    height: 280,
     label: {
       text: (d) =>
         `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
@@ -54,12 +54,17 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
         },
       ],
     },
-    legend: {
-      color: {
-        title: false,
-        position: 'right',
-        rowPadding: 5,
-      },
+    legend: false,
+    tooltip: {
+      title: (d: ObjectiveStatusChartDataItem) => d.type,
+      items: [
+        {
+          field: 'count',
+          name: 'Objectives',
+          valueFormatter: (value: number) =>
+            `${value} (${Math.round((value / total) * 100)}%)`,
+        },
+      ],
     },
   }
 

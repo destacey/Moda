@@ -11,6 +11,7 @@ import { use, useEffect } from 'react'
 import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
 import { Flex } from 'antd'
 import IterationsStrip from '../_components/iterations-strip'
+import PiAtAGlance from '../_components/pi-at-a-glance'
 
 const PlanningIntervalOverviewPage = (props: {
   params: Promise<{ key: string }>
@@ -44,6 +45,7 @@ const PlanningIntervalOverviewPage = (props: {
   return (
     <Flex vertical gap="middle">
       <PageTitle title="PI Overview" />
+      <PiAtAGlance planningInterval={planningIntervalData} />
       <IterationsStrip piKey={piKey} />
     </Flex>
   )

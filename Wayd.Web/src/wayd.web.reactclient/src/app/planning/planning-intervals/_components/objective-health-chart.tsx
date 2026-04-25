@@ -43,8 +43,8 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
     data: props.data,
     angleField: 'count',
     colorField: 'type',
-    height: 350,
-    width: 425,
+    autoFit: true,
+    height: 280,
     label: {
       text: (d) =>
         `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
@@ -54,12 +54,17 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
         },
       ],
     },
-    legend: {
-      color: {
-        title: false,
-        position: 'right',
-        rowPadding: 5,
-      },
+    legend: false,
+    tooltip: {
+      title: (d: ObjectiveHealthChartDataItem) => d.type,
+      items: [
+        {
+          field: 'count',
+          name: 'Objectives',
+          valueFormatter: (value: number) =>
+            `${value} (${Math.round((value / total) * 100)}%)`,
+        },
+      ],
     },
   }
 
