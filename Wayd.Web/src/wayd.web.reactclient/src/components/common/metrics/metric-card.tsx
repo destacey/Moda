@@ -1,6 +1,6 @@
 import { Card, Flex, Statistic, StatisticProps } from 'antd'
 import WaydTooltip from '@/src/components/common/wayd-tooltip'
-import { FC } from 'react'
+import { FC, ReactNode } from 'react'
 
 const { Meta } = Card
 
@@ -8,7 +8,7 @@ export interface MetricCardProps extends Omit<StatisticProps, 'valueStyle'> {
   cardStyle?: React.CSSProperties
   statisticStyle?: React.CSSProperties
   tooltip?: string
-  secondaryValue?: string | number
+  secondaryValue?: ReactNode
   // Support both old valueStyle (for backwards compatibility) and new styles.content
   valueStyle?: React.CSSProperties
 }

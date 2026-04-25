@@ -1,6 +1,12 @@
 'use client'
 
 import { CycleTimeMetric, MetricCard } from '@/src/components/common/metrics'
+import WaydTooltip from '@/src/components/common/wayd-tooltip'
+import {
+  AimOutlined,
+  CheckCircleOutlined,
+  PlusCircleOutlined,
+} from '@ant-design/icons'
 import TimelineProgress from '@/src/components/common/planning/timeline-progress'
 import { IterationState } from '@/src/components/types'
 import { PlanningIntervalDetailsDto } from '@/src/services/wayd-api'
@@ -97,6 +103,19 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
 
   const hasObjectives = !!objectivesData && objectivesData.length > 0
 
+  const objectiveCounts = (() => {
+    if (!objectivesData) return { regular: 0, stretch: 0, completed: 0 }
+    return objectivesData.reduce(
+      (acc, o) => {
+        if (o.isStretch) acc.stretch += 1
+        else acc.regular += 1
+        if (o.status.name === 'Completed') acc.completed += 1
+        return acc
+      },
+      { regular: 0, stretch: 0, completed: 0 },
+    )
+  })()
+
   return (
     <Card size="small" title="At a Glance">
       <Flex vertical gap="middle">
@@ -129,6 +148,37 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
                 precision={0}
                 suffix="%"
                 tooltip="The percentage of completed objectives compared to the number of non-stretched objectives in this planning interval."
+                secondaryValue={
+                  <Flex gap={12} style={{ fontSize: 12 }}>
+                    <WaydTooltip title="Completed">
+                      <span>
+                        <CheckCircleOutlined
+                          style={{ marginRight: 4 }}
+                          aria-label="Completed"
+                        />
+                        {objectiveCounts.completed}
+                      </span>
+                    </WaydTooltip>
+                    <WaydTooltip title="Regular (non-stretch)">
+                      <span>
+                        <AimOutlined
+                          style={{ marginRight: 4 }}
+                          aria-label="Regular"
+                        />
+                        {objectiveCounts.regular}
+                      </span>
+                    </WaydTooltip>
+                    <WaydTooltip title="Stretch">
+                      <span>
+                        <PlusCircleOutlined
+                          style={{ marginRight: 4 }}
+                          aria-label="Stretch"
+                        />
+                        {objectiveCounts.stretch}
+                      </span>
+                    </WaydTooltip>
+                  </Flex>
+                }
               />
             </Col>
           )}
