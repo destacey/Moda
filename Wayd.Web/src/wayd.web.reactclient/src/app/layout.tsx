@@ -25,6 +25,7 @@ import LogoutPage from './logout/page'
 import { usePathname, useRouter } from 'next/navigation'
 import { isAuthActive } from '../services/clients'
 import ReleaseCleanup from '../components/release-cleanup'
+import BreakpointIndicator from './_components/breakpoint-indicator'
 
 const { Content } = Layout
 const { useBreakpoint } = Grid
@@ -156,6 +157,7 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
                 <AuthGate>{children}</AuthGate>
               </MsalProvider>
             </Provider>
+            {process.env.NODE_ENV !== 'production' && <BreakpointIndicator />}
           </AntdRegistry>
         ) : (
           <SsrFallback />
