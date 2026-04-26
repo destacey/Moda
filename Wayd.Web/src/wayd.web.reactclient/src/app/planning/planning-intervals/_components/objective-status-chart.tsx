@@ -1,9 +1,12 @@
 'use client'
 
+import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
+import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
+import { getObjectiveStatusColor } from '@/src/utils'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
-import { Card } from 'antd'
+import { theme } from 'antd'
 
 const Pie = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
@@ -11,63 +14,129 @@ const Pie = dynamic(
 )
 
 export interface ObjectiveStatusChartProps {
-  data: ObjectiveStatusChartDataItem[]
+  objectivesData: PlanningIntervalObjectiveListDto[]
+  embedded?: boolean
+  height?: number
 }
 
-export interface ObjectiveStatusChartDataItem {
+interface ObjectiveStatusChartDataItem {
   type: string
   count: number
 }
 
+const OBJECTIVE_STATUS_ORDER = [
+  'Not Started',
+  'In Progress',
+  'Completed',
+  'Missed',
+  'Canceled',
+]
+
 const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
-  const { currentThemeName, antDesignChartsTheme } = useTheme()
+  const { antDesignChartsTheme } = useTheme()
+  const { token } = theme.useToken()
 
-  if (!props.data || props.data.length === 0) return null
+  if (!props.objectivesData || props.objectivesData.length === 0) return null
 
-  const fontColor =
-    currentThemeName === 'light'
-      ? 'rgba(0, 0, 0, 0.45)'
-      : 'rgba(255, 255, 255, 0.45)'
-
-  const total = props.data.reduce((acc, x) => acc + x.count, 0)
-  const config: PieConfig = {
-    title: {
-      title: 'Objectives By Status',
-      style: {
-        titleFontSize: 14,
-        titleFontWeight: 'normal',
-        titleFill: fontColor,
-      },
+  const groupedStatusData = props.objectivesData.reduce(
+    (acc, objective) => {
+      const status = objective.status?.name ?? 'Unknown'
+      acc[status] = acc[status] ? acc[status] + 1 : 1
+      return acc
     },
+    {} as Record<string, number>,
+  )
+
+  const data: ObjectiveStatusChartDataItem[] = Object.entries(groupedStatusData)
+    .map(([status, count]) => ({ type: status, count }))
+    .sort((a, b) => {
+      const aIndex = OBJECTIVE_STATUS_ORDER.indexOf(a.type)
+      const bIndex = OBJECTIVE_STATUS_ORDER.indexOf(b.type)
+      const normalizedAIndex = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex
+      const normalizedBIndex = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex
+      return normalizedAIndex - normalizedBIndex
+    })
+
+  const mapSemanticColorToChartColor = (semanticColor: string) => {
+    switch (semanticColor) {
+      case 'processing':
+        return token.colorPrimary
+      case 'success':
+        return token.colorSuccess
+      case 'error':
+        return token.colorError
+      case 'warning':
+        return token.colorWarning
+      case 'default':
+      default:
+        return token.colorTextQuaternary
+    }
+  }
+
+  const statusDomain = data.map((item) => item.type)
+  const statusRange = data.map((item) =>
+    mapSemanticColorToChartColor(getObjectiveStatusColor(item.type)),
+  )
+  const tooltipBounding =
+    typeof window !== 'undefined'
+      ? {
+          x: 0,
+          y: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        }
+      : undefined
+  const total = data.reduce((acc, x) => acc + x.count, 0)
+  const config: PieConfig = {
     theme: antDesignChartsTheme,
-    data: props.data,
+    data,
     angleField: 'count',
     colorField: 'type',
-    height: 350,
-    width: 425,
+    scale: {
+      color: {
+        domain: statusDomain,
+        range: statusRange,
+      },
+    },
+    autoFit: true,
+    height: props.height ?? 280,
+    padding: props.embedded ? 0 : 'auto',
     label: {
       text: (d) =>
-        `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
+        props.embedded
+          ? `${d.count} (${Math.round((d.count / total) * 100)}%)`
+          : `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
       transform: [
         {
           type: 'overlapDodgeY',
         },
       ],
     },
-    legend: {
-      color: {
-        title: false,
-        position: 'right',
-        rowPadding: 5,
+    legend: false,
+    interaction: {
+      tooltip: {
+        mount: 'body',
+        ...(props.embedded ? { position: 'top' as const } : {}),
+        ...(tooltipBounding ? { bounding: tooltipBounding } : {}),
       },
     },
+    tooltip: {
+      title: () => 'Objectives',
+      items: [
+        (d: ObjectiveStatusChartDataItem) => ({
+          name: d.type,
+          value: `${d.count} (${Math.round((d.count / total) * 100)}%)`,
+        }),
+      ],
+    } as any,
   }
 
   return (
-    <Card size="small">
+    <ChartCard title="Objectives By Status" embedded={props.embedded}>
       <Pie {...(config as any)} />
-    </Card>
+    </ChartCard>
   )
 }
 
 export default ObjectiveStatusChart
+

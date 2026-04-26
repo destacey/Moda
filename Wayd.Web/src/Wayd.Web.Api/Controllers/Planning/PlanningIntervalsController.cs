@@ -271,6 +271,126 @@ public class PlanningIntervalsController : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpGet("{idOrKey}/metrics")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
+    [OpenApiOperation("Get PI-level metrics aggregated across all mapped sprints in every iteration.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlanningIntervalMetricsResponse>> GetMetrics(string idOrKey, CancellationToken cancellationToken)
+    {
+        // Pull the PI itself for identity fields.
+        var planningInterval = await _sender.Send(
+            new GetPlanningIntervalQuery(idOrKey),
+            cancellationToken);
+
+        if (planningInterval is null)
+            return NotFound();
+
+        // Pull sprint mappings for every iteration in the PI in one shot.
+        var iterationSprints = await _sender.Send(
+            new GetPlanningIntervalIterationSprintsQuery(idOrKey, null),
+            cancellationToken);
+
+        if (iterationSprints is null)
+            return NotFound();
+
+        // Predictability is computed by the existing query and includes a
+        // per-team breakdown — we surface those values here so the client only
+        // needs one round-trip for the at-a-glance team cards.
+        var predictability = await _sender.Send(
+            new GetPlanningIntervalPredictabilityQuery(new IdOrKey(idOrKey)),
+            cancellationToken);
+
+        // Flatten across iterations and de-dupe sprint ids — the same sprint
+        // could in theory be mapped to multiple iterations and we don't want
+        // to double-count its metrics.
+        var sprintToTeam = iterationSprints
+            .SelectMany(i => i.Sprints)
+            .GroupBy(s => s.Id)
+            .ToDictionary(
+                g => g.Key,
+                g => g.First().Team);
+        var sprintIds = sprintToTeam.Keys.ToList();
+
+        if (sprintIds.Count == 0)
+        {
+            return Ok(new PlanningIntervalMetricsResponse
+            {
+                PlanningIntervalId = planningInterval.Id,
+                PlanningIntervalKey = planningInterval.Key,
+                PlanningIntervalName = planningInterval.Name,
+                TeamCount = 0,
+                SprintCount = 0,
+                CycleTime = CycleTimeSummary.Empty,
+                TeamMetrics = [],
+            });
+        }
+
+        var sprintMetrics = await _sender.Send(
+            new GetSprintsWorkItemMetricsQuery(sprintIds),
+            cancellationToken);
+
+        // Pull team codes for the participating teams so the response can carry
+        // the short code the plan-review tabs route on. The PlanningTeamNavigationDto
+        // we already have via sprintToTeam doesn't expose Code.
+        var participatingTeamIds = sprintToTeam.Values.Select(t => t.Id).Distinct().ToList();
+        var teamList = await _sender.Send(
+            new GetTeamsQuery(true, participatingTeamIds),
+            cancellationToken);
+        var codeByTeamId = teamList.ToDictionary(t => t.Id, t => t.Code);
+
+        // Per-team rollup. Cycle time aggregates by summing each sprint's
+        // count + total — composing CycleTimeSummary objects this way yields
+        // a true weighted average (Σtotal / Σcount) rather than an
+        // average-of-averages. Predictability comes from the existing
+        // predictability query.
+        var teamPredictabilityByTeamId = predictability?.TeamPredictabilities
+            .ToDictionary(t => t.Team.Id)
+            ?? [];
+
+        var teamMetrics = sprintMetrics
+            .Where(m => sprintToTeam.ContainsKey(m.SprintId))
+            .GroupBy(m => sprintToTeam[m.SprintId].Id)
+            .Select(g =>
+            {
+                var team = sprintToTeam[g.First().SprintId];
+                teamPredictabilityByTeamId.TryGetValue(team.Id, out var teamPredictability);
+                codeByTeamId.TryGetValue(team.Id, out var teamCode);
+                var resolvedTeamCode = !string.IsNullOrWhiteSpace(teamCode) ? teamCode : team.Code;
+
+                if (string.IsNullOrWhiteSpace(resolvedTeamCode))
+                    throw new InvalidOperationException($"Unable to resolve a non-empty team code for team '{team.Name}' ({team.Id}).");
+
+                return new PlanningIntervalTeamMetrics
+                {
+                    Team = new Common.Application.Dtos.NavigationDto { Id = team.Id, Key = team.Key, Name = team.Name },
+                    TeamCode = resolvedTeamCode,
+                    Predictability = teamPredictability?.Predictability,
+                    RegularObjectivesCount = teamPredictability?.RegularObjectivesCount ?? 0,
+                    StretchObjectivesCount = teamPredictability?.StretchObjectivesCount ?? 0,
+                    CompletedObjectivesCount = teamPredictability?.CompletedObjectivesCount ?? 0,
+                    CycleTime = CycleTimeSummary.Combine(g.Select(m => m.CycleTime)),
+                    SprintCount = g.Count(),
+                };
+            })
+            .OrderBy(t => t.Team.Name)
+            .ToList();
+
+        var teamCount = sprintToTeam.Values.Select(t => t.Id).Distinct().Count();
+
+        return Ok(new PlanningIntervalMetricsResponse
+        {
+            PlanningIntervalId = planningInterval.Id,
+            PlanningIntervalKey = planningInterval.Key,
+            PlanningIntervalName = planningInterval.Name,
+            TeamCount = teamCount,
+            SprintCount = sprintIds.Count,
+            CycleTime = CycleTimeSummary.Combine(sprintMetrics.Select(m => m.CycleTime)),
+            TeamMetrics = teamMetrics,
+        });
+    }
+
     [HttpGet("{idOrKey}/iterations/{iterationIdOrKey}/metrics")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervals)]
     [OpenApiOperation("Get metrics for a PI iteration aggregated across all mapped sprints.", "")]
@@ -323,16 +443,9 @@ public class PlanningIntervalsController : ControllerBase
                 NotStartedWorkItems = metrics?.NotStartedWorkItems ?? 0,
                 NotStartedStoryPoints = metrics?.NotStartedStoryPoints ?? 0,
                 MissingStoryPointsCount = metrics?.MissingStoryPointsCount ?? 0,
-                AverageCycleTimeDays = metrics?.AverageCycleTimeDays
+                CycleTime = metrics?.CycleTime ?? CycleTimeSummary.Empty,
             };
         }).ToList();
-
-        // Calculate aggregate cycle time
-        var allCycleTimes = sprintMetricsSummaries
-            .Where(s => s.AverageCycleTimeDays.HasValue)
-            .Select(s => s.AverageCycleTimeDays!.Value)
-            .ToList();
-        var avgCycleTime = allCycleTimes.Count > 0 ? allCycleTimes.Average() : (double?)null;
 
         return Ok(new PlanningIntervalIterationMetricsResponse
         {
@@ -353,7 +466,7 @@ public class PlanningIntervalsController : ControllerBase
             NotStartedWorkItems = sprintMetricsSummaries.Sum(s => s.NotStartedWorkItems),
             NotStartedStoryPoints = sprintMetricsSummaries.Sum(s => s.NotStartedStoryPoints),
             MissingStoryPointsCount = sprintMetricsSummaries.Sum(s => s.MissingStoryPointsCount),
-            AverageCycleTimeDays = avgCycleTime,
+            CycleTime = CycleTimeSummary.Combine(sprintMetricsSummaries.Select(s => s.CycleTime)),
             SprintMetrics = sprintMetricsSummaries
         });
     }
@@ -679,5 +792,4 @@ public class PlanningIntervalsController : ControllerBase
     }
 
     #endregion Risks
-
 }

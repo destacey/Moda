@@ -169,15 +169,14 @@ const SprintMetrics: FC<SprintMetricsProps> = ({
             />
           </Col>
         )}
-        {metrics?.averageCycleTimeDays !== undefined &&
-          metrics.averageCycleTimeDays !== null && (
-            <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-              <CycleTimeMetric
-                value={metrics.averageCycleTimeDays}
-                tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
-              />
-            </Col>
-          )}
+        {metrics?.cycleTime && metrics.cycleTime.workItemsCount > 0 && (
+          <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+            <CycleTimeMetric
+              value={metrics.cycleTime.averageCycleTimeDays ?? 0}
+              tooltip="The average cycle time of done work items in the sprint (in days). Cycle time measures the time from when work starts (Activated) to when it's completed (Done)."
+            />
+          </Col>
+        )}
         {useStoryPoints && metrics && (
           <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
             <HealthMetric

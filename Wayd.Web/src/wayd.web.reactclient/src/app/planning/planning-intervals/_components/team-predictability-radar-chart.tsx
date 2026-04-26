@@ -1,14 +1,47 @@
 'use client'
 
+import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/wayd-api'
-import { Card } from 'antd'
 import dynamic from 'next/dynamic'
+import { useEffect, useRef, useState } from 'react'
 
 const Radar = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Radar) as any,
   { ssr: false },
 )
+
+// @ant-design/charts v2 has a known issue where Radar doesn't always reflow
+// when its container resizes (autoFit's ResizeObserver fires but the polygon
+// stays positioned for the original width, leaving it visually off-center).
+// We watch the container ourselves and bump a key whenever the width changes
+// by more than a small threshold, forcing a remount that re-runs the chart's
+// initial layout against the current dimensions.
+const WIDTH_CHANGE_THRESHOLD_PX = 8
+
+const useRemountKeyOnResize = () => {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [renderKey, setRenderKey] = useState(0)
+  const lastWidthRef = useRef(0)
+
+  useEffect(() => {
+    const node = ref.current
+    if (!node) return
+
+    const observer = new ResizeObserver((entries) => {
+      const width = entries[0]?.contentRect.width ?? 0
+      if (Math.abs(width - lastWidthRef.current) >= WIDTH_CHANGE_THRESHOLD_PX) {
+        lastWidthRef.current = width
+        setRenderKey((k) => k + 1)
+      }
+    })
+
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [])
+
+  return { ref, renderKey }
+}
 
 interface TeamPredictabilityRadarChartProps {
   teamPredictabilities?: PlanningIntervalTeamPredictabilityDto[]
@@ -21,26 +54,14 @@ const TeamPredictabilityRadarChart: React.FC<
   teamPredictabilities,
   isLoading,
 }: TeamPredictabilityRadarChartProps) => {
-  const { currentThemeName, antDesignChartsTheme } = useTheme()
+  const { antDesignChartsTheme } = useTheme()
+  const { ref, renderKey } = useRemountKeyOnResize()
 
   const config = (() => {
-    const fontColor =
-      currentThemeName === 'light'
-        ? 'rgba(0, 0, 0, 0.45)'
-        : 'rgba(255, 255, 255, 0.45)'
-
     return {
-      title: {
-        title: 'Team Predictability',
-        style: {
-          titleFontSize: 14,
-          titleFontWeight: 'normal',
-          titleFill: fontColor,
-        },
-      },
       theme: antDesignChartsTheme,
-      height: 350,
-      width: 400,
+      autoFit: true,
+      height: 280,
       data: teamPredictabilities?.map((x) => ({
         team: x.team.name,
         predictability: x.predictability ?? 0,
@@ -87,13 +108,15 @@ const TeamPredictabilityRadarChart: React.FC<
   })()
 
   return (
-    <Card
-      size="small"
+    <ChartCard
+      title="Team Predictability"
       loading={isLoading}
-      style={{ minHeight: 350, minWidth: 400 }}
+      cardStyle={{ height: '100%' }}
     >
-      <Radar {...config} />
-    </Card>
+      <div ref={ref}>
+        <Radar key={renderKey} {...config} />
+      </div>
+    </ChartCard>
   )
 }
 

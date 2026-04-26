@@ -23,7 +23,11 @@ public sealed record SprintWorkItemMetricsDto
 
     public int MissingStoryPointsCount { get; init; }
 
-    public double? AverageCycleTimeDays { get; init; }
+    /// <summary>
+    /// Cycle-time rollup for the sprint. Carries count and total so callers can
+    /// aggregate across sprints without average-of-averages bias.
+    /// </summary>
+    public required CycleTimeSummary CycleTime { get; init; }
 
     /// <summary>
     /// Creates metrics from a list of work items for a specific sprint.
@@ -39,20 +43,15 @@ public sealed record SprintWorkItemMetricsDto
         var inProgress = items.Where(w => w.StatusCategory == WorkStatusCategory.Active).ToList();
         var notStarted = items.Where(w => w.StatusCategory == WorkStatusCategory.Proposed).ToList();
 
-        // Calculate average cycle time for completed items with valid timestamps
+        // Cycle time: only items moved to Done with a valid Activated→Done span
         var doneItems = items.Where(w =>
             w.StatusCategory == WorkStatusCategory.Done &&
             w.ActivatedTimestamp.HasValue &&
             w.DoneTimestamp.HasValue &&
             w.DoneTimestamp.Value > w.ActivatedTimestamp.Value).ToList();
 
-        double? avgCycleTime = null;
-        if (doneItems.Count > 0)
-        {
-            var totalCycleTime = doneItems.Sum(w =>
-                (w.DoneTimestamp!.Value - w.ActivatedTimestamp!.Value).ToTimeSpan().TotalDays);
-            avgCycleTime = totalCycleTime / doneItems.Count;
-        }
+        var totalCycleTimeDays = doneItems.Sum(w =>
+            (w.DoneTimestamp!.Value - w.ActivatedTimestamp!.Value).ToTimeSpan().TotalDays);
 
         return new SprintWorkItemMetricsDto
         {
@@ -66,7 +65,11 @@ public sealed record SprintWorkItemMetricsDto
             NotStartedWorkItems = notStarted.Count,
             NotStartedStoryPoints = notStarted.Sum(w => w.StoryPoints ?? 0),
             MissingStoryPointsCount = items.Count(w => !w.StoryPoints.HasValue || w.StoryPoints == 0),
-            AverageCycleTimeDays = avgCycleTime
+            CycleTime = new CycleTimeSummary
+            {
+                WorkItemsCount = doneItems.Count,
+                TotalCycleTimeDays = totalCycleTimeDays,
+            },
         };
     }
 }

@@ -109,7 +109,11 @@ describe('SprintCard', () => {
     notStartedWorkItems: 2,
     notStartedStoryPoints: 20,
     missingStoryPointsCount: 1,
-    averageCycleTimeDays: 4.5,
+    cycleTime: {
+      workItemsCount: 4,
+      totalCycleTimeDays: 18,
+      averageCycleTimeDays: 4.5,
+    },
   }
 
   const mockOperatingModelStoryPoints: TeamOperatingModelDetailsDto = {
@@ -422,7 +426,11 @@ describe('SprintCard', () => {
     it('renders cycle time as 0 when null', () => {
       const sprintWithNullCycleTime = {
         ...mockSprint,
-        averageCycleTimeDays: undefined,
+        cycleTime: {
+          workItemsCount: 0,
+          totalCycleTimeDays: 0,
+          averageCycleTimeDays: undefined,
+        },
       }
 
       render(

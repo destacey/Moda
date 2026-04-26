@@ -9,12 +9,7 @@ import {
   useGetPlanningIntervalIterationsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
 import { notFound, usePathname, useRouter } from 'next/navigation'
-import {
-  ReactNode,
-  use,
-  useEffect,
-  useState,
-} from 'react'
+import { ReactNode, use, useEffect, useState } from 'react'
 import PlanningIntervalIterationDetailsLoading from './loading'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { SwapOutlined } from '@ant-design/icons'
@@ -23,18 +18,18 @@ import {
   IterationStateTag,
   SprintBacklogGrid,
 } from '@/src/components/common/planning'
-import { PlanningIntervalIterationSummary } from './_components'
+import { PlanningIntervalIterationOverview } from './_components'
 import { IterationState } from '@/src/components/types'
 
 enum IterationTabs {
-  Summary = 'summary',
+  Overview = 'overview',
   Backlog = 'backlog',
 }
 
 const tabs = [
   {
-    key: IterationTabs.Summary,
-    tab: 'Summary',
+    key: IterationTabs.Overview,
+    tab: 'Overview',
   },
   {
     key: IterationTabs.Backlog,
@@ -49,7 +44,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
   const piKey = Number(key)
   const piIterationKey = Number(iterationKey)
 
-  const [activeTab, setActiveTab] = useState(IterationTabs.Summary)
+  const [activeTab, setActiveTab] = useState(IterationTabs.Overview)
   const [backlogQueryEnabled, setBacklogQueryEnabled] = useState(false)
   const [healthIndicator, setHealthIndicator] = useState<ReactNode>(null)
 
@@ -94,23 +89,23 @@ const PlanningIntervalIterationDetailsPage = (props: {
   const iterationItems = !piIterationsData
     ? []
     : [...piIterationsData]
-        .sort((a, b) => new Date(b.start).getTime() - new Date(a.start).getTime())
+        .sort(
+          (a, b) => new Date(b.start).getTime() - new Date(a.start).getTime(),
+        )
         .map((option) => ({
           label: option.name,
           value: option.key,
         }))
 
-  const switchIterations = !iterationItems.length
-    ? null
-    : (
-      <IconMenu
-        icon={<SwapOutlined />}
-        tooltip="Switch to another PI iteration"
-        items={iterationItems}
-        selectedKeys={[piIterationKey.toString()]}
-        onChange={handleIterationChange}
-      />
-    )
+  const switchIterations = !iterationItems.length ? null : (
+    <IconMenu
+      icon={<SwapOutlined />}
+      tooltip="Switch to another PI iteration"
+      items={iterationItems}
+      selectedKeys={[piIterationKey.toString()]}
+      onChange={handleIterationChange}
+    />
+  )
 
   const onTabChange = (tabKey: string) => {
     setActiveTab(tabKey as IterationTabs)
@@ -122,9 +117,9 @@ const PlanningIntervalIterationDetailsPage = (props: {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case IterationTabs.Summary:
+      case IterationTabs.Overview:
         return (
-          <PlanningIntervalIterationSummary
+          <PlanningIntervalIterationOverview
             iteration={iterationData}
             onHealthIndicatorReady={setHealthIndicator}
           />

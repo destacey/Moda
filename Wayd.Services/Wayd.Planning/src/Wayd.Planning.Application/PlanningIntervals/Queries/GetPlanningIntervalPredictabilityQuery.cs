@@ -46,8 +46,27 @@ internal sealed class GetPlanningIntervalPredictabilityQueryHandler : IQueryHand
 
         var currentDate = _dateTimeProvider.Now.InUtc().Date;
 
+        // Pre-bucket team objectives once. We need per-team counts of
+        // regular/stretch/completed objectives — same data the predictability
+        // calculation already uses, just exposed for display.
+        var objectivesByTeam = planningInterval.Objectives
+            .GroupBy(o => o.TeamId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
         var teamPredictabilities = planningInterval.Teams
-            .Select(t => new PlanningIntervalTeamPredictabilityDto(t.Team, planningInterval.CalculatePredictability(currentDate, t.TeamId)))
+            .Select(t =>
+            {
+                objectivesByTeam.TryGetValue(t.TeamId, out var teamObjectives);
+                teamObjectives ??= [];
+                return new PlanningIntervalTeamPredictabilityDto
+                {
+                    Team = PlanningTeamNavigationDto.FromPlanningTeam(t.Team),
+                    Predictability = planningInterval.CalculatePredictability(currentDate, t.TeamId),
+                    RegularObjectivesCount = teamObjectives.Count(o => !o.IsStretch),
+                    StretchObjectivesCount = teamObjectives.Count(o => o.IsStretch),
+                    CompletedObjectivesCount = teamObjectives.Count(o => o.Status == ObjectiveStatus.Completed),
+                };
+            })
             .OrderBy(t => t.Team.Name)
             .ToList();
 
@@ -59,12 +78,11 @@ public sealed record PlanningIntervalPredictabilityDto(double? Predictability, L
 
 public sealed record PlanningIntervalTeamPredictabilityDto
 {
-    public PlanningIntervalTeamPredictabilityDto(PlanningTeam team, double? predictability)
-    {
-        Team = PlanningTeamNavigationDto.FromPlanningTeam(team);
-        Predictability = predictability;
-    }
+    public required PlanningTeamNavigationDto Team { get; init; }
+    public double? Predictability { get; init; }
 
-    public PlanningTeamNavigationDto Team { get; set; }
-    public double? Predictability { get; set; }
+    /// <summary>Count of non-stretch (committed) objectives for this team.</summary>
+    public int RegularObjectivesCount { get; init; }
+    public int StretchObjectivesCount { get; init; }
+    public int CompletedObjectivesCount { get; init; }
 }

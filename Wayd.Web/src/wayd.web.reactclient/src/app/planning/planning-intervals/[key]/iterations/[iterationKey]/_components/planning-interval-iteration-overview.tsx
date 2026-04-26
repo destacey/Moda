@@ -31,13 +31,13 @@ import { useGetTeamOperatingModelsForTeamsQuery } from '@/src/store/features/org
 
 const { Title } = Typography
 
-export interface PlanningIntervalIterationSummaryProps {
+export interface PlanningIntervalIterationOverviewProps {
   iteration: PlanningIntervalIterationDetailsDto
   onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
-const PlanningIntervalIterationSummary: FC<
-  PlanningIntervalIterationSummaryProps
+const PlanningIntervalIterationOverview: FC<
+  PlanningIntervalIterationOverviewProps
 > = ({ iteration, onHealthIndicatorReady }) => {
   const [sizingMethod, setSizingMethod] = useState<SizingMethod>(
     SizingMethod.StoryPoints,
@@ -169,15 +169,14 @@ const PlanningIntervalIterationSummary: FC<
                 tooltip="Total not-started work items across all team sprints."
               />
             </Col>
-            {metrics.averageCycleTimeDays !== undefined &&
-              metrics.averageCycleTimeDays !== null && (
-                <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
-                  <CycleTimeMetric
-                    value={metrics.averageCycleTimeDays}
-                    tooltip="Average cycle time of completed (Done) work items across all team sprints."
-                  />
-                </Col>
-              )}
+            {metrics.cycleTime && metrics.cycleTime.workItemsCount > 0 && (
+              <Col xs={12} sm={8} md={6} lg={4} xxl={3}>
+                <CycleTimeMetric
+                  value={metrics.cycleTime.averageCycleTimeDays ?? 0}
+                  tooltip="Average cycle time of completed (Done) work items across all team sprints."
+                />
+              </Col>
+            )}
           </>
         )}
       </Row>
@@ -224,4 +223,4 @@ const PlanningIntervalIterationSummary: FC<
   )
 }
 
-export default PlanningIntervalIterationSummary
+export default PlanningIntervalIterationOverview

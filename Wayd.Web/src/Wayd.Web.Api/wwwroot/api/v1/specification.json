@@ -10058,6 +10058,63 @@
         ]
       }
     },
+    "/api/planning/planning-intervals/{idOrKey}/metrics": {
+      "get": {
+        "tags": [
+          "PlanningIntervals"
+        ],
+        "summary": "Get PI-level metrics aggregated across all mapped sprints in every iteration.",
+        "operationId": "PlanningIntervals_GetMetrics",
+        "parameters": [
+          {
+            "name": "idOrKey",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanningIntervalMetricsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/planning/planning-intervals/{idOrKey}/iterations/{iterationIdOrKey}/metrics": {
       "get": {
         "tags": [
@@ -25377,7 +25434,10 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "team"
+          "team",
+          "regularObjectivesCount",
+          "stretchObjectivesCount",
+          "completedObjectivesCount"
         ],
         "properties": {
           "team": {
@@ -25387,6 +25447,18 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "regularObjectivesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "stretchObjectivesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedObjectivesCount": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -25399,9 +25471,14 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
+              "code",
               "type"
             ],
             "properties": {
+              "code": {
+                "type": "string",
+                "minLength": 1
+              },
               "type": {
                 "type": "string",
                 "minLength": 1
@@ -25920,6 +25997,130 @@
           }
         }
       },
+      "PlanningIntervalMetricsResponse": {
+        "type": "object",
+        "description": "Response containing PI-level metrics aggregated across all mapped sprints in\nevery iteration of the Planning Interval. Intended as a thin, extensible\nrollup; per-iteration breakdowns remain on the iteration-level endpoint.",
+        "additionalProperties": false,
+        "required": [
+          "planningIntervalName",
+          "cycleTime",
+          "teamMetrics",
+          "planningIntervalId",
+          "planningIntervalKey",
+          "teamCount",
+          "sprintCount"
+        ],
+        "properties": {
+          "planningIntervalId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "planningIntervalKey": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "planningIntervalName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "teamCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprintCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cycleTime": {
+            "description": "Cycle-time rollup across every sprint in every iteration of this PI.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CycleTimeSummary"
+              }
+            ]
+          },
+          "teamMetrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanningIntervalTeamMetrics"
+            }
+          }
+        }
+      },
+      "CycleTimeSummary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "workItemsCount",
+          "totalCycleTimeDays"
+        ],
+        "properties": {
+          "workItemsCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalCycleTimeDays": {
+            "type": "number",
+            "format": "double"
+          },
+          "averageCycleTimeDays": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        }
+      },
+      "PlanningIntervalTeamMetrics": {
+        "type": "object",
+        "description": "Per-team rollup for a Planning Interval. Cycle time is averaged across all\nof the team's sprints mapped to any iteration in the PI; predictability\nmatches the value returned by the predictability endpoint.",
+        "additionalProperties": false,
+        "required": [
+          "team",
+          "teamCode",
+          "cycleTime",
+          "regularObjectivesCount",
+          "stretchObjectivesCount",
+          "completedObjectivesCount",
+          "sprintCount"
+        ],
+        "properties": {
+          "team": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "teamCode": {
+            "type": "string",
+            "description": "The team's short code (e.g. \"CORE\"). Used to route to the\n            team-specific tab on the plan-review page.",
+            "minLength": 1
+          },
+          "predictability": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "regularObjectivesCount": {
+            "type": "integer",
+            "description": "Count of non-stretch (committed) objectives for this team in the PI.",
+            "format": "int32"
+          },
+          "stretchObjectivesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "completedObjectivesCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "cycleTime": {
+            "$ref": "#/components/schemas/CycleTimeSummary"
+          },
+          "sprintCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "PlanningIntervalIterationMetricsResponse": {
         "type": "object",
         "description": "Response containing PI Iteration metrics aggregated across all mapped sprints.",
@@ -25929,6 +26130,7 @@
           "start",
           "end",
           "category",
+          "cycleTime",
           "sprintMetrics",
           "iterationId",
           "iterationKey",
@@ -26014,10 +26216,13 @@
             "type": "integer",
             "format": "int32"
           },
-          "averageCycleTimeDays": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "cycleTime": {
+            "description": "Cycle-time rollup across all sprints in this iteration.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CycleTimeSummary"
+              }
+            ]
           },
           "sprintMetrics": {
             "type": "array",
@@ -26035,6 +26240,7 @@
           "sprintName",
           "state",
           "team",
+          "cycleTime",
           "sprintId",
           "sprintKey",
           "start",
@@ -26114,10 +26320,13 @@
             "type": "integer",
             "format": "int32"
           },
-          "averageCycleTimeDays": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "cycleTime": {
+            "description": "Cycle-time rollup for this sprint.",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CycleTimeSummary"
+              }
+            ]
           }
         }
       },
@@ -28522,6 +28731,7 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
+          "cycleTime",
           "sprintId",
           "totalWorkItems",
           "totalStoryPoints",
@@ -28576,10 +28786,8 @@
             "type": "integer",
             "format": "int32"
           },
-          "averageCycleTimeDays": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
+          "cycleTime": {
+            "$ref": "#/components/schemas/CycleTimeSummary"
           }
         }
       },
