@@ -1,35 +1,10 @@
 'use client'
 
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
-import {
-  Button,
-  Card,
-  Dropdown,
-  List,
-  MenuProps,
-  Progress,
-  Space,
-  Tag,
-  Typography,
-} from 'antd'
-import dayjs from 'dayjs'
-import Link from 'next/link'
-import { useState } from 'react'
-import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
-import { ItemType } from 'antd/es/menu/interface'
-import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { SystemContext } from '@/src/components/constants'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
-import { EditPlanningIntervalObjectiveForm } from '../../_components'
+import { HolderOutlined } from '@ant-design/icons'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { getObjectiveStatusColor } from '@/src/utils'
-
-const { Item } = List
-const { Meta } = Item
-const { Text } = Typography
+import PlanningIntervalObjectiveCard from '../_components/planning-interval-objective-card'
 
 export interface ObjectiveListItemProps {
   objective: PlanningIntervalObjectiveListDto
@@ -48,131 +23,8 @@ const ObjectiveListItem = ({
   refreshObjectives,
   onObjectiveClick,
 }: ObjectiveListItemProps) => {
-  const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
-    useState<boolean>(false)
-
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: objective.id })
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectId,
-  )
-
-  const title = () => {
-    return (
-      <Link
-        onClick={(e) => e.stopPropagation()} // prevents the parent component onClick event from firing
-        href={`/planning/planning-intervals/${piKey}/objectives/${objective.key}`}
-      >
-        {objective.key} - {objective.name}
-      </Link>
-    )
-  }
-
-  const description = () => {
-    const startDate = objective.startDate
-      ? `Start: ${
-          objective.startDate
-            ? dayjs(objective.startDate)?.format('M/D/YYYY')
-            : ''
-        }`
-      : null
-    const targetDate = objective.targetDate
-      ? `Target: ${
-          objective.targetDate
-            ? dayjs(objective.targetDate)?.format('M/D/YYYY')
-            : ''
-        }`
-      : null
-    const showProgress = objective.status?.name !== 'Not Started'
-    const progressStatus = ['Canceled', 'Missed'].includes(
-      objective.status?.name,
-    )
-      ? 'exception'
-      : undefined
-
-    return (
-      <>
-        <Space wrap>
-          <Tag color={getObjectiveStatusColor(objective.status.name)}>
-            {objective.status.name}
-          </Tag>
-          {objective.isStretch && <Tag>Stretch</Tag>}
-          <HealthCheckTag healthCheck={objective?.healthCheck} />
-          <Text>
-            {startDate}
-            {startDate && targetDate && ' - '}
-            {targetDate}
-          </Text>
-        </Space>
-        {showProgress && (
-          <Progress
-            percent={objective.progress}
-            status={progressStatus}
-            size="small"
-          />
-        )}
-      </>
-    )
-  }
-
-  // TODO: make a menu component that will render one item with its icon, or a dropdown when there multiple items
-  const menuItems: MenuProps['items'] = (() => {
-    const items: ItemType[] = []
-    if (canUpdateObjectives || canCreateHealthChecks) {
-      items.push(
-        {
-          key: 'edit',
-          label: 'Edit',
-          disabled: !canUpdateObjectives,
-          onClick: (info) => {
-            info.domEvent.stopPropagation() // prevents the parent component onClick event from firing
-            setOpenUpdateObjectiveForm(true)
-          },
-        },
-        {
-          key: 'createHealthCheck',
-          label: 'Create Health Check',
-          disabled: !canCreateHealthChecks,
-          onClick: (info) => {
-            info.domEvent.stopPropagation() // prevents the parent component onClick event from firing
-            dispatch(
-              beginHealthCheckCreate({
-                objectId: objective.id,
-                contextId: SystemContext.PlanningPlanningIntervalObjective,
-              }),
-            )
-          },
-        },
-        {
-          key: 'healthReport',
-          onClick: (info) => info.domEvent.stopPropagation(), // prevents the parent component onClick event from firing
-          label: (
-            <Link
-              href={`/planning/planning-intervals/${objective.planningInterval.key}/objectives/${objective.key}/health-report`}
-            >
-              Health Report
-            </Link>
-          ),
-        },
-      )
-    }
-    return items
-  })()
-
-  const onEditObjectiveFormClosed = (wasSaved: boolean) => {
-    setOpenUpdateObjectiveForm(false)
-    if (wasSaved) {
-      refreshObjectives()
-    }
-  }
-
-  const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
-    if (wasSaved) {
-      refreshObjectives()
-    }
-  }
 
   const sortableStyle = {
     transition: transition,
@@ -182,50 +34,27 @@ const ObjectiveListItem = ({
   }
 
   return (
-    <>
-      <Card
-        size="small"
-        ref={setNodeRef}
-        {...attributes}
-        style={sortableStyle}
-        styles={{ body: { padding: 0 } }}
-        hoverable
-        onClick={() => onObjectiveClick(objective.key)}
-      >
-        <Item key={objective.key}>
-          {canUpdateObjectives && (
-            // TODO: add a visual indicator that the item is draggable for the whole row
-            <HolderOutlined
-              {...listeners}
-              rotate={90}
-              style={{ marginRight: 12 }}
-            />
-          )}
-          <Meta title={title()} description={description()} />
-          {canUpdateObjectives && (
-            <Dropdown menu={{ items: menuItems }} trigger={['click']}>
-              <Button
-                type="text"
-                size="small"
-                icon={<MoreOutlined />}
-                onClick={(e) => e.stopPropagation()} // prevents the parent component onClick event from firing
-              />
-            </Dropdown>
-          )}
-        </Item>
-      </Card>
-      {openUpdateObjectiveForm && (
-        <EditPlanningIntervalObjectiveForm
-          objectiveKey={objective?.key}
-          planningIntervalKey={objective?.planningInterval?.key}
-          onFormSave={() => onEditObjectiveFormClosed(true)}
-          onFormCancel={() => onEditObjectiveFormClosed(false)}
-        />
-      )}
-      {editingObjectiveId == objective?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
-      )}
-    </>
+    <PlanningIntervalObjectiveCard
+      objective={objective}
+      piKey={piKey}
+      canUpdateObjectives={canUpdateObjectives}
+      canCreateHealthChecks={canCreateHealthChecks}
+      refreshObjectives={refreshObjectives}
+      onObjectiveClick={onObjectiveClick}
+      leading={
+        canUpdateObjectives ? (
+          <HolderOutlined
+            {...listeners}
+            rotate={90}
+            style={{ marginRight: 12 }}
+          />
+        ) : null
+      }
+      cardRef={setNodeRef}
+      cardAttributes={attributes}
+      cardStyle={sortableStyle}
+      showTeamTag={false}
+    />
   )
 }
 

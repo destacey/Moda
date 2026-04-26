@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { act, render, screen } from '@testing-library/react'
 import { Suspense } from 'react'
 
 global.ResizeObserver = class {
@@ -71,14 +71,17 @@ const syncResolvedParams = <T,>(value: T): Promise<T> => {
   return p
 }
 
-const renderPage = () =>
-  render(
-    <Suspense fallback={<div data-testid="suspense-fallback" />}>
-      <PlanningIntervalPlanReviewPage
-        params={syncResolvedParams({ key: '7' })}
-      />
-    </Suspense>,
-  )
+const renderPage = async () => {
+  await act(async () => {
+    render(
+      <Suspense fallback={<div data-testid="suspense-fallback" />}>
+        <PlanningIntervalPlanReviewPage
+          params={syncResolvedParams({ key: '7' })}
+        />
+      </Suspense>,
+    )
+  })
+}
 
 describe('PlanningIntervalPlanReviewPage', () => {
   beforeEach(() => {
@@ -101,7 +104,7 @@ describe('PlanningIntervalPlanReviewPage', () => {
   })
 
   it('falls back to the first team when no hash is present', async () => {
-    renderPage()
+    await renderPage()
 
     expect(await screen.findByTestId('team-plan-review-stub')).toHaveTextContent(
       'team:CORE',
@@ -111,7 +114,7 @@ describe('PlanningIntervalPlanReviewPage', () => {
   it('honors the URL hash and selects the matching team on first render', async () => {
     setHash('#data')
 
-    renderPage()
+    await renderPage()
 
     expect(await screen.findByTestId('team-plan-review-stub')).toHaveTextContent(
       'team:DATA',
@@ -123,7 +126,7 @@ describe('PlanningIntervalPlanReviewPage', () => {
   it('does not append a second hash segment when navigating in via a hash link', async () => {
     setHash('#data')
 
-    renderPage()
+    await renderPage()
 
     // After the page settles, the URL should have exactly one fragment.
     expect(window.location.hash).toBe('#data')
@@ -150,7 +153,7 @@ describe('PlanningIntervalPlanReviewPage', () => {
     // common flow of arriving from the overview where teamsQuery is warm.
     setHash('#data')
 
-    renderPage()
+    await renderPage()
 
     expect(
       await screen.findByTestId('team-plan-review-stub'),
@@ -163,14 +166,16 @@ describe('PlanningIntervalPlanReviewPage', () => {
   it('reflects manual hashchange events into the active team', async () => {
     setHash('#core')
 
-    renderPage()
+    await renderPage()
 
     expect(await screen.findByTestId('team-plan-review-stub')).toHaveTextContent(
       'team:CORE',
     )
 
     setHash('#data')
-    window.dispatchEvent(new HashChangeEvent('hashchange'))
+    await act(async () => {
+      window.dispatchEvent(new HashChangeEvent('hashchange'))
+    })
 
     expect(await screen.findByTestId('team-plan-review-stub')).toHaveTextContent(
       'team:DATA',
