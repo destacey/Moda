@@ -559,20 +559,25 @@ export default function LoginPage() {
         window.location.href = '/'
       } catch (error) {
         console.error('[Login] Entra token exchange failed:', error)
-        if (error instanceof InteractionRequiredAuthError) {
-          // A silent acquisition failed because interaction is required.
-          // Signal to the user to click the Microsoft button again; that
-          // triggers a full loginRedirect.
-          setExchangeError(
-            'Sign-in needs to be completed interactively. Please click Sign in with Microsoft again.',
-          )
-        } else {
-          setExchangeError(
-            error instanceof Error
-              ? error.message
-              : 'Sign-in failed. Please try again.',
-          )
+
+        // Silent acquisition failed — typical after a long idle when MSAL's
+        // cached account is stale (timed_out) or the Entra session needs
+        // re-consent (InteractionRequiredAuthError). Clear MSAL's cache so the
+        // next button click triggers a fresh loginRedirect rather than another
+        // doomed silent acquire. Without this, the user clicks the button and
+        // immediately lands back on this same failure branch.
+        try {
+          instance.setActiveAccount(null)
+          await instance.clearCache()
+        } catch (cacheError) {
+          console.warn('[Login] MSAL clearCache failed; continuing.', cacheError)
         }
+
+        const message =
+          error instanceof InteractionRequiredAuthError
+            ? 'Sign-in needs to be completed interactively. Please click Sign in with Microsoft.'
+            : 'Sign-in session expired. Please click Sign in with Microsoft to continue.'
+        setExchangeError(message)
         setExchangeState('failed')
       }
     }
