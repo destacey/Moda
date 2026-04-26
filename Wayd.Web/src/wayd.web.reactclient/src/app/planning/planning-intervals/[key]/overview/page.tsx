@@ -12,6 +12,7 @@ import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/plann
 import { Flex } from 'antd'
 import IterationsStrip from '../_components/iterations-strip'
 import PiAtAGlance from '../_components/pi-at-a-glance'
+import PiTeamCards from '../_components/pi-team-cards'
 
 const PlanningIntervalOverviewPage = (props: {
   params: Promise<{ key: string }>
@@ -47,6 +48,7 @@ const PlanningIntervalOverviewPage = (props: {
       <PageTitle title="PI Overview" />
       <PiAtAGlance planningInterval={planningIntervalData} />
       <IterationsStrip piKey={piKey} />
+      <PiTeamCards piKey={piKey} />
     </Flex>
   )
 }

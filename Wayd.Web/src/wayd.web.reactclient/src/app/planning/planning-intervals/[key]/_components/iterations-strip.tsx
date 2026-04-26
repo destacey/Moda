@@ -51,7 +51,7 @@ const IterationsStrip = ({ piKey }: { piKey: number }) => {
       size="small"
       title="Iterations"
       extra={
-        <Text type="secondary">Click an iteration to open its view →</Text>
+        <Text type="secondary">Click an iteration card to open its view →</Text>
       }
     >
       <Flex gap={12} wrap>

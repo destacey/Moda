@@ -25026,6 +25026,9 @@ export interface PlanningIntervalPredictabilityDto {
 export interface PlanningIntervalTeamPredictabilityDto {
     team: PlanningTeamNavigationDto;
     predictability?: number | undefined;
+    regularObjectivesCount: number;
+    stretchObjectivesCount: number;
+    completedObjectivesCount: number;
 }
 
 export interface PlanningTeamNavigationDto extends NavigationDto {
@@ -25176,7 +25179,30 @@ export interface PlanningIntervalMetricsResponse {
     planningIntervalName: string;
     teamCount: number;
     sprintCount: number;
+    /** Cycle-time rollup across every sprint in every iteration of this PI. */
+    cycleTime: CycleTimeSummary;
+    teamMetrics: PlanningIntervalTeamMetrics[];
+}
+
+export interface CycleTimeSummary {
+    workItemsCount: number;
+    totalCycleTimeDays: number;
     averageCycleTimeDays?: number | undefined;
+}
+
+/** Per-team rollup for a Planning Interval. Cycle time is averaged across all of the team's sprints mapped to any iteration in the PI; predictability matches the value returned by the predictability endpoint. */
+export interface PlanningIntervalTeamMetrics {
+    team: NavigationDto;
+    /** The team's short code (e.g. "CORE"). Used to route to the
+            team-specific tab on the plan-review page. */
+    teamCode: string;
+    predictability?: number | undefined;
+    /** Count of non-stretch (committed) objectives for this team in the PI. */
+    regularObjectivesCount: number;
+    stretchObjectivesCount: number;
+    completedObjectivesCount: number;
+    cycleTime: CycleTimeSummary;
+    sprintCount: number;
 }
 
 /** Response containing PI Iteration metrics aggregated across all mapped sprints. */
@@ -25198,7 +25224,8 @@ export interface PlanningIntervalIterationMetricsResponse {
     notStartedWorkItems: number;
     notStartedStoryPoints: number;
     missingStoryPointsCount: number;
-    averageCycleTimeDays?: number | undefined;
+    /** Cycle-time rollup across all sprints in this iteration. */
+    cycleTime: CycleTimeSummary;
     sprintMetrics: SprintMetricsSummary[];
 }
 
@@ -25220,7 +25247,8 @@ export interface SprintMetricsSummary {
     notStartedWorkItems: number;
     notStartedStoryPoints: number;
     missingStoryPointsCount: number;
-    averageCycleTimeDays?: number | undefined;
+    /** Cycle-time rollup for this sprint. */
+    cycleTime: CycleTimeSummary;
 }
 
 export interface SprintBacklogItemDto {
@@ -25786,7 +25814,7 @@ export interface SprintWorkItemMetricsDto {
     notStartedWorkItems: number;
     notStartedStoryPoints: number;
     missingStoryPointsCount: number;
-    averageCycleTimeDays?: number | undefined;
+    cycleTime: CycleTimeSummary;
 }
 
 export interface TeamTypeDto {

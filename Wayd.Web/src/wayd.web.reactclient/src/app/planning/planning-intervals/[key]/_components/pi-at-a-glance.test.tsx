@@ -142,15 +142,36 @@ describe('PiAtAGlance', () => {
     expect(args[1]).toEqual({ skip: false })
   })
 
-  it('only renders the Cycle Time card when averageCycleTimeDays is present', () => {
+  it('only renders the Cycle Time card when there are contributing work items', () => {
     const { rerender } = render(
       <PiAtAGlance planningInterval={mkPi() as any} />,
     )
     expect(screen.queryByText('Avg Cycle Time')).not.toBeInTheDocument()
 
-    mockMetrics.mockReturnValue({ data: { averageCycleTimeDays: 4.5 } })
+    // Empty cycle-time summary should still be hidden — count is the gate.
+    mockMetrics.mockReturnValue({
+      data: {
+        cycleTime: {
+          workItemsCount: 0,
+          totalCycleTimeDays: 0,
+          averageCycleTimeDays: null,
+        },
+      },
+    })
     rerender(<PiAtAGlance planningInterval={mkPi() as any} />)
+    expect(screen.queryByText('Avg Cycle Time')).not.toBeInTheDocument()
 
+    // Non-zero count → card shows.
+    mockMetrics.mockReturnValue({
+      data: {
+        cycleTime: {
+          workItemsCount: 4,
+          totalCycleTimeDays: 18,
+          averageCycleTimeDays: 4.5,
+        },
+      },
+    })
+    rerender(<PiAtAGlance planningInterval={mkPi() as any} />)
     expect(screen.getByText('Avg Cycle Time')).toBeInTheDocument()
   })
 

@@ -5,7 +5,7 @@ import { PlanningIntervalTeamResponse } from '@/src/services/wayd-api'
 import { use, useEffect, useMemo, useState } from 'react'
 import { Alert, Card, Tag } from 'antd'
 import TeamPlanReview from './team-plan-review'
-import { notFound, useRouter } from 'next/navigation'
+import { notFound } from 'next/navigation'
 import { WaydEmpty, PageTitle } from '@/src/components/common'
 import PlanningIntervalPlanReviewLoading from './loading'
 import { authorizePage } from '@/src/components/hoc'
@@ -21,7 +21,6 @@ const PlanningIntervalPlanReviewPage = (props: {
   const piKey = Number(key)
 
   useDocumentTitle('PI Plan Review')
-  const router = useRouter()
 
   const {
     data: planningIntervalData,
@@ -45,34 +44,52 @@ const PlanningIntervalPlanReviewPage = (props: {
     [teamData],
   )
 
-  // Track user interactions separately from derived state
-  const [userSelectedTab, setUserSelectedTab] = useState<string | null>(null)
-
-  // Derive activeTab: use user selection, or fall back to hash/first team
-  const activeTab = (() => {
-    if (userSelectedTab) return userSelectedTab
-    if (teams.length === 0) return ''
-
-    const hash =
-      typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
-    return hash && hash !== '' ? hash : teams[0]?.code.toLowerCase()
-  })()
-
-  // Update URL hash if it doesn't match activeTab - side effect only
+  // Tab the user/URL has selected. `undefined` is the "haven't checked yet"
+  // sentinel — important because Next.js's client-side navigation commits the
+  // URL hash AFTER the first render phase, so window.location.hash returns ""
+  // during render even when the URL bar shows "/plan-review#juice". We read
+  // the hash in an effect (post-commit) and gate the URL-mirroring effect
+  // until that read has happened, otherwise mirror would clobber the incoming
+  // hash with the first-team fallback on render 1.
+  const [selectedTab, setSelectedTab] = useState<string | null | undefined>(
+    undefined,
+  )
   useEffect(() => {
+    // Legitimate mount-time read of window.location.hash. Lint flags this as
+    // "setState in effect" but it's the documented pattern for reading
+    // external state on mount when render-phase reads aren't available
+    // (see comment above on Next.js's hash-commit timing).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSelectedTab(window.location.hash.slice(1) || null)
+  }, [])
+
+  // Derive activeTab: hash/user selection wins; otherwise the first team.
+  // While selectedTab is undefined (pre-mount-effect), keep activeTab empty
+  // so the mirror effect doesn't write the wrong hash.
+  const activeTab =
+    selectedTab === undefined
+      ? ''
+      : selectedTab || (teams.length > 0 ? teams[0]?.code.toLowerCase() : '')
+
+  // Mirror activeTab back into the URL hash whenever it changes. We use
+  // history.replaceState rather than router.push/replace('#hash') because
+  // next/navigation's bare-hash forms append instead of replacing the
+  // fragment, producing doubled hashes like ".../plan-review#data#core".
+  useEffect(() => {
+    if (selectedTab === undefined) return
     if (!activeTab || teams.length === 0) return
+    const currentHash = window.location.hash.slice(1)
+    if (currentHash === activeTab) return
 
-    const hash = window.location.hash.slice(1)
-    if (!hash || hash === '') {
-      router.replace(`#${activeTab}`, { scroll: false })
-    }
-  }, [activeTab, teams, router])
+    const newUrl = `${window.location.pathname}${window.location.search}#${activeTab}`
+    window.history.replaceState(null, '', newUrl)
+  }, [activeTab, teams, selectedTab])
 
-  // Handle hash change events
+  // Handle hash change events (back/forward navigation, manual edits)
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1)
-      setUserSelectedTab(hash || null)
+      setSelectedTab(hash || null)
     }
     window.addEventListener('hashchange', handleHashChange)
 
@@ -80,13 +97,6 @@ const PlanningIntervalPlanReviewPage = (props: {
       window.removeEventListener('hashchange', handleHashChange)
     }
   }, [])
-
-  useEffect(() => {
-    const hash = window.location.hash.slice(1)
-    if (!hash || hash === '' || !activeTab || activeTab === hash) return
-
-    router.push(`#${activeTab}`, { scroll: false })
-  }, [activeTab, router])
 
   const tabs = teams?.map((team) => ({
     key: team.code.toLowerCase(),
@@ -122,7 +132,7 @@ const PlanningIntervalPlanReviewPage = (props: {
         style={{ width: '100%' }}
         tabList={tabs}
         activeTabKey={activeTab}
-        onTabChange={(key) => setUserSelectedTab(key)}
+        onTabChange={(key) => setSelectedTab(key)}
       >
         {!tabExists ? (
           <Alert title="Please select a valid team." type="error" />

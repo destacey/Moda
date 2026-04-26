@@ -1,4 +1,5 @@
 ﻿using Wayd.Common.Application.Dtos;
+using Wayd.Work.Application.WorkItems.Dtos;
 
 namespace Wayd.Web.Api.Models.Planning.PlanningIntervals;
 
@@ -32,7 +33,8 @@ public sealed record PlanningIntervalIterationMetricsResponse
 
     public int MissingStoryPointsCount { get; init; }
 
-    public double? AverageCycleTimeDays { get; init; }
+    /// <summary>Cycle-time rollup across all sprints in this iteration.</summary>
+    public required CycleTimeSummary CycleTime { get; init; }
 
     // Per-sprint breakdown
     public required IReadOnlyList<SprintMetricsSummary> SprintMetrics { get; init; }
@@ -61,5 +63,7 @@ public sealed record SprintMetricsSummary
     public int NotStartedWorkItems { get; init; }
     public double NotStartedStoryPoints { get; init; }
     public int MissingStoryPointsCount { get; init; }
-    public double? AverageCycleTimeDays { get; init; }
+
+    /// <summary>Cycle-time rollup for this sprint.</summary>
+    public required CycleTimeSummary CycleTime { get; init; }
 }

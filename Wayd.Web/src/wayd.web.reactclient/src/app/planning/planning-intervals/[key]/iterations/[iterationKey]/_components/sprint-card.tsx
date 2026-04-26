@@ -199,7 +199,7 @@ const SprintCard: FC<SprintCardProps> = ({
               </Col>
               <Col xs={12} sm={8} md={6}>
                 <CycleTimeMetric
-                  value={sprint.averageCycleTimeDays ?? 0}
+                  value={sprint.cycleTime?.averageCycleTimeDays ?? 0}
                   cardStyle={metricCardStyle}
                 />
               </Col>

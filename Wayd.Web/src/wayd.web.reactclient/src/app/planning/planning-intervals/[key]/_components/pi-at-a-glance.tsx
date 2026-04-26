@@ -148,6 +148,7 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
                 precision={0}
                 suffix="%"
                 tooltip="The percentage of completed objectives compared to the number of non-stretched objectives in this planning interval."
+                tooltipTarget="title"
                 secondaryValue={
                   <Flex gap={12} style={{ fontSize: 12 }}>
                     <WaydTooltip title="Completed">
@@ -182,14 +183,15 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
               />
             </Col>
           )}
-          {piMetricsData?.averageCycleTimeDays != null && (
-            <Col xs={12} sm={6} md={6} lg={6}>
-              <CycleTimeMetric
-                value={piMetricsData.averageCycleTimeDays}
-                tooltip="Average cycle time of completed (Done) work items across all team sprints in every iteration of this planning interval."
-              />
-            </Col>
-          )}
+          {piMetricsData?.cycleTime &&
+            piMetricsData.cycleTime.workItemsCount > 0 && (
+              <Col xs={12} sm={6} md={6} lg={6}>
+                <CycleTimeMetric
+                  value={piMetricsData.cycleTime.averageCycleTimeDays ?? 0}
+                  tooltip="Average cycle time of completed (Done) work items across all team sprints in every iteration of this planning interval."
+                />
+              </Col>
+            )}
         </Row>
         {hasObjectives && (
           <Row gutter={[16, 16]} align="stretch">

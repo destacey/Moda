@@ -8,18 +8,33 @@ export interface MetricCardProps extends Omit<StatisticProps, 'valueStyle'> {
   cardStyle?: React.CSSProperties
   statisticStyle?: React.CSSProperties
   tooltip?: string
+  /**
+   * Where the `tooltip` is anchored. Defaults to `'card'` — the entire card
+   * is the hover target. Use `'title'` when the metric has its own child
+   * tooltips (e.g. icon-stat secondaries) so hovers don't double up.
+   */
+  tooltipTarget?: 'card' | 'title'
   secondaryValue?: ReactNode
   // Support both old valueStyle (for backwards compatibility) and new styles.content
   valueStyle?: React.CSSProperties
+  /**
+   * When true, renders without the card's border or hover affordance — for
+   * cases where the metric sits inside another card and the nested chrome
+   * would feel doubled-up.
+   */
+  embedded?: boolean
 }
 
 const MetricCard: FC<MetricCardProps> = ({
   cardStyle,
   statisticStyle,
   tooltip,
+  tooltipTarget = 'card',
   secondaryValue,
   valueStyle,
   styles,
+  embedded = false,
+  title,
   ...statisticProps
 }) => {
   const defaultCardStyle = cardStyle ?? { height: '100%' }
@@ -30,10 +45,35 @@ const MetricCard: FC<MetricCardProps> = ({
     ? { ...styles, content: valueStyle }
     : styles
 
-  const card = (
+  const titleNode =
+    tooltip && tooltipTarget === 'title' ? (
+      <WaydTooltip title={tooltip}>
+        <span>{title}</span>
+      </WaydTooltip>
+    ) : (
+      title
+    )
+
+  // Embedded mode: skip the Card wrapper entirely — the metric is nested in
+  // another card already, so the body padding / background of an inner card
+  // reads as visual noise even with `variant="borderless"`.
+  const inner = embedded ? (
+    <Flex vertical>
+      <Statistic
+        {...statisticProps}
+        title={titleNode}
+        style={defaultStatisticStyle}
+        styles={statisticStyles}
+      />
+      {secondaryValue !== undefined && (
+        <Flex justify="flex-end">{secondaryValue}</Flex>
+      )}
+    </Flex>
+  ) : (
     <Card style={defaultCardStyle} size="small" hoverable>
       <Statistic
         {...statisticProps}
+        title={titleNode}
         style={defaultStatisticStyle}
         styles={statisticStyles}
       />
@@ -43,7 +83,11 @@ const MetricCard: FC<MetricCardProps> = ({
     </Card>
   )
 
-  return tooltip ? <WaydTooltip title={tooltip}>{card}</WaydTooltip> : card
+  return tooltip && tooltipTarget === 'card' ? (
+    <WaydTooltip title={tooltip}>{inner}</WaydTooltip>
+  ) : (
+    inner
+  )
 }
 
 export default MetricCard

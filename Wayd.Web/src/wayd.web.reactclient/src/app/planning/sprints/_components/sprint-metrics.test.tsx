@@ -122,7 +122,11 @@ describe('SprintMetrics', () => {
     inProgressStoryPoints: 30,
     notStartedStoryPoints: 20,
     missingStoryPointsCount: 1,
-    averageCycleTimeDays: 4.5,
+    cycleTime: {
+      workItemsCount: 4,
+      totalCycleTimeDays: 18,
+      averageCycleTimeDays: 4.5,
+    },
   }
 
   beforeEach(() => {
@@ -263,7 +267,14 @@ describe('SprintMetrics', () => {
 
     it('does not render cycle time when null', () => {
       ;(useGetSprintMetricsQuery as jest.Mock).mockReturnValue({
-        data: { ...mockMetrics, averageCycleTimeDays: null },
+        data: {
+          ...mockMetrics,
+          cycleTime: {
+            workItemsCount: 0,
+            totalCycleTimeDays: 0,
+            averageCycleTimeDays: null,
+          },
+        },
         isLoading: false,
       })
       render(<SprintMetrics sprint={mockSprint} />)

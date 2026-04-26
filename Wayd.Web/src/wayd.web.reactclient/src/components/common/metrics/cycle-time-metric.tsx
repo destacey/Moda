@@ -8,6 +8,7 @@ export interface CycleTimeMetricProps {
   title?: string
   tooltip?: string
   cardStyle?: React.CSSProperties
+  embedded?: boolean
 }
 
 const CycleTimeMetric: FC<CycleTimeMetricProps> = ({
@@ -15,6 +16,7 @@ const CycleTimeMetric: FC<CycleTimeMetricProps> = ({
   title = 'Avg Cycle Time',
   tooltip = 'The time from when work starts (Activated) to when it is completed (Done).',
   cardStyle,
+  embedded,
 }) => {
   return (
     <MetricCard
@@ -24,6 +26,7 @@ const CycleTimeMetric: FC<CycleTimeMetricProps> = ({
       suffix="days"
       tooltip={tooltip}
       cardStyle={cardStyle}
+      embedded={embedded}
     />
   )
 }
