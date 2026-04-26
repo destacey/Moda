@@ -1,9 +1,10 @@
 'use client'
 
+import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
+import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
-import { Card } from 'antd'
 
 const Pie = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
@@ -11,36 +12,36 @@ const Pie = dynamic(
 )
 
 export interface ObjectiveStatusChartProps {
-  data: ObjectiveStatusChartDataItem[]
+  objectivesData: PlanningIntervalObjectiveListDto[]
 }
 
-export interface ObjectiveStatusChartDataItem {
+interface ObjectiveStatusChartDataItem {
   type: string
   count: number
 }
 
 const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
-  const { currentThemeName, antDesignChartsTheme } = useTheme()
+  const { antDesignChartsTheme } = useTheme()
 
-  if (!props.data || props.data.length === 0) return null
+  if (!props.objectivesData || props.objectivesData.length === 0) return null
 
-  const fontColor =
-    currentThemeName === 'light'
-      ? 'rgba(0, 0, 0, 0.45)'
-      : 'rgba(255, 255, 255, 0.45)'
-
-  const total = props.data.reduce((acc, x) => acc + x.count, 0)
-  const config: PieConfig = {
-    title: {
-      title: 'Objectives By Status',
-      style: {
-        titleFontSize: 14,
-        titleFontWeight: 'normal',
-        titleFill: fontColor,
-      },
+  const groupedStatusData = props.objectivesData.reduce(
+    (acc, objective) => {
+      const status = objective.status?.name ?? 'Unknown'
+      acc[status] = acc[status] ? acc[status] + 1 : 1
+      return acc
     },
+    {} as Record<string, number>,
+  )
+
+  const data: ObjectiveStatusChartDataItem[] = Object.entries(
+    groupedStatusData,
+  ).map(([status, count]) => ({ type: status, count }))
+
+  const total = data.reduce((acc, x) => acc + x.count, 0)
+  const config: PieConfig = {
     theme: antDesignChartsTheme,
-    data: props.data,
+    data,
     angleField: 'count',
     colorField: 'type',
     autoFit: true,
@@ -69,9 +70,9 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
   }
 
   return (
-    <Card size="small">
+    <ChartCard title="Objectives By Status">
       <Pie {...(config as any)} />
-    </Card>
+    </ChartCard>
   )
 }
 

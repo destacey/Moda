@@ -1,9 +1,10 @@
 'use client'
 
+import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
+import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
-import { Card } from 'antd'
 
 const Pie = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
@@ -11,36 +12,47 @@ const Pie = dynamic(
 )
 
 export interface ObjectiveHealthChartProps {
-  data: ObjectiveHealthChartDataItem[]
+  objectivesData: PlanningIntervalObjectiveListDto[]
 }
 
-export interface ObjectiveHealthChartDataItem {
+interface ObjectiveHealthChartDataItem {
   type: string
   count: number
 }
 
 const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
-  const { currentThemeName, antDesignChartsTheme } = useTheme()
+  const { antDesignChartsTheme } = useTheme()
 
-  if (!props.data || props.data.length === 0) return null
+  if (!props.objectivesData || props.objectivesData.length === 0) return null
 
-  const fontColor =
-    currentThemeName === 'light'
-      ? 'rgba(0, 0, 0, 0.45)'
-      : 'rgba(255, 255, 255, 0.45)'
+  const activeObjectives = props.objectivesData.filter(
+    (objective) => objective.status?.name !== 'Completed',
+  )
 
-  const total = props.data.reduce((acc, x) => acc + x.count, 0)
-  const config: PieConfig = {
-    title: {
-      title: 'Objectives By Health',
-      style: {
-        titleFontSize: 14,
-        titleFontWeight: 'normal',
-        titleFill: fontColor,
-      },
+  if (activeObjectives.length === 0) return null
+
+  const groupedHealthData = activeObjectives.reduce(
+    (acc, objective) => {
+      const status = objective.status?.name
+      const health =
+        status === 'Canceled' || status === 'Missed'
+          ? 'Unhealthy'
+          : (objective.healthCheck?.status?.name ?? 'Unknown')
+
+      acc[health] = acc[health] ? acc[health] + 1 : 1
+      return acc
     },
+    {} as Record<string, number>,
+  )
+
+  const data: ObjectiveHealthChartDataItem[] = Object.entries(
+    groupedHealthData,
+  ).map(([health, count]) => ({ type: health, count }))
+
+  const total = data.reduce((acc, x) => acc + x.count, 0)
+  const config: PieConfig = {
     theme: antDesignChartsTheme,
-    data: props.data,
+    data,
     angleField: 'count',
     colorField: 'type',
     autoFit: true,
@@ -69,10 +81,14 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
   }
 
   return (
-    <Card size="small">
+    <ChartCard
+      title="Objectives By Health"
+      tooltip="Objective health for open objectives."
+    >
       <Pie {...(config as any)} />
-    </Card>
+    </ChartCard>
   )
 }
 
 export default ObjectiveHealthChart
+

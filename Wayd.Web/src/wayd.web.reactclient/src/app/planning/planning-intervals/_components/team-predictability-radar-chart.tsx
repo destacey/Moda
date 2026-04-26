@@ -1,8 +1,8 @@
 'use client'
 
+import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalTeamPredictabilityDto } from '@/src/services/wayd-api'
-import { Card } from 'antd'
 import dynamic from 'next/dynamic'
 import { useEffect, useRef, useState } from 'react'
 
@@ -54,24 +54,11 @@ const TeamPredictabilityRadarChart: React.FC<
   teamPredictabilities,
   isLoading,
 }: TeamPredictabilityRadarChartProps) => {
-  const { currentThemeName, antDesignChartsTheme } = useTheme()
+  const { antDesignChartsTheme } = useTheme()
   const { ref, renderKey } = useRemountKeyOnResize()
 
   const config = (() => {
-    const fontColor =
-      currentThemeName === 'light'
-        ? 'rgba(0, 0, 0, 0.45)'
-        : 'rgba(255, 255, 255, 0.45)'
-
     return {
-      title: {
-        title: 'Team Predictability',
-        style: {
-          titleFontSize: 14,
-          titleFontWeight: 'normal',
-          titleFill: fontColor,
-        },
-      },
       theme: antDesignChartsTheme,
       autoFit: true,
       height: 280,
@@ -121,11 +108,15 @@ const TeamPredictabilityRadarChart: React.FC<
   })()
 
   return (
-    <Card size="small" loading={isLoading} style={{ height: '100%' }}>
+    <ChartCard
+      title="Team Predictability"
+      loading={isLoading}
+      cardStyle={{ height: '100%' }}
+    >
       <div ref={ref}>
         <Radar key={renderKey} {...config} />
       </div>
-    </Card>
+    </ChartCard>
   )
 }
 

@@ -7,6 +7,7 @@ const { Meta } = Card
 export interface ChartCardProps {
   title?: ReactNode
   children: ReactNode
+  loading?: boolean
   cardStyle?: React.CSSProperties
   contentStyle?: React.CSSProperties
   tooltip?: string
@@ -27,6 +28,7 @@ export interface ChartCardProps {
 const ChartCard: FC<ChartCardProps> = ({
   title,
   children,
+  loading = false,
   cardStyle,
   contentStyle,
   tooltip,
@@ -73,7 +75,7 @@ const ChartCard: FC<ChartCardProps> = ({
       )}
     </Flex>
   ) : (
-    <Card style={defaultCardStyle} size="small">
+    <Card style={defaultCardStyle} size="small" loading={loading}>
       {content}
       {secondaryValue !== undefined && (
         <Meta description={<Flex justify="flex-end">{secondaryValue}</Flex>} />

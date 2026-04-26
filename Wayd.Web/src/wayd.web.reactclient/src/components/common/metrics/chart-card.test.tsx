@@ -45,4 +45,15 @@ describe('ChartCard', () => {
     expect(screen.getByText('With Secondary')).toBeInTheDocument()
     expect(screen.getByText('Detail')).toBeInTheDocument()
   })
+
+  it('renders loading state', () => {
+    const { container } = render(
+      <ChartCard title="Loading" loading>
+        <div>Content</div>
+      </ChartCard>,
+    )
+
+    const skeleton = container.querySelector('.ant-skeleton')
+    expect(skeleton).toBeInTheDocument()
+  })
 })

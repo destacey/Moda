@@ -19,9 +19,7 @@ import {
 import { Card, Col, Flex, Row } from 'antd'
 import {
   ObjectiveHealthChart,
-  ObjectiveHealthChartDataItem,
   ObjectiveStatusChart,
-  ObjectiveStatusChartDataItem,
   TeamPredictabilityRadarChart,
 } from '../../_components'
 
@@ -62,46 +60,6 @@ const PlanningIntervalAtAGlance = ({
         planningInterval.state.id === IterationState.Future,
     },
   )
-
-  const { objectiveStatusData, objectiveHealthData } = (() => {
-    if (!objectivesData)
-      return { objectiveStatusData: [], objectiveHealthData: [] }
-    const objectives = objectivesData.map((o) => ({
-      status: o.status.name,
-      health:
-        o.status.name === 'Completed'
-          ? 'Healthy'
-          : o.status.name === 'Canceled' || o.status.name === 'Missed'
-            ? 'Unhealthy'
-            : (o.healthCheck?.status.name ?? 'Unknown'),
-    }))
-
-    const statusData = objectives.reduce(
-      (acc, obj) => {
-        acc[obj.status] = acc[obj.status] ? acc[obj.status] + 1 : 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-    const objectiveStatusData: ObjectiveStatusChartDataItem[] = Object.entries(
-      statusData,
-    ).map(([status, count]) => ({ type: status, count }))
-
-    const healthData = objectives.reduce(
-      (acc, obj) => {
-        acc[obj.health] = acc[obj.health] ? acc[obj.health] + 1 : 1
-        return acc
-      },
-      {} as Record<string, number>,
-    )
-
-    const objectiveHealthData: ObjectiveHealthChartDataItem[] = Object.entries(
-      healthData,
-    ).map(([health, count]) => ({ type: health, count }))
-
-    return { objectiveStatusData, objectiveHealthData }
-  })()
 
   const hasObjectives = !!objectivesData && objectivesData.length > 0
 
@@ -206,10 +164,10 @@ const PlanningIntervalAtAGlance = ({
               />
             </Col>
             <Col xs={24} md={12} lg={8}>
-              <ObjectiveStatusChart data={objectiveStatusData} />
+              <ObjectiveStatusChart objectivesData={objectivesData ?? []} />
             </Col>
             <Col xs={24} md={12} lg={8}>
-              <ObjectiveHealthChart data={objectiveHealthData} />
+              <ObjectiveHealthChart objectivesData={objectivesData ?? []} />
             </Col>
           </Row>
         )}
@@ -219,4 +177,3 @@ const PlanningIntervalAtAGlance = ({
 }
 
 export default PlanningIntervalAtAGlance
-
