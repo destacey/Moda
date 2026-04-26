@@ -25,22 +25,24 @@ jest.mock('@/src/store/features/planning/planning-interval-api', () => ({
 }))
 
 import { useGetPlanningIntervalMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
-import PiTeamCards from './pi-team-cards'
+import PlanningIntervalTeamCards from './planning-interval-team-cards'
 
 const mockMetrics = useGetPlanningIntervalMetricsQuery as unknown as jest.Mock
 
-const teamMetrics = (overrides: Partial<{
-  id: string
-  key: number
-  name: string
-  teamCode: string
-  predictability: number | null
-  averageCycleTimeDays: number | null
-  sprintCount: number
-  regularObjectivesCount: number
-  stretchObjectivesCount: number
-  completedObjectivesCount: number
-}> = {}) => {
+const teamMetrics = (
+  overrides: Partial<{
+    id: string
+    key: number
+    name: string
+    teamCode: string
+    predictability: number | null
+    averageCycleTimeDays: number | null
+    sprintCount: number
+    regularObjectivesCount: number
+    stretchObjectivesCount: number
+    completedObjectivesCount: number
+  }> = {},
+) => {
   const avg =
     overrides.averageCycleTimeDays === undefined
       ? 4.2
@@ -71,7 +73,7 @@ const teamMetrics = (overrides: Partial<{
 const findTeamLink = (name: string) =>
   screen.getByText(name).closest('a') as HTMLAnchorElement
 
-describe('PiTeamCards', () => {
+describe('PlanningIntervalTeamCards', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -79,7 +81,7 @@ describe('PiTeamCards', () => {
   it('renders a loading skeleton while the query is pending', () => {
     mockMetrics.mockReturnValue({ data: undefined, isLoading: true })
 
-    const { container } = render(<PiTeamCards piKey={1} />)
+    const { container } = render(<PlanningIntervalTeamCards piKey={1} />)
 
     expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
   })
@@ -90,7 +92,7 @@ describe('PiTeamCards', () => {
       isLoading: false,
     })
 
-    const { container } = render(<PiTeamCards piKey={1} />)
+    const { container } = render(<PlanningIntervalTeamCards piKey={1} />)
 
     expect(container).toBeEmptyDOMElement()
   })
@@ -120,7 +122,7 @@ describe('PiTeamCards', () => {
       isLoading: false,
     })
 
-    render(<PiTeamCards piKey={7} />)
+    render(<PlanningIntervalTeamCards piKey={7} />)
 
     const alphaLink = findTeamLink('Alpha')
     expect(alphaLink).toHaveAttribute(
@@ -154,7 +156,7 @@ describe('PiTeamCards', () => {
       isLoading: false,
     })
 
-    render(<PiTeamCards piKey={1} />)
+    render(<PlanningIntervalTeamCards piKey={1} />)
 
     const link = findTeamLink('Alpha')
 
@@ -183,7 +185,7 @@ describe('PiTeamCards', () => {
       isLoading: false,
     })
 
-    render(<PiTeamCards piKey={1} />)
+    render(<PlanningIntervalTeamCards piKey={1} />)
 
     const link = findTeamLink('Team Gamma')
     expect(link.textContent).toMatch(/0\s*%/)
@@ -196,10 +198,11 @@ describe('PiTeamCards', () => {
       isLoading: false,
     })
 
-    render(<PiTeamCards piKey={1} />)
+    render(<PlanningIntervalTeamCards piKey={1} />)
 
     expect(
-      screen.getByText(/click a team to open its plan review/i),
+      screen.getByText(/click a team card to open its plan review/i),
     ).toBeInTheDocument()
   })
 })
+

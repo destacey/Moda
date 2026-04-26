@@ -29,7 +29,7 @@ import {
   useGetPlanningIntervalIterationsQuery,
   useGetPlanningIntervalIterationMetricsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
-import IterationsStrip from './iterations-strip'
+import IterationsCards from './iteration-cards'
 
 const mockQuery = useGetPlanningIntervalIterationsQuery as unknown as jest.Mock
 const mockMetricsQuery =
@@ -60,7 +60,7 @@ const mkIteration = (overrides: {
   category: { id: 1, name: overrides.categoryName ?? 'Development' },
 })
 
-describe('IterationsStrip', () => {
+describe('IterationCards', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useRealTimers()
@@ -74,7 +74,7 @@ describe('IterationsStrip', () => {
   it('shows a loading skeleton while the query is pending', () => {
     mockQuery.mockReturnValue({ data: undefined, isLoading: true })
 
-    const { container } = render(<IterationsStrip piKey={1} />)
+    const { container } = render(<IterationsCards piKey={1} />)
 
     expect(container.querySelector('.ant-skeleton')).toBeInTheDocument()
   })
@@ -82,7 +82,7 @@ describe('IterationsStrip', () => {
   it('renders nothing when there are no iterations', () => {
     mockQuery.mockReturnValue({ data: [], isLoading: false })
 
-    const { container } = render(<IterationsStrip piKey={1} />)
+    const { container } = render(<IterationsCards piKey={1} />)
 
     expect(container).toBeEmptyDOMElement()
   })
@@ -115,7 +115,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    render(<IterationsStrip piKey={7} />)
+    render(<IterationsCards piKey={7} />)
 
     const cards = screen.getAllByRole('link')
     expect(cards.map((c) => c.getAttribute('href'))).toEqual([
@@ -141,7 +141,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    render(<IterationsStrip piKey={1} />)
+    render(<IterationsCards piKey={1} />)
 
     // Jun 10..Jun 23 is 14 days inclusive; Jun 16 is day 7.
     expect(
@@ -163,7 +163,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    render(<IterationsStrip piKey={1} />)
+    render(<IterationsCards piKey={1} />)
 
     expect(screen.queryByText(/Day\s+\d+\/\d+/i)).not.toBeInTheDocument()
   })
@@ -184,7 +184,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    render(<IterationsStrip piKey={1} />)
+    render(<IterationsCards piKey={1} />)
 
     expect(
       screen.getByText((content) => /Day\s+14\/14/i.test(content)),
@@ -206,7 +206,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    render(<IterationsStrip piKey={1} />)
+    render(<IterationsCards piKey={1} />)
 
     expect(screen.getByText(/Innovation & Planning/i)).toBeInTheDocument()
     expect(
@@ -231,7 +231,7 @@ describe('IterationsStrip', () => {
         isLoading: false,
       })
 
-      const { container } = render(<IterationsStrip piKey={1} />)
+      const { container } = render(<IterationsCards piKey={1} />)
 
       const cardBody = container.querySelector(
         'a .ant-card-body',
@@ -257,7 +257,7 @@ describe('IterationsStrip', () => {
       isLoading: false,
     })
 
-    const { container } = render(<IterationsStrip piKey={1} />)
+    const { container } = render(<IterationsCards piKey={1} />)
 
     const cardBody = container.querySelector(
       'a .ant-card-body',
@@ -286,7 +286,7 @@ describe('IterationsStrip', () => {
       setupActive()
       mockMetricsQuery.mockReturnValue({ data: undefined })
 
-      const { container } = render(<IterationsStrip piKey={1} />)
+      const { container } = render(<IterationsCards piKey={1} />)
 
       expect(container.querySelector('.anticon-flag')).toBeNull()
     })
@@ -308,7 +308,7 @@ describe('IterationsStrip', () => {
         data: { totalWorkItems: 10, completedWorkItems: 10 },
       })
 
-      const { container } = render(<IterationsStrip piKey={1} />)
+      const { container } = render(<IterationsCards piKey={1} />)
 
       expect(container.querySelector('.anticon-flag')).toBeNull()
     })
@@ -334,7 +334,7 @@ describe('IterationsStrip', () => {
           },
         })
 
-        const { container } = render(<IterationsStrip piKey={1} />)
+        const { container } = render(<IterationsCards piKey={1} />)
 
         const flag = container.querySelector(
           '.anticon-flag',
@@ -350,7 +350,7 @@ describe('IterationsStrip', () => {
         data: { totalWorkItems: 10, completedWorkItems: 5 },
       })
 
-      render(<IterationsStrip piKey={99} />)
+      render(<IterationsCards piKey={99} />)
 
       expect(mockMetricsQuery).toHaveBeenCalledWith({
         planningIntervalKey: 99,
@@ -359,3 +359,4 @@ describe('IterationsStrip', () => {
     })
   })
 })
+

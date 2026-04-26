@@ -31,13 +31,13 @@ import { useGetTeamOperatingModelsForTeamsQuery } from '@/src/store/features/org
 
 const { Title } = Typography
 
-export interface PlanningIntervalIterationSummaryProps {
+export interface PlanningIntervalIterationOverviewProps {
   iteration: PlanningIntervalIterationDetailsDto
   onHealthIndicatorReady?: (indicator: ReactNode) => void
 }
 
-const PlanningIntervalIterationSummary: FC<
-  PlanningIntervalIterationSummaryProps
+const PlanningIntervalIterationOverview: FC<
+  PlanningIntervalIterationOverviewProps
 > = ({ iteration, onHealthIndicatorReady }) => {
   const [sizingMethod, setSizingMethod] = useState<SizingMethod>(
     SizingMethod.StoryPoints,
@@ -223,4 +223,4 @@ const PlanningIntervalIterationSummary: FC<
   )
 }
 
-export default PlanningIntervalIterationSummary
+export default PlanningIntervalIterationOverview

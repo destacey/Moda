@@ -13,11 +13,13 @@ import Link from 'next/link'
 
 const { Text } = Typography
 
-interface PiTeamCardsProps {
+interface PlanningIntervalTeamCardsProps {
   piKey: number
 }
 
-const PiTeamCards = ({ piKey }: PiTeamCardsProps) => {
+const PlanningIntervalTeamCards = ({
+  piKey,
+}: PlanningIntervalTeamCardsProps) => {
   const { data, isLoading } = useGetPlanningIntervalMetricsQuery(piKey, {
     skip: !piKey,
   })
@@ -114,5 +116,5 @@ const PiTeamCards = ({ piKey }: PiTeamCardsProps) => {
   )
 }
 
-export default PiTeamCards
+export default PlanningIntervalTeamCards
 

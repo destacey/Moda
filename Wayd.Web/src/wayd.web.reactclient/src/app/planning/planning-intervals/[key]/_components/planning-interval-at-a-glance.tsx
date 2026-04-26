@@ -25,11 +25,13 @@ import {
   TeamPredictabilityRadarChart,
 } from '../../_components'
 
-interface PiAtAGlanceProps {
+interface PlanningIntervalAtAGlanceProps {
   planningInterval: PlanningIntervalDetailsDto
 }
 
-const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
+const PlanningIntervalAtAGlance = ({
+  planningInterval,
+}: PlanningIntervalAtAGlanceProps) => {
   const { data: piPredictabilityData, isLoading: isLoadingPiPredictability } =
     useGetPlanningIntervalPredictabilityQuery(planningInterval.key, {
       skip: !planningInterval.key,
@@ -197,7 +199,9 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
           <Row gutter={[16, 16]} align="stretch">
             <Col xs={24} md={12} lg={8}>
               <TeamPredictabilityRadarChart
-                teamPredictabilities={piPredictabilityData?.teamPredictabilities}
+                teamPredictabilities={
+                  piPredictabilityData?.teamPredictabilities
+                }
                 isLoading={isLoadingPiPredictability}
               />
             </Col>
@@ -214,4 +218,5 @@ const PiAtAGlance = ({ planningInterval }: PiAtAGlanceProps) => {
   )
 }
 
-export default PiAtAGlance
+export default PlanningIntervalAtAGlance
+

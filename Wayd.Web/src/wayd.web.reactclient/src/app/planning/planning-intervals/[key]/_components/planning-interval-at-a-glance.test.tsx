@@ -50,7 +50,7 @@ import {
   useGetPlanningIntervalPredictabilityQuery,
   useGetPlanningIntervalTeamsQuery,
 } from '@/src/store/features/planning/planning-interval-api'
-import PiAtAGlance from './pi-at-a-glance'
+import PlanningIntervalAtAGlance from './planning-interval-at-a-glance'
 
 const mockPredictability =
   useGetPlanningIntervalPredictabilityQuery as unknown as jest.Mock
@@ -63,7 +63,9 @@ const mockObjectives =
 const ACTIVE = 2
 const FUTURE = 3
 
-const mkPi = (overrides: Partial<{ stateId: number; predictability: number }> = {}) => ({
+const mkPi = (
+  overrides: Partial<{ stateId: number; predictability: number }> = {},
+) => ({
   id: 'pi-1',
   key: 7,
   name: '2026 PI 1',
@@ -87,7 +89,7 @@ const mkObjective = (
   type: { id: 1, name: 'Business' },
 })
 
-describe('PiAtAGlance', () => {
+describe('PlanningIntervalAtAGlance', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockPredictability.mockReturnValue({ data: undefined, isLoading: false })
@@ -97,7 +99,7 @@ describe('PiAtAGlance', () => {
   })
 
   it('renders the timeline and a Teams card even with no other data', () => {
-    render(<PiAtAGlance planningInterval={mkPi() as any} />)
+    render(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
 
     expect(screen.getByTestId('timeline-progress')).toBeInTheDocument()
     expect(screen.getByText('Teams')).toBeInTheDocument()
@@ -106,8 +108,22 @@ describe('PiAtAGlance', () => {
   it('counts only teams with type === "Team" for the Teams metric', () => {
     mockTeams.mockReturnValue({
       data: [
-        { id: 't1', key: 1, name: 'Alpha', code: 'A', type: 'Team', isActive: true },
-        { id: 't2', key: 2, name: 'Beta', code: 'B', type: 'Team', isActive: true },
+        {
+          id: 't1',
+          key: 1,
+          name: 'Alpha',
+          code: 'A',
+          type: 'Team',
+          isActive: true,
+        },
+        {
+          id: 't2',
+          key: 2,
+          name: 'Beta',
+          code: 'B',
+          type: 'Team',
+          isActive: true,
+        },
         {
           id: 'tot',
           key: 3,
@@ -119,7 +135,7 @@ describe('PiAtAGlance', () => {
       ],
     })
 
-    render(<PiAtAGlance planningInterval={mkPi() as any} />)
+    render(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
 
     // Find the Teams metric card by its title, then read the value within
     const teamsTitle = screen.getByText('Teams')
@@ -128,7 +144,11 @@ describe('PiAtAGlance', () => {
   })
 
   it('skips the metrics query for Future PIs', () => {
-    render(<PiAtAGlance planningInterval={mkPi({ stateId: FUTURE }) as any} />)
+    render(
+      <PlanningIntervalAtAGlance
+        planningInterval={mkPi({ stateId: FUTURE }) as any}
+      />,
+    )
 
     expect(mockMetrics).toHaveBeenCalled()
     const args = mockMetrics.mock.calls[mockMetrics.mock.calls.length - 1]
@@ -136,7 +156,11 @@ describe('PiAtAGlance', () => {
   })
 
   it('runs the metrics query for Active PIs', () => {
-    render(<PiAtAGlance planningInterval={mkPi({ stateId: ACTIVE }) as any} />)
+    render(
+      <PlanningIntervalAtAGlance
+        planningInterval={mkPi({ stateId: ACTIVE }) as any}
+      />,
+    )
 
     const args = mockMetrics.mock.calls[mockMetrics.mock.calls.length - 1]
     expect(args[1]).toEqual({ skip: false })
@@ -144,7 +168,7 @@ describe('PiAtAGlance', () => {
 
   it('only renders the Cycle Time card when there are contributing work items', () => {
     const { rerender } = render(
-      <PiAtAGlance planningInterval={mkPi() as any} />,
+      <PlanningIntervalAtAGlance planningInterval={mkPi() as any} />,
     )
     expect(screen.queryByText('Avg Cycle Time')).not.toBeInTheDocument()
 
@@ -158,7 +182,7 @@ describe('PiAtAGlance', () => {
         },
       },
     })
-    rerender(<PiAtAGlance planningInterval={mkPi() as any} />)
+    rerender(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
     expect(screen.queryByText('Avg Cycle Time')).not.toBeInTheDocument()
 
     // Non-zero count → card shows.
@@ -171,7 +195,7 @@ describe('PiAtAGlance', () => {
         },
       },
     })
-    rerender(<PiAtAGlance planningInterval={mkPi() as any} />)
+    rerender(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
     expect(screen.getByText('Avg Cycle Time')).toBeInTheDocument()
   })
 
@@ -189,12 +213,12 @@ describe('PiAtAGlance', () => {
     })
 
     it('renders the PI Predictability card', () => {
-      render(<PiAtAGlance planningInterval={mkPi() as any} />)
+      render(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
       expect(screen.getByText('PI Predictability')).toBeInTheDocument()
     })
 
     it('counts completed, regular (non-stretch), and stretch objectives separately', () => {
-      render(<PiAtAGlance planningInterval={mkPi() as any} />)
+      render(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
 
       const predictabilityCard = screen
         .getByText('PI Predictability')
@@ -220,19 +244,26 @@ describe('PiAtAGlance', () => {
 
   it('renders the chart row only when objectives exist', () => {
     const { rerender } = render(
-      <PiAtAGlance planningInterval={mkPi() as any} />,
+      <PlanningIntervalAtAGlance planningInterval={mkPi() as any} />,
     )
-    expect(screen.queryByTestId('team-predictability-radar')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('objective-status-chart')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('objective-health-chart')).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('team-predictability-radar'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('objective-status-chart'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('objective-health-chart'),
+    ).not.toBeInTheDocument()
 
     mockObjectives.mockReturnValue({
       data: [mkObjective({ status: 'Completed' })],
     })
-    rerender(<PiAtAGlance planningInterval={mkPi() as any} />)
+    rerender(<PlanningIntervalAtAGlance planningInterval={mkPi() as any} />)
 
     expect(screen.getByTestId('team-predictability-radar')).toBeInTheDocument()
     expect(screen.getByTestId('objective-status-chart')).toBeInTheDocument()
     expect(screen.getByTestId('objective-health-chart')).toBeInTheDocument()
   })
 })
+

@@ -30,7 +30,7 @@ const activeDayInfo = (start: Date, end: Date) => {
   return { currentDay, totalDays }
 }
 
-const IterationsStrip = ({ piKey }: { piKey: number }) => {
+const IterationCards = ({ piKey }: { piKey: number }) => {
   const { data: iterations, isLoading } =
     useGetPlanningIntervalIterationsQuery(piKey)
 
@@ -127,5 +127,5 @@ const IterationsStrip = ({ piKey }: { piKey: number }) => {
   )
 }
 
-export default IterationsStrip
+export default IterationCards
 
