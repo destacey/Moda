@@ -25032,6 +25032,7 @@ export interface PlanningIntervalTeamPredictabilityDto {
 }
 
 export interface PlanningTeamNavigationDto extends NavigationDto {
+    code: string;
     type: string;
 }
 

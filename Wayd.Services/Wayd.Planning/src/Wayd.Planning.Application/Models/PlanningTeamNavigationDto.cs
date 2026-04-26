@@ -5,6 +5,7 @@ namespace Wayd.Planning.Application.Models;
 
 public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
 {
+    public required string Code { get; set; }
     public required string Type { get; set; }
 
     public void ConfigureMapping(TypeAdapterConfig config)
@@ -20,6 +21,7 @@ public record PlanningTeamNavigationDto : NavigationDto, IMapFrom<PlanningTeam>
             Id = team.Id,
             Key = team.Key,
             Name = team.Name,
+            Code = team.Code,
             Type = team.Type.GetDisplayName()
         };
     }
