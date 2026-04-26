@@ -10,6 +10,7 @@ import PlanningIntervalDetailsLoading from '../loading'
 import { use, useEffect } from 'react'
 import { useGetPlanningIntervalQuery } from '@/src/store/features/planning/planning-interval-api'
 import { Flex } from 'antd'
+import { IterationState } from '@/src/components/types'
 import {
   IterationCards,
   PlanningIntervalAtAGlance,
@@ -45,12 +46,15 @@ const PlanningIntervalOverviewPage = (props: {
     return notFound()
   }
 
+  const isFuturePlanningInterval =
+    planningIntervalData.state.id === IterationState.Future
+
   return (
     <Flex vertical gap="middle">
       <PageTitle title="PI Overview" />
       <PlanningIntervalAtAGlance planningInterval={planningIntervalData} />
       <IterationCards piKey={piKey} />
-      <PlanningIntervalTeamCards piKey={piKey} />
+      {!isFuturePlanningInterval && <PlanningIntervalTeamCards piKey={piKey} />}
     </Flex>
   )
 }
@@ -62,4 +66,3 @@ const PlanningIntervalOverviewPageWithAuthorization = authorizePage(
 )
 
 export default PlanningIntervalOverviewPageWithAuthorization
-
