@@ -357,10 +357,15 @@ public class PlanningIntervalsController : ControllerBase
                 var team = sprintToTeam[g.First().SprintId];
                 teamPredictabilityByTeamId.TryGetValue(team.Id, out var teamPredictability);
                 codeByTeamId.TryGetValue(team.Id, out var teamCode);
+                var resolvedTeamCode = !string.IsNullOrWhiteSpace(teamCode) ? teamCode : team.Code;
+
+                if (string.IsNullOrWhiteSpace(resolvedTeamCode))
+                    throw new InvalidOperationException($"Unable to resolve a non-empty team code for team '{team.Name}' ({team.Id}).");
+
                 return new PlanningIntervalTeamMetrics
                 {
                     Team = new Common.Application.Dtos.NavigationDto { Id = team.Id, Key = team.Key, Name = team.Name },
-                    TeamCode = teamCode ?? string.Empty,
+                    TeamCode = resolvedTeamCode,
                     Predictability = teamPredictability?.Predictability,
                     RegularObjectivesCount = teamPredictability?.RegularObjectivesCount ?? 0,
                     StretchObjectivesCount = teamPredictability?.StretchObjectivesCount ?? 0,

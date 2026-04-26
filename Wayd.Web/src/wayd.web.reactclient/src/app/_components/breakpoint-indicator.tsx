@@ -4,9 +4,9 @@ import { Grid } from 'antd'
 
 const { useBreakpoint } = Grid
 
-// Dev-only floating chip that shows the current Ant Design breakpoint and
-// viewport width. Mount from the root layout behind a NODE_ENV check so it
-// is tree-shaken out of production builds.
+// Dev-only floating chip that shows the current Ant Design breakpoint.
+// Mount from the root layout behind a NODE_ENV check so it is tree-shaken
+// out of production builds.
 const BreakpointIndicator = () => {
   const screens = useBreakpoint()
 

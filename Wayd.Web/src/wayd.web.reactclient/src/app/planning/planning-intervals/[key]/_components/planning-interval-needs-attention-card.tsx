@@ -1,15 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Card, Col, Row, Segmented, Typography } from 'antd'
+import { Card, Col, Row, Segmented } from 'antd'
 import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
-import useTheme from '@/src/components/contexts/theme'
 import WaydEmpty from '@/src/components/common/wayd-empty'
 import { PlanningIntervalObjectiveCard } from '.'
 import useAuth from '@/src/components/contexts/auth'
 import { PlanningIntervalObjectiveDetailsDrawer } from '../../_components'
-
-const { Text } = Typography
 
 type SortMode = 'health' | 'progress' | 'team'
 
@@ -31,7 +28,6 @@ const PlanningIntervalNeedsAttentionCard = ({
   const [selectedObjectiveKey, setSelectedObjectiveKey] = useState<
     number | null
   >(null)
-  const { badgeColor } = useTheme()
   const { hasPermissionClaim } = useAuth()
 
   const {

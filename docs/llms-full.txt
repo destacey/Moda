@@ -54,7 +54,7 @@ Fixed timeframe (typically 8-12 weeks) for coordinated delivery. Properties:
 
 States based on current date: Future, Active, Completed.
 
-PI detail page navigation: Overview, Plan Review, Objectives, Risks, Reports (Health Report), Teams, Sprint Mappings.
+PI detail page navigation: Overview, Details (contains Teams and Sprint Mappings tabs), Plan Review, Objectives, Risks, Reports (Health Report).
 
 #### PI Overview Page
 
