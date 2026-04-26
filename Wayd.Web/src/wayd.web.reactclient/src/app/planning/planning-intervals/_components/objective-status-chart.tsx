@@ -3,8 +3,10 @@
 import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
+import { getObjectiveStatusColor } from '@/src/utils'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
+import { theme } from 'antd'
 
 const Pie = dynamic(
   () => import('@ant-design/charts').then((mod) => mod.Pie) as any,
@@ -22,8 +24,17 @@ interface ObjectiveStatusChartDataItem {
   count: number
 }
 
+const OBJECTIVE_STATUS_ORDER = [
+  'Not Started',
+  'In Progress',
+  'Completed',
+  'Missed',
+  'Canceled',
+]
+
 const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
   const { antDesignChartsTheme } = useTheme()
+  const { token } = theme.useToken()
 
   if (!props.objectivesData || props.objectivesData.length === 0) return null
 
@@ -36,22 +47,65 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
     {} as Record<string, number>,
   )
 
-  const data: ObjectiveStatusChartDataItem[] = Object.entries(
-    groupedStatusData,
-  ).map(([status, count]) => ({ type: status, count }))
+  const data: ObjectiveStatusChartDataItem[] = Object.entries(groupedStatusData)
+    .map(([status, count]) => ({ type: status, count }))
+    .sort((a, b) => {
+      const aIndex = OBJECTIVE_STATUS_ORDER.indexOf(a.type)
+      const bIndex = OBJECTIVE_STATUS_ORDER.indexOf(b.type)
+      const normalizedAIndex = aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex
+      const normalizedBIndex = bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex
+      return normalizedAIndex - normalizedBIndex
+    })
 
+  const mapSemanticColorToChartColor = (semanticColor: string) => {
+    switch (semanticColor) {
+      case 'processing':
+        return token.colorPrimary
+      case 'success':
+        return token.colorSuccess
+      case 'error':
+        return token.colorError
+      case 'warning':
+        return token.colorWarning
+      case 'default':
+      default:
+        return token.colorTextQuaternary
+    }
+  }
+
+  const statusDomain = data.map((item) => item.type)
+  const statusRange = data.map((item) =>
+    mapSemanticColorToChartColor(getObjectiveStatusColor(item.type)),
+  )
+  const tooltipBounding =
+    typeof window !== 'undefined'
+      ? {
+          x: 0,
+          y: 0,
+          width: window.innerWidth,
+          height: window.innerHeight,
+        }
+      : undefined
   const total = data.reduce((acc, x) => acc + x.count, 0)
   const config: PieConfig = {
     theme: antDesignChartsTheme,
     data,
     angleField: 'count',
     colorField: 'type',
+    scale: {
+      color: {
+        domain: statusDomain,
+        range: statusRange,
+      },
+    },
     autoFit: true,
     height: props.height ?? 280,
     padding: props.embedded ? 0 : 'auto',
     label: {
       text: (d) =>
-        `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
+        props.embedded
+          ? `${d.count} (${Math.round((d.count / total) * 100)}%)`
+          : `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
       transform: [
         {
           type: 'overlapDodgeY',
@@ -59,17 +113,22 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
       ],
     },
     legend: false,
-    tooltip: {
-      title: (d: ObjectiveStatusChartDataItem) => d.type,
-      items: [
-        {
-          field: 'count',
-          name: 'Objectives',
-          valueFormatter: (value: number) =>
-            `${value} (${Math.round((value / total) * 100)}%)`,
-        },
-      ],
+    interaction: {
+      tooltip: {
+        mount: 'body',
+        ...(props.embedded ? { position: 'top' as const } : {}),
+        ...(tooltipBounding ? { bounding: tooltipBounding } : {}),
+      },
     },
+    tooltip: {
+      title: () => 'Objectives',
+      items: [
+        (d: ObjectiveStatusChartDataItem) => ({
+          name: d.type,
+          value: `${d.count} (${Math.round((d.count / total) * 100)}%)`,
+        }),
+      ],
+    } as any,
   }
 
   return (
@@ -80,3 +139,4 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
 }
 
 export default ObjectiveStatusChart
+

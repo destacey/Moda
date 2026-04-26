@@ -64,7 +64,7 @@ const teamMetrics = (
     teamCode: overrides.teamCode ?? 'ALPHA',
     predictability:
       overrides.predictability === undefined ? 75 : overrides.predictability,
-    regularObjectivesCount: overrides.regularObjectivesCount ?? 0,
+    regularObjectivesCount: overrides.regularObjectivesCount ?? 1,
     stretchObjectivesCount: overrides.stretchObjectivesCount ?? 0,
     completedObjectivesCount: overrides.completedObjectivesCount ?? 0,
     cycleTime: {
@@ -180,13 +180,15 @@ describe('PlanningIntervalTeamCards', () => {
     ).toBe('1')
   })
 
-  it('shows zero values when predictability or cycle time is null', () => {
+  it('shows "N/A" when objective count is zero', () => {
     mockMetrics.mockReturnValue({
       data: {
         teamMetrics: [
           teamMetrics({
             name: 'Team Gamma',
             predictability: null,
+            regularObjectivesCount: 0,
+            stretchObjectivesCount: 0,
             averageCycleTimeDays: null,
           }),
         ],
@@ -197,8 +199,11 @@ describe('PlanningIntervalTeamCards', () => {
     render(<PlanningIntervalTeamCards piKey={1} />)
 
     const link = findTeamLink('Team Gamma')
-    expect(link.textContent).toMatch(/0\s*%/)
+    expect(link.textContent).toMatch(/N\/A/)
     expect(link.textContent).toMatch(/0\.00\s*days/)
+    expect(within(link).queryByLabelText('Completed')).not.toBeInTheDocument()
+    expect(within(link).queryByLabelText('Regular')).not.toBeInTheDocument()
+    expect(within(link).queryByLabelText('Stretch')).not.toBeInTheDocument()
   })
 
   it('shows a click affordance hinting that team cards are clickable', () => {

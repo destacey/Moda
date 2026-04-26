@@ -83,7 +83,12 @@ const ConfigureTeamSprintMappingsForm = ({
   // Derive mappings from query data + user overrides
   const mappings: IterationSprintMapping[] = !iterationSprintsData
     ? []
-    : iterationSprintsData.map((iteration) => {
+    : [...iterationSprintsData]
+        .sort(
+          (a, b) =>
+            new Date(a.start).getTime() - new Date(b.start).getTime(),
+        )
+        .map((iteration) => {
         const existingSprint = iteration.sprints?.find(
           (s) => s.team.id === teamId,
         )

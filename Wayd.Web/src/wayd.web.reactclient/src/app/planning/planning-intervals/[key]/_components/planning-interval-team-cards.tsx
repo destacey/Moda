@@ -39,6 +39,10 @@ const TeamMetricsCard = ({ piKey, teamMetrics }: TeamMetricsCardProps) => {
   )
 
   const hasObjectives = !!objectivesData && objectivesData.length > 0
+  const teamObjectiveCount =
+    (teamMetrics.regularObjectivesCount ?? 0) +
+    (teamMetrics.stretchObjectivesCount ?? 0)
+  const hasTeamObjectives = teamObjectiveCount > 0
 
   return (
     <Link
@@ -54,41 +58,47 @@ const TeamMetricsCard = ({ piKey, teamMetrics }: TeamMetricsCardProps) => {
                 <MetricCard
                   embedded
                   title="Predictability"
-                  value={teamMetrics.predictability ?? 0}
-                  precision={0}
-                  suffix="%"
-                  tooltip="The team's predictability for this planning interval — completed objectives over committed (non-stretch) objectives."
+                  value={
+                    hasTeamObjectives
+                      ? (teamMetrics.predictability ?? 0)
+                      : 'N/A'
+                  }
+                  precision={hasTeamObjectives ? 0 : undefined}
+                  suffix={hasTeamObjectives ? '%' : undefined}
+                  tooltip="The team's predictability for this planning interval — completed objectives over committed (non-stretch) objectives. N/A means this metric is not applicable because the team has no objectives."
                   tooltipTarget="title"
                   secondaryValue={
-                    <Flex gap={12} style={{ fontSize: 12 }}>
-                      <WaydTooltip title="Completed">
-                        <span>
-                          <CheckCircleOutlined
-                            style={{ marginRight: 4 }}
-                            aria-label="Completed"
-                          />
-                          {teamMetrics.completedObjectivesCount}
-                        </span>
-                      </WaydTooltip>
-                      <WaydTooltip title="Regular (non-stretch)">
-                        <span>
-                          <AimOutlined
-                            style={{ marginRight: 4 }}
-                            aria-label="Regular"
-                          />
-                          {teamMetrics.regularObjectivesCount}
-                        </span>
-                      </WaydTooltip>
-                      <WaydTooltip title="Stretch">
-                        <span>
-                          <PlusCircleOutlined
-                            style={{ marginRight: 4 }}
-                            aria-label="Stretch"
-                          />
-                          {teamMetrics.stretchObjectivesCount}
-                        </span>
-                      </WaydTooltip>
-                    </Flex>
+                    hasTeamObjectives ? (
+                      <Flex gap={12} style={{ fontSize: 12 }}>
+                        <WaydTooltip title="Completed">
+                          <span>
+                            <CheckCircleOutlined
+                              style={{ marginRight: 4 }}
+                              aria-label="Completed"
+                            />
+                            {teamMetrics.completedObjectivesCount}
+                          </span>
+                        </WaydTooltip>
+                        <WaydTooltip title="Regular (non-stretch)">
+                          <span>
+                            <AimOutlined
+                              style={{ marginRight: 4 }}
+                              aria-label="Regular"
+                            />
+                            {teamMetrics.regularObjectivesCount}
+                          </span>
+                        </WaydTooltip>
+                        <WaydTooltip title="Stretch">
+                          <span>
+                            <PlusCircleOutlined
+                              style={{ marginRight: 4 }}
+                              aria-label="Stretch"
+                            />
+                            {teamMetrics.stretchObjectivesCount}
+                          </span>
+                        </WaydTooltip>
+                      </Flex>
+                    ) : undefined
                   }
                 />
               </Col>
@@ -165,4 +175,3 @@ const PlanningIntervalTeamCards = ({
 }
 
 export default PlanningIntervalTeamCards
-

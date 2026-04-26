@@ -75,6 +75,8 @@ const PlanningIntervalAtAGlance = ({
       { regular: 0, stretch: 0, completed: 0 },
     )
   })()
+  const piObjectiveCount = objectiveCounts.regular + objectiveCounts.stretch
+  const hasPiObjectives = piObjectiveCount > 0
 
   return (
     <Card size="small" title="At a Glance">
@@ -104,41 +106,47 @@ const PlanningIntervalAtAGlance = ({
             <Col xs={12} sm={6} md={6} lg={6}>
               <MetricCard
                 title="PI Predictability"
-                value={planningInterval.predictability ?? 0}
-                precision={0}
-                suffix="%"
+                value={
+                  hasPiObjectives
+                    ? (planningInterval.predictability ?? 0)
+                    : 'No Objectives'
+                }
+                precision={hasPiObjectives ? 0 : undefined}
+                suffix={hasPiObjectives ? '%' : undefined}
                 tooltip="The percentage of completed objectives compared to the number of non-stretched objectives in this planning interval."
                 tooltipTarget="title"
                 secondaryValue={
-                  <Flex gap={12} style={{ fontSize: 12 }}>
-                    <WaydTooltip title="Completed">
-                      <span>
-                        <CheckCircleOutlined
-                          style={{ marginRight: 4 }}
-                          aria-label="Completed"
-                        />
-                        {objectiveCounts.completed}
-                      </span>
-                    </WaydTooltip>
-                    <WaydTooltip title="Regular (non-stretch)">
-                      <span>
-                        <AimOutlined
-                          style={{ marginRight: 4 }}
-                          aria-label="Regular"
-                        />
-                        {objectiveCounts.regular}
-                      </span>
-                    </WaydTooltip>
-                    <WaydTooltip title="Stretch">
-                      <span>
-                        <PlusCircleOutlined
-                          style={{ marginRight: 4 }}
-                          aria-label="Stretch"
-                        />
-                        {objectiveCounts.stretch}
-                      </span>
-                    </WaydTooltip>
-                  </Flex>
+                  hasPiObjectives ? (
+                    <Flex gap={12} style={{ fontSize: 12 }}>
+                      <WaydTooltip title="Completed">
+                        <span>
+                          <CheckCircleOutlined
+                            style={{ marginRight: 4 }}
+                            aria-label="Completed"
+                          />
+                          {objectiveCounts.completed}
+                        </span>
+                      </WaydTooltip>
+                      <WaydTooltip title="Regular (non-stretch)">
+                        <span>
+                          <AimOutlined
+                            style={{ marginRight: 4 }}
+                            aria-label="Regular"
+                          />
+                          {objectiveCounts.regular}
+                        </span>
+                      </WaydTooltip>
+                      <WaydTooltip title="Stretch">
+                        <span>
+                          <PlusCircleOutlined
+                            style={{ marginRight: 4 }}
+                            aria-label="Stretch"
+                          />
+                          {objectiveCounts.stretch}
+                        </span>
+                      </WaydTooltip>
+                    </Flex>
+                  ) : undefined
                 }
               />
             </Col>
