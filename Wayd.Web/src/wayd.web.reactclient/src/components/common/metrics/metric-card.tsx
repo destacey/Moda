@@ -9,9 +9,8 @@ export interface MetricCardProps extends Omit<StatisticProps, 'valueStyle'> {
   statisticStyle?: React.CSSProperties
   tooltip?: string
   /**
-   * Where the `tooltip` is anchored. Defaults to `'card'` — the entire card
-   * is the hover target. Use `'title'` when the metric has its own child
-   * tooltips (e.g. icon-stat secondaries) so hovers don't double up.
+   * Where the `tooltip` is anchored. Defaults to `'title'` so metric
+   * interactions are not blocked by a card-level tooltip.
    */
   tooltipTarget?: 'card' | 'title'
   secondaryValue?: ReactNode
@@ -29,7 +28,7 @@ const MetricCard: FC<MetricCardProps> = ({
   cardStyle,
   statisticStyle,
   tooltip,
-  tooltipTarget = 'card',
+  tooltipTarget = 'title',
   secondaryValue,
   valueStyle,
   styles,
@@ -47,7 +46,7 @@ const MetricCard: FC<MetricCardProps> = ({
 
   const titleNode =
     tooltip && tooltipTarget === 'title' ? (
-      <WaydTooltip title={tooltip}>
+      <WaydTooltip title={tooltip} helpCursor>
         <span>{title}</span>
       </WaydTooltip>
     ) : (
@@ -70,7 +69,7 @@ const MetricCard: FC<MetricCardProps> = ({
       )}
     </Flex>
   ) : (
-    <Card style={defaultCardStyle} size="small" hoverable>
+    <Card style={defaultCardStyle} size="small">
       <Statistic
         {...statisticProps}
         title={titleNode}
@@ -84,7 +83,9 @@ const MetricCard: FC<MetricCardProps> = ({
   )
 
   return tooltip && tooltipTarget === 'card' ? (
-    <WaydTooltip title={tooltip}>{inner}</WaydTooltip>
+    <WaydTooltip title={tooltip} helpCursor>
+      {inner}
+    </WaydTooltip>
   ) : (
     inner
   )
