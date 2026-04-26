@@ -543,6 +543,12 @@ export default function LoginPage() {
     setExchangeError(null)
 
     const run = async () => {
+      // Step 1: silent MSAL token acquisition. Failures here mean MSAL's
+      // cached state is unusable — typical after a long idle (timed_out) or
+      // when Entra needs re-consent (InteractionRequiredAuthError). We clear
+      // MSAL's cache so the next button click runs a fresh loginRedirect
+      // rather than another doomed silent acquire.
+      let accessToken: string
       try {
         const account = instance.getActiveAccount() ?? accounts[0]
         instance.setActiveAccount(account)
@@ -550,22 +556,10 @@ export default function LoginPage() {
           ...tokenRequest,
           account,
         })
-        const tokenResponse = await getAuthClient().exchange({
-          provider: 'MicrosoftEntraId',
-          subjectToken: msalResponse.accessToken,
-        })
-        storeAuth(tokenResponse)
-        // Full reload so the layout gate re-reads storage and mounts the app.
-        window.location.href = '/'
+        accessToken = msalResponse.accessToken
       } catch (error) {
-        console.error('[Login] Entra token exchange failed:', error)
+        console.error('[Login] MSAL silent token acquisition failed:', error)
 
-        // Silent acquisition failed — typical after a long idle when MSAL's
-        // cached account is stale (timed_out) or the Entra session needs
-        // re-consent (InteractionRequiredAuthError). Clear MSAL's cache so the
-        // next button click triggers a fresh loginRedirect rather than another
-        // doomed silent acquire. Without this, the user clicks the button and
-        // immediately lands back on this same failure branch.
         try {
           instance.setActiveAccount(null)
           await instance.clearCache()
@@ -578,6 +572,28 @@ export default function LoginPage() {
             ? 'Sign-in needs to be completed interactively. Please click Sign in with Microsoft.'
             : 'Sign-in session expired. Please click Sign in with Microsoft to continue.'
         setExchangeError(message)
+        setExchangeState('failed')
+        return
+      }
+
+      // Step 2: trade the MSAL access token for a Wayd JWT. Failures here are
+      // backend/network issues — the user's Entra session is fine, so we
+      // deliberately leave MSAL's cache intact. Forcing them to redo Entra
+      // auth for a transient API failure would be a regression; on retry the
+      // existing MSAL account can still produce a token silently.
+      try {
+        const tokenResponse = await getAuthClient().exchange({
+          provider: 'MicrosoftEntraId',
+          subjectToken: accessToken,
+        })
+        storeAuth(tokenResponse)
+        // Full reload so the layout gate re-reads storage and mounts the app.
+        window.location.href = '/'
+      } catch (error) {
+        console.error('[Login] Wayd token exchange failed:', error)
+        setExchangeError(
+          'Unable to complete sign-in. Please try again in a moment.',
+        )
         setExchangeState('failed')
       }
     }
