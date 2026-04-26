@@ -13,6 +13,8 @@ const Pie = dynamic(
 
 export interface ObjectiveHealthChartProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
+  embedded?: boolean
+  height?: number
 }
 
 interface ObjectiveHealthChartDataItem {
@@ -56,7 +58,8 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
     angleField: 'count',
     colorField: 'type',
     autoFit: true,
-    height: 280,
+    height: props.height ?? 280,
+    padding: props.embedded ? 0 : 'auto',
     label: {
       text: (d) =>
         `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
@@ -84,6 +87,7 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
     <ChartCard
       title="Objectives By Health"
       tooltip="Objective health for open objectives."
+      embedded={props.embedded}
     >
       <Pie {...(config as any)} />
     </ChartCard>
@@ -91,4 +95,3 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
 }
 
 export default ObjectiveHealthChart
-

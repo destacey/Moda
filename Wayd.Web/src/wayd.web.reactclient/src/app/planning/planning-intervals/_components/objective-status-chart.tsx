@@ -13,6 +13,8 @@ const Pie = dynamic(
 
 export interface ObjectiveStatusChartProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
+  embedded?: boolean
+  height?: number
 }
 
 interface ObjectiveStatusChartDataItem {
@@ -45,7 +47,8 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
     angleField: 'count',
     colorField: 'type',
     autoFit: true,
-    height: 280,
+    height: props.height ?? 280,
+    padding: props.embedded ? 0 : 'auto',
     label: {
       text: (d) =>
         `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
@@ -70,7 +73,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
   }
 
   return (
-    <ChartCard title="Objectives By Status">
+    <ChartCard title="Objectives By Status" embedded={props.embedded}>
       <Pie {...(config as any)} />
     </ChartCard>
   )

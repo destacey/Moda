@@ -22,12 +22,20 @@ Object.defineProperty(window, 'matchMedia', {
 
 jest.mock('@/src/store/features/planning/planning-interval-api', () => ({
   useGetPlanningIntervalMetricsQuery: jest.fn(),
+  useGetPlanningIntervalObjectivesQuery: jest.fn(),
 }))
 
 import { useGetPlanningIntervalMetricsQuery } from '@/src/store/features/planning/planning-interval-api'
+import { useGetPlanningIntervalObjectivesQuery } from '@/src/store/features/planning/planning-interval-api'
 import PlanningIntervalTeamCards from './planning-interval-team-cards'
+jest.mock('../../_components', () => ({
+  ObjectiveStatusChart: () => <div data-testid="objective-status-chart" />,
+  ObjectiveHealthChart: () => <div data-testid="objective-health-chart" />,
+}))
 
 const mockMetrics = useGetPlanningIntervalMetricsQuery as unknown as jest.Mock
+const mockObjectives =
+  useGetPlanningIntervalObjectivesQuery as unknown as jest.Mock
 
 const teamMetrics = (
   overrides: Partial<{
@@ -76,6 +84,7 @@ const findTeamLink = (name: string) =>
 describe('PlanningIntervalTeamCards', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockObjectives.mockReturnValue({ data: undefined })
   })
 
   it('renders a loading skeleton while the query is pending', () => {
@@ -204,5 +213,32 @@ describe('PlanningIntervalTeamCards', () => {
       screen.getByText(/click a team card to open its plan review/i),
     ).toBeInTheDocument()
   })
-})
 
+  it('renders objective status and health charts when team objectives exist', () => {
+    mockMetrics.mockReturnValue({
+      data: { teamMetrics: [teamMetrics({ name: 'Alpha' })] },
+      isLoading: false,
+    })
+    mockObjectives.mockReturnValue({
+      data: [
+        {
+          id: 'o1',
+          key: 1,
+          name: 'Improve reliability',
+          status: { id: 1, name: 'In Progress' },
+          healthCheck: { id: 'h1', status: { id: 1, name: 'Healthy' } },
+          planningInterval: { id: 'pi1', key: 1, name: 'PI 1' },
+          team: { id: 't1', key: 1, name: 'Alpha', code: 'ALPHA' },
+          progress: 50,
+          type: { id: 1, name: 'Standard' },
+          isStretch: false,
+        },
+      ],
+    })
+
+    render(<PlanningIntervalTeamCards piKey={1} />)
+
+    expect(screen.getByTestId('objective-status-chart')).toBeInTheDocument()
+    expect(screen.getByTestId('objective-health-chart')).toBeInTheDocument()
+  })
+})
