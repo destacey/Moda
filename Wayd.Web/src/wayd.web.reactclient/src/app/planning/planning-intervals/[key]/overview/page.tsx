@@ -14,6 +14,7 @@ import { IterationState } from '@/src/components/types'
 import {
   IterationCards,
   PlanningIntervalAtAGlance,
+  PlanningIntervalNeedsAttentionCard,
   PlanningIntervalTeamCards,
 } from '../_components'
 
@@ -48,6 +49,8 @@ const PlanningIntervalOverviewPage = (props: {
 
   const isFuturePlanningInterval =
     planningIntervalData.state.id === IterationState.Future
+  const isActivePlanningInterval =
+    planningIntervalData.state.id === IterationState.Active
 
   return (
     <Flex vertical gap="middle">
@@ -55,6 +58,7 @@ const PlanningIntervalOverviewPage = (props: {
       <PlanningIntervalAtAGlance planningInterval={planningIntervalData} />
       <IterationCards piKey={piKey} />
       {!isFuturePlanningInterval && <PlanningIntervalTeamCards piKey={piKey} />}
+      {isActivePlanningInterval && <PlanningIntervalNeedsAttentionCard piKey={piKey} />}
     </Flex>
   )
 }

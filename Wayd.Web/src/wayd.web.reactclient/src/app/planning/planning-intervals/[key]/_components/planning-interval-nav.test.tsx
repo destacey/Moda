@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react'
+import React from 'react'
 
 global.ResizeObserver = class {
   observe() {}
@@ -18,6 +19,50 @@ Object.defineProperty(window, 'matchMedia', {
     removeEventListener: jest.fn(),
     dispatchEvent: jest.fn(),
   })),
+})
+
+jest.mock('antd', () => {
+  const actual = jest.requireActual('antd')
+
+  const renderMenuItems = (
+    items: Array<{ key?: string; label?: React.ReactNode; children?: any[] }> = [],
+    selectedKeys: string[] = [],
+  ): React.ReactNode =>
+    items.map((item) => {
+      if (item.children?.length) {
+        return (
+          <li key={item.key}>
+            <span>{item.label}</span>
+            <ul>{renderMenuItems(item.children, selectedKeys)}</ul>
+          </li>
+        )
+      }
+
+      const selected = !!item.key && selectedKeys.includes(item.key)
+      return (
+        <li
+          key={item.key}
+          className={selected ? 'ant-menu-item-selected' : undefined}
+        >
+          {item.label}
+        </li>
+      )
+    })
+
+  return {
+    ...actual,
+    Menu: ({
+      items,
+      selectedKeys,
+    }: {
+      items?: Array<{ key?: string; label?: React.ReactNode; children?: any[] }>
+      selectedKeys?: string[]
+    }) => (
+      <ul data-testid="mock-menu">
+        {renderMenuItems(items ?? [], selectedKeys ?? [])}
+      </ul>
+    ),
+  }
 })
 
 const mockUsePathname = jest.fn()

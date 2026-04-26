@@ -47,13 +47,7 @@ const IterationCards = ({ piKey }: { piKey: number }) => {
   )
 
   return (
-    <Card
-      size="small"
-      title="Iterations"
-      extra={
-        <Text type="secondary">Click an iteration card to open its view →</Text>
-      }
-    >
+    <Card size="small" title="Iterations">
       <Flex gap={12} wrap>
         {ordered.map((iteration) => {
           const isActive = iteration.state === 'Active'

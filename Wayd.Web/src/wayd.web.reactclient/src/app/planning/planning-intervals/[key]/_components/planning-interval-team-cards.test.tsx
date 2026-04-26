@@ -206,19 +206,6 @@ describe('PlanningIntervalTeamCards', () => {
     expect(within(link).queryByLabelText('Stretch')).not.toBeInTheDocument()
   })
 
-  it('shows a click affordance hinting that team cards are clickable', () => {
-    mockMetrics.mockReturnValue({
-      data: { teamMetrics: [teamMetrics({ name: 'Alpha' })] },
-      isLoading: false,
-    })
-
-    render(<PlanningIntervalTeamCards piKey={1} />)
-
-    expect(
-      screen.getByText(/click a team card to open its plan review/i),
-    ).toBeInTheDocument()
-  })
-
   it('renders objective status and health charts when team objectives exist', () => {
     mockMetrics.mockReturnValue({
       data: { teamMetrics: [teamMetrics({ name: 'Alpha' })] },
@@ -247,3 +234,4 @@ describe('PlanningIntervalTeamCards', () => {
     expect(screen.getByTestId('objective-health-chart')).toBeInTheDocument()
   })
 })
+

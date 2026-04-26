@@ -154,15 +154,7 @@ const PlanningIntervalTeamCards = ({
   if (teamMetrics.length === 0) return null
 
   return (
-    <Card
-      size="small"
-      title="Teams"
-      extra={
-        <Text type="secondary">
-          Click a team card to open its plan review →
-        </Text>
-      }
-    >
+    <Card size="small" title="Teams">
       <Row gutter={[16, 16]}>
         {teamMetrics.map((tm) => (
           <Col xs={24} md={12} lg={8} key={tm.team.id}>
@@ -175,3 +167,4 @@ const PlanningIntervalTeamCards = ({
 }
 
 export default PlanningIntervalTeamCards
+
