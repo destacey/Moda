@@ -485,7 +485,7 @@ function LocalLoginTab() {
 }
 
 export default function LoginPage() {
-  useDocumentTitle('Moda Login')
+  useDocumentTitle('Wayd Login')
   const isMsalAuthenticated = useIsAuthenticated()
   const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()
@@ -564,7 +564,10 @@ export default function LoginPage() {
           instance.setActiveAccount(null)
           await instance.clearCache()
         } catch (cacheError) {
-          console.warn('[Login] MSAL clearCache failed; continuing.', cacheError)
+          console.warn(
+            '[Login] MSAL clearCache failed; continuing.',
+            cacheError,
+          )
         }
 
         const message =

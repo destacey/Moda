@@ -202,6 +202,11 @@ internal class TokenService(
             new(ClaimTypes.Email, user.Email ?? string.Empty),
             new(ClaimTypes.Name, user.FirstName ?? string.Empty),
             new(ClaimTypes.Surname, user.LastName ?? string.Empty),
+            // Frontend reads this to drive provider-specific UX (e.g. showing the
+            // "Change Password" button only for local users) and to gate the
+            // forced-password-change flow. Without it, authMethod is null for
+            // every session and those branches silently disable themselves.
+            new("loginProvider", user.LoginProvider),
         };
 
         if (user.EmployeeId.HasValue)
