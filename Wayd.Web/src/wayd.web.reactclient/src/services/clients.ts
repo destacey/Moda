@@ -244,15 +244,17 @@ axiosClient.interceptors.response.use(
           // 2. Network error (offline, server unreachable, request aborted):
           //    no proof the session is bad — we just couldn't ask. Wiping
           //    storage here would log out a user every time their wifi
-          //    blipped. Leave storage intact and reject; the original request
-          //    will surface its own network error, and a future request can
-          //    try the refresh again.
+          //    blipped. Leave storage intact and reject the caller with the
+          //    original 401, not the refresh-call error — the caller asked
+          //    about their endpoint, not /refresh-token, so surfacing the
+          //    refresh URL/message would be misleading. A future request can
+          //    re-attempt the refresh once the network recovers.
           if (isNetworkError(refreshError)) {
             console.warn(
               'Token refresh on 401 unreachable; leaving session intact:',
               refreshError,
             )
-            return Promise.reject(refreshError)
+            return Promise.reject(error)
           }
 
           console.error('Token refresh on 401 failed:', refreshError)
