@@ -79,6 +79,26 @@ export function getAuthRefreshToken(): string | null {
   return getAuthStorage().getItem(AUTH_REFRESH_TOKEN_KEY)
 }
 
+/**
+ * Returns true when the stored token is expired or within the skew window of
+ * expiring. Used by the request interceptor to refresh proactively rather than
+ * letting every concurrent call 401 first. The skew also covers small clock
+ * drift between client and server.
+ *
+ * Returns false (treat as fresh) when there's no expiry recorded — older
+ * sessions that predate the expiry-stamp landing should fall through to the
+ * reactive 401 path instead of being force-refreshed on every request.
+ */
+const TOKEN_REFRESH_SKEW_MS = 30_000
+export function isAuthTokenExpiringSoon(): boolean {
+  if (typeof window === 'undefined') return false
+  const stamp = getAuthStorage().getItem(AUTH_TOKEN_EXPIRY_KEY)
+  if (!stamp) return false
+  const expiresAt = Date.parse(stamp)
+  if (Number.isNaN(expiresAt)) return false
+  return expiresAt - Date.now() <= TOKEN_REFRESH_SKEW_MS
+}
+
 export function isAuthActive(): boolean {
   if (typeof window === 'undefined') return false
   // Check both storages since we don't know which was used until we read the flag.
@@ -134,6 +154,27 @@ const axiosClient = axios.create({
   baseURL: apiUrl,
   timeout: 30000, // 30 second timeout
 })
+
+/**
+ * True for axios failures where no response was received: offline, DNS failure,
+ * server unreachable, request timed out, request aborted. We treat these as
+ * "couldn't ask the server" rather than "server said no" — the distinction
+ * matters when deciding whether a failed refresh proves the session is bad.
+ *
+ * Axios sets `response` only when the server actually responded; for transport
+ * failures it sets `code` to ERR_NETWORK / ECONNABORTED / ERR_CANCELED. We
+ * accept both signals because some axios errors get reshaped by interceptors
+ * before reaching us.
+ */
+function isNetworkError(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false
+  const e = error as { response?: unknown; code?: string; message?: string }
+  if (e.response) return false
+  if (e.code === 'ERR_NETWORK' || e.code === 'ECONNABORTED' || e.code === 'ERR_CANCELED') {
+    return true
+  }
+  return e.message === 'Network Error'
+}
 
 // Single-flight guard for refresh. When multiple requests 401 concurrently
 // (typical after an idle period: every in-flight call fails at once), they all
@@ -192,17 +233,28 @@ axiosClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
           return axiosClient(originalRequest)
         } catch (refreshError) {
-          // Server rejected the refresh — the session is invalid. Wipe storage
-          // and force a hard navigation to /login. Without the redirect, the
-          // app keeps rendering with no token: every subsequent request 401s,
-          // pages load missing data, and the user only escapes by manually
-          // refreshing. AuthGate reads isAuthActive() once and won't re-check
-          // on its own, so the navigation is the trigger that resets it.
+          // The refresh attempt itself failed. Two distinct cases:
           //
-          // Stash the current path under the same key AuthGate uses (see
-          // app/layout.tsx) so post-login lands the user back on the page that
-          // 401'd, not on /. Hard-navigation skips AuthGate's own preservation
-          // path, so we have to write the key ourselves here.
+          // 1. Server reachable, refresh rejected (4xx/5xx): the session is
+          //    invalid. Wipe storage and hard-navigate to /login so AuthGate
+          //    re-renders unauthenticated. We also stash the current path
+          //    under the same key AuthGate uses (see app/layout.tsx) so the
+          //    user lands back where they were.
+          //
+          // 2. Network error (offline, server unreachable, request aborted):
+          //    no proof the session is bad — we just couldn't ask. Wiping
+          //    storage here would log out a user every time their wifi
+          //    blipped. Leave storage intact and reject; the original request
+          //    will surface its own network error, and a future request can
+          //    try the refresh again.
+          if (isNetworkError(refreshError)) {
+            console.warn(
+              'Token refresh on 401 unreachable; leaving session intact:',
+              refreshError,
+            )
+            return Promise.reject(refreshError)
+          }
+
           console.error('Token refresh on 401 failed:', refreshError)
           clearAuth()
           if (typeof window !== 'undefined') {
@@ -223,14 +275,46 @@ axiosClient.interceptors.response.use(
       // 401 a page might trigger.
     }
 
-    console.error('API Error:', error.message, error.config?.url)
+    // Quiet log for transient network errors — RTK Query retries plus
+    // refetch-on-focus mean a single offline blip can produce dozens of
+    // identical entries, and each endpoint's own queryFn already logs the
+    // error with its endpoint context. Real server errors stay loud.
+    if (isNetworkError(error)) {
+      console.warn('API unreachable:', error.config?.url)
+    } else {
+      console.error('API Error:', error.message, error.config?.url)
+    }
     return Promise.reject(error)
   },
 )
 
-// Request interceptor: attach the Wayd JWT to outgoing requests.
+// Request interceptor: attach the Wayd JWT to outgoing requests, refreshing
+// proactively when the stored token is expired or about to expire.
+//
+// Why proactive: when a user returns after a long idle, the menu page fires a
+// dozen queries in parallel. Without this, each one round-trips to the API,
+// 401s, and queues a refresh attempt — fast on a healthy network, but on a
+// flaky one each doomed request burns time and floods the console with errors
+// before the response interceptor even gets a chance to recover. Refreshing
+// here means the failure surface is the single /refresh-token call, not N.
+//
+// Refresh failure here doesn't reject the request; we send it with the stale
+// token and let the response interceptor's 401 path handle storage cleanup
+// and the redirect to /login. Single flow for "session is bad," kept in one
+// place. Network failures inside refreshOnce() also fall through to send-as-is
+// — better to let the actual call decide than to fail eagerly here.
 axiosClient.interceptors.request.use(
-  (config) => {
+  async (config) => {
+    if (isAuthTokenExpiringSoon()) {
+      const refresh = refreshOnce()
+      if (refresh) {
+        try {
+          await refresh
+        } catch {
+          // Swallowed deliberately — see comment above.
+        }
+      }
+    }
     const token = getAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
