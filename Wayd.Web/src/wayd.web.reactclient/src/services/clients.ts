@@ -192,10 +192,29 @@ axiosClient.interceptors.response.use(
           originalRequest.headers.Authorization = `Bearer ${tokenResponse.token}`
           return axiosClient(originalRequest)
         } catch (refreshError) {
-          // Server rejected the refresh — the session is invalid. Wipe it so
-          // the app falls through to /login on the next protected route.
+          // Server rejected the refresh — the session is invalid. Wipe storage
+          // and force a hard navigation to /login. Without the redirect, the
+          // app keeps rendering with no token: every subsequent request 401s,
+          // pages load missing data, and the user only escapes by manually
+          // refreshing. AuthGate reads isAuthActive() once and won't re-check
+          // on its own, so the navigation is the trigger that resets it.
+          //
+          // Stash the current path under the same key AuthGate uses (see
+          // app/layout.tsx) so post-login lands the user back on the page that
+          // 401'd, not on /. Hard-navigation skips AuthGate's own preservation
+          // path, so we have to write the key ourselves here.
           console.error('Token refresh on 401 failed:', refreshError)
           clearAuth()
+          if (typeof window !== 'undefined') {
+            const { pathname } = window.location
+            if (pathname && pathname !== '/' && pathname !== '/login' && pathname !== '/logout') {
+              sessionStorage.setItem('wayd.returnUrl', pathname)
+            }
+            window.location.href = '/login'
+          }
+          // Reject early so the generic "API Error" log + downstream error
+          // handlers don't run for a 401 we've already handled.
+          return Promise.reject(refreshError)
         }
       }
       // No tokens to refresh with: the caller was already unauthenticated.

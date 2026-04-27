@@ -504,6 +504,27 @@ public class TokenServiceTests
         jwt.Claims.Where(c => c.Type == "permission").Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task GetTokenAsync_ShouldEmbedLoginProviderClaim()
+    {
+        // The frontend reads loginProvider to drive provider-specific UX
+        // (Change Password button, forced-password-change gate). A missing
+        // claim silently disables those features.
+        var user = CreateLocalUser();
+        SeedActiveWaydIdentity(user.Id);
+
+        _mockUserManager.Setup(x => x.FindByNameAsync("testuser")).ReturnsAsync(user);
+        _mockSignInManager.Setup(x => x.CheckPasswordSignInAsync(user, "Password123!", true))
+            .ReturnsAsync(SignInResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var result = await _sut.GetTokenAsync(new LoginCommand("testuser", "Password123!"), TestContext.Current.CancellationToken);
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(result.Token);
+        jwt.Claims.First(c => c.Type == "loginProvider").Value.Should().Be(LoginProviders.Wayd);
+    }
+
     #endregion
 
     #region ExchangeTokenAsync
@@ -595,6 +616,33 @@ public class TokenServiceTests
         var handler = new JwtSecurityTokenHandler();
         var jwt = handler.ReadJwtToken(result.Token);
         jwt.Claims.Where(c => c.Type == "permission").Select(c => c.Value).Should().Contain("Permissions.Projects.View");
+    }
+
+    [Fact]
+    public async Task ExchangeTokenAsync_ShouldEmbedLoginProviderClaim()
+    {
+        // Same provider-aware UX hooks as the local-login path — verifying
+        // the claim is also set on Entra-exchanged tokens.
+        var user = CreateEntraUser();
+        var principal = CreateEntraPrincipal();
+
+        _mockEntraIdTokenValidator
+            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
+        _mockUserService
+            .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
+            .ReturnsAsync((user.Id, (string?)null));
+        _mockUserManager.Setup(x => x.FindByIdAsync(user.Id)).ReturnsAsync(user);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+        SeedActiveEntraIdentity(user.Id);
+
+        var result = await _sut.ExchangeTokenAsync(
+            new ExchangeTokenCommand(LoginProviders.MicrosoftEntraId, "token"),
+            TestContext.Current.CancellationToken);
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwt = handler.ReadJwtToken(result.Token);
+        jwt.Claims.First(c => c.Type == "loginProvider").Value.Should().Be(LoginProviders.MicrosoftEntraId);
     }
 
     [Fact]
