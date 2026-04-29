@@ -1,11 +1,16 @@
-﻿using CSharpFunctionalExtensions;
+using CSharpFunctionalExtensions;
+using Wayd.Common.Domain.Enums;
 using Wayd.Common.Domain.Interfaces;
+using Wayd.Common.Domain.Models.HealthChecks;
 using Wayd.Planning.Domain.Enums;
+using NodaTime;
 
 namespace Wayd.Planning.Domain.Models;
 
 public sealed class PlanningIntervalObjective : BaseSoftDeletableEntity, IHasIdAndKey
 {
+    private readonly List<PlanningIntervalObjectiveHealthCheck> _healthChecks = [];
+
     private PlanningIntervalObjective() { }
 
     internal PlanningIntervalObjective(Guid planningIntervalId, Guid teamId, Guid objectiveId, PlanningIntervalObjectiveType type, bool isStretch)
@@ -51,7 +56,11 @@ public sealed class PlanningIntervalObjective : BaseSoftDeletableEntity, IHasIdA
     /// <value><c>true</c> if this instance is stretch; otherwise, <c>false</c>.</value>
     public bool IsStretch { get; private set; } = false;
 
-    public SimpleHealthCheck? HealthCheck { get; private set; }
+    /// <summary>
+    /// Full history of health checks for this objective, ordered by EF as loaded.
+    /// Domain invariant: at most one check is non-expired at any instant.
+    /// </summary>
+    public IReadOnlyCollection<PlanningIntervalObjectiveHealthCheck> HealthChecks => _healthChecks.AsReadOnly();
 
     /// <summary>Updates the specified PI objective.</summary>
     /// <param name="status">The status.</param>
@@ -65,23 +74,41 @@ public sealed class PlanningIntervalObjective : BaseSoftDeletableEntity, IHasIdA
         return Result.Success();
     }
 
-    public Result AddHealthCheck(SimpleHealthCheck healthCheck)
+    public Result<PlanningIntervalObjectiveHealthCheck> AddHealthCheck(HealthStatus status, Guid reportedById, Instant expiration, string? note, Instant now)
     {
-        if (HealthCheck is not null)
-            return Result.Failure("Health check already exists.");
+        if (expiration <= now)
+            return Result.Failure<PlanningIntervalObjectiveHealthCheck>("Expiration must be in the future.");
 
-        HealthCheck = healthCheck;
+        var newCheck = new PlanningIntervalObjectiveHealthCheck(Id, status, reportedById, now, expiration, note);
 
-        return Result.Success();
+        var report = new HealthReport<PlanningIntervalObjectiveHealthCheck>(_healthChecks);
+        report.Add(newCheck, now);
+
+        _healthChecks.Add(newCheck);
+
+        return Result.Success(newCheck);
     }
 
-    public Result RemoveHealthCheck()
+    public Result<PlanningIntervalObjectiveHealthCheck> UpdateHealthCheck(Guid healthCheckId, HealthStatus status, Instant expiration, string? note, Instant now)
     {
-        if (HealthCheck is null)
-            return Result.Failure("No health check to remove.");
+        var healthCheck = _healthChecks.FirstOrDefault(h => h.Id == healthCheckId);
+        if (healthCheck is null)
+            return Result.Failure<PlanningIntervalObjectiveHealthCheck>($"Health check {healthCheckId} not found on objective {Id}.");
 
-        HealthCheck = null;
+        var updateResult = healthCheck.Update(status, expiration, note, now);
+        if (updateResult.IsFailure)
+            return Result.Failure<PlanningIntervalObjectiveHealthCheck>(updateResult.Error);
 
-        return Result.Success();
+        return Result.Success(healthCheck);
+    }
+
+    public Result<PlanningIntervalObjectiveHealthCheck> RemoveHealthCheck(Guid healthCheckId)
+    {
+        var healthCheck = _healthChecks.FirstOrDefault(h => h.Id == healthCheckId);
+        if (healthCheck is null)
+            return Result.Failure<PlanningIntervalObjectiveHealthCheck>($"Health check {healthCheckId} not found on objective {Id}.");
+
+        _healthChecks.Remove(healthCheck);
+        return Result.Success(healthCheck);
     }
 }

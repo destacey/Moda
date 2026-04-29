@@ -24,7 +24,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     private readonly List<PlanningInterval> _planningIntervals = [];
     private readonly List<Risk> _risks = [];
     private readonly List<PlanningTeam> _planningTeams = [];
-    private readonly List<SimpleHealthCheck> _planningHealthChecks = [];
+    private readonly List<PlanningIntervalObjectiveHealthCheck> _planningIntervalObjectiveHealthChecks = [];
     private readonly List<Roadmap> _roadmaps = [];
     private readonly List<EstimationScale> _estimationScales = [];
     private readonly List<PokerSession> _pokerSessions = [];
@@ -41,7 +41,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public DbSet<PlanningInterval> PlanningIntervals => _planningIntervals.AsDbSet();
     public DbSet<Risk> Risks => _risks.AsDbSet();
     public DbSet<PlanningTeam> PlanningTeams => _planningTeams.AsDbSet();
-    public DbSet<SimpleHealthCheck> PlanningHealthChecks => _planningHealthChecks.AsDbSet();
+    public DbSet<PlanningIntervalObjectiveHealthCheck> PlanningIntervalObjectiveHealthChecks => _planningIntervalObjectiveHealthChecks.AsDbSet();
     public DbSet<Roadmap> Roadmaps => _roadmaps.AsDbSet();
     public DbSet<EstimationScale> EstimationScales => _estimationScales.AsDbSet();
     public DbSet<PokerSession> PokerSessions => _pokerSessions.AsDbSet();
@@ -67,7 +67,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
 
         // Return the total number of entities as a simple success indicator
         var count = _iterations.Count + _planningIntervals.Count + _risks.Count +
-                    _planningTeams.Count + _planningHealthChecks.Count + _roadmaps.Count +
+                    _planningTeams.Count + _planningIntervalObjectiveHealthChecks.Count + _roadmaps.Count +
                     _estimationScales.Count + _pokerSessions.Count +
                     _employees.Count + _externalEmployeeBlacklistItems.Count + _personalAccessTokens.Count;
         return Task.FromResult(count);
@@ -93,6 +93,10 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public void AddPlanningInterval(PlanningInterval planningInterval) => _planningIntervals.Add(planningInterval);
     public void AddPlanningIntervals(IEnumerable<PlanningInterval> planningIntervals) => _planningIntervals.AddRange(planningIntervals);
 
+    // PlanningIntervalObjective
+    public void AddPlanningIntervalObjective(PlanningIntervalObjective objective) => _planningIntervalObjectives.Add(objective);
+    public void AddPlanningIntervalObjectives(IEnumerable<PlanningIntervalObjective> objectives) => _planningIntervalObjectives.AddRange(objectives);
+
     // Risk
     public void AddRisk(Risk risk) => _risks.Add(risk);
     public void AddRisks(IEnumerable<Risk> risks) => _risks.AddRange(risks);
@@ -101,9 +105,9 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public void AddPlanningTeam(PlanningTeam planningTeam) => _planningTeams.Add(planningTeam);
     public void AddPlanningTeams(IEnumerable<PlanningTeam> planningTeams) => _planningTeams.AddRange(planningTeams);
 
-    // SimpleHealthCheck
-    public void AddPlanningHealthCheck(SimpleHealthCheck healthCheck) => _planningHealthChecks.Add(healthCheck);
-    public void AddPlanningHealthChecks(IEnumerable<SimpleHealthCheck> healthChecks) => _planningHealthChecks.AddRange(healthChecks);
+    // PlanningIntervalObjectiveHealthCheck
+    public void AddPlanningIntervalObjectiveHealthCheck(PlanningIntervalObjectiveHealthCheck healthCheck) => _planningIntervalObjectiveHealthChecks.Add(healthCheck);
+    public void AddPlanningIntervalObjectiveHealthChecks(IEnumerable<PlanningIntervalObjectiveHealthCheck> healthChecks) => _planningIntervalObjectiveHealthChecks.AddRange(healthChecks);
 
     // Roadmap
     public void AddRoadmap(Roadmap roadmap) => _roadmaps.Add(roadmap);
@@ -129,9 +133,10 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     {
         _iterations.Clear();
         _planningIntervals.Clear();
+        _planningIntervalObjectives.Clear();
         _risks.Clear();
         _planningTeams.Clear();
-        _planningHealthChecks.Clear();
+        _planningIntervalObjectiveHealthChecks.Clear();
         _roadmaps.Clear();
         _estimationScales.Clear();
         _pokerSessions.Clear();

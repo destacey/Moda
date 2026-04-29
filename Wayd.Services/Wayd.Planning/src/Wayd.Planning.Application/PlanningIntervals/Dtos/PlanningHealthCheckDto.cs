@@ -1,11 +1,11 @@
-﻿using Wayd.Common.Application.Dtos;
+using Wayd.Common.Application.Dtos;
 
 namespace Wayd.Planning.Application.PlanningIntervals.Dtos;
 
 public sealed record PlanningHealthCheckDto
 {
     /// <summary>
-    /// The id associated with the health check.
+    /// The id of the health check.
     /// </summary>
     public Guid Id { get; set; }
 
@@ -15,19 +15,37 @@ public sealed record PlanningHealthCheckDto
     public required SimpleNavigationDto Status { get; set; }
 
     /// <summary>
+    /// The timestamp of when the health check was reported.
+    /// </summary>
+    public Instant ReportedOn { get; set; }
+
+    /// <summary>
     /// The expiration of the health check.
     /// </summary>
     public Instant Expiration { get; set; }
 
-    public static PlanningHealthCheckDto? Create(SimpleHealthCheck healthCheck, Instant now)
+    /// <summary>
+    /// The note for the health check.
+    /// </summary>
+    public string? Note { get; set; }
+
+    /// <summary>
+    /// Returns the most recent active (non-expired) health check projected from the supplied collection,
+    /// or <c>null</c> if none are active. The domain invariant guarantees at most one active check at a time.
+    /// </summary>
+    public static PlanningHealthCheckDto? FromCurrent(IEnumerable<PlanningIntervalObjectiveHealthCheck> healthChecks, Instant now)
     {
-        return healthCheck.IsExpired(now)
-            ? null
-            : new PlanningHealthCheckDto()
-            {
-                Id = healthCheck.Id,
-                Status = SimpleNavigationDto.FromEnum(healthCheck.Status),
-                Expiration = healthCheck.Expiration
-            };
+        var current = healthChecks.FirstOrDefault(h => !h.IsExpired(now));
+        if (current is null)
+            return null;
+
+        return new PlanningHealthCheckDto
+        {
+            Id = current.Id,
+            Status = SimpleNavigationDto.FromEnum(current.Status),
+            ReportedOn = current.ReportedOn,
+            Expiration = current.Expiration,
+            Note = current.Note
+        };
     }
 }

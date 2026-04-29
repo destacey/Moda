@@ -4,16 +4,19 @@ using Mapster;
 using Wayd.Common.Application.Interfaces;
 using Wayd.Common.Application.Models;
 using Wayd.Common.Extensions;
-using Wayd.Health.Queries;
 using Wayd.Organization.Application.Teams.Queries;
 using Wayd.Organization.Application.TeamsOfTeams.Queries;
 using Wayd.Planning.Application.PlanningIntervals.Commands;
 using Wayd.Planning.Application.PlanningIntervals.Dtos;
+using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Commands;
+using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Dtos;
+using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Queries;
 using Wayd.Planning.Application.PlanningIntervals.Queries;
 using Wayd.Planning.Application.Risks.Dtos;
 using Wayd.Planning.Application.Risks.Queries;
 using Wayd.Web.Api.Dtos.Planning;
 using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.Planning.HealthChecks;
 using Wayd.Web.Api.Models.Planning.PlanningIntervals;
 using Wayd.Work.Application.WorkItems.Dtos;
 using Wayd.Work.Application.WorkItems.Queries;
@@ -605,16 +608,7 @@ public class PlanningIntervalsController : ControllerBase
         if (objectives == null)
             return Ok(new List<PlanningIntervalObjectiveHealthCheckDto>());
 
-        // get healthchecks
-        var healthCheckIds = objectives.Where(o => o.HealthCheck is not null).Select(o => o.HealthCheck!.Id).ToList();
-        var healthChecks = await _sender.Send(new GetHealthChecksQuery(healthCheckIds), cancellationToken);
-
-        var objectiveHealthChecks = new List<PlanningIntervalObjectiveHealthCheckDto>(objectives.Count);
-        foreach (var objective in objectives)
-        {
-            var healthCheck = healthChecks.FirstOrDefault(h => h.Id == objective.HealthCheck?.Id);
-            objectiveHealthChecks.Add(PlanningIntervalObjectiveHealthCheckDto.Create(objective, healthCheck));
-        }
+        var objectiveHealthChecks = objectives.Select(PlanningIntervalObjectiveHealthCheckDto.Create).ToList();
 
         return Ok(objectiveHealthChecks);
     }
@@ -775,6 +769,96 @@ public class PlanningIntervalsController : ControllerBase
     }
 
     #endregion Objectives
+
+    #region Objective Health Checks
+
+    [HttpGet("{id}/objectives/{objectiveId}/health-checks")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Get the health check history for a planning interval objective.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<IReadOnlyList<PlanningIntervalObjectiveHealthCheckDetailsDto>>> GetObjectiveHealthChecks(Guid id, Guid objectiveId, CancellationToken cancellationToken)
+    {
+        var healthChecks = await _sender.Send(new GetPlanningIntervalObjectiveHealthChecksQuery(objectiveId), cancellationToken);
+        return Ok(healthChecks);
+    }
+
+    [HttpGet("{id}/objectives/{objectiveId}/health-checks/{healthCheckId}")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Get a planning interval objective health check by id.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PlanningIntervalObjectiveHealthCheckDetailsDto>> GetObjectiveHealthCheck(Guid id, Guid objectiveId, Guid healthCheckId, CancellationToken cancellationToken)
+    {
+        var healthCheck = await _sender.Send(new GetPlanningIntervalObjectiveHealthCheckQuery(objectiveId, healthCheckId), cancellationToken);
+
+        return healthCheck is not null
+            ? Ok(healthCheck)
+            : NotFound();
+    }
+
+    [HttpPost("{id}/objectives/{objectiveId}/health-checks")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Create a planning interval objective health check.", "")]
+    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
+    public async Task<ActionResult> CreateObjectiveHealthCheck(Guid id, Guid objectiveId, [FromBody] CreatePlanningIntervalObjectiveHealthCheckRequest request, CancellationToken cancellationToken)
+    {
+        if (objectiveId != request.PlanningIntervalObjectiveId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(objectiveId), nameof(request.PlanningIntervalObjectiveId), HttpContext));
+
+        var result = await _sender.Send(request.ToCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? CreatedAtAction(nameof(GetObjectiveHealthCheck), new { id, objectiveId, healthCheckId = result.Value }, result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpPut("{id}/objectives/{objectiveId}/health-checks/{healthCheckId}")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Update a planning interval objective health check.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult<PlanningIntervalObjectiveHealthCheckDetailsDto>> UpdateObjectiveHealthCheck(Guid id, Guid objectiveId, Guid healthCheckId, [FromBody] UpdatePlanningIntervalObjectiveHealthCheckRequest request, CancellationToken cancellationToken)
+    {
+        if (objectiveId != request.PlanningIntervalObjectiveId)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(objectiveId), nameof(request.PlanningIntervalObjectiveId), HttpContext));
+        else if (healthCheckId != request.Id)
+            return BadRequest(ProblemDetailsExtensions.ForRouteParamMismatch(nameof(healthCheckId), nameof(request.Id), HttpContext));
+
+        var result = await _sender.Send(request.ToCommand(), cancellationToken);
+
+        return result.IsSuccess
+            ? Ok(result.Value)
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/objectives/{objectiveId}/health-checks/{healthCheckId}")]
+    [MustHavePermission(ApplicationAction.Manage, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Delete a planning interval objective health check.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteObjectiveHealthCheck(Guid id, Guid objectiveId, Guid healthCheckId, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new DeletePlanningIntervalObjectiveHealthCheckCommand(objectiveId, healthCheckId), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("objectives/health-checks/statuses")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
+    [OpenApiOperation("Get a list of health check statuses.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<HealthStatusDto>>> GetHealthStatuses(CancellationToken cancellationToken)
+    {
+        var items = await _sender.Send(new GetHealthStatusesQuery(), cancellationToken);
+        return Ok(items.OrderBy(c => c.Order));
+    }
+
+    #endregion Objective Health Checks
 
     #region Risks
 

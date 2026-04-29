@@ -195,9 +195,9 @@ public class PlanningIntervalObjectiveConfig : IEntityTypeConfiguration<Planning
             .HasForeignKey(p => p.TeamId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasOne(o => o.HealthCheck)
+        builder.HasMany(o => o.HealthChecks)
             .WithOne()
-            .HasForeignKey<SimpleHealthCheck>(h => h.ObjectId)
+            .HasForeignKey(h => h.PlanningIntervalObjectiveId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }
@@ -593,24 +593,40 @@ public class PlanningIntervalIterationSprintConfig : IEntityTypeConfiguration<Pl
 #endregion Iterations
 
 
-public class SimpleHealthCheckConfig : IEntityTypeConfiguration<SimpleHealthCheck>
+public class PlanningIntervalObjectiveHealthCheckConfig : IEntityTypeConfiguration<PlanningIntervalObjectiveHealthCheck>
 {
-    public void Configure(EntityTypeBuilder<SimpleHealthCheck> builder)
+    public void Configure(EntityTypeBuilder<PlanningIntervalObjectiveHealthCheck> builder)
     {
-        builder.ToTable("PlanningHealthChecks", SchemaNames.Planning);
+        builder.ToTable("PlanningIntervalObjectiveHealthChecks", SchemaNames.Planning);
 
-        builder.HasKey(h => h.ObjectId);
+        builder.HasKey(h => h.Id);
 
-        builder.HasIndex(r => r.ObjectId);
+        builder.HasIndex(h => new { h.PlanningIntervalObjectiveId, h.Expiration, h.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
 
-        builder.Property(h => h.ObjectId).IsRequired();
-        builder.Property(h => h.Id).IsRequired();
+        builder.Property(h => h.Id).ValueGeneratedNever();
+        builder.Property(h => h.PlanningIntervalObjectiveId).IsRequired();
+
         builder.Property(h => h.Status).IsRequired()
             .HasConversion<EnumConverter<HealthStatus>>()
             .HasColumnType("varchar")
             .HasMaxLength(32);
+
+        builder.Property(h => h.ReportedById).IsRequired();
         builder.Property(h => h.ReportedOn).IsRequired();
         builder.Property(h => h.Expiration).IsRequired();
+        builder.Property(h => h.Note).HasMaxLength(1024);
+
+        // Soft Delete
+        builder.Property(h => h.Deleted);
+        builder.Property(h => h.DeletedBy);
+        builder.Property(h => h.IsDeleted);
+
+        // Relationships
+        builder.HasOne(h => h.ReportedBy)
+            .WithMany()
+            .HasForeignKey(h => h.ReportedById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 

@@ -6,8 +6,6 @@ using Wayd.Common.Domain.Employees;
 using Wayd.Common.Domain.FeatureManagement;
 using Wayd.Common.Domain.Models.Goals;
 using Wayd.Goals.Application.Persistence;
-using Wayd.Health;
-using Wayd.Health.Models;
 using Wayd.Infrastructure.Common.Services;
 using Wayd.Links;
 using Wayd.Links.Models;
@@ -29,7 +27,7 @@ using StrategicTheme = Wayd.StrategicManagement.Domain.Models.StrategicTheme;
 
 namespace Wayd.Infrastructure.Persistence.Context;
 
-public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureManagementDbContext, IGoalsDbContext, IHealthDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
+public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureManagementDbContext, IGoalsDbContext, ILinksDbContext, IOrganizationDbContext, IPlanningDbContext, IProjectPortfolioManagementDbContext, IStrategicManagementDbContext, IWorkDbContext
 {
     public WaydDbContext(DbContextOptions options, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider, IOptions<DatabaseSettings> dbSettings, IEventPublisher events, IRequestCorrelationIdProvider requestCorrelationIdProvider)
         : base(options, currentUser, dateTimeProvider, dbSettings, events, requestCorrelationIdProvider)
@@ -65,12 +63,6 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
 
     #endregion IGoals
 
-    #region IHealth
-
-    public DbSet<HealthCheck> HealthChecks => Set<HealthCheck>();
-
-    #endregion IHealth
-
     #region ILinks
 
     public DbSet<Link> Links => Set<Link>();
@@ -93,7 +85,7 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<PlanningInterval> PlanningIntervals => Set<PlanningInterval>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
-    public DbSet<SimpleHealthCheck> PlanningHealthChecks => Set<SimpleHealthCheck>();
+    public DbSet<PlanningIntervalObjectiveHealthCheck> PlanningIntervalObjectiveHealthChecks => Set<PlanningIntervalObjectiveHealthCheck>();
     public DbSet<Roadmap> Roadmaps => Set<Roadmap>();
     public DbSet<EstimationScale> EstimationScales => Set<EstimationScale>();
     public DbSet<PokerSession> PokerSessions => Set<PokerSession>();

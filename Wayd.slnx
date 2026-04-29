@@ -47,13 +47,6 @@
     <Project Path="Wayd.Services/Wayd.Goals/tests/Wayd.Goals.Application.Tests/Wayd.Goals.Application.Tests.csproj" />
     <Project Path="Wayd.Services/Wayd.Goals/tests/Wayd.Goals.Domain.Tests/Wayd.Goals.Domain.Tests.csproj" />
   </Folder>
-  <Folder Name="/Wayd.Services/Wayd.Health/" />
-  <Folder Name="/Wayd.Services/Wayd.Health/src/">
-    <Project Path="Wayd.Services/Wayd.Health/src/Wayd.Health/Wayd.Health.csproj" />
-  </Folder>
-  <Folder Name="/Wayd.Services/Wayd.Health/tests/">
-    <Project Path="Wayd.Services/Wayd.Health/tests/Wayd.Health.Tests/Wayd.Health.Tests.csproj" />
-  </Folder>
   <Folder Name="/Wayd.Services/Wayd.Links/" />
   <Folder Name="/Wayd.Services/Wayd.Links/src/">
     <Project Path="Wayd.Services/Wayd.Links/src/Wayd.Links/Wayd.Links.csproj" />

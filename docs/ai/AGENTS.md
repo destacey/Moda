@@ -40,7 +40,6 @@ All services share a single `WaydDbContext` (no repository pattern).
 | StrategicManagement        | `Wayd.StrategicManagement`        | Strategic themes                                  |
 | AppIntegration             | `Wayd.AppIntegration`             | External system connections                       |
 | Links                      | `Wayd.Links`                      | Cross-entity associations                         |
-| Health                     | `Wayd.Health`                     | Health checks                                     |
 
 ## Patterns to Follow
 
