@@ -20,7 +20,6 @@ import HealthCheckTag from '@/src/components/common/health-check/health-check-ta
 import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { ItemType } from 'antd/es/menu/interface'
 import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { SystemContext } from '@/src/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../_components'
@@ -65,7 +64,7 @@ const PlanningIntervalObjectiveCard = ({
 
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectId,
+    (state) => state.healthCheck.createContext.objectiveId,
   )
 
   const title = () => {
@@ -113,7 +112,11 @@ const PlanningIntervalObjectiveCard = ({
             {objective.status.name}
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}
-          <HealthCheckTag healthCheck={objective?.healthCheck} />
+          <HealthCheckTag
+            healthCheck={objective?.healthCheck}
+            planningIntervalId={objective?.planningInterval?.id}
+            objectiveId={objective?.id}
+          />
           <Text>
             {startDate}
             {startDate && targetDate && ' - '}
@@ -152,8 +155,8 @@ const PlanningIntervalObjectiveCard = ({
             info.domEvent.stopPropagation()
             dispatch(
               beginHealthCheckCreate({
-                objectId: objective.id,
-                contextId: SystemContext.PlanningPlanningIntervalObjective,
+                planningIntervalId: objective.planningInterval.id,
+                objectiveId: objective.id,
               }),
             )
           },

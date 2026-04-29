@@ -609,76 +609,6 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("IterationExternalMetadata", "Planning");
                 });
 
-            modelBuilder.Entity("Wayd.Health.Models.HealthCheck", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Context")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar");
-
-                    b.Property<DateTime?>("Deleted")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("DeletedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("Expiration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Note")
-                        .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
-
-                    b.Property<Guid>("ObjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ReportedById")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ReportedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
-
-                    b.Property<DateTime>("SystemCreated")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SystemCreatedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("SystemLastModified")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("SystemLastModifiedBy")
-                        .HasMaxLength(450)
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Id");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("Id"), new[] { "ObjectId" });
-
-                    b.HasIndex("ObjectId");
-
-                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("ObjectId"), new[] { "Id" });
-
-                    b.HasIndex("ReportedById");
-
-                    b.ToTable("HealthChecks", "Health");
-                });
-
             modelBuilder.Entity("Wayd.Infrastructure.Auditing.Trail", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1686,6 +1616,66 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.ToTable("PlanningIntervalObjectives", "Planning");
                 });
 
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjectiveHealthCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<Guid>("PlanningIntervalObjectiveId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReportedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedById");
+
+                    b.HasIndex("PlanningIntervalObjectiveId", "Expiration", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("PlanningIntervalObjectiveHealthChecks", "Planning");
+                });
+
             modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalTeam", b =>
                 {
                     b.Property<Guid>("PlanningIntervalId")
@@ -2179,32 +2169,6 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("RoadmapId", "ManagerId");
 
                     b.ToTable("RoadmapManagers", "Planning");
-                });
-
-            modelBuilder.Entity("Wayd.Planning.Domain.Models.SimpleHealthCheck", b =>
-                {
-                    b.Property<Guid>("ObjectId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("Expiration")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("Id")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ReportedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(32)
-                        .HasColumnType("varchar");
-
-                    b.HasKey("ObjectId");
-
-                    b.HasIndex("ObjectId");
-
-                    b.ToTable("PlanningHealthChecks", "Planning");
                 });
 
             modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ExpenditureCategory", b =>
@@ -4649,17 +4613,6 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Wayd.Health.Models.HealthCheck", b =>
-                {
-                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
-                        .WithMany()
-                        .HasForeignKey("ReportedById")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("ReportedBy");
-                });
-
             modelBuilder.Entity("Wayd.Infrastructure.Identity.ApplicationRoleClaim", b =>
                 {
                     b.HasOne("Wayd.Infrastructure.Identity.ApplicationRole", null)
@@ -4839,6 +4792,23 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjectiveHealthCheck", b =>
+                {
+                    b.HasOne("Wayd.Planning.Domain.Models.PlanningIntervalObjective", null)
+                        .WithMany("HealthChecks")
+                        .HasForeignKey("PlanningIntervalObjectiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
+                        .WithMany()
+                        .HasForeignKey("ReportedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ReportedBy");
+                });
+
             modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalTeam", b =>
                 {
                     b.HasOne("Wayd.Planning.Domain.Models.PlanningInterval", null)
@@ -4957,15 +4927,6 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                         .IsRequired();
 
                     b.Navigation("Manager");
-                });
-
-            modelBuilder.Entity("Wayd.Planning.Domain.Models.SimpleHealthCheck", b =>
-                {
-                    b.HasOne("Wayd.Planning.Domain.Models.PlanningIntervalObjective", null)
-                        .WithOne("HealthCheck")
-                        .HasForeignKey("Wayd.Planning.Domain.Models.SimpleHealthCheck", "ObjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Program", b =>
@@ -5815,7 +5776,7 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningIntervalObjective", b =>
                 {
-                    b.Navigation("HealthCheck");
+                    b.Navigation("HealthChecks");
                 });
 
             modelBuilder.Entity("Wayd.Planning.Domain.Models.PlanningPoker.PokerRound", b =>

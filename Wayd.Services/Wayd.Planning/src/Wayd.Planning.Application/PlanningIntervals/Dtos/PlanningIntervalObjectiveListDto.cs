@@ -63,7 +63,7 @@ public sealed record PlanningIntervalObjectiveListDto
             Name = objective.Name,
             PlanningInterval = piNavigationDto,
             Status = SimpleNavigationDto.FromEnum(piObjective.Status),
-            HealthCheck = piObjective.HealthCheck is not null ? PlanningHealthCheckDto.Create(piObjective.HealthCheck, now) : null,
+            HealthCheck = PlanningHealthCheckDto.FromCurrent(piObjective.HealthChecks, now),
             Progress = objective.Progress,
             Team = PlanningTeamNavigationDto.FromPlanningTeam(piObjective.Team),
             Type = SimpleNavigationDto.FromEnum(piObjective.Type),

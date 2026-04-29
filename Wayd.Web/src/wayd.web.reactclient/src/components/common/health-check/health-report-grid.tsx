@@ -8,12 +8,13 @@ import {
   HealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
 } from '../wayd-grid-cell-renderers'
-import { HealthCheckDto } from '@/src/services/wayd-api'
+import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
-import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
+import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/common/health-checks-api'
 
 interface HealthReportGridProps {
-  objectId: string
+  planningIntervalId: string
+  objectiveId: string
 }
 
 const ReportedByLinkCellRenderer = ({ value, data }) => {
@@ -31,9 +32,15 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
     isFetching,
     error,
     refetch,
-  } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
+  } = useGetObjectiveHealthChecksQuery(
+    {
+      planningIntervalId: props.planningIntervalId,
+      objectiveId: props.objectiveId,
+    },
+    { skip: !props.planningIntervalId || !props.objectiveId },
+  )
 
-  const columnDefs = useMemo<ColDef<HealthCheckDto>[]>(() => [
+  const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveHealthCheckDetailsDto>[]>(() => [
     { field: 'id', hide: true },
     {
       field: 'status.name',

@@ -30,7 +30,6 @@ Wayd/
     Wayd.StrategicManagement/     # Visions, strategies, themes
     Wayd.AppIntegration/          # Integration configuration
     Wayd.Links/                   # Cross-entity relationships
-    Wayd.Health/                  # Health checks
   Wayd.Infrastructure/            # EF Core, auth, jobs, logging
   Wayd.Integrations/              # Azure DevOps, Microsoft Graph
   Wayd.Web/

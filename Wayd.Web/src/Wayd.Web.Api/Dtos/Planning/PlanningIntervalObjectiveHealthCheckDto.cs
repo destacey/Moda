@@ -1,5 +1,4 @@
-﻿using Wayd.Common.Application.Dtos;
-using Wayd.Health.Dtos;
+using Wayd.Common.Application.Dtos;
 using Wayd.Planning.Application.Models;
 using Wayd.Planning.Application.PlanningIntervals.Dtos;
 
@@ -49,7 +48,7 @@ public sealed record PlanningIntervalObjectiveHealthCheckDto
     public SimpleNavigationDto? HealthStatus { get; set; }
 
     /// <summary>
-    /// The timestamp of when the health check was initially created.
+    /// The timestamp of when the health check was reported.
     /// </summary>
     public Instant? ReportedOn { get; set; }
 
@@ -63,7 +62,7 @@ public sealed record PlanningIntervalObjectiveHealthCheckDto
     /// </summary>
     public string? Note { get; set; }
 
-    public static PlanningIntervalObjectiveHealthCheckDto Create(PlanningIntervalObjectiveListDto objective, HealthCheckDto? healthCheck)
+    public static PlanningIntervalObjectiveHealthCheckDto Create(PlanningIntervalObjectiveListDto objective)
     {
         return new PlanningIntervalObjectiveHealthCheckDto()
         {
@@ -76,11 +75,11 @@ public sealed record PlanningIntervalObjectiveHealthCheckDto
             Team = objective.Team,
             Progress = objective.Progress,
             IsStretch = objective.IsStretch,
-            HealthCheckId = healthCheck?.Id,
-            HealthStatus = healthCheck?.Status,
-            ReportedOn = healthCheck?.ReportedOn,
-            Expiration = healthCheck?.Expiration,
-            Note = healthCheck?.Note
+            HealthCheckId = objective.HealthCheck?.Id,
+            HealthStatus = objective.HealthCheck?.Status,
+            ReportedOn = objective.HealthCheck?.ReportedOn,
+            Expiration = objective.HealthCheck?.Expiration,
+            Note = objective.HealthCheck?.Note
         };
     }
 }

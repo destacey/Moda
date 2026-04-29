@@ -98,9 +98,7 @@ const TeamPlanReview = ({
   const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
-  const canCreatePIObjectiveHealthChecks =
-    !!canManageObjectives &&
-    hasPermissionClaim('Permissions.HealthChecks.Create')
+  const canCreatePIObjectiveHealthChecks = !!canManageObjectives
   const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
   const canUpdateRisks = hasPermissionClaim('Permissions.Risks.Update')
 

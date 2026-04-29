@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import {
   getHealthCheck,
   selectHealthCheckContext,
+  setHealthReportContext,
 } from '@/src/store/features/health-check-slice'
 import { healthCheckTagColor } from './health-check-utils'
 import { MarkdownRenderer } from '../markdown'
@@ -15,9 +16,20 @@ const { Item } = Descriptions
 
 export interface HealthCheckTagProps {
   healthCheck?: PlanningHealthCheckDto
+  /**
+   * Parent context required to resolve the health check via the nested
+   * /planning-intervals/{id}/objectives/{objectiveId}/health-checks endpoint.
+   * Required when the popover should fetch full health-check details on hover.
+   */
+  planningIntervalId?: string
+  objectiveId?: string
 }
 
-const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
+const HealthCheckTag = ({
+  healthCheck,
+  planningIntervalId,
+  objectiveId,
+}: HealthCheckTagProps) => {
   const dispatch = useAppDispatch()
   const { item: healthCheckData, isLoading } = useAppSelector(
     selectHealthCheckContext,
@@ -25,11 +37,29 @@ const HealthCheckTag = ({ healthCheck }: HealthCheckTagProps) => {
 
   if (!healthCheck) return null
 
+  const canFetchDetails = !!planningIntervalId && !!objectiveId
+
   const handleHoverChange = (open: boolean) => {
-    !!open && dispatch(getHealthCheck(healthCheck.id))
+    if (!open || !canFetchDetails) return
+    dispatch(
+      setHealthReportContext({
+        planningIntervalId: planningIntervalId!,
+        objectiveId: objectiveId!,
+      }),
+    )
+    dispatch(getHealthCheck(healthCheck.id))
   }
 
   const content = () => {
+    if (!canFetchDetails) {
+      return (
+        <Descriptions size="small" column={1} style={{ maxWidth: '250px' }}>
+          <Item label="Expires On">
+            {dayjs(healthCheck.expiration).format('M/D/YYYY hh:mm A')}
+          </Item>
+        </Descriptions>
+      )
+    }
     if (!healthCheckData) return null
     if (isLoading) return <Spin size="small" />
 

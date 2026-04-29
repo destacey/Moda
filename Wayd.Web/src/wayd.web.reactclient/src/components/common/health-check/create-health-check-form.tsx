@@ -1,10 +1,8 @@
 'use client'
 
-import { CreateHealthCheckRequest } from '@/src/services/wayd-api'
 import { DatePicker, Form, FormProps, Radio } from 'antd'
 import useAuth from '../../contexts/auth'
 import dayjs from 'dayjs'
-import { SystemContext } from '@/src/components/constants'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import withModalForm from '../../hoc/with-modal-form'
 import {
@@ -20,8 +18,6 @@ const { Item } = Form
 const { Group: RadioGroup } = Radio
 
 export interface CreateHealthCheckFormProps {
-  objectId: string
-  context: SystemContext
   onFormCreate: () => void
   onFormCancel: () => void
 }
@@ -30,14 +26,6 @@ export interface CreateHealthCheckFormValues {
   statusId: number
   expiration: Date
   note?: string | undefined
-}
-
-const mapToRequestValues = (values: CreateHealthCheckFormValues) => {
-  return {
-    statusId: values.statusId,
-    expiration: values.expiration,
-    note: values.note,
-  } as CreateHealthCheckRequest
 }
 
 const datePresets = [
@@ -53,7 +41,7 @@ const CreateHealthCheckForm = ({
   const { hasClaim } = useAuth()
   const canCreateHealthChecks = hasClaim(
     'Permission',
-    'Permissions.HealthChecks.Create',
+    'Permissions.PlanningIntervalObjectives.Manage',
   )
   const dispatch = useAppDispatch()
 

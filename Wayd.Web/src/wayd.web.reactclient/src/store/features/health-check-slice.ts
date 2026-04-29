@@ -1,20 +1,25 @@
 import createCrudSlice, { CrudState } from '../crud-slice'
 import {
-  CreateHealthCheckRequest,
-  HealthCheckDto,
-  UpdateHealthCheckRequest,
+  CreatePlanningIntervalObjectiveHealthCheckRequest,
+  PlanningIntervalObjectiveHealthCheckDetailsDto,
+  UpdatePlanningIntervalObjectiveHealthCheckRequest,
 } from '../../services/wayd-api'
-import { getHealthChecksClient } from '../../services/clients'
+import { getPlanningIntervalsClient } from '../../services/clients'
 import { CreateHealthCheckFormValues } from '../../components/common/health-check/create-health-check-form'
-import { SystemContext } from '../../components/constants'
 import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { OptionModel } from '../../components/types'
+import { apiSlice } from './apiSlice'
+import { QueryTags } from './query-tags'
 
-interface HealthCheckState extends CrudState<HealthCheckDto> {
-  objectId?: string
+interface HealthCheckState
+  extends CrudState<PlanningIntervalObjectiveHealthCheckDetailsDto> {
+  context: {
+    planningIntervalId: string
+    objectiveId: string
+  }
   createContext: {
-    objectId: string
-    contextId: SystemContext | null
+    planningIntervalId: string
+    objectiveId: string
   }
   statusOptions: OptionModel<number>[]
 }
@@ -22,40 +27,43 @@ interface HealthCheckState extends CrudState<HealthCheckDto> {
 export const getHealthCheckStatusOptions = createAsyncThunk(
   'healthCheck/getHealthCheckStatusOptions',
   async () => {
-    return await getHealthChecksClient().getStatuses()
+    return await getPlanningIntervalsClient().getHealthStatuses()
   },
 )
 
 const healthCheckSlice = createCrudSlice({
   name: 'healthCheck',
   initialState: (
-    defaultState: CrudState<HealthCheckDto>,
+    defaultState: CrudState<PlanningIntervalObjectiveHealthCheckDetailsDto>,
   ): HealthCheckState => ({
     ...defaultState,
-    objectId: null,
+    context: { planningIntervalId: '', objectiveId: '' },
     statusOptions: [],
-    createContext: {
-      objectId: '',
-      contextId: null,
-    },
+    createContext: { planningIntervalId: '', objectiveId: '' },
   }),
   reducers: {
     beginHealthCheckCreate: (
       state,
-      action: PayloadAction<{ objectId: string; contextId: SystemContext }>,
+      action: PayloadAction<{
+        planningIntervalId: string
+        objectiveId: string
+      }>,
     ) => {
       state.createContext = action.payload
       state.detail.isInEditMode = true
     },
     cancelHealthCheckCreate: (state) => {
-      state.createContext = {
-        objectId: '',
-        contextId: null,
-      }
+      state.createContext = { planningIntervalId: '', objectiveId: '' }
       state.detail.isInEditMode = false
     },
-    setHealthReportId: (state, action) => {
-      state.objectId = action.payload
+    setHealthReportContext: (
+      state,
+      action: PayloadAction<{
+        planningIntervalId: string
+        objectiveId: string
+      }>,
+    ) => {
+      state.context = action.payload
     },
   },
   extraReducers: (builder) => {
@@ -69,10 +77,7 @@ const healthCheckSlice = createCrudSlice({
   additionalThunkReducers: ({ createDetail }) => {
     return {
       [createDetail.fulfilled.type]: (state) => {
-        state.createContext = {
-          objectId: '',
-          contextId: null,
-        }
+        state.createContext = { planningIntervalId: '', objectiveId: '' }
       },
     }
   },
@@ -81,45 +86,92 @@ const healthCheckSlice = createCrudSlice({
       const { healthCheck: healthCheckState } = getState() as {
         healthCheck: HealthCheckState
       }
-      return await getHealthChecksClient().getHealthReport(
-        healthCheckState.objectId,
+      const { planningIntervalId, objectiveId } = healthCheckState.context
+      return await getPlanningIntervalsClient().getObjectiveHealthChecks(
+        planningIntervalId,
+        objectiveId,
       )
     } catch (error) {
       return rejectWithValue({ error })
     }
   },
-  getDetail: async (id: string, { rejectWithValue }) => {
+  getDetail: async (id: string, { getState, rejectWithValue }) => {
     try {
-      return await getHealthChecksClient().getById(id)
+      const { healthCheck: healthCheckState } = getState() as {
+        healthCheck: HealthCheckState
+      }
+      const { planningIntervalId, objectiveId } = healthCheckState.context
+      return await getPlanningIntervalsClient().getObjectiveHealthCheck(
+        planningIntervalId,
+        objectiveId,
+        id,
+      )
     } catch (error) {
       return rejectWithValue({ error })
     }
   },
   createDetail: async (
     newHealthCheck: CreateHealthCheckFormValues,
-    { getState, rejectWithValue },
+    { getState, dispatch, rejectWithValue },
   ) => {
     try {
       const { healthCheck: healthCheckState } = getState() as {
         healthCheck: HealthCheckState
       }
-      const healthCheck: CreateHealthCheckRequest = {
-        ...newHealthCheck,
-        ...healthCheckState.createContext,
+      const { planningIntervalId, objectiveId } =
+        healthCheckState.createContext
+      const request: CreatePlanningIntervalObjectiveHealthCheckRequest = {
+        planningIntervalObjectiveId: objectiveId,
+        statusId: newHealthCheck.statusId,
+        expiration: newHealthCheck.expiration,
+        note: newHealthCheck.note,
       }
-      const id = await getHealthChecksClient().create(healthCheck)
-      return await getHealthChecksClient().getById(id)
+      const id = await getPlanningIntervalsClient().createObjectiveHealthCheck(
+        planningIntervalId,
+        objectiveId,
+        request,
+      )
+      const detail = await getPlanningIntervalsClient().getObjectiveHealthCheck(
+        planningIntervalId,
+        objectiveId,
+        id,
+      )
+      dispatch(
+        apiSlice.util.invalidateTags([
+          { type: QueryTags.PlanningIntervalObjective, id: 'LIST' },
+          { type: QueryTags.HealthChecksHealthReport, id: objectiveId },
+        ]),
+      )
+      return detail
     } catch (error) {
       return rejectWithValue({ error })
     }
   },
   updateDetail: async (
-    healthCheck: UpdateHealthCheckRequest,
-    { rejectWithValue },
+    healthCheck: UpdatePlanningIntervalObjectiveHealthCheckRequest,
+    { getState, dispatch, rejectWithValue },
   ) => {
     try {
-      await getHealthChecksClient().update(healthCheck.id, healthCheck)
-      return await getHealthChecksClient().getById(healthCheck.id)
+      const { healthCheck: healthCheckState } = getState() as {
+        healthCheck: HealthCheckState
+      }
+      const { planningIntervalId } = healthCheckState.context
+      const updated = await getPlanningIntervalsClient().updateObjectiveHealthCheck(
+        planningIntervalId,
+        healthCheck.planningIntervalObjectiveId,
+        healthCheck.id,
+        healthCheck,
+      )
+      dispatch(
+        apiSlice.util.invalidateTags([
+          { type: QueryTags.PlanningIntervalObjective, id: 'LIST' },
+          {
+            type: QueryTags.HealthChecksHealthReport,
+            id: healthCheck.planningIntervalObjectiveId,
+          },
+        ]),
+      )
+      return updated
     } catch (error) {
       return rejectWithValue({ error })
     }
@@ -134,7 +186,7 @@ export const {
   beginHealthCheckCreate,
   cancelHealthCheckCreate,
   setEditMode,
-  setHealthReportId,
+  setHealthReportContext,
 } = healthCheckSlice.actions
 
 export const {

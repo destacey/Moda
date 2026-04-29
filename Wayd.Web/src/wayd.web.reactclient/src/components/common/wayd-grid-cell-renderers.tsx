@@ -22,17 +22,28 @@ import { LifecycleStatusTag } from '.'
 export interface HealthCheckStatusColumn {
   id: string
   status: SimpleNavigationDto
+  reportedOn: Date
   expiration: Date
 }
 
 export const NestedHealthCheckStatusCellRenderer = <
-  T extends { healthCheck: HealthCheckStatusColumn | null },
+  T extends {
+    id: string
+    healthCheck: HealthCheckStatusColumn | null
+    planningInterval?: { id: string }
+  },
 >(
   props: CustomCellRendererProps<T>,
 ) => {
   const { data } = props
   if (!data?.healthCheck) return null
-  return <HealthCheckTag healthCheck={data.healthCheck} />
+  return (
+    <HealthCheckTag
+      healthCheck={data.healthCheck}
+      planningIntervalId={data.planningInterval?.id}
+      objectiveId={data.id}
+    />
+  )
 }
 
 export const HealthCheckStatusCellRenderer = (

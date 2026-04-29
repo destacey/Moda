@@ -44,7 +44,7 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler(IPlanningDbConte
                 .Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
                     .ThenInclude(o => o.Team)
                 .Include(p => p.Objectives.Where(o => o.TeamId == request.TeamId.Value))
-                    .ThenInclude(o => o.HealthCheck);
+                    .ThenInclude(o => o.HealthChecks);
         }
         else
         {
@@ -52,7 +52,7 @@ internal sealed class GetPlanningIntervalObjectivesQueryHandler(IPlanningDbConte
                 .Include(p => p.Objectives)
                     .ThenInclude(o => o.Team)
                 .Include(p => p.Objectives)
-                    .ThenInclude(o => o.HealthCheck);
+                    .ThenInclude(o => o.HealthChecks);
         }
 
         var planningInterval = await query

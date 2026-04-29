@@ -71,9 +71,20 @@ const ObjectiveHealthReportPage = (props: {
       <PageTitle
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Health Report"
-        tags={<HealthCheckTag healthCheck={objectiveData?.healthCheck} />}
+        tags={
+          <HealthCheckTag
+            healthCheck={objectiveData?.healthCheck}
+            planningIntervalId={objectiveData?.planningInterval?.id}
+            objectiveId={objectiveData?.id}
+          />
+        }
       />
-      {objectiveData?.id && <HealthReportGrid objectId={objectiveData.id} />}
+      {objectiveData?.id && (
+        <HealthReportGrid
+          planningIntervalId={objectiveData.planningInterval?.id}
+          objectiveId={objectiveData.id}
+        />
+      )}
     </>
   )
 }

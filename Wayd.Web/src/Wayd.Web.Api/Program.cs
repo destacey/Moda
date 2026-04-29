@@ -5,7 +5,6 @@ using Wayd.AppIntegration.Application;
 using Wayd.Common.Application;
 using Wayd.Common.Application.Interfaces;
 using Wayd.Goals.Application;
-using Wayd.Health;
 using Wayd.Infrastructure;
 using Wayd.Infrastructure.Common;
 using Wayd.Links;
@@ -61,7 +60,6 @@ try
 
     builder.Services.AddAppIntegrationApplication();
     builder.Services.AddGoalsApplication();
-    builder.Services.AddHealthApplication();
     builder.Services.AddLinksApplication();
     builder.Services.AddOrganizationApplication();
     builder.Services.AddPlanningApplication();

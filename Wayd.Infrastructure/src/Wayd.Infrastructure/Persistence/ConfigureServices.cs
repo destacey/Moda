@@ -3,7 +3,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Wayd.Common.Application.FeatureManagement;
 using Wayd.Goals.Application.Persistence;
-using Wayd.Health;
 using Wayd.Links;
 using Wayd.Planning.Application.Persistence;
 using Wayd.ProjectPortfolioManagement.Application;
@@ -80,7 +79,6 @@ internal static class ConfigureServices
         services.AddScoped<IAppIntegrationDbContext, WaydDbContext>();
         services.AddScoped<IFeatureManagementDbContext, WaydDbContext>();
         services.AddScoped<IGoalsDbContext, WaydDbContext>();
-        services.AddScoped<IHealthDbContext, WaydDbContext>();
         services.AddScoped<ILinksDbContext, WaydDbContext>();
         services.AddScoped<IOrganizationDbContext, WaydDbContext>();
         services.AddScoped<IPlanningDbContext, WaydDbContext>();
