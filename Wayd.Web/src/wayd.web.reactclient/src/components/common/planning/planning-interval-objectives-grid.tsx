@@ -10,7 +10,6 @@ import useAuth from '../../contexts/auth'
 import EditPlanningIntervalObjectiveForm from '@/src/app/planning/planning-intervals/_components/edit-planning-interval-objective-form'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
-import { SystemContext } from '../../constants'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import {
@@ -46,13 +45,18 @@ const ProgressCellRenderer = ({ value, data }) => {
 }
 
 interface RowMenuProps extends MenuProps {
+  planningIntervalId: string
   planningIntervalKey: number
   objectiveId: string
   objectiveKey: number
   canManageObjectives: boolean
   canCreateHealthChecks: boolean
   onEditObjectiveMenuClicked: (id: string, key: number) => void
-  onCreateHealthCheckMenuClicked: (id: string, key: number) => void
+  onCreateHealthCheckMenuClicked: (
+    planningIntervalId: string,
+    id: string,
+    key: number,
+  ) => void
 }
 
 const getRowMenuItems = (props: RowMenuProps) => {
@@ -78,6 +82,7 @@ const getRowMenuItems = (props: RowMenuProps) => {
       disabled: !props.canCreateHealthChecks,
       onClick: () =>
         props.onCreateHealthCheckMenuClicked(
+          props.planningIntervalId,
           props.objectiveId,
           props.objectiveKey,
         ),
@@ -115,16 +120,14 @@ const PlanningIntervalObjectivesGrid = ({
 
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectId,
+    (state) => state.healthCheck.createContext.objectiveId,
   )
 
   const { hasPermissionClaim } = useAuth()
   const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
-  const canCreateHealthChecks =
-    !!canManageObjectives &&
-    hasPermissionClaim('Permissions.HealthChecks.Create')
+  const canCreateHealthChecks = !!canManageObjectives
 
   const refresh = async () => {
     refreshObjectives()
@@ -136,12 +139,16 @@ const PlanningIntervalObjectivesGrid = ({
       setOpenUpdateObjectiveForm(true)
     }
 
-    const onCreateHealthCheckMenuClicked = (id: string, key: number) => {
+    const onCreateHealthCheckMenuClicked = (
+      planningIntervalId: string,
+      id: string,
+      key: number,
+    ) => {
       setSelectedObjective({ id, key })
       dispatch(
         beginHealthCheckCreate({
-          objectId: id,
-          contextId: SystemContext.PlanningPlanningIntervalObjective,
+          planningIntervalId,
+          objectiveId: id,
         }),
       )
     }
@@ -155,6 +162,7 @@ const PlanningIntervalObjectivesGrid = ({
       hide: !canManageObjectives,
       cellRenderer: (params) => {
         const menuItems = getRowMenuItems({
+          planningIntervalId: params.data.planningInterval.id,
           planningIntervalKey: planningIntervalKey,
           objectiveId: params.data.id,
           objectiveKey: params.data.key,

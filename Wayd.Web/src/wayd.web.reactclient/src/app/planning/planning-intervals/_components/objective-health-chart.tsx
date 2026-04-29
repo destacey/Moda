@@ -32,20 +32,18 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
 
   if (!props.objectivesData || props.objectivesData.length === 0) return null
 
-  const activeObjectives = props.objectivesData.filter(
-    (objective) => objective.status?.name !== 'Completed',
-  )
+  const activeObjectives = props.objectivesData.filter((objective) => {
+    const status = objective.status?.name
+    return (
+      status !== 'Completed' && status !== 'Canceled' && status !== 'Missed'
+    )
+  })
 
   if (activeObjectives.length === 0) return null
 
   const groupedHealthData = activeObjectives.reduce(
     (acc, objective) => {
-      const status = objective.status?.name
-      const health =
-        status === 'Canceled' || status === 'Missed'
-          ? 'Unhealthy'
-          : (objective.healthCheck?.status?.name ?? 'Unknown')
-
+      const health = objective.healthCheck?.status?.name ?? 'Unknown'
       acc[health] = acc[health] ? acc[health] + 1 : 1
       return acc
     },

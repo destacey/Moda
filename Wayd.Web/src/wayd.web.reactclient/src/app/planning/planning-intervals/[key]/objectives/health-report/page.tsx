@@ -8,10 +8,9 @@ import { notFound } from 'next/navigation'
 import {
   MarkdownCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
-  HealthCheckStatusCellRenderer,
-  HealthCheckStatusColumn,
   NestedTeamNameLinkCellRenderer,
 } from '@/src/components/common/wayd-grid-cell-renderers'
+import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
 import dayjs from 'dayjs'
 import { WaydGrid } from '@/src/components/common'
 import { Progress } from 'antd'
@@ -19,12 +18,19 @@ import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/f
 
 const LocalHealthCheckCellRenderer = (params) => {
   if (!params.data?.healthCheckId) return null
-  const healthCheck: HealthCheckStatusColumn = {
-    id: params.data.healthCheckId,
-    status: params.data.healthStatus,
-    expiration: params.data.expiration,
-  }
-  return HealthCheckStatusCellRenderer({ ...params, data: healthCheck })
+  return (
+    <HealthCheckTag
+      healthCheck={{
+        id: params.data.healthCheckId,
+        status: params.data.healthStatus,
+        reportedOn: params.data.reportedOn,
+        expiration: params.data.expiration,
+        note: params.data.note,
+      }}
+      planningIntervalId={params.data.planningInterval?.id}
+      objectiveId={params.data.id}
+    />
+  )
 }
 
 const ProgressCellRenderer = ({ value, data }) => {

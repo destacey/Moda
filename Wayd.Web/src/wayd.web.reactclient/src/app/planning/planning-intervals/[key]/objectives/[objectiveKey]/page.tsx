@@ -14,7 +14,6 @@ import { notFound, useRouter } from 'next/navigation'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { SystemContext } from '@/src/components/constants'
 import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
 import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import Link from 'next/link'
@@ -59,14 +58,12 @@ const ObjectiveDetailsPage = (props: {
   const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
-  const canCreateHealthChecks =
-    !!canManageObjectives &&
-    hasPermissionClaim('Permissions.HealthChecks.Create')
+  const canCreateHealthChecks = !!canManageObjectives
   const showActions = canManageObjectives
 
   const dispatch = useAppDispatch()
   const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectId,
+    (state) => state.healthCheck.createContext.objectiveId,
   )
 
   const renderTabContent = () => {
@@ -133,8 +130,8 @@ const ObjectiveDetailsPage = (props: {
           onClick: () =>
             dispatch(
               beginHealthCheckCreate({
-                objectId: objectiveData?.id,
-                contextId: SystemContext.PlanningPlanningIntervalObjective,
+                planningIntervalId: objectiveData?.planningInterval.id ?? '',
+                objectiveId: objectiveData?.id ?? '',
               }),
             ),
         },
@@ -168,7 +165,13 @@ const ObjectiveDetailsPage = (props: {
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
-        tags={<HealthCheckTag healthCheck={objectiveData?.healthCheck} />}
+        tags={
+          <HealthCheckTag
+            healthCheck={objectiveData?.healthCheck}
+            planningIntervalId={objectiveData?.planningInterval?.id}
+            objectiveId={objectiveData?.id}
+          />
+        }
       />
       <Card
         style={{ width: '100%' }}

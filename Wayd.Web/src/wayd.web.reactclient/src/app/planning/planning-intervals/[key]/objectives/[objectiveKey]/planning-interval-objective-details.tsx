@@ -81,7 +81,10 @@ const PlanningIntervalObjectiveDetails = ({
         </Col>
       </Row>
       <Space align="start" wrap>
-        <HealthReportChart objectId={objective.id} />
+        <HealthReportChart
+          planningIntervalId={objective.planningInterval?.id}
+          objectiveId={objective.id}
+        />
         <PlanningIntervalObjectiveWorkItemsCard
           planningIntervalKey={objective.planningInterval?.key}
           objectiveKey={objective.key}

@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { FC } from 'react'
 import useTheme from '../../contexts/theme'
-import { useGetHealthReportQuery } from '@/src/store/features/common/health-checks-api'
+import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/common/health-checks-api'
 import { Card } from 'antd'
 import dayjs from 'dayjs'
 
@@ -13,7 +13,8 @@ const Line = dynamic(
 )
 
 interface HealthReportChartProps {
-  objectId: string
+  planningIntervalId: string
+  objectiveId: string
 }
 
 const convertStatusToNumber = (status: string) => {
@@ -49,7 +50,13 @@ const HealthReportChart: FC<HealthReportChartProps> = (
     isFetching,
     error,
     refetch,
-  } = useGetHealthReportQuery(props.objectId, { skip: !props.objectId })
+  } = useGetObjectiveHealthChecksQuery(
+    {
+      planningIntervalId: props.planningIntervalId,
+      objectiveId: props.objectiveId,
+    },
+    { skip: !props.planningIntervalId || !props.objectiveId },
+  )
 
   // Derive series data from health report data
   const seriesData = !healthReportData

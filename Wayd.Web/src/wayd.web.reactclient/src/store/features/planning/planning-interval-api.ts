@@ -415,10 +415,10 @@ export const planningIntervalApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result) => [
-        QueryTags.PlanningIntervalObjective,
-        ...result.map(({ key }) => ({
+        { type: QueryTags.PlanningIntervalObjective, id: 'LIST' },
+        ...(result ?? []).map(({ key }) => ({
           type: QueryTags.PlanningIntervalObjective,
-          key,
+          id: key,
         })),
       ],
     }),

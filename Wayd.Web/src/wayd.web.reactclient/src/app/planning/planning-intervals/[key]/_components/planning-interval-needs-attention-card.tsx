@@ -47,9 +47,7 @@ const PlanningIntervalNeedsAttentionCard = ({
   const canManageObjectives = hasPermissionClaim(
     'Permissions.PlanningIntervalObjectives.Manage',
   )
-  const canCreatePIObjectiveHealthChecks =
-    !!canManageObjectives &&
-    hasPermissionClaim('Permissions.HealthChecks.Create')
+  const canCreatePIObjectiveHealthChecks = !!canManageObjectives
 
   const attentionObjectives = useMemo(() => {
     const objectives = (objectivesData ?? []).filter(
