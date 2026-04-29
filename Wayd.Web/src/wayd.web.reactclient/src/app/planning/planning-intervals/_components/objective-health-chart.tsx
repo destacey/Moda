@@ -4,6 +4,7 @@ import { ChartCard } from '@/src/components/common/metrics'
 import { healthCheckTagColor } from '@/src/components/common/health-check/health-check-utils'
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
+import { getSemanticChartColor, softenChartColor } from '@/src/utils'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
 import { theme } from 'antd'
@@ -60,25 +61,12 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
       return normalizedAIndex - normalizedBIndex
     })
 
-  const mapSemanticColorToChartColor = (semanticColor: string) => {
-    switch (semanticColor) {
-      case 'processing':
-        return token.colorInfo
-      case 'success':
-        return token.colorSuccess
-      case 'error':
-        return token.colorError
-      case 'warning':
-        return token.colorWarning
-      case 'default':
-      default:
-        return token.colorTextQuaternary
-    }
-  }
-
   const healthDomain = data.map((item) => item.type)
   const healthRange = data.map((item) =>
-    mapSemanticColorToChartColor(healthCheckTagColor(item.type)),
+    softenChartColor(
+      getSemanticChartColor(healthCheckTagColor(item.type), token),
+      token.colorBgContainer,
+    ),
   )
 
   const total = data.reduce((acc, x) => acc + x.count, 0)
