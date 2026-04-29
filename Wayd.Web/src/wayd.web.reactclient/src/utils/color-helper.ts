@@ -132,3 +132,84 @@ export const getLifecyclePhaseTagColor = (
       return 'default'
   }
 }
+
+export const getSemanticChartColor = (
+  semanticColor: string,
+  token: Pick<
+    GlobalToken,
+    | 'colorInfo'
+    | 'colorSuccess'
+    | 'colorError'
+    | 'colorWarning'
+    | 'colorTextQuaternary'
+  >,
+): string => {
+  switch (semanticColor) {
+    case 'processing':
+      return token.colorInfo
+    case 'success':
+      return token.colorSuccess
+    case 'error':
+      return token.colorError
+    case 'warning':
+      return token.colorWarning
+    case 'default':
+    default:
+      return token.colorTextQuaternary
+  }
+}
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
+const parseColor = (color: string): [number, number, number] | null => {
+  const trimmed = color.trim()
+
+  const hex = trimmed.replace('#', '')
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return [
+      Number.parseInt(hex.slice(0, 2), 16),
+      Number.parseInt(hex.slice(2, 4), 16),
+      Number.parseInt(hex.slice(4, 6), 16),
+    ]
+  }
+
+  if (/^[0-9a-fA-F]{3}$/.test(hex)) {
+    return [
+      Number.parseInt(hex[0] + hex[0], 16),
+      Number.parseInt(hex[1] + hex[1], 16),
+      Number.parseInt(hex[2] + hex[2], 16),
+    ]
+  }
+
+  const rgbMatch = trimmed.match(
+    /^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})/i,
+  )
+  if (rgbMatch) {
+    return [
+      clamp(Number.parseInt(rgbMatch[1], 10), 0, 255),
+      clamp(Number.parseInt(rgbMatch[2], 10), 0, 255),
+      clamp(Number.parseInt(rgbMatch[3], 10), 0, 255),
+    ]
+  }
+
+  return null
+}
+
+export const softenChartColor = (
+  baseColor: string,
+  backgroundColor: string,
+  softenBy = 0.35,
+): string => {
+  const base = parseColor(baseColor)
+  const background = parseColor(backgroundColor)
+
+  if (!base || !background) return baseColor
+
+  const t = clamp(softenBy, 0, 1)
+  const mixed = base.map((channel, index) =>
+    Math.round(channel * (1 - t) + background[index] * t),
+  )
+
+  return `rgb(${mixed[0]}, ${mixed[1]}, ${mixed[2]})`
+}
