@@ -98,6 +98,10 @@ const ObjectiveHealthChart = (props: ObjectiveHealthChartProps) => {
         props.embedded
           ? `${d.count} (${Math.round((d.count / total) * 100)}%)`
           : `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
+      style: {
+        fill: token.colorTextLightSolid,
+        fontWeight: 500,
+      },
       transform: [
         {
           type: 'overlapDodgeY',

@@ -148,7 +148,7 @@ describe('getLifecyclePhaseTagColor', () => {
 
 describe('softenChartColor', () => {
   test('should blend two hex colors with the default soften amount', () => {
-    expect(softenChartColor('#000000', '#ffffff')).toBe('rgb(89, 89, 89)')
+    expect(softenChartColor('#000000', '#ffffff')).toBe('rgb(115, 115, 115)')
   })
 
   test('should support rgb() input colors', () => {
@@ -168,6 +168,18 @@ describe('softenChartColor', () => {
   test('should return baseColor when parsing fails', () => {
     expect(softenChartColor('not-a-color', '#ffffff', 0.5)).toBe('not-a-color')
   })
+
+  test('should support rgba input by compositing over background first', () => {
+    expect(softenChartColor('rgba(0, 0, 0, 0.25)', '#ffffff', 0.35)).toBe(
+      'rgb(213, 213, 213)',
+    )
+  })
+
+  test('should support 8-digit hex with alpha', () => {
+    expect(softenChartColor('#00000040', '#ffffff', 0.35)).toBe(
+      'rgb(213, 213, 213)',
+    )
+  })
 })
 
 describe('getSemanticChartColor', () => {
@@ -176,7 +188,7 @@ describe('getSemanticChartColor', () => {
     colorSuccess: '#52c41a',
     colorError: '#ff4d4f',
     colorWarning: '#faad14',
-    colorTextQuaternary: '#00000040',
+    colorTextSecondary: '#000000a6',
   }
 
   test('should map processing to colorInfo', () => {
@@ -201,12 +213,12 @@ describe('getSemanticChartColor', () => {
     )
   })
 
-  test('should map default and unknown to colorTextQuaternary', () => {
+  test('should map default and unknown to colorTextSecondary', () => {
     expect(getSemanticChartColor('default', token as any)).toBe(
-      token.colorTextQuaternary,
+      token.colorTextSecondary,
     )
     expect(getSemanticChartColor('anything-else', token as any)).toBe(
-      token.colorTextQuaternary,
+      token.colorTextSecondary,
     )
   })
 })
