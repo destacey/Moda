@@ -132,3 +132,136 @@ export const getLifecyclePhaseTagColor = (
       return 'default'
   }
 }
+
+export const getSemanticChartColor = (
+  semanticColor: string,
+  token: Pick<
+    GlobalToken,
+    | 'colorInfo'
+    | 'colorSuccess'
+    | 'colorError'
+    | 'colorWarning'
+    | 'colorTextSecondary'
+  >,
+): string => {
+  switch (semanticColor) {
+    case 'processing':
+      return token.colorInfo
+    case 'success':
+      return token.colorSuccess
+    case 'error':
+      return token.colorError
+    case 'warning':
+      return token.colorWarning
+    case 'default':
+    default:
+      return token.colorTextSecondary
+  }
+}
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
+interface ParsedColor {
+  r: number
+  g: number
+  b: number
+  a: number
+}
+
+const parseColor = (color: string): ParsedColor | null => {
+  const trimmed = color.trim()
+
+  const hex = trimmed.replace('#', '')
+  if (/^[0-9a-fA-F]{6}$/.test(hex)) {
+    return {
+      r: Number.parseInt(hex.slice(0, 2), 16),
+      g: Number.parseInt(hex.slice(2, 4), 16),
+      b: Number.parseInt(hex.slice(4, 6), 16),
+      a: 1,
+    }
+  }
+
+  if (/^[0-9a-fA-F]{3}$/.test(hex)) {
+    return {
+      r: Number.parseInt(hex[0] + hex[0], 16),
+      g: Number.parseInt(hex[1] + hex[1], 16),
+      b: Number.parseInt(hex[2] + hex[2], 16),
+      a: 1,
+    }
+  }
+
+  if (/^[0-9a-fA-F]{8}$/.test(hex)) {
+    return {
+      r: Number.parseInt(hex.slice(0, 2), 16),
+      g: Number.parseInt(hex.slice(2, 4), 16),
+      b: Number.parseInt(hex.slice(4, 6), 16),
+      a: Number.parseInt(hex.slice(6, 8), 16) / 255,
+    }
+  }
+
+  if (/^[0-9a-fA-F]{4}$/.test(hex)) {
+    return {
+      r: Number.parseInt(hex[0] + hex[0], 16),
+      g: Number.parseInt(hex[1] + hex[1], 16),
+      b: Number.parseInt(hex[2] + hex[2], 16),
+      a: Number.parseInt(hex[3] + hex[3], 16) / 255,
+    }
+  }
+
+  const rgbMatch = trimmed.match(
+    /^rgba?\(\s*(\d{1,3})\s*[, ]\s*(\d{1,3})\s*[, ]\s*(\d{1,3})(?:\s*[,/]\s*(\d*\.?\d+))?\s*\)$/i,
+  )
+  if (rgbMatch) {
+    return {
+      r: clamp(Number.parseInt(rgbMatch[1], 10), 0, 255),
+      g: clamp(Number.parseInt(rgbMatch[2], 10), 0, 255),
+      b: clamp(Number.parseInt(rgbMatch[3], 10), 0, 255),
+      a: clamp(
+        rgbMatch[4] !== undefined ? Number.parseFloat(rgbMatch[4]) : 1,
+        0,
+        1,
+      ),
+    }
+  }
+
+  return null
+}
+
+const compositeColor = (foreground: ParsedColor, background: ParsedColor) => {
+  const a = clamp(foreground.a, 0, 1)
+  return {
+    r: Math.round(foreground.r * a + background.r * (1 - a)),
+    g: Math.round(foreground.g * a + background.g * (1 - a)),
+    b: Math.round(foreground.b * a + background.b * (1 - a)),
+    a: 1,
+  }
+}
+
+export const softenChartColor = (
+  baseColor: string,
+  backgroundColor: string,
+  softenBy = 0.45,
+): string => {
+  const base = parseColor(baseColor)
+  const background = parseColor(backgroundColor)
+
+  if (!base || !background) return baseColor
+
+  // Resolve semi-transparent colors against the provided background so blending
+  // reflects what users actually see on screen.
+  const opaqueBackground =
+    background.a < 1
+      ? compositeColor(background, { r: 255, g: 255, b: 255, a: 1 })
+      : background
+  const visibleBase = compositeColor(base, opaqueBackground)
+
+  const t = clamp(softenBy, 0, 1)
+  const mixed = {
+    r: Math.round(visibleBase.r * (1 - t) + opaqueBackground.r * t),
+    g: Math.round(visibleBase.g * (1 - t) + opaqueBackground.g * t),
+    b: Math.round(visibleBase.b * (1 - t) + opaqueBackground.b * t),
+  }
+
+  return `rgb(${mixed.r}, ${mixed.g}, ${mixed.b})`
+}

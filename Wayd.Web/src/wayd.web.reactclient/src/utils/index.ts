@@ -8,6 +8,8 @@ export {
   getLifecyclePhaseTagColor,
   getLifecyclePhaseColorFromStatus,
   getAvatarColor,
+  getSemanticChartColor,
+  softenChartColor,
 } from './color-helper'
 export {
   calculateIterationHealth,

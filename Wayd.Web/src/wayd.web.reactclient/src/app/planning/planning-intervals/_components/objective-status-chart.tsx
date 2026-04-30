@@ -3,7 +3,11 @@
 import { ChartCard } from '@/src/components/common/metrics'
 import useTheme from '@/src/components/contexts/theme'
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
-import { getObjectiveStatusColor } from '@/src/utils'
+import {
+  getObjectiveStatusColor,
+  getSemanticChartColor,
+  softenChartColor,
+} from '@/src/utils'
 import dynamic from 'next/dynamic'
 import type { PieConfig } from '@ant-design/charts'
 import { theme } from 'antd'
@@ -57,25 +61,12 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
       return normalizedAIndex - normalizedBIndex
     })
 
-  const mapSemanticColorToChartColor = (semanticColor: string) => {
-    switch (semanticColor) {
-      case 'processing':
-        return token.colorPrimary
-      case 'success':
-        return token.colorSuccess
-      case 'error':
-        return token.colorError
-      case 'warning':
-        return token.colorWarning
-      case 'default':
-      default:
-        return token.colorTextQuaternary
-    }
-  }
-
   const statusDomain = data.map((item) => item.type)
   const statusRange = data.map((item) =>
-    mapSemanticColorToChartColor(getObjectiveStatusColor(item.type)),
+    softenChartColor(
+      getSemanticChartColor(getObjectiveStatusColor(item.type), token),
+      token.colorBgContainer,
+    ),
   )
   const tooltipBounding =
     typeof window !== 'undefined'
@@ -106,6 +97,10 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
         props.embedded
           ? `${d.count} (${Math.round((d.count / total) * 100)}%)`
           : `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,
+      style: {
+        fill: token.colorTextLightSolid,
+        fontWeight: 500,
+      },
       transform: [
         {
           type: 'overlapDodgeY',
@@ -139,4 +134,3 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
 }
 
 export default ObjectiveStatusChart
-
