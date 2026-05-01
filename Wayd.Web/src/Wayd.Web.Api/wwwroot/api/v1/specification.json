@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v14.7.0.0 (NJsonSchema v11.6.0.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "Wayd API",
@@ -19981,12 +19981,10 @@
         ],
         "properties": {
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "slug": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "items": {
             "type": "array",
@@ -20010,20 +20008,17 @@
         ],
         "properties": {
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "subtitle": {
             "type": "string",
             "nullable": true
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "entityType": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "auxKey": {
             "type": "string",
@@ -20560,8 +20555,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "userId": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "type": {
             "type": "string",
@@ -20841,8 +20835,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -20889,12 +20882,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -20994,12 +20985,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -21061,8 +21050,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21101,12 +21089,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21246,8 +21232,7 @@
             "format": "int32"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21332,8 +21317,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21367,12 +21351,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -21490,12 +21472,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -21524,12 +21504,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -21613,12 +21591,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -21792,8 +21768,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -21861,12 +21836,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -21956,8 +21929,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22006,8 +21978,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22086,8 +22057,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -22118,12 +22088,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -22400,12 +22368,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22453,12 +22419,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -22488,12 +22452,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "order": {
             "type": "integer",
@@ -22707,16 +22669,13 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "businessCase": {
             "type": "string",
@@ -23218,12 +23177,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
@@ -23232,8 +23189,7 @@
             "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23364,8 +23320,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "level": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23388,21 +23343,17 @@
           "id": {
             "type": "string",
             "format": "guid",
-            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspaceKey": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "externalViewWorkItemUrl": {
             "type": "string",
@@ -23424,12 +23375,10 @@
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               },
               "type": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               }
             }
           }
@@ -23549,12 +23498,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "nodeType": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23564,8 +23511,7 @@
             "format": "int32"
           },
           "wbs": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -23685,12 +23631,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23857,8 +23801,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "projectId": {
             "type": "string",
@@ -23867,8 +23810,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -23945,12 +23887,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -23978,8 +23918,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "projectId": {
             "type": "string",
@@ -23988,8 +23927,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -24370,8 +24308,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -24397,8 +24334,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -24424,8 +24360,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -24462,12 +24397,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/LifecycleNavigationDto"
@@ -24690,8 +24623,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "startingValue": {
             "type": "number",
@@ -24759,8 +24691,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -24975,8 +24906,7 @@
             "format": "date-time"
           },
           "dateLabel": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -25010,8 +24940,7 @@
             "format": "date-time"
           },
           "dateLabel": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "measurement": {
             "nullable": true,
@@ -25275,8 +25204,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -25404,8 +25332,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -25444,8 +25371,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -25495,8 +25421,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -25536,8 +25461,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -25615,12 +25539,10 @@
             ],
             "properties": {
               "code": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               },
               "type": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               }
             }
           }
@@ -25775,8 +25697,7 @@
             ],
             "properties": {
               "type": {
-                "type": "string",
-                "minLength": 1
+                "type": "string"
               }
             }
           }
@@ -25913,8 +25834,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -25925,8 +25845,7 @@
             "format": "date"
           },
           "state": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -25958,8 +25877,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -25970,8 +25888,7 @@
             "format": "date"
           },
           "state": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "category": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -25995,8 +25912,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -26032,8 +25948,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -26078,8 +25993,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26161,8 +26075,7 @@
             "format": "int32"
           },
           "planningIntervalName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "teamCount": {
             "type": "integer",
@@ -26230,8 +26143,7 @@
           },
           "teamCode": {
             "type": "string",
-            "description": "The team's short code (e.g. \"CORE\"). Used to route to the\n            team-specific tab on the plan-review page.",
-            "minLength": 1
+            "description": "The team's short code (e.g. \"CORE\"). Used to route to the\n            team-specific tab on the plan-review page."
           },
           "predictability": {
             "type": "number",
@@ -26297,8 +26209,7 @@
             "format": "int32"
           },
           "iterationName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -26406,8 +26317,7 @@
             "format": "int32"
           },
           "sprintName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26493,23 +26403,19 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26618,8 +26524,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -26724,8 +26629,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -26944,8 +26848,7 @@
           },
           "name": {
             "type": "string",
-            "description": "The name of the objective.",
-            "minLength": 1
+            "description": "The name of the objective."
           },
           "status": {
             "description": "Gets or sets the status.",
@@ -27122,8 +27025,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27269,8 +27171,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27306,8 +27207,7 @@
             "format": "int32"
           },
           "summary": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "team": {
             "nullable": true,
@@ -27322,16 +27222,13 @@
             "format": "date-time"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "category": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "exposure": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "assignee": {
             "nullable": true,
@@ -27370,12 +27267,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "facilitator": {
             "nullable": true,
@@ -27402,13 +27297,11 @@
           "id": {
             "type": "string",
             "format": "guid",
-            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "userName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
             "type": "string",
@@ -27450,12 +27343,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "facilitator": {
             "nullable": true,
@@ -27513,8 +27404,7 @@
             "nullable": true
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "consensusEstimate": {
             "type": "string",
@@ -27693,8 +27583,7 @@
             "format": "int32"
           },
           "summary": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27902,8 +27791,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27929,8 +27817,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27956,8 +27843,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -27994,8 +27880,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "start": {
             "type": "string",
@@ -28048,8 +27933,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -28274,8 +28158,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -28312,8 +28195,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -28429,8 +28311,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29003,8 +28884,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29100,8 +28980,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29135,8 +29014,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "ownership": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29168,8 +29046,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29225,8 +29102,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29263,8 +29139,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29330,8 +29205,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29360,12 +29234,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29398,12 +29270,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29464,8 +29334,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "externalId": {
             "type": "integer",
@@ -29473,8 +29342,7 @@
             "nullable": true
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
@@ -29483,8 +29351,7 @@
             "$ref": "#/components/schemas/WorkTypeNavigationDto"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29594,8 +29461,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "project": {
             "nullable": true,
@@ -29660,8 +29526,7 @@
             "$ref": "#/components/schemas/WorkItemDetailsNavigationDto"
           },
           "type": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "state": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29706,29 +29571,23 @@
           "id": {
             "type": "string",
             "format": "guid",
-            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspaceKey": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "type": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -29779,8 +29638,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -29850,8 +29708,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -30006,8 +29863,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -30044,20 +29900,17 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "middleName": {
             "type": "string",
             "nullable": true
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "suffix": {
             "type": "string",
@@ -30068,12 +29921,10 @@
             "nullable": true
           },
           "employeeNumber": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "email": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "jobTitle": {
             "type": "string",
@@ -30126,24 +29977,20 @@
             "format": "int32"
           },
           "displayName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "fullName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "firstName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "middleName": {
             "type": "string",
             "nullable": true
           },
           "lastName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "suffix": {
             "type": "string",
@@ -30154,8 +30001,7 @@
             "nullable": true
           },
           "employeeNumber": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "hireDate": {
             "type": "string",
@@ -30163,8 +30009,7 @@
             "nullable": true
           },
           "email": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "jobTitle": {
             "type": "string",
@@ -30684,8 +30529,7 @@
             "nullable": true
           },
           "state": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -30782,23 +30626,19 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "key": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "title": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workspace": {
             "$ref": "#/components/schemas/WorkspaceNavigationDto"
           },
           "type": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "status": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "statusCategory": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -31103,12 +30943,10 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "code": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "type": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
@@ -31118,8 +30956,7 @@
             "format": "int32"
           },
           "path": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "children": {
             "type": "array",
@@ -31362,12 +31199,10 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "url": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
@@ -31526,8 +31361,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "teamName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "boardId": {
             "type": "string",
@@ -31668,8 +31502,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "systemId": {
             "type": "string",
@@ -31732,8 +31565,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -31767,8 +31599,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -31834,16 +31665,13 @@
         ],
         "properties": {
           "organization": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "personalAccessToken": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "organizationUrl": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "workProcesses": {
             "type": "array",
@@ -31874,8 +31702,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -31902,7 +31729,6 @@
           "internalId": {
             "type": "string",
             "format": "guid",
-            "minLength": 1,
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
@@ -31927,8 +31753,7 @@
             "example": "00000000-0000-0000-0000-000000000000"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -31997,16 +31822,13 @@
         ],
         "properties": {
           "baseUrl": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "apiKey": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "deploymentName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "defaultTemperature": {
             "type": "number",
@@ -32071,13 +31893,11 @@
             "properties": {
               "organization": {
                 "type": "string",
-                "description": "The Azure DevOps Organization name.",
-                "minLength": 1
+                "description": "The Azure DevOps Organization name."
               },
               "personalAccessToken": {
                 "type": "string",
-                "description": "The personal access token that enables access to Azure DevOps data.",
-                "minLength": 1
+                "description": "The personal access token that enables access to Azure DevOps data."
               }
             }
           }
@@ -32099,18 +31919,15 @@
             "properties": {
               "baseUrl": {
                 "type": "string",
-                "description": "Azure OpenAI resource URL.",
-                "minLength": 1
+                "description": "Azure OpenAI resource URL."
               },
               "apiKey": {
                 "type": "string",
-                "description": "The API key for Azure OpenAI resource.",
-                "minLength": 1
+                "description": "The API key for Azure OpenAI resource."
               },
               "deploymentName": {
                 "type": "string",
-                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")",
-                "minLength": 1
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
               }
             }
           }
@@ -32175,13 +31992,11 @@
             "properties": {
               "organization": {
                 "type": "string",
-                "description": "The Azure DevOps Organization name.",
-                "minLength": 1
+                "description": "The Azure DevOps Organization name."
               },
               "personalAccessToken": {
                 "type": "string",
-                "description": "The personal access token that enables access to Azure DevOps data.",
-                "minLength": 1
+                "description": "The personal access token that enables access to Azure DevOps data."
               }
             }
           }
@@ -32203,18 +32018,15 @@
             "properties": {
               "baseUrl": {
                 "type": "string",
-                "description": "Azure OpenAI resource URL.",
-                "minLength": 1
+                "description": "Azure OpenAI resource URL."
               },
               "apiKey": {
                 "type": "string",
-                "description": "The API key for Azure OpenAI resource.",
-                "minLength": 1
+                "description": "The API key for Azure OpenAI resource."
               },
               "deploymentName": {
                 "type": "string",
-                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")",
-                "minLength": 1
+                "description": "The OpenAI model deployment name to use for this connection (e.g. \"gpt-4o\")"
               }
             }
           }
@@ -32235,8 +32047,7 @@
             "format": "int32"
           },
           "name": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           },
           "description": {
             "type": "string",
@@ -32247,8 +32058,7 @@
             "format": "int32"
           },
           "groupName": {
-            "type": "string",
-            "minLength": 1
+            "type": "string"
           }
         }
       },
