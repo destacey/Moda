@@ -1,6 +1,6 @@
 'use client'
 
-import PlanningIntervalObjectivesGrid from '@/src/components/common/planning/planning-interval-objectives-grid'
+import PlanningIntervalObjectivesGrid from '@/src/app/planning/planning-intervals/_components/planning-interval-objectives-grid'
 import { useDocumentTitle } from '@/src/hooks'
 import { BuildOutlined, MenuOutlined } from '@ant-design/icons'
 import Segmented, { SegmentedLabeledOption } from 'antd/es/segmented'

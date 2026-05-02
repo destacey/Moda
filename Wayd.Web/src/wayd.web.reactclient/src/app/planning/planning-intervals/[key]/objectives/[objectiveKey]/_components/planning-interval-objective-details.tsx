@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import PlanningIntervalObjectiveWorkItemsCard from './planning-interval-objective-work-items-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
-import HealthReportChart from '@/src/components/common/health-check/health-report-chart'
+import PiObjectiveHealthReportChart from '@/src/app/planning/planning-intervals/_components/pi-objective-health-report-chart'
 
 const { Item } = Descriptions
 
@@ -81,7 +81,7 @@ const PlanningIntervalObjectiveDetails = ({
         </Col>
       </Row>
       <Space align="start" wrap>
-        <HealthReportChart
+        <PiObjectiveHealthReportChart
           planningIntervalId={objective.planningInterval?.id}
           objectiveId={objective.id}
         />

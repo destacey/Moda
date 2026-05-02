@@ -16,13 +16,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { CSSProperties, HTMLAttributes, ReactNode, useState } from 'react'
 import { MoreOutlined } from '@ant-design/icons'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { ItemType } from 'antd/es/menu/interface'
-import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
-import { EditPlanningIntervalObjectiveForm } from '../../_components'
+import {
+  CreatePlanningIntervalObjectiveHealthCheckForm,
+  EditPlanningIntervalObjectiveForm,
+} from '../../_components'
 import { getObjectiveStatusColor } from '@/src/utils'
 
 const { Text } = Typography
@@ -60,12 +60,9 @@ const PlanningIntervalObjectiveCard = ({
 }: PlanningIntervalObjectiveCardProps) => {
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
   const showMenu = canUpdateObjectives || canCreateHealthChecks
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectiveId,
-  )
 
   const title = () => {
     return (
@@ -104,7 +101,9 @@ const PlanningIntervalObjectiveCard = ({
       <>
         <Space wrap>
           {showTeamTag && objective.team?.code && (
-            <WaydTooltip title={`Team - ${objective.team?.name ?? objective.team.code}`}>
+            <WaydTooltip
+              title={`Team - ${objective.team?.name ?? objective.team.code}`}
+            >
               <Tag>{objective.team.code}</Tag>
             </WaydTooltip>
           )}
@@ -112,7 +111,7 @@ const PlanningIntervalObjectiveCard = ({
             {objective.status.name}
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}
-          <HealthCheckTag
+          <PiObjectiveHealthCheckTag
             healthCheck={objective?.healthCheck}
             planningIntervalId={objective?.planningInterval?.id}
             objectiveId={objective?.id}
@@ -153,12 +152,7 @@ const PlanningIntervalObjectiveCard = ({
           disabled: !canCreateHealthChecks,
           onClick: (info) => {
             info.domEvent.stopPropagation()
-            dispatch(
-              beginHealthCheckCreate({
-                planningIntervalId: objective.planningInterval.id,
-                objectiveId: objective.id,
-              }),
-            )
+            setOpenCreateHealthCheckForm(true)
           },
         },
         {
@@ -185,6 +179,7 @@ const PlanningIntervalObjectiveCard = ({
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refreshObjectives()
     }
@@ -233,8 +228,13 @@ const PlanningIntervalObjectiveCard = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {editingObjectiveId == objective?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
+      {openCreateHealthCheckForm && (
+        <CreatePlanningIntervalObjectiveHealthCheckForm
+          planningIntervalId={objective.planningInterval.id}
+          objectiveId={objective.id}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
       )}
     </>
   )

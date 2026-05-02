@@ -7,7 +7,7 @@ import {
 import { DashboardOutlined, FormOutlined } from '@ant-design/icons'
 import { Button, Card } from 'antd'
 import { useState } from 'react'
-import ManagePlanningIntervalObjectiveWorkItemsForm from './manage-planning-interval-objective-work-items-form'
+import ManagePlanningIntervalObjectiveWorkItemsForm from '../../../../_components/manage-planning-interval-objective-work-items-form'
 import { useGetObjectiveWorkItemsQuery } from '@/src/store/features/planning/planning-interval-api'
 import { WorkProgress } from '@/src/components/common'
 

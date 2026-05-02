@@ -2,8 +2,8 @@
 
 import dynamic from 'next/dynamic'
 import { FC } from 'react'
-import useTheme from '../../contexts/theme'
-import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/common/health-checks-api'
+import useTheme from '../../../../components/contexts/theme'
+import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 import { Card } from 'antd'
 import dayjs from 'dayjs'
 
@@ -12,7 +12,7 @@ const Line = dynamic(
   { ssr: false },
 )
 
-interface HealthReportChartProps {
+interface PiObjectiveHealthReportChartProps {
   planningIntervalId: string
   objectiveId: string
 }
@@ -39,8 +39,8 @@ const statusMap = {
 // TODO: copying the image in light mode works, but in dark mode it doesn't
 // TODO: add empty state
 
-const HealthReportChart: FC<HealthReportChartProps> = (
-  props: HealthReportChartProps,
+const PiObjectiveHealthReportChart: FC<PiObjectiveHealthReportChartProps> = (
+  props: PiObjectiveHealthReportChartProps,
 ) => {
   const { currentThemeName, antDesignChartsTheme } = useTheme()
 
@@ -141,4 +141,4 @@ const HealthReportChart: FC<HealthReportChartProps> = (
   )
 }
 
-export default HealthReportChart
+export default PiObjectiveHealthReportChart

@@ -3,22 +3,22 @@
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
 import { use, useState } from 'react'
-import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
-import EditPlanningIntervalObjectiveForm from '../../../_components/edit-planning-interval-objective-form'
 import { ItemType } from 'antd/es/menu/interface'
-import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
-import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
+import { PlanningIntervalObjectiveDetails } from './_components'
+import {
+  CreatePlanningIntervalObjectiveHealthCheckForm,
+  DeletePlanningIntervalObjectiveForm,
+  EditPlanningIntervalObjectiveForm,
+} from '../../../_components'
 
 enum ObjectiveTabs {
   Details = 'details',
@@ -43,6 +43,8 @@ const ObjectiveDetailsPage = (props: {
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
 
   const {
     data: objectiveData,
@@ -60,11 +62,6 @@ const ObjectiveDetailsPage = (props: {
   )
   const canCreateHealthChecks = !!canManageObjectives
   const showActions = canManageObjectives
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectiveId,
-  )
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -100,6 +97,7 @@ const ObjectiveDetailsPage = (props: {
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refetchObjective()
     }
@@ -127,13 +125,7 @@ const ObjectiveDetailsPage = (props: {
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () =>
-            dispatch(
-              beginHealthCheckCreate({
-                planningIntervalId: objectiveData?.planningInterval.id ?? '',
-                objectiveId: objectiveData?.id ?? '',
-              }),
-            ),
+          onClick: () => setOpenCreateHealthCheckForm(true),
         },
       )
     }
@@ -166,7 +158,7 @@ const ObjectiveDetailsPage = (props: {
         subtitle="PI Objective Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
         tags={
-          <HealthCheckTag
+          <PiObjectiveHealthCheckTag
             healthCheck={objectiveData?.healthCheck}
             planningIntervalId={objectiveData?.planningInterval?.id}
             objectiveId={objectiveData?.id}
@@ -196,8 +188,13 @@ const ObjectiveDetailsPage = (props: {
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
         />
       )}
-      {editingObjectiveId == objectiveData?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
+      {openCreateHealthCheckForm && objectiveData && (
+        <CreatePlanningIntervalObjectiveHealthCheckForm
+          planningIntervalId={objectiveData.planningInterval.id}
+          objectiveId={objectiveData.id}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
       )}
     </>
   )

@@ -34,7 +34,6 @@ export default function remarkDocsLinks(options: RemarkDocsLinksOptions = {}) {
   // Both cases: strip the last segment to get the directory.
   const sourceDir = slug.length > 1 ? slug.slice(0, -1).join('/') : ''
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (tree: any) => {
     visit(tree, 'link', (node: any) => {
       const href = node.url

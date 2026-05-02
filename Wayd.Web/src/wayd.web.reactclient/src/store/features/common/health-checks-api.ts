@@ -1,40 +1,25 @@
-import { getPlanningIntervalsClient } from '@/src/services/clients'
+import { getHealthChecksClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
-import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
+import { HealthStatusDto } from '@/src/services/wayd-api'
 import { QueryTags } from '../query-tags'
-
-export interface GetObjectiveHealthChecksArgs {
-  planningIntervalId: string
-  objectiveId: string
-}
 
 export const healthChecksApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    getObjectiveHealthChecks: builder.query<
-      PlanningIntervalObjectiveHealthCheckDetailsDto[],
-      GetObjectiveHealthChecksArgs
-    >({
-      queryFn: async ({ planningIntervalId, objectiveId }) => {
+    getHealthStatuses: builder.query<HealthStatusDto[], void>({
+      queryFn: async () => {
         try {
-          const data = await getPlanningIntervalsClient().getObjectiveHealthChecks(
-            planningIntervalId,
-            objectiveId,
-          )
+          const data = await getHealthChecksClient().getStatuses()
           return { data }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
         }
       },
-      providesTags: (result = [], error, { objectiveId }) => [
-        { type: QueryTags.HealthChecksHealthReport, id: objectiveId },
-        ...(result?.map(({ id }: { id: string }) => ({
-          type: QueryTags.HealthChecksHealthReport,
-          id,
-        })) ?? []),
+      providesTags: () => [
+        { type: QueryTags.HealthChecksStatusOptions, id: 'LIST' },
       ],
     }),
   }),
 })
 
-export const { useGetObjectiveHealthChecksQuery } = healthChecksApi
+export const { useGetHealthStatusesQuery } = healthChecksApi

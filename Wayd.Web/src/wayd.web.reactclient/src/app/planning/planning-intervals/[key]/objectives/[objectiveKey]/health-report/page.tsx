@@ -7,8 +7,8 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
 import { useAppDispatch } from '@/src/hooks'
 import { BreadcrumbItem, setBreadcrumbRoute } from '@/src/store/breadcrumbs'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
-import HealthReportGrid from '@/src/components/common/health-check/health-report-grid'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
+import PiObjectiveHealthReportGrid from '@/src/app/planning/planning-intervals/_components/pi-objective-health-report-grid'
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
 
 const ObjectiveHealthReportPage = (props: {
@@ -72,7 +72,7 @@ const ObjectiveHealthReportPage = (props: {
         title={`${objectiveData?.key} - ${objectiveData?.name}`}
         subtitle="PI Objective Health Report"
         tags={
-          <HealthCheckTag
+          <PiObjectiveHealthCheckTag
             healthCheck={objectiveData?.healthCheck}
             planningIntervalId={objectiveData?.planningInterval?.id}
             objectiveId={objectiveData?.id}
@@ -80,7 +80,7 @@ const ObjectiveHealthReportPage = (props: {
         }
       />
       {objectiveData?.id && (
-        <HealthReportGrid
+        <PiObjectiveHealthReportGrid
           planningIntervalId={objectiveData.planningInterval?.id}
           objectiveId={objectiveData.id}
         />

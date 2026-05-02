@@ -4,7 +4,7 @@ import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/plann
 import { Button, Descriptions, Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import dayjs from 'dayjs'
-import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/planning-interval-objective-work-items-card'
+import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objectiveKey]/_components/planning-interval-objective-work-items-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { FC, useEffect, useState } from 'react'
 import { EditPlanningIntervalObjectiveForm } from '.'

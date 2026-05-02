@@ -1,8 +1,7 @@
+using Wayd.Common.Application.HealthChecks.Dtos;
 using Wayd.Common.Domain.Enums;
-using Wayd.Common.Extensions;
-using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Dtos;
 
-namespace Wayd.Planning.Application.PlanningIntervals.HealthChecks.Queries;
+namespace Wayd.Common.Application.HealthChecks.Queries;
 
 public sealed record GetHealthStatusesQuery : IQuery<IReadOnlyList<HealthStatusDto>>;
 

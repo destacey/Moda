@@ -2,7 +2,7 @@ import { ExportOutlined, MoreOutlined } from '@ant-design/icons'
 import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import './wayd-grid-cell-renderers.css'
-import HealthCheckTag from './health-check/health-check-tag'
+import PiObjectiveHealthCheckTag from '../../app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import {
   LifecycleNavigationDto,
   NavigationDto,
@@ -38,7 +38,7 @@ export const NestedHealthCheckStatusCellRenderer = <
   const { data } = props
   if (!data?.healthCheck) return null
   return (
-    <HealthCheckTag
+    <PiObjectiveHealthCheckTag
       healthCheck={data.healthCheck}
       planningIntervalId={data.planningInterval?.id}
       objectiveId={data.id}
@@ -51,7 +51,7 @@ export const HealthCheckStatusCellRenderer = (
 ) => {
   const { data } = props
   if (!data) return null
-  return <HealthCheckTag healthCheck={data} />
+  return <PiObjectiveHealthCheckTag healthCheck={data} />
 }
 
 export const WorkStatusTagCellRenderer = <

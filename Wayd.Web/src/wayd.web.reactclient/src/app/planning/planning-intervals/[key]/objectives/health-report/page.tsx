@@ -10,7 +10,7 @@ import {
   PlanningIntervalObjectiveLinkCellRenderer,
   NestedTeamNameLinkCellRenderer,
 } from '@/src/components/common/wayd-grid-cell-renderers'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import dayjs from 'dayjs'
 import { WaydGrid } from '@/src/components/common'
 import { Progress } from 'antd'
@@ -19,7 +19,7 @@ import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/f
 const LocalHealthCheckCellRenderer = (params) => {
   if (!params.data?.healthCheckId) return null
   return (
-    <HealthCheckTag
+    <PiObjectiveHealthCheckTag
       healthCheck={{
         id: params.data.healthCheckId,
         status: params.data.healthStatus,
