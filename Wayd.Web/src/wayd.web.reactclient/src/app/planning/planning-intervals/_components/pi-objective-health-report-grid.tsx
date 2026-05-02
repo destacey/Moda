@@ -1,18 +1,18 @@
 'use client'
 
 import React, { useMemo } from 'react'
-import WaydGrid from '../wayd-grid'
+import WaydGrid from '../../../../components/common/wayd-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import {
   HealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
-} from '../wayd-grid-cell-renderers'
+} from '../../../../components/common/wayd-grid-cell-renderers'
 import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 
-interface HealthReportGridProps {
+interface PiObjectiveHealthReportGridProps {
   planningIntervalId: string
   objectiveId: string
 }
@@ -25,7 +25,9 @@ const ReportedByLinkCellRenderer = ({ value, data }) => {
   )
 }
 
-const HealthReportGrid = (props: HealthReportGridProps) => {
+const PiObjectiveHealthReportGrid = (
+  props: PiObjectiveHealthReportGridProps,
+) => {
   const {
     data: healthReportData,
     isLoading,
@@ -40,36 +42,41 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
     { skip: !props.planningIntervalId || !props.objectiveId },
   )
 
-  const columnDefs = useMemo<ColDef<PlanningIntervalObjectiveHealthCheckDetailsDto>[]>(() => [
-    { field: 'id', hide: true },
-    {
-      field: 'status.name',
-      headerName: 'Health',
-      width: 115,
-      cellRenderer: HealthCheckStatusCellRenderer,
-    },
-    {
-      field: 'note',
-      width: 400,
-      autoHeight: true,
-      cellRenderer: MarkdownCellRenderer,
-    },
-    {
-      field: 'reportedBy.name',
-      headerName: 'Reported By',
-      cellRenderer: ReportedByLinkCellRenderer,
-    },
-    {
-      field: 'reportedOn',
-      valueGetter: (params) =>
-        dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
-    },
-    {
-      field: 'expiration',
-      valueGetter: (params) =>
-        dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
-    },
-  ], [])
+  const columnDefs = useMemo<
+    ColDef<PlanningIntervalObjectiveHealthCheckDetailsDto>[]
+  >(
+    () => [
+      { field: 'id', hide: true },
+      {
+        field: 'status.name',
+        headerName: 'Health',
+        width: 115,
+        cellRenderer: HealthCheckStatusCellRenderer,
+      },
+      {
+        field: 'note',
+        width: 400,
+        autoHeight: true,
+        cellRenderer: MarkdownCellRenderer,
+      },
+      {
+        field: 'reportedBy.name',
+        headerName: 'Reported By',
+        cellRenderer: ReportedByLinkCellRenderer,
+      },
+      {
+        field: 'reportedOn',
+        valueGetter: (params) =>
+          dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
+      },
+      {
+        field: 'expiration',
+        valueGetter: (params) =>
+          dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
+      },
+    ],
+    [],
+  )
 
   const refresh = async () => {
     refetch()
@@ -88,4 +95,4 @@ const HealthReportGrid = (props: HealthReportGridProps) => {
   )
 }
 
-export default HealthReportGrid
+export default PiObjectiveHealthReportGrid

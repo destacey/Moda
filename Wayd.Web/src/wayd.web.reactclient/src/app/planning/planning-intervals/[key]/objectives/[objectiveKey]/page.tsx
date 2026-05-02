@@ -3,20 +3,22 @@
 import PageTitle from '@/src/components/common/page-title'
 import { Card, MenuProps } from 'antd'
 import { use, useState } from 'react'
-import PlanningIntervalObjectiveDetails from './planning-interval-objective-details'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
-import EditPlanningIntervalObjectiveForm from '../../../_components/edit-planning-interval-objective-form'
 import { ItemType } from 'antd/es/menu/interface'
-import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
-import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
+import { PlanningIntervalObjectiveDetails } from './_components'
+import {
+  CreatePlanningIntervalObjectiveHealthCheckForm,
+  DeletePlanningIntervalObjectiveForm,
+  EditPlanningIntervalObjectiveForm,
+} from '../../../_components'
 
 enum ObjectiveTabs {
   Details = 'details',
@@ -156,7 +158,7 @@ const ObjectiveDetailsPage = (props: {
         subtitle="PI Objective Details"
         actions={<PageActions actionItems={actionsMenuItems} />}
         tags={
-          <HealthCheckTag
+          <PiObjectiveHealthCheckTag
             healthCheck={objectiveData?.healthCheck}
             planningIntervalId={objectiveData?.planningInterval?.id}
             objectiveId={objectiveData?.id}
@@ -187,7 +189,7 @@ const ObjectiveDetailsPage = (props: {
         />
       )}
       {openCreateHealthCheckForm && objectiveData && (
-        <CreateHealthCheckForm
+        <CreatePlanningIntervalObjectiveHealthCheckForm
           planningIntervalId={objectiveData.planningInterval.id}
           objectiveId={objectiveData.id}
           onFormCreate={() => onCreateHealthCheckFormClosed(true)}

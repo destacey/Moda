@@ -16,11 +16,13 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { CSSProperties, HTMLAttributes, ReactNode, useState } from 'react'
 import { MoreOutlined } from '@ant-design/icons'
-import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
+import PiObjectiveHealthCheckTag from '@/src/app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { ItemType } from 'antd/es/menu/interface'
-import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { EditPlanningIntervalObjectiveForm } from '../../_components'
+import {
+  CreatePlanningIntervalObjectiveHealthCheckForm,
+  EditPlanningIntervalObjectiveForm,
+} from '../../_components'
 import { getObjectiveStatusColor } from '@/src/utils'
 
 const { Text } = Typography
@@ -99,7 +101,9 @@ const PlanningIntervalObjectiveCard = ({
       <>
         <Space wrap>
           {showTeamTag && objective.team?.code && (
-            <WaydTooltip title={`Team - ${objective.team?.name ?? objective.team.code}`}>
+            <WaydTooltip
+              title={`Team - ${objective.team?.name ?? objective.team.code}`}
+            >
               <Tag>{objective.team.code}</Tag>
             </WaydTooltip>
           )}
@@ -107,7 +111,7 @@ const PlanningIntervalObjectiveCard = ({
             {objective.status.name}
           </Tag>
           {objective.isStretch && <Tag>Stretch</Tag>}
-          <HealthCheckTag
+          <PiObjectiveHealthCheckTag
             healthCheck={objective?.healthCheck}
             planningIntervalId={objective?.planningInterval?.id}
             objectiveId={objective?.id}
@@ -225,7 +229,7 @@ const PlanningIntervalObjectiveCard = ({
         />
       )}
       {openCreateHealthCheckForm && (
-        <CreateHealthCheckForm
+        <CreatePlanningIntervalObjectiveHealthCheckForm
           planningIntervalId={objective.planningInterval.id}
           objectiveId={objective.id}
           onFormCreate={() => onCreateHealthCheckFormClosed(true)}

@@ -5,12 +5,12 @@ import { Descriptions, Popover, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useGetObjectiveHealthCheckQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
-import { healthCheckTagColor } from './health-check-utils'
-import { MarkdownRenderer } from '../markdown'
+import { healthCheckTagColor } from '../../../../components/common/health-check/health-check-utils'
+import { MarkdownRenderer } from '../../../../components/common/markdown'
 
 const { Item } = Descriptions
 
-export interface HealthCheckTagProps {
+export interface PiObjectiveHealthCheckTagProps {
   healthCheck?: PlanningHealthCheckDto
   /**
    * Parent context required to resolve the health check via the nested
@@ -21,11 +21,11 @@ export interface HealthCheckTagProps {
   objectiveId?: string
 }
 
-const HealthCheckTag = ({
+const PiObjectiveHealthCheckTag = ({
   healthCheck,
   planningIntervalId,
   objectiveId,
-}: HealthCheckTagProps) => {
+}: PiObjectiveHealthCheckTagProps) => {
   const [hovered, setHovered] = useState(false)
   const canFetchDetails = !!planningIntervalId && !!objectiveId
 
@@ -91,4 +91,5 @@ const HealthCheckTag = ({
   )
 }
 
-export default HealthCheckTag
+export default PiObjectiveHealthCheckTag
+

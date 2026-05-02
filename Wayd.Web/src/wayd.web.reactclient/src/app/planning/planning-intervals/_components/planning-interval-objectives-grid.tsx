@@ -3,22 +3,22 @@
 import { PlanningIntervalObjectiveListDto } from '@/src/services/wayd-api'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import WaydGrid from '../wayd-grid'
+import WaydGrid from '../../../../components/common/wayd-grid'
 import { MenuProps, Progress } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import useAuth from '../../contexts/auth'
+import useAuth from '../../../../components/contexts/auth'
 import EditPlanningIntervalObjectiveForm from '@/src/app/planning/planning-intervals/_components/edit-planning-interval-objective-form'
 import dayjs from 'dayjs'
-import CreateHealthCheckForm from '../health-check/create-health-check-form'
+import CreateHealthCheckForm from './create-pi-objective-health-check-form'
 import {
   NestedHealthCheckStatusCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
   NestedTeamNameLinkCellRenderer,
   NestedPlanningIntervalLinkCellRenderer,
-} from '../wayd-grid-cell-renderers'
+} from '../../../../components/common/wayd-grid-cell-renderers'
 import { ColDef } from 'ag-grid-community'
-import { ControlItemSwitch } from '../control-items-menu'
+import { ControlItemSwitch } from '../../../../components/common/control-items-menu'
 
 export interface PlanningIntervalObjectivesGridProps {
   objectivesData: PlanningIntervalObjectiveListDto[]
@@ -142,80 +142,81 @@ const PlanningIntervalObjectivesGrid = ({
     }
 
     return [
-    {
-      width: 50,
-      filter: false,
-      sortable: false,
-      resizable: false,
-      hide: !canManageObjectives,
-      cellRenderer: (params) => {
-        const menuItems = getRowMenuItems({
-          planningIntervalId: params.data.planningInterval.id,
-          planningIntervalKey: planningIntervalKey,
-          objectiveId: params.data.id,
-          objectiveKey: params.data.key,
-          canManageObjectives,
-          canCreateHealthChecks,
-          onEditObjectiveMenuClicked,
-          onCreateHealthCheckMenuClicked,
-        })
+      {
+        width: 50,
+        filter: false,
+        sortable: false,
+        resizable: false,
+        hide: !canManageObjectives,
+        cellRenderer: (params) => {
+          const menuItems = getRowMenuItems({
+            planningIntervalId: params.data.planningInterval.id,
+            planningIntervalKey: planningIntervalKey,
+            objectiveId: params.data.id,
+            objectiveKey: params.data.key,
+            canManageObjectives,
+            canCreateHealthChecks,
+            onEditObjectiveMenuClicked,
+            onCreateHealthCheckMenuClicked,
+          })
 
-        return RowMenuCellRenderer({ ...params, menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems })
+        },
       },
-    },
-    { field: 'id', hide: true },
-    { field: 'key', width: 90 },
-    {
-      field: 'name',
-      width: 500,
-      cellRenderer: PlanningIntervalObjectiveLinkCellRenderer,
-    },
-    { field: 'isStretch', width: 100 },
-    {
-      field: 'planningInterval.name',
-      headerName: 'Planning Interval',
-      cellRenderer: NestedPlanningIntervalLinkCellRenderer,
-      hide: hidePlanningInterval,
-    },
-    { field: 'status.name', headerName: 'Status', width: 125 },
-    {
-      field: 'team.name',
-      headerName: 'Team',
-      cellRenderer: NestedTeamNameLinkCellRenderer,
-      hide: hideTeam,
-    },
-    {
-      field: 'healthCheck.status.name',
-      headerName: 'Health',
-      width: 125,
-      cellRenderer: NestedHealthCheckStatusCellRenderer,
-    },
-    { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
-    {
-      field: 'startDate',
-      valueGetter: (params) =>
-        params.data.startDate
-          ? dayjs(params.data.startDate).format('M/D/YYYY')
-          : null,
-    },
-    {
-      field: 'targetDate',
-      valueGetter: (params) =>
-        params.data.targetDate
-          ? dayjs(params.data.targetDate).format('M/D/YYYY')
-          : null,
-    },
-    {
-      field: 'order',
-      width: 100,
-      comparator: (a, b) => {
-        if (!a) return 1 // sort empty at the end
-        if (!b) return -1
+      { field: 'id', hide: true },
+      { field: 'key', width: 90 },
+      {
+        field: 'name',
+        width: 500,
+        cellRenderer: PlanningIntervalObjectiveLinkCellRenderer,
+      },
+      { field: 'isStretch', width: 100 },
+      {
+        field: 'planningInterval.name',
+        headerName: 'Planning Interval',
+        cellRenderer: NestedPlanningIntervalLinkCellRenderer,
+        hide: hidePlanningInterval,
+      },
+      { field: 'status.name', headerName: 'Status', width: 125 },
+      {
+        field: 'team.name',
+        headerName: 'Team',
+        cellRenderer: NestedTeamNameLinkCellRenderer,
+        hide: hideTeam,
+      },
+      {
+        field: 'healthCheck.status.name',
+        headerName: 'Health',
+        width: 125,
+        cellRenderer: NestedHealthCheckStatusCellRenderer,
+      },
+      { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
+      {
+        field: 'startDate',
+        valueGetter: (params) =>
+          params.data.startDate
+            ? dayjs(params.data.startDate).format('M/D/YYYY')
+            : null,
+      },
+      {
+        field: 'targetDate',
+        valueGetter: (params) =>
+          params.data.targetDate
+            ? dayjs(params.data.targetDate).format('M/D/YYYY')
+            : null,
+      },
+      {
+        field: 'order',
+        width: 100,
+        comparator: (a, b) => {
+          if (!a) return 1 // sort empty at the end
+          if (!b) return -1
 
-        return a - b
+          return a - b
+        },
       },
-    },
-  ]}, [
+    ]
+  }, [
     planningIntervalKey,
     canManageObjectives,
     canCreateHealthChecks,
