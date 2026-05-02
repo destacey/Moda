@@ -10,8 +10,6 @@ import useAuth from '../../contexts/auth'
 import EditPlanningIntervalObjectiveForm from '@/src/app/planning/planning-intervals/_components/edit-planning-interval-objective-form'
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from '../health-check/create-health-check-form'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import {
   NestedHealthCheckStatusCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
@@ -55,7 +53,6 @@ interface RowMenuProps extends MenuProps {
   onCreateHealthCheckMenuClicked: (
     planningIntervalId: string,
     id: string,
-    key: number,
   ) => void
 }
 
@@ -84,7 +81,6 @@ const getRowMenuItems = (props: RowMenuProps) => {
         props.onCreateHealthCheckMenuClicked(
           props.planningIntervalId,
           props.objectiveId,
-          props.objectiveKey,
         ),
     },
     {
@@ -117,11 +113,10 @@ const PlanningIntervalObjectivesGrid = ({
     useState<boolean>(false)
   const [selectedObjective, setSelectedObjective] =
     useState<SelectedObjective | null>(null)
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectiveId,
-  )
+  const [creatingHealthCheckFor, setCreatingHealthCheckFor] = useState<{
+    planningIntervalId: string
+    objectiveId: string
+  } | null>(null)
 
   const { hasPermissionClaim } = useAuth()
   const canManageObjectives = hasPermissionClaim(
@@ -142,15 +137,8 @@ const PlanningIntervalObjectivesGrid = ({
     const onCreateHealthCheckMenuClicked = (
       planningIntervalId: string,
       id: string,
-      key: number,
     ) => {
-      setSelectedObjective({ id, key })
-      dispatch(
-        beginHealthCheckCreate({
-          planningIntervalId,
-          objectiveId: id,
-        }),
-      )
+      setCreatingHealthCheckFor({ planningIntervalId, objectiveId: id })
     }
 
     return [
@@ -233,7 +221,6 @@ const PlanningIntervalObjectivesGrid = ({
     canCreateHealthChecks,
     hidePlanningInterval,
     hideTeam,
-    dispatch,
   ])
 
   const onHidePlanningIntervalChange = (checked: boolean) => {
@@ -284,6 +271,7 @@ const PlanningIntervalObjectivesGrid = ({
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setCreatingHealthCheckFor(null)
     if (wasSaved) {
       refresh()
     }
@@ -311,8 +299,13 @@ const PlanningIntervalObjectivesGrid = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {editingObjectiveId == selectedObjective?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
+      {creatingHealthCheckFor && (
+        <CreateHealthCheckForm
+          planningIntervalId={creatingHealthCheckFor.planningIntervalId}
+          objectiveId={creatingHealthCheckFor.objectiveId}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
       )}
     </>
   )

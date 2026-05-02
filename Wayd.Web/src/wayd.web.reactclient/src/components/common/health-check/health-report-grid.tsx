@@ -10,7 +10,7 @@ import {
 } from '../wayd-grid-cell-renderers'
 import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
-import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/common/health-checks-api'
+import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 
 interface HealthReportGridProps {
   planningIntervalId: string

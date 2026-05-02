@@ -20,8 +20,6 @@ import HealthCheckTag from '@/src/components/common/health-check/health-check-ta
 import WaydTooltip from '@/src/components/common/wayd-tooltip'
 import { ItemType } from 'antd/es/menu/interface'
 import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import { EditPlanningIntervalObjectiveForm } from '../../_components'
 import { getObjectiveStatusColor } from '@/src/utils'
 
@@ -60,12 +58,9 @@ const PlanningIntervalObjectiveCard = ({
 }: PlanningIntervalObjectiveCardProps) => {
   const [openUpdateObjectiveForm, setOpenUpdateObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
   const showMenu = canUpdateObjectives || canCreateHealthChecks
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectiveId,
-  )
 
   const title = () => {
     return (
@@ -153,12 +148,7 @@ const PlanningIntervalObjectiveCard = ({
           disabled: !canCreateHealthChecks,
           onClick: (info) => {
             info.domEvent.stopPropagation()
-            dispatch(
-              beginHealthCheckCreate({
-                planningIntervalId: objective.planningInterval.id,
-                objectiveId: objective.id,
-              }),
-            )
+            setOpenCreateHealthCheckForm(true)
           },
         },
         {
@@ -185,6 +175,7 @@ const PlanningIntervalObjectiveCard = ({
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refreshObjectives()
     }
@@ -233,8 +224,13 @@ const PlanningIntervalObjectiveCard = ({
           onFormCancel={() => onEditObjectiveFormClosed(false)}
         />
       )}
-      {editingObjectiveId == objective?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
+      {openCreateHealthCheckForm && (
+        <CreateHealthCheckForm
+          planningIntervalId={objective.planningInterval.id}
+          objectiveId={objective.id}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
       )}
     </>
   )

@@ -11,11 +11,9 @@ import { ItemType } from 'antd/es/menu/interface'
 import DeletePlanningIntervalObjectiveForm from './delete-planning-interval-objective-form'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, useRouter } from 'next/navigation'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
 import PlanningIntervalObjectiveDetailsLoading from './loading'
 import CreateHealthCheckForm from '@/src/components/common/health-check/create-health-check-form'
 import HealthCheckTag from '@/src/components/common/health-check/health-check-tag'
-import { beginHealthCheckCreate } from '@/src/store/features/health-check-slice'
 import Link from 'next/link'
 import { PageActions } from '@/src/components/common'
 import { useGetPlanningIntervalObjectiveQuery } from '@/src/store/features/planning/planning-interval-api'
@@ -43,6 +41,8 @@ const ObjectiveDetailsPage = (props: {
     useState<boolean>(false)
   const [openDeleteObjectiveForm, setOpenDeleteObjectiveForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
 
   const {
     data: objectiveData,
@@ -60,11 +60,6 @@ const ObjectiveDetailsPage = (props: {
   )
   const canCreateHealthChecks = !!canManageObjectives
   const showActions = canManageObjectives
-
-  const dispatch = useAppDispatch()
-  const editingObjectiveId = useAppSelector(
-    (state) => state.healthCheck.createContext.objectiveId,
-  )
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -100,6 +95,7 @@ const ObjectiveDetailsPage = (props: {
   }
 
   const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
     if (wasSaved) {
       refetchObjective()
     }
@@ -127,13 +123,7 @@ const ObjectiveDetailsPage = (props: {
           key: 'createHealthCheck',
           label: 'Create Health Check',
           disabled: !canCreateHealthChecks,
-          onClick: () =>
-            dispatch(
-              beginHealthCheckCreate({
-                planningIntervalId: objectiveData?.planningInterval.id ?? '',
-                objectiveId: objectiveData?.id ?? '',
-              }),
-            ),
+          onClick: () => setOpenCreateHealthCheckForm(true),
         },
       )
     }
@@ -196,8 +186,13 @@ const ObjectiveDetailsPage = (props: {
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
         />
       )}
-      {editingObjectiveId == objectiveData?.id && (
-        <CreateHealthCheckForm onClose={onCreateHealthCheckFormClosed} />
+      {openCreateHealthCheckForm && objectiveData && (
+        <CreateHealthCheckForm
+          planningIntervalId={objectiveData.planningInterval.id}
+          objectiveId={objectiveData.id}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
       )}
     </>
   )

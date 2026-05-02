@@ -1,31 +1,29 @@
 'use client'
 
-import { DatePicker, Form, FormProps, Radio } from 'antd'
-import useAuth from '../../contexts/auth'
+import { DatePicker, Form, Modal, Radio } from 'antd'
 import dayjs from 'dayjs'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import withModalForm from '../../hoc/with-modal-form'
-import {
-  createHealthCheck,
-  selectHealthCheckEditContext,
-  cancelHealthCheckCreate,
-  getHealthCheckStatusOptions,
-} from '@/src/store/features/health-check-slice'
-import { useEffect } from 'react'
+import { useMemo } from 'react'
+import { useMessage } from '../../contexts/messaging'
+import { useModalForm } from '@/src/hooks'
+import { useGetHealthStatusesQuery } from '@/src/store/features/common/health-checks-api'
+import { useCreateObjectiveHealthCheckMutation } from '@/src/store/features/planning/pi-objective-health-checks-api'
+import { toFormErrors } from '@/src/utils'
 import { MarkdownEditor } from '../markdown'
 
 const { Item } = Form
 const { Group: RadioGroup } = Radio
 
-export interface CreateHealthCheckFormProps {
-  onFormCreate: () => void
-  onFormCancel: () => void
-}
-
 export interface CreateHealthCheckFormValues {
   statusId: number
   expiration: Date
   note?: string | undefined
+}
+
+export interface CreateHealthCheckFormProps {
+  planningIntervalId: string
+  objectiveId: string
+  onFormCreate: () => void
+  onFormCancel: () => void
 }
 
 const datePresets = [
@@ -36,27 +34,77 @@ const datePresets = [
 ]
 
 const CreateHealthCheckForm = ({
-  form,
-}: FormProps<CreateHealthCheckFormValues>) => {
-  const { hasClaim } = useAuth()
-  const canCreateHealthChecks = hasClaim(
-    'Permission',
-    'Permissions.PlanningIntervalObjectives.Manage',
+  planningIntervalId,
+  objectiveId,
+  onFormCreate,
+  onFormCancel,
+}: CreateHealthCheckFormProps) => {
+  const messageApi = useMessage()
+
+  const { data: healthStatuses } = useGetHealthStatusesQuery()
+  const statusOptions = useMemo(
+    () =>
+      healthStatuses?.map((status) => ({
+        value: status.id,
+        label: status.name,
+      })) ?? [],
+    [healthStatuses],
   )
-  const dispatch = useAppDispatch()
 
-  const statusOptions = useAppSelector(
-    (state) => state.healthCheck.statusOptions,
-  )
+  const [createHealthCheck] = useCreateObjectiveHealthCheckMutation()
 
-  useEffect(() => {
-    dispatch(getHealthCheckStatusOptions())
-  }, [dispatch])
+  const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
+    useModalForm<CreateHealthCheckFormValues>({
+      permission: 'Permissions.PlanningIntervalObjectives.Manage',
+      onSubmit: async (values, form) => {
+        const response = await createHealthCheck({
+          planningIntervalId,
+          objectiveId,
+          request: {
+            planningIntervalObjectiveId: objectiveId,
+            statusId: values.statusId,
+            expiration: values.expiration,
+            note: values.note,
+          },
+        })
 
-  if (!canCreateHealthChecks) return null
+        if ('error' in response && response.error) {
+          const error = response.error as {
+            status?: number
+            errors?: Record<string, string[]>
+            detail?: string
+          }
+          if (error.status === 422 && error.errors) {
+            form.setFields(toFormErrors(error.errors))
+            messageApi.error('Correct the validation error(s) to continue.')
+          } else {
+            messageApi.error(
+              error.detail ??
+                'An error occurred while creating the health check. Please try again.',
+            )
+          }
+          return false
+        }
+
+        messageApi.success('Health check created.')
+        return true
+      },
+      onComplete: onFormCreate,
+      onCancel: onFormCancel,
+    })
 
   return (
-    <>
+    <Modal
+      title="Create Health Check"
+      open={isOpen}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Create"
+      confirmLoading={isSaving}
+      onCancel={handleCancel}
+      keyboard={false}
+      destroyOnHidden
+    >
       <Form
         form={form}
         size="small"
@@ -103,16 +151,8 @@ const CreateHealthCheckForm = ({
           />
         </Item>
       </Form>
-    </>
+    </Modal>
   )
 }
 
-export const ModalCreateHealthCheckForm = withModalForm(CreateHealthCheckForm, {
-  title: 'Create Health Check',
-  okText: 'Create',
-  useFormState: () => useAppSelector(selectHealthCheckEditContext),
-  onOk: (values: CreateHealthCheckFormValues) => createHealthCheck(values),
-  onCancel: cancelHealthCheckCreate(),
-})
-
-export default ModalCreateHealthCheckForm
+export default CreateHealthCheckForm

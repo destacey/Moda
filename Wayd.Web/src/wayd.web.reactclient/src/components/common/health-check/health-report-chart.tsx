@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic'
 import { FC } from 'react'
 import useTheme from '../../contexts/theme'
-import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/common/health-checks-api'
+import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 import { Card } from 'antd'
 import dayjs from 'dayjs'
 

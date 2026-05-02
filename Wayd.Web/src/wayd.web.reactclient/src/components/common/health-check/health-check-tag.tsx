@@ -3,12 +3,8 @@
 import { PlanningHealthCheckDto } from '@/src/services/wayd-api'
 import { Descriptions, Popover, Spin, Tag } from 'antd'
 import dayjs from 'dayjs'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
-import {
-  getHealthCheck,
-  selectHealthCheckContext,
-  setHealthReportContext,
-} from '@/src/store/features/health-check-slice'
+import { useState } from 'react'
+import { useGetObjectiveHealthCheckQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 import { healthCheckTagColor } from './health-check-utils'
 import { MarkdownRenderer } from '../markdown'
 
@@ -30,25 +26,22 @@ const HealthCheckTag = ({
   planningIntervalId,
   objectiveId,
 }: HealthCheckTagProps) => {
-  const dispatch = useAppDispatch()
-  const { item: healthCheckData, isLoading } = useAppSelector(
-    selectHealthCheckContext,
+  const [hovered, setHovered] = useState(false)
+  const canFetchDetails = !!planningIntervalId && !!objectiveId
+
+  // Skip the request until the user actually hovers — avoids hitting the API
+  // for every tag rendered in a long list of objectives. RTK Query caches per
+  // arg-tuple, so re-hovering the same tag is free.
+  const { data: healthCheckData, isLoading } = useGetObjectiveHealthCheckQuery(
+    {
+      planningIntervalId: planningIntervalId ?? '',
+      objectiveId: objectiveId ?? '',
+      healthCheckId: healthCheck?.id ?? '',
+    },
+    { skip: !hovered || !canFetchDetails || !healthCheck },
   )
 
   if (!healthCheck) return null
-
-  const canFetchDetails = !!planningIntervalId && !!objectiveId
-
-  const handleHoverChange = (open: boolean) => {
-    if (!open || !canFetchDetails) return
-    dispatch(
-      setHealthReportContext({
-        planningIntervalId: planningIntervalId!,
-        objectiveId: objectiveId!,
-      }),
-    )
-    dispatch(getHealthCheck(healthCheck.id))
-  }
 
   const content = () => {
     if (!canFetchDetails) {
@@ -60,8 +53,7 @@ const HealthCheckTag = ({
         </Descriptions>
       )
     }
-    if (!healthCheckData) return null
-    if (isLoading) return <Spin size="small" />
+    if (isLoading || !healthCheckData) return <Spin size="small" />
 
     const maxWidth = healthCheckData.note
       ? healthCheckData.note.length <= 200
@@ -90,7 +82,7 @@ const HealthCheckTag = ({
       title="Health Check"
       content={content}
       trigger="hover"
-      onOpenChange={handleHoverChange}
+      onOpenChange={(open) => setHovered(open)}
     >
       <Tag color={healthCheckTagColor(healthCheck.status.name)}>
         {healthCheck.status.name}
