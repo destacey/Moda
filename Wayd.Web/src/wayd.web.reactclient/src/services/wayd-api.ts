@@ -13907,57 +13907,6 @@ export class PlanningIntervalsClient {
     }
 
     /**
-     * Get a list of health check statuses.
-     */
-    getHealthStatuses( cancelToken?: CancelToken): Promise<HealthStatusDto[]> {
-        let url_ = this.baseUrl + "/api/planning/planning-intervals/objectives/health-checks/statuses";
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_: AxiosRequestConfig = {
-            method: "GET",
-            url: url_,
-            headers: {
-                "Accept": "application/json"
-            },
-            cancelToken
-        };
-
-        return this.instance.request(options_).catch((_error: any) => {
-            if (isAxiosError(_error) && _error.response) {
-                return _error.response;
-            } else {
-                throw _error;
-            }
-        }).then((_response: AxiosResponse) => {
-            return this.processGetHealthStatuses(_response);
-        });
-    }
-
-    protected processGetHealthStatuses(response: AxiosResponse): Promise<HealthStatusDto[]> {
-        const status = response.status;
-        let _headers: any = {};
-        if (response.headers && typeof response.headers === "object") {
-            for (const k in response.headers) {
-                if (response.headers.hasOwnProperty(k)) {
-                    _headers[k] = response.headers[k];
-                }
-            }
-        }
-        if (status === 200) {
-            const _responseText = response.data;
-            let result200: any = null;
-            let resultData200  = _responseText;
-            result200 = resultData200;
-            return Promise.resolve<HealthStatusDto[]>(result200);
-
-        } else if (status !== 200 && status !== 204) {
-            const _responseText = response.data;
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-        }
-        return Promise.resolve<HealthStatusDto[]>(null as any);
-    }
-
-    /**
      * Get planning interval risks. The default value for includeClosed is false.
      * @param includeClosed (optional) 
      * @param teamId (optional) 
@@ -22580,6 +22529,71 @@ export class LinksClient {
     }
 }
 
+export class HealthChecksClient {
+    protected instance: AxiosInstance;
+    protected baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(baseUrl?: string, instance?: AxiosInstance) {
+
+        this.instance = instance || axios.create();
+
+        this.baseUrl = baseUrl ?? "";
+
+    }
+
+    /**
+     * Get the list of health check statuses.
+     */
+    getStatuses( cancelToken?: CancelToken): Promise<HealthStatusDto[]> {
+        let url_ = this.baseUrl + "/api/health-checks/statuses";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetStatuses(_response);
+        });
+    }
+
+    protected processGetStatuses(response: AxiosResponse): Promise<HealthStatusDto[]> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<HealthStatusDto[]>(result200);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<HealthStatusDto[]>(null as any);
+    }
+}
+
 export class AzureDevOpsConnectionsClient {
     protected instance: AxiosInstance;
     protected baseUrl: string;
@@ -25490,13 +25504,6 @@ export interface UpdatePlanningIntervalObjectiveHealthCheckRequest {
     note?: string | undefined;
 }
 
-export interface HealthStatusDto {
-    id: number;
-    name: string;
-    description?: string | undefined;
-    order: number;
-}
-
 export interface RiskListDto {
     id: string;
     key: number;
@@ -26473,6 +26480,13 @@ export interface UpdateLinkRequest {
     id: string;
     name: string;
     url: string;
+}
+
+export interface HealthStatusDto {
+    id: number;
+    name: string;
+    description?: string | undefined;
+    order: number;
 }
 
 export interface InitWorkProcessIntegrationRequest {

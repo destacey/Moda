@@ -3,6 +3,7 @@ import {
   AuthClient,
   BackgroundJobsClient,
   EmployeesClient,
+  HealthChecksClient,
   LinksClient,
   PermissionsClient,
   ProfileClient,
@@ -333,6 +334,9 @@ export const getAzureDevOpsConnectionsClient = () =>
 
 export const getBackgroundJobsClient = () =>
   new BackgroundJobsClient('', axiosClient)
+
+export const getHealthChecksClient = () =>
+  new HealthChecksClient('', axiosClient)
 
 export const getLinksClient = () => new LinksClient('', axiosClient)
 

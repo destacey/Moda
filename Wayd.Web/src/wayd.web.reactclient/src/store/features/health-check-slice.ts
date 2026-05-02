@@ -4,7 +4,10 @@ import {
   PlanningIntervalObjectiveHealthCheckDetailsDto,
   UpdatePlanningIntervalObjectiveHealthCheckRequest,
 } from '../../services/wayd-api'
-import { getPlanningIntervalsClient } from '../../services/clients'
+import {
+  getHealthChecksClient,
+  getPlanningIntervalsClient,
+} from '../../services/clients'
 import { CreateHealthCheckFormValues } from '../../components/common/health-check/create-health-check-form'
 import { PayloadAction, createAsyncThunk } from '@reduxjs/toolkit'
 import { OptionModel } from '../../components/types'
@@ -27,7 +30,7 @@ interface HealthCheckState
 export const getHealthCheckStatusOptions = createAsyncThunk(
   'healthCheck/getHealthCheckStatusOptions',
   async () => {
-    return await getPlanningIntervalsClient().getHealthStatuses()
+    return await getHealthChecksClient().getStatuses()
   },
 )
 

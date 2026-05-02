@@ -9,7 +9,6 @@ using Wayd.Organization.Application.TeamsOfTeams.Queries;
 using Wayd.Planning.Application.PlanningIntervals.Commands;
 using Wayd.Planning.Application.PlanningIntervals.Dtos;
 using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Commands;
-using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Dtos;
 using Wayd.Planning.Application.PlanningIntervals.HealthChecks.Queries;
 using Wayd.Planning.Application.PlanningIntervals.Queries;
 using Wayd.Planning.Application.Risks.Dtos;
@@ -846,16 +845,6 @@ public class PlanningIntervalsController : ControllerBase
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
-    }
-
-    [HttpGet("objectives/health-checks/statuses")]
-    [MustHavePermission(ApplicationAction.View, ApplicationResource.PlanningIntervalObjectives)]
-    [OpenApiOperation("Get a list of health check statuses.", "")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IReadOnlyList<HealthStatusDto>>> GetHealthStatuses(CancellationToken cancellationToken)
-    {
-        var items = await _sender.Send(new GetHealthStatusesQuery(), cancellationToken);
-        return Ok(items.OrderBy(c => c.Order));
     }
 
     #endregion Objective Health Checks

@@ -1,4 +1,4 @@
-namespace Wayd.Planning.Application.PlanningIntervals.HealthChecks.Dtos;
+namespace Wayd.Common.Application.HealthChecks.Dtos;
 
 public sealed record HealthStatusDto
 {
