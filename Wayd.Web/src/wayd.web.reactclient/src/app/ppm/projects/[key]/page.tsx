@@ -12,7 +12,8 @@ import {
   useGetProjectQuery,
   useGetProjectWorkItemsQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { Alert, MenuProps, Tabs } from 'antd'
+import { Alert, Flex, MenuProps, Spin, Tabs } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
 import { notFound, usePathname, useRouter } from 'next/navigation'
 import { use, useEffect, useState } from 'react'
 import ProjectDetailsLoading from './loading'
@@ -21,9 +22,11 @@ import {
   ChangeProjectStatusForm,
   ChangeProjectProgramForm,
   ChangeProjectKeyForm,
+  CreateProjectHealthCheckForm,
   DeleteProjectForm,
   EditProjectForm,
   ProjectDetailsTab,
+  ProjectHealthCheckTag,
 } from '../_components'
 import AssignProjectLifecycleForm from '../_components/assign-project-lifecycle-form'
 import ChangeProjectLifecycleForm from '../_components/change-project-lifecycle-form'
@@ -33,16 +36,22 @@ import { ProjectStatusAction } from '../_components/change-project-status-form'
 
 const ProjectPlan = dynamic(() => import('../_components/project-plan'), {
   ssr: false,
+  loading: () => <Spin />,
 })
 
 const ProjectTeamGrid = dynamic(
   () => import('../_components/project-team-grid'),
-  { ssr: false },
+  { ssr: false, loading: () => <Spin /> },
 )
 
 const ProjectWorkItemsViewManager = dynamic(
   () => import('../_components/project-work-items-view-manager'),
-  { ssr: false },
+  { ssr: false, loading: () => <Spin /> },
+)
+
+const ProjectHealthReport = dynamic(
+  () => import('./_components/project-health-report'),
+  { ssr: false, loading: () => <Spin /> },
 )
 
 enum ProjectTabs {
@@ -50,6 +59,7 @@ enum ProjectTabs {
   Team = 'team',
   Plan = 'plan',
   WorkItems = 'workItems',
+  HealthReport = 'health-report',
 }
 
 enum ProjectAction {
@@ -77,6 +87,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
     return ProjectTabs.Details
   })
+  const [dynamicTabs, setDynamicTabs] = useState<
+    Array<{ key: string; label: string; closable: boolean }>
+  >([])
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
@@ -95,10 +108,11 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     useState<boolean>(false)
   const [openChangeLifecycleForm, setOpenChangeLifecycleForm] =
     useState<boolean>(false)
+  const [openCreateHealthCheckForm, setOpenCreateHealthCheckForm] =
+    useState<boolean>(false)
 
   const pathname = usePathname()
   const dispatch = useAppDispatch()
-
   const router = useRouter()
 
   const { hasPermissionClaim } = useAuth()
@@ -111,19 +125,9 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     refetch: refetchProject,
   } = useGetProjectQuery(projectKey)
 
-  useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
+  const canManageHealthChecks = !!projectData?.canManageHealthChecks
 
-  const tabs = (() => {
-    const items = [
-      { key: ProjectTabs.Details, label: 'Details' },
-      { key: ProjectTabs.Team, label: 'Team' },
-    ]
-    if (projectData?.projectLifecycle) {
-      items.push({ key: ProjectTabs.Plan, label: 'Plan' })
-    }
-    items.push({ key: ProjectTabs.WorkItems, label: 'Work Items' })
-    return items
-  })()
+  useDocumentTitle(`${projectData?.name ?? projectKey} - Project Details`)
 
   const {
     data: workItemsData,
@@ -135,21 +139,64 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     if (!projectData) return
 
     const breadcrumbRoute: BreadcrumbItem[] = [
-      {
-        title: 'PPM',
-      },
-      {
-        href: `/ppm/projects`,
-        title: 'Projects',
-      },
+      { title: 'PPM' },
+      { href: `/ppm/projects`, title: 'Projects' },
+      { title: 'Details' },
     ]
-
-    breadcrumbRoute.push({
-      title: 'Details',
-    })
 
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, projectData])
+
+  const openHealthReport = () => {
+    if (!dynamicTabs.some((t) => t.key === ProjectTabs.HealthReport)) {
+      setDynamicTabs((prev) => [
+        ...prev,
+        {
+          key: ProjectTabs.HealthReport,
+          label: 'Health Report',
+          closable: true,
+        },
+      ])
+    }
+    setActiveTab(ProjectTabs.HealthReport)
+  }
+
+  const closeTab = (tabKey: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    setDynamicTabs((prev) => prev.filter((t) => t.key !== tabKey))
+    if (activeTab === tabKey) {
+      setActiveTab(ProjectTabs.Details)
+    }
+  }
+
+  const staticTabs = (() => {
+    const items = [
+      { key: ProjectTabs.Details, label: 'Details' },
+      { key: ProjectTabs.Team, label: 'Team' },
+    ]
+    if (projectData?.projectLifecycle) {
+      items.push({ key: ProjectTabs.Plan, label: 'Plan' })
+    }
+    items.push({ key: ProjectTabs.WorkItems, label: 'Work Items' })
+    return items
+  })()
+
+  const allTabs = [
+    ...staticTabs,
+    ...dynamicTabs.map((tab) => ({
+      key: tab.key,
+      label: (
+        <span key={tab.key}>
+          {tab.label}
+          <CloseOutlined
+            key={`${tab.key}-close`}
+            style={{ marginLeft: 8 }}
+            onClick={(e) => closeTab(tab.key, e)}
+          />
+        </span>
+      ),
+    })),
+  ]
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -173,6 +220,10 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             hideProjectColumn={true}
           />
         )
+      case ProjectTabs.HealthReport:
+        return projectData?.id ? (
+          <ProjectHealthReport projectId={projectData.id} />
+        ) : null
       default:
         return null
     }
@@ -256,6 +307,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         }
       }
     }
+
     if (canDeleteProject && availableActions.includes(ProjectAction.Delete)) {
       items.push({
         key: 'delete',
@@ -272,10 +324,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         availableActions.includes(ProjectAction.Complete) ||
         availableActions.includes(ProjectAction.Cancel))
     ) {
-      items.push({
-        key: 'manage-divider',
-        type: 'divider',
-      })
+      items.push({ key: 'manage-divider', type: 'divider' })
     }
 
     if (canUpdateProject && availableActions.includes(ProjectAction.Approve)) {
@@ -310,35 +359,43 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       })
     }
 
+    items.push({ key: 'other-divider', type: 'divider' })
+
+    if (canManageHealthChecks) {
+      items.push({
+        key: 'create-health-check',
+        label: 'Create Health Check',
+        onClick: () => setOpenCreateHealthCheckForm(true),
+      })
+    }
+
+    items.push({
+      key: 'health-report',
+      label: 'Health Report',
+      onClick: openHealthReport,
+    })
+
     return items
   })()
 
   const onEditProjectFormClosed = (wasSaved: boolean) => {
     setOpenEditProjectForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onAssignLifecycleFormClosed = (wasSaved: boolean) => {
     setOpenAssignLifecycleForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onChangeLifecycleFormClosed = (wasSaved: boolean) => {
     setOpenChangeLifecycleForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onChangeProgramFormClosed = (wasSaved: boolean) => {
     setOpenChangeProgramForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onChangeKeyFormClosed = (wasSaved: boolean, newKey?: string) => {
@@ -354,37 +411,32 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const onApproveProjectFormClosed = (wasSaved: boolean) => {
     setOpenApproveProjectForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onActivateProjectFormClosed = (wasSaved: boolean) => {
     setOpenActivateProjectForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onCompleteProjectFormClosed = (wasSaved: boolean) => {
     setOpenCompleteProjectForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onCancelProjectFormClosed = (wasSaved: boolean) => {
     setOpenCancelProjectForm(false)
-    if (wasSaved) {
-      refetchProject()
-    }
+    if (wasSaved) refetchProject()
   }
 
   const onDeleteProjectFormClosed = (wasDeleted: boolean) => {
     setOpenDeleteProjectForm(false)
-    if (wasDeleted) {
-      router.push('/ppm/projects')
-    }
+    if (wasDeleted) router.push('/ppm/projects')
+  }
+
+  const onCreateHealthCheckFormClosed = (wasSaved: boolean) => {
+    setOpenCreateHealthCheckForm(false)
+    if (wasSaved) refetchProject()
   }
 
   if (isLoading) {
@@ -398,14 +450,22 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   return (
     <>
       <PageTitle
-        title={`${projectData?.key} - ${projectData?.name}`}
+        title={`${projectData.key} - ${projectData.name}`}
         subtitle="Project Details"
-        tags={<LifecycleStatusTag status={projectData?.status} />}
+        tags={
+          <Flex gap="small" wrap>
+            <LifecycleStatusTag status={projectData.status} />
+            <ProjectHealthCheckTag
+              healthCheck={projectData.healthCheck}
+              projectId={projectData.id}
+            />
+          </Flex>
+        }
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
 
-      {(projectData?.status.name === 'Proposed' ||
-        projectData?.status.name === 'Approved') && (
+      {(projectData.status.name === 'Proposed' ||
+        projectData.status.name === 'Approved') && (
         <>
           {missingDates && (
             <Alert
@@ -414,7 +474,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               showIcon
             />
           )}
-          {!projectData?.projectLifecycle && (
+          {!projectData.projectLifecycle && (
             <Alert
               title="A Project Lifecycle is required before approving."
               type="warning"
@@ -422,12 +482,12 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               style={missingDates ? { marginTop: 8 } : undefined}
             />
           )}
-          {(missingDates || !projectData?.projectLifecycle) && <br />}
+          {(missingDates || !projectData.projectLifecycle) && <br />}
         </>
       )}
       <Tabs
         size="large"
-        items={tabs}
+        items={allTabs}
         activeKey={activeTab}
         onChange={onTabChange}
       />
@@ -435,7 +495,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
       {openEditProjectForm && (
         <EditProjectForm
-          projectKey={projectData?.key}
+          projectKey={projectData.key}
           onFormComplete={() => onEditProjectFormClosed(true)}
           onFormCancel={() => onEditProjectFormClosed(false)}
         />
@@ -507,6 +567,13 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           onFormCancel={() => onChangeLifecycleFormClosed(false)}
         />
       )}
+      {openCreateHealthCheckForm && (
+        <CreateProjectHealthCheckForm
+          projectId={projectData.id}
+          onFormCreate={() => onCreateHealthCheckFormClosed(true)}
+          onFormCancel={() => onCreateHealthCheckFormClosed(false)}
+        />
+      )}
     </>
   )
 }
@@ -518,3 +585,4 @@ const ProjectDetailsPageWithAuthorization = authorizePage(
 )
 
 export default ProjectDetailsPageWithAuthorization
+

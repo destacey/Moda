@@ -84,6 +84,8 @@ export enum QueryTags {
   Program = 'Ppm.Program',
   ProgramProjects = 'Ppm.Program.Projects',
   Project = 'Ppm.Project',
+  ProjectHealthCheck = 'Ppm.Project.HealthCheck',
+  ProjectHealthChecksHealthReport = 'Ppm.Project.HealthChecks.HealthReport',
   ProjectTask = 'Ppm.Project.Task',
   ProjectTaskTree = 'Ppm.Project.TaskTree',
   ProjectTaskDependency = 'Ppm.Project.TaskDependency',

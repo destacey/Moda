@@ -31,6 +31,11 @@ internal sealed class GetProjectQueryHandler(
         var project = await _ppmDbContext.Projects
             .AsSplitQuery()
             .Include(p => p.HealthChecks)
+            .Include(p => p.ExpenditureCategory)
+            .Include(p => p.Roles).ThenInclude(r => r.Employee)
+            .Include(p => p.StrategicThemeTags).ThenInclude(t => t.StrategicTheme)
+            .Include(p => p.ProjectLifecycle)
+            .Include(p => p.Phases)
             .Include(p => p.Portfolio).ThenInclude(p => p!.Roles)
             .Include(p => p.Program).ThenInclude(p => p!.Roles)
             .Where(request.IdOrKeyFilter)
@@ -45,11 +50,11 @@ internal sealed class GetProjectQueryHandler(
         dto.HealthCheck = ProjectHealthCheckDto.FromCurrent(project.HealthChecks, now);
 
         var employeeId = _currentUser.GetEmployeeId();
-        if (employeeId.HasValue)
+        if (employeeId.HasValue && project.Portfolio is not null)
         {
             dto.CanManageHealthChecks = project.CanManageHealthChecks(
                 employeeId.Value,
-                project.Portfolio!.Roles,
+                project.Portfolio.Roles,
                 project.Program?.Roles);
         }
 

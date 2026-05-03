@@ -1,0 +1,78 @@
+'use client'
+
+import { useMemo } from 'react'
+import WaydGrid from '@/src/components/common/wayd-grid'
+import Link from 'next/link'
+import dayjs from 'dayjs'
+import {
+  HealthCheckStatusCellRenderer,
+  MarkdownCellRenderer,
+} from '@/src/components/common/wayd-grid-cell-renderers'
+import { ProjectHealthCheckDetailsDto } from '@/src/services/wayd-api'
+import { ColDef } from 'ag-grid-community'
+
+interface ProjectHealthReportGridProps {
+  data?: ProjectHealthCheckDetailsDto[]
+  isLoading: boolean
+  refetch: () => void
+}
+
+const ReportedByLinkCellRenderer = ({ value, data }) => (
+  <Link href={`/organizations/employees/${data.reportedBy?.key}`}>{value}</Link>
+)
+
+const ProjectHealthReportGrid = ({
+  data,
+  isLoading,
+  refetch,
+}: ProjectHealthReportGridProps) => {
+  const columnDefs = useMemo<ColDef<ProjectHealthCheckDetailsDto>[]>(
+    () => [
+      { field: 'id', hide: true },
+      {
+        field: 'status.name',
+        headerName: 'Health',
+        width: 115,
+        cellRenderer: HealthCheckStatusCellRenderer,
+      },
+      {
+        field: 'note',
+        width: 400,
+        autoHeight: true,
+        cellRenderer: MarkdownCellRenderer,
+      },
+      {
+        field: 'reportedBy.name',
+        headerName: 'Reported By',
+        cellRenderer: ReportedByLinkCellRenderer,
+      },
+      {
+        field: 'reportedOn',
+        valueGetter: (params) =>
+          dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
+      },
+      {
+        field: 'expiration',
+        valueGetter: (params) =>
+          dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
+      },
+    ],
+    [],
+  )
+
+  return (
+    <WaydGrid
+      height={550}
+      columnDefs={columnDefs}
+      rowData={data}
+      loadData={() => {
+        refetch()
+      }}
+      loading={isLoading}
+      emptyMessage="No health checks found."
+    />
+  )
+}
+
+export default ProjectHealthReportGrid
+
