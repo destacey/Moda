@@ -20,7 +20,7 @@ import {
 } from '@/src/store/features/ppm/portfolios-api'
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { projectHelpText } from './project-help-text'
 import {
   Card,
@@ -125,13 +125,14 @@ const CreateProjectForm = ({
             )
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while creating the project. Please try again.',
               )
             }

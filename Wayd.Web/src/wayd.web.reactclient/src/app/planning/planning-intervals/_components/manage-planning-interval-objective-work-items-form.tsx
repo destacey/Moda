@@ -22,6 +22,7 @@ import {
 } from '@/src/components/common/grid/ag-grid-transfer'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { workItemKeyComparator } from '@/src/components/common/work'
+import { isApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -153,8 +154,9 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
         messageApi.success('Successfully updated objective work items.')
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          `Failed to update objective work items. Error: ${error.detail}`,
+          `Failed to update objective work items. Error: ${apiError.detail}`,
         )
         console.error(error)
         return false

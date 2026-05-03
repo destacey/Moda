@@ -10,6 +10,7 @@ import {
   useCompleteStrategicInitiativeMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Alert, Modal, Space } from 'antd'
+import { isApiError } from '@/src/utils'
 
 export enum StrategicInitiativeStatusAction {
   Approve = 'Approve',
@@ -105,8 +106,9 @@ const ChangeStrategicInitiativeStatusForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the strategic initiative.`,
         )
         console.log(error)

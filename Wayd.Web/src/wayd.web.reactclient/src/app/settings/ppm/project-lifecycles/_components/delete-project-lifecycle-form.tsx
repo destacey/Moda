@@ -5,6 +5,7 @@ import { ProjectLifecycleDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteProjectLifecycleMutation } from '@/src/store/features/ppm/project-lifecycles-api'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
+import { isApiError } from '@/src/utils'
 
 export interface DeleteProjectLifecycleFormProps {
   lifecycle: ProjectLifecycleDetailsDto
@@ -31,8 +32,9 @@ const DeleteProjectLifecycleForm = ({
         messageApi.success('Successfully deleted project lifecycle.')
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             'An unexpected error occurred while deleting the project lifecycle.',
         )
         console.log(error)

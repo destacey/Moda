@@ -8,6 +8,7 @@ import {
   useArchiveRoadmapMutation,
 } from '@/src/store/features/planning/roadmaps-api'
 import { Modal, Space } from 'antd'
+import { isApiError } from '@/src/utils'
 
 export enum RoadmapStateAction {
   Activate = 'Activate',
@@ -57,8 +58,9 @@ const ChangeRoadmapStateForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${stateAction.toLowerCase()}ing the roadmap.`,
         )
         console.error(error)

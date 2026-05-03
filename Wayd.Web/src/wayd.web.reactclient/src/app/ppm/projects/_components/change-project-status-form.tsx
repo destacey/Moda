@@ -10,6 +10,7 @@ import {
   useCompleteProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
 import { Alert, Modal, Space } from 'antd'
+import { isApiError } from '@/src/utils'
 
 export enum ProjectStatusAction {
   Approve = 'Approve',
@@ -101,8 +102,9 @@ const ChangeProjectStatusForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the project.`,
         )
         console.log(error)

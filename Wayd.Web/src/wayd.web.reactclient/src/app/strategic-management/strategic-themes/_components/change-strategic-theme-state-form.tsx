@@ -8,6 +8,7 @@ import {
   useArchiveStrategicThemeMutation,
 } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal, Space } from 'antd'
+import { isApiError } from '@/src/utils'
 
 export enum StrategicThemeStateAction {
   Activate = 'Activate',
@@ -57,8 +58,9 @@ const ChangeStrategicThemeStateForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${stateAction}ing the strategic theme.`,
         )
         console.error(error)

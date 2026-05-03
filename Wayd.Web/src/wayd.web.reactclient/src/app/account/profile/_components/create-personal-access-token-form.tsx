@@ -5,7 +5,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import dayjs, { Dayjs } from 'dayjs'
 import { ExclamationCircleOutlined } from '@ant-design/icons'
 import { useCreatePersonalAccessTokenMutation } from '@/src/store/features/user-management/personal-access-tokens-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
@@ -45,13 +45,14 @@ const CreatePersonalAccessTokenForm = ({
           onFormCreate(response.data.token!)
           return false
         } catch (error) {
-          if (error.status === 422 && error.errors) {
-            const formErrors = toFormErrors(error.errors)
+          const apiError = isApiError(error) ? error : {}
+          if (apiError.status === 422 && apiError.errors) {
+            const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              error.detail ??
+              apiError.detail ??
                 'An error occurred while creating the PAT. Please try again.',
             )
           }

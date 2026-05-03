@@ -17,6 +17,7 @@ import { ColDef } from 'ag-grid-community'
 import { useMemo, useState } from 'react'
 import AddProjectLifecyclePhaseForm from './add-project-lifecycle-phase-form'
 import EditProjectLifecyclePhaseForm from './edit-project-lifecycle-phase-form'
+import { isApiError } from '@/src/utils'
 
 export interface ProjectLifecyclePhasesListProps {
   lifecycle: ProjectLifecycleDetailsDto
@@ -122,8 +123,9 @@ const ProjectLifecyclePhasesList = ({
             }
             messageApi.success('Phase deleted successfully.')
           } catch (error) {
+            const apiError = isApiError(error) ? error : {}
             messageApi.error(
-              error.detail ??
+              apiError.detail ??
                 'An unexpected error occurred while deleting the phase.',
             )
             console.log(error)
@@ -151,8 +153,9 @@ const ProjectLifecyclePhasesList = ({
           throw response.error
         }
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ?? 'An error occurred while reordering phases.',
+          apiError.detail ?? 'An error occurred while reordering phases.',
         )
         console.error(error)
       }

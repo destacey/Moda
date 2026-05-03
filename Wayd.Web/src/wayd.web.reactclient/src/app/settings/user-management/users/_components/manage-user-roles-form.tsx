@@ -8,6 +8,7 @@ import {
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
 import { useEffect, useState } from 'react'
 import { useConfirmModal } from '@/src/hooks'
+import { isApiError } from '@/src/utils'
 
 export interface ManageUserRolesFormProps {
   userId: string
@@ -58,11 +59,12 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         messageApi.success('Successfully updated user roles.')
         return true
       } catch (error) {
-        if (error.status === 422 && error.errors) {
+        const apiError = isApiError(error) ? error : {}
+        if (apiError.status === 422 && apiError.errors) {
           messageApi.error('Correct the validation error(s) to continue.')
         } else {
           messageApi.error(
-            error.detail ??
+            apiError.detail ??
               'An error occurred while updating the user roles. Please try again.',
           )
         }

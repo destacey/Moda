@@ -6,7 +6,7 @@ import {
   useGetEstimationScaleQuery,
   useUpdateEstimationScaleMutation,
 } from '@/src/store/features/planning/estimation-scales-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, Form, Input, Modal, Space } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
@@ -55,13 +55,14 @@ const EditEstimationScaleForm = ({
             messageApi.success('Estimation scale updated successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while updating the estimation scale. Please try again.',
               )
             }

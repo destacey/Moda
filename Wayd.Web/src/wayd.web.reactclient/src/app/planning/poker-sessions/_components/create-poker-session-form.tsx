@@ -6,7 +6,7 @@ import {
   CreatePokerSessionRequest,
   EstimationScaleDto,
 } from '@/src/services/wayd-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import useTheme from '@/src/components/contexts/theme'
 import { useCreatePokerSessionMutation } from '@/src/store/features/planning/poker-sessions-api'
@@ -98,8 +98,9 @@ const CreatePokerSessionForm = ({
             messageApi.success('Successfully created poker session.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {

@@ -12,7 +12,7 @@ import {
   useGetConnectionQuery,
   useUpdateConnectionMutation,
 } from '@/src/store/features/app-integration/connections-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { Button, Divider, Form, Input, Modal, Typography } from 'antd'
 import { useEffect, useState } from 'react'
 import { useModalForm } from '@/src/hooks'
@@ -91,8 +91,9 @@ const EditConnectionForm = ({
             messageApi.success('Successfully updated connection.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {

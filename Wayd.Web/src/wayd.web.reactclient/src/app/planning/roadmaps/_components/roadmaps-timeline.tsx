@@ -27,6 +27,7 @@ import { getLuminance } from '@/src/utils/color-helper'
 import { useUpdateRoadmapItemDatesMutation } from '@/src/store/features/planning/roadmaps-api'
 import { DateType, TimelineItem } from 'vis-timeline/standalone'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -407,8 +408,9 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       }
       console.log('Update roadmap activity dates')
     } catch (error) {
+      const apiError = isApiError(error) ? error : {}
       messageApi.error(
-        error.detail ??
+        apiError.detail ??
           'An error occurred while updating the roadmap activity. Please try again.',
       )
       console.error('Error updating roadmap activity dates', error)

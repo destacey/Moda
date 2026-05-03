@@ -3,7 +3,7 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { ProjectLifecyclePhaseRequest } from '@/src/services/wayd-api'
 import { useAddProjectLifecyclePhaseMutation } from '@/src/store/features/ppm/project-lifecycles-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useModalForm } from '@/src/hooks'
@@ -54,13 +54,14 @@ const AddProjectLifecyclePhaseForm = ({
             messageApi.success('Phase added successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while adding the phase. Please try again.',
               )
             }

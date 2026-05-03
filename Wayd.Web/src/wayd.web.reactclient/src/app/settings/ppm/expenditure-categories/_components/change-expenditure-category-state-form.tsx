@@ -8,6 +8,7 @@ import {
 } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal, Space } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
+import { isApiError } from '@/src/utils'
 
 export enum ExpenditureCategoryStateAction {
   Activate = 'Activate',
@@ -53,8 +54,9 @@ const ChangeExpenditureCategoryStateForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${stateAction}ing the expenditure category.`,
         )
         console.log(error)

@@ -6,7 +6,7 @@ import {
   useGetVisibilityOptionsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useEffect } from 'react'
 import dayjs from 'dayjs'
@@ -82,14 +82,15 @@ const EditRoadmapForm = ({
             messageApi.success('Roadmap updated successfully.')
             return true
           } catch (error) {
+            const apiError = isApiError(error) ? error : {}
             console.error('update error', error)
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while updating the roadmap. Please try again.',
               )
             }

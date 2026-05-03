@@ -19,5 +19,5 @@ export {
 } from './iteration-health'
 export { saveElementAsImage } from './save-element-as-image'
 
-export { default as toFormErrors } from './problem-details'
+export { default as toFormErrors, isApiError, type ApiError } from './problem-details'
 export { getDrawerWidthPixels } from './window-utils'

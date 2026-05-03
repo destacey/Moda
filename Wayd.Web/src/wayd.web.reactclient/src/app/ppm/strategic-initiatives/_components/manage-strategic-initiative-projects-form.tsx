@@ -19,6 +19,7 @@ import {
 import { ColDef } from 'ag-grid-community'
 import { Modal } from 'antd'
 import { useEffect, useState } from 'react'
+import { isApiError } from '@/src/utils'
 
 export interface ManageStrategicInitiativeProjectsFormProps {
   strategicInitiativeId: string
@@ -91,8 +92,9 @@ const ManageStrategicInitiativeProjectsForm = ({
         messageApi.success('Projects updated successfully.')
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             'An error occurred while updating the projects. Please try again.',
         )
         console.error(error)

@@ -9,6 +9,7 @@ import {
   useCompleteProgramMutation,
 } from '@/src/store/features/ppm/programs-api'
 import { Alert, Modal, Space } from 'antd'
+import { isApiError } from '@/src/utils'
 
 export enum ProgramStatusAction {
   Activate = 'Activate',
@@ -92,8 +93,9 @@ const ChangeProgramStatusForm = ({
         )
         return true
       } catch (error) {
+        const apiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the program.`,
         )
         console.log(error)

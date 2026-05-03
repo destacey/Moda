@@ -10,7 +10,7 @@ import {
   useMapAzdoConnectionTeamsMutation,
 } from '@/src/store/features/app-integration/azdo-integration-api'
 import { useGetTeamOptionsQuery } from '@/src/store/features/organizations/team-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError } from '@/src/utils'
 import { Flex, Form, Input, Modal, Select, Typography } from 'antd'
 import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
@@ -88,13 +88,14 @@ const MapAzdoWorkspaceTeamsForm = ({
             messageApi.success('Successfully updated workspace team mappings.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while update workspace team mappings.',
               )
               console.error(error)
