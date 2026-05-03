@@ -24819,6 +24819,7 @@ export interface DescriptiveNavigationDto extends DescriptiveNavigationDtoOfGuid
 export interface ProjectHealthCheckDto {
     id: string;
     status: SimpleNavigationDto;
+    reportedBy: NavigationDto;
     reportedOn: Date;
     expiration: Date;
     note?: string | undefined;
@@ -25756,6 +25757,7 @@ export interface PlanningIntervalObjectiveListDto {
 export interface PlanningHealthCheckDto {
     id: string;
     status: SimpleNavigationDto;
+    reportedBy: NavigationDto;
     reportedOn: Date;
     expiration: Date;
     note?: string | undefined;

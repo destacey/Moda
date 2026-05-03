@@ -44,6 +44,7 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContex
             .ThenInclude(o => o.Team)
         .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
             .ThenInclude(o => o.HealthChecks)
+                .ThenInclude(h => h.ReportedBy)
         .Where(request.PlanningIntervalIdOrKeyFilter)
         .AsNoTrackingWithIdentityResolution()
         .FirstOrDefaultAsync(cancellationToken);

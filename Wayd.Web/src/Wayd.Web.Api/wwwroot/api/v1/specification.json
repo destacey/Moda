@@ -23247,6 +23247,7 @@
         "additionalProperties": false,
         "required": [
           "status",
+          "reportedBy",
           "id",
           "reportedOn",
           "expiration"
@@ -23260,6 +23261,9 @@
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "reportedBy": {
+            "$ref": "#/components/schemas/NavigationDto"
           },
           "reportedOn": {
             "type": "string",
@@ -27051,6 +27055,7 @@
         "additionalProperties": false,
         "required": [
           "status",
+          "reportedBy",
           "id",
           "reportedOn",
           "expiration"
@@ -27064,6 +27069,9 @@
           },
           "status": {
             "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "reportedBy": {
+            "$ref": "#/components/schemas/NavigationDto"
           },
           "reportedOn": {
             "type": "string",
