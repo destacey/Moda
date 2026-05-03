@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Wayd.Common.Domain.Enums;
 using Wayd.Common.Domain.Enums.Organization;
 using Wayd.Common.Domain.Enums.StrategicManagement;
 using Wayd.Common.Domain.Models.KeyPerformanceIndicators;
@@ -229,6 +230,48 @@ public class ProjectConfiguration : IEntityTypeConfiguration<Project>
             .WithOne()
             .HasForeignKey(p => p.ProjectId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasMany(p => p.HealthChecks)
+            .WithOne()
+            .HasForeignKey(h => h.ProjectId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class ProjectHealthCheckConfiguration : IEntityTypeConfiguration<ProjectHealthCheck>
+{
+    public void Configure(EntityTypeBuilder<ProjectHealthCheck> builder)
+    {
+        builder.ToTable("ProjectHealthChecks", SchemaNames.ProjectPortfolioManagement);
+
+        builder.HasKey(h => h.Id);
+
+        builder.HasIndex(h => new { h.ProjectId, h.Expiration, h.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.Property(h => h.Id).ValueGeneratedNever();
+        builder.Property(h => h.ProjectId).IsRequired();
+
+        builder.Property(h => h.Status).IsRequired()
+            .HasConversion<EnumConverter<HealthStatus>>()
+            .HasColumnType("varchar")
+            .HasMaxLength(32);
+
+        builder.Property(h => h.ReportedById).IsRequired();
+        builder.Property(h => h.ReportedOn).IsRequired();
+        builder.Property(h => h.Expiration).IsRequired();
+        builder.Property(h => h.Note).HasMaxLength(1024);
+
+        // Soft Delete
+        builder.Property(h => h.Deleted);
+        builder.Property(h => h.DeletedBy);
+        builder.Property(h => h.IsDeleted);
+
+        // Relationships
+        builder.HasOne(h => h.ReportedBy)
+            .WithMany()
+            .HasForeignKey(h => h.ReportedById)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }
 

@@ -1,7 +1,9 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Wayd.Common.Domain.Enums;
 using Wayd.Common.Domain.Events.ProjectPortfolioManagement;
 using Wayd.Common.Domain.Interfaces.ProjectPortfolioManagement;
+using Wayd.Common.Domain.Models.HealthChecks;
 using Wayd.Common.Domain.Models.ProjectPortfolioManagement;
 using Wayd.ProjectPortfolioManagement.Domain.Enums;
 using Wayd.ProjectPortfolioManagement.Domain.Models.StrategicInitiatives;
@@ -19,6 +21,7 @@ public sealed class Project : BaseAuditableEntity, IHasIdAndKey<ProjectKey>, ISi
     private readonly HashSet<StrategicInitiativeProject> _strategicInitiativeProjects = [];
     private readonly List<ProjectPhase> _phases = [];
     private readonly List<ProjectTask> _tasks = [];
+    private readonly List<ProjectHealthCheck> _healthChecks = [];
 
     private Project() { }
 
@@ -171,6 +174,12 @@ public sealed class Project : BaseAuditableEntity, IHasIdAndKey<ProjectKey>, ISi
     /// The tasks associated with this project.
     /// </summary>
     public IReadOnlyCollection<ProjectTask> Tasks => _tasks.AsReadOnly();
+
+    /// <summary>
+    /// Full history of health checks for this project, ordered by EF as loaded.
+    /// Domain invariant: at most one check is non-expired at any instant.
+    /// </summary>
+    public IReadOnlyCollection<ProjectHealthCheck> HealthChecks => _healthChecks.AsReadOnly();
 
     /// <summary>
     /// Indicates whether the project can be deleted.
@@ -899,6 +908,145 @@ public sealed class Project : BaseAuditableEntity, IHasIdAndKey<ProjectKey>, ISi
     }
 
     #endregion Tasks
+
+    #region Health Checks
+
+    private const string UnauthorizedHealthCheckActorError =
+        "Only the project's owner or manager — or the parent portfolio's or program's owner or manager — may manage health checks.";
+
+    /// <summary>
+    /// Adds a new health check to the project, attributed to <paramref name="actorEmployeeId"/>.
+    /// The actor must be authorized per <see cref="CanManageHealthChecks"/>; if the latest
+    /// existing check has not yet expired at <paramref name="now"/>, its expiration is truncated
+    /// so that no two checks are active simultaneously.
+    /// </summary>
+    /// <param name="status">The health status of the new check.</param>
+    /// <param name="actorEmployeeId">The ID of the employee adding the health check.</param>
+    /// <param name="portfolioRoles">The roles of the actor in the portfolio.</param>
+    /// <param name="programRoles">The roles of the actor in the program, if applicable.</param>
+    /// <param name="expiration">The expiration time of the health check.</param>
+    /// <param name="note">An optional note for the health check.</param>
+    /// <param name="now">The current time.</param>
+    /// <returns>The result of the operation, including the newly added health check if successful.</returns>
+    public Result<ProjectHealthCheck> AddHealthCheck(
+        HealthStatus status,
+        Guid actorEmployeeId,
+        IEnumerable<RoleAssignment<ProjectPortfolioRole>> portfolioRoles,
+        IEnumerable<RoleAssignment<ProgramRole>>? programRoles,
+        Instant expiration,
+        string? note,
+        Instant now)
+    {
+        if (!CanManageHealthChecks(actorEmployeeId, portfolioRoles, programRoles))
+            return Result.Failure<ProjectHealthCheck>(UnauthorizedHealthCheckActorError);
+
+        if (expiration <= now)
+            return Result.Failure<ProjectHealthCheck>("Expiration must be in the future.");
+
+        var newCheck = new ProjectHealthCheck(Id, status, actorEmployeeId, now, expiration, note);
+
+        var report = new HealthReport<ProjectHealthCheck>(_healthChecks);
+        report.Add(newCheck, now);
+
+        _healthChecks.Add(newCheck);
+
+        return Result.Success(newCheck);
+    }
+
+    /// <summary>
+    /// Updates an existing (non-expired) health check on this project. The actor must be
+    /// authorized at the time of the action — original reporters do not get special treatment.
+    /// </summary>
+    /// <param name="healthCheckId">The ID of the health check to update.</param>
+    /// <param name="actorEmployeeId">The ID of the employee updating the health check.</param>
+    /// <param name="portfolioRoles">The roles of the actor in the portfolio.</param>
+    /// <param name="programRoles">The roles of the actor in the program, if applicable.</param>
+    /// <param name="status">The new health status.</param>
+    /// <param name="expiration">The new expiration time.</param>
+    /// <param name="note">An optional note for the health check.</param>
+    /// <param name="now">The current time.</param>
+    /// <returns>The result of the operation, including the updated health check if successful.</returns>
+    public Result<ProjectHealthCheck> UpdateHealthCheck(
+        Guid healthCheckId,
+        Guid actorEmployeeId,
+        IEnumerable<RoleAssignment<ProjectPortfolioRole>> portfolioRoles,
+        IEnumerable<RoleAssignment<ProgramRole>>? programRoles,
+        HealthStatus status,
+        Instant expiration,
+        string? note,
+        Instant now)
+    {
+        if (!CanManageHealthChecks(actorEmployeeId, portfolioRoles, programRoles))
+            return Result.Failure<ProjectHealthCheck>(UnauthorizedHealthCheckActorError);
+
+        var healthCheck = _healthChecks.FirstOrDefault(h => h.Id == healthCheckId);
+        if (healthCheck is null)
+            return Result.Failure<ProjectHealthCheck>($"Health check {healthCheckId} not found on project {Id}.");
+
+        var updateResult = healthCheck.Update(status, expiration, note, now);
+        if (updateResult.IsFailure)
+            return Result.Failure<ProjectHealthCheck>(updateResult.Error);
+
+        return Result.Success(healthCheck);
+    }
+
+    /// <summary>
+    /// Removes a health check from this project. The actor must be authorized at the time of the action.
+    /// </summary>
+    /// <param name="healthCheckId">The ID of the health check to remove.</param>
+    /// <param name="actorEmployeeId">The ID of the employee removing the health check.</param>
+    /// <param name="portfolioRoles">The roles of the actor in the portfolio.</param>
+    /// <param name="programRoles">The roles of the actor in the program, if applicable.</param>
+    /// <returns>The result of the operation, including the removed health check if successful.</returns>
+    public Result<ProjectHealthCheck> RemoveHealthCheck(
+        Guid healthCheckId,
+        Guid actorEmployeeId,
+        IEnumerable<RoleAssignment<ProjectPortfolioRole>> portfolioRoles,
+        IEnumerable<RoleAssignment<ProgramRole>>? programRoles)
+    {
+        if (!CanManageHealthChecks(actorEmployeeId, portfolioRoles, programRoles))
+            return Result.Failure<ProjectHealthCheck>(UnauthorizedHealthCheckActorError);
+
+        var healthCheck = _healthChecks.FirstOrDefault(h => h.Id == healthCheckId);
+        if (healthCheck is null)
+            return Result.Failure<ProjectHealthCheck>($"Health check {healthCheckId} not found on project {Id}.");
+
+        _healthChecks.Remove(healthCheck);
+        return Result.Success(healthCheck);
+    }
+
+    /// <summary>
+    /// Read-side authorization predicate: returns true if the given employee may create, update,
+    /// or delete health checks on this project. Owner/Manager on the project itself OR on the
+    /// parent portfolio OR on the parent program (when assigned) is sufficient. Sponsors are
+    /// intentionally excluded — they fund and oversee but don't run delivery.
+    ///
+    /// The lifecycle methods on this aggregate enforce the same rule inline, so callers cannot
+    /// bypass it; this method exists primarily so the API layer can surface the decision to the
+    /// UI for action-availability hints.
+    /// </summary>
+    /// <param name="employeeId">The ID of the employee to check.</param>
+    /// <param name="portfolioRoles">The roles of the employee in the portfolio.</param>
+    /// <param name="programRoles">The roles of the employee in the program, if applicable.</param>
+    /// <returns>True if the employee can manage health checks; otherwise, false.</returns>
+    public bool CanManageHealthChecks(
+        Guid employeeId,
+        IEnumerable<RoleAssignment<ProjectPortfolioRole>> portfolioRoles,
+        IEnumerable<RoleAssignment<ProgramRole>>? programRoles)
+    {
+        if (_roles.Any(r => r.EmployeeId == employeeId && r.Role is ProjectRole.Owner or ProjectRole.Manager))
+            return true;
+
+        if (portfolioRoles.Any(r => r.EmployeeId == employeeId && r.Role is ProjectPortfolioRole.Owner or ProjectPortfolioRole.Manager))
+            return true;
+
+        if (programRoles is not null && programRoles.Any(r => r.EmployeeId == employeeId && r.Role is ProgramRole.Owner or ProgramRole.Manager))
+            return true;
+
+        return false;
+    }
+
+    #endregion Health Checks
 
     /// <summary>
     /// Creates a new project.
