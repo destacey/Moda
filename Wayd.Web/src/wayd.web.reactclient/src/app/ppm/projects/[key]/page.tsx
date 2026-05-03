@@ -89,7 +89,15 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   })
   const [dynamicTabs, setDynamicTabs] = useState<
     Array<{ key: string; label: string; closable: boolean }>
-  >([])
+  >(() => {
+    if (typeof window !== 'undefined') {
+      const hash = window.location.hash.replace('#', '')
+      if (hash === ProjectTabs.HealthReport) {
+        return [{ key: ProjectTabs.HealthReport, label: 'Health Report', closable: true }]
+      }
+    }
+    return []
+  })
   const [openEditProjectForm, setOpenEditProjectForm] = useState<boolean>(false)
   const [openChangeProgramForm, setOpenChangeProgramForm] =
     useState<boolean>(false)
@@ -147,6 +155,16 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     dispatch(setBreadcrumbRoute({ route: breadcrumbRoute, pathname }))
   }, [dispatch, pathname, projectData])
 
+  const onTabChange = (tabKey: string) => {
+    setActiveTab(tabKey as ProjectTabs)
+    const base = window.location.pathname + window.location.search
+    if (tabKey === ProjectTabs.Details) {
+      window.history.replaceState(null, '', base)
+    } else {
+      window.history.replaceState(null, '', `${base}#${tabKey}`)
+    }
+  }
+
   const openHealthReport = () => {
     if (!dynamicTabs.some((t) => t.key === ProjectTabs.HealthReport)) {
       setDynamicTabs((prev) => [
@@ -158,14 +176,14 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         },
       ])
     }
-    setActiveTab(ProjectTabs.HealthReport)
+    onTabChange(ProjectTabs.HealthReport)
   }
 
   const closeTab = (tabKey: string, e: React.MouseEvent) => {
     e.stopPropagation()
     setDynamicTabs((prev) => prev.filter((t) => t.key !== tabKey))
     if (activeTab === tabKey) {
-      setActiveTab(ProjectTabs.Details)
+      onTabChange(ProjectTabs.Details)
     }
   }
 
@@ -226,16 +244,6 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         ) : null
       default:
         return null
-    }
-  }
-
-  const onTabChange = (tabKey: string) => {
-    setActiveTab(tabKey as ProjectTabs)
-    const base = window.location.pathname + window.location.search
-    if (tabKey === ProjectTabs.Details) {
-      window.history.replaceState(null, '', base)
-    } else {
-      window.history.replaceState(null, '', `${base}#${tabKey}`)
     }
   }
 

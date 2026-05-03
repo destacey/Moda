@@ -9,11 +9,12 @@ import { useCreateProjectHealthCheckMutation } from '@/src/store/features/ppm/pr
 import { toFormErrors } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { MarkdownEditor } from '@/src/components/common/markdown'
+import { HealthStatus } from '@/src/services/wayd-api'
 const { Item } = Form
 const { Group: RadioGroup } = Radio
 
 interface CreateProjectHealthCheckFormValues {
-  status: number
+  status: HealthStatus
   expiration: Date
   note?: string
 }
@@ -42,7 +43,7 @@ const CreateProjectHealthCheckForm = ({
   const statusOptions = useMemo(
     () =>
       healthStatuses?.map((status) => ({
-        value: status.id,
+        value: HealthStatus[status.name as keyof typeof HealthStatus],
         label: status.name,
       })) ?? [],
     [healthStatuses],
@@ -57,7 +58,7 @@ const CreateProjectHealthCheckForm = ({
         const response = await createHealthCheck({
           projectId,
           request: {
-            status: values.status as any,
+            status: values.status,
             expiration: values.expiration,
             note: values.note,
           },

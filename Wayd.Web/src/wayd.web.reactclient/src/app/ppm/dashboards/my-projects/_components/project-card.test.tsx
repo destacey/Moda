@@ -16,6 +16,12 @@ jest.mock('./project-stat-pills', () => {
   return MockStatPills
 })
 
+jest.mock('@/src/app/ppm/projects/_components/project-health-check-tag', () => {
+  const MockHealthCheckTag = () => null
+  MockHealthCheckTag.displayName = 'MockHealthCheckTag'
+  return MockHealthCheckTag
+})
+
 function createProject(
   overrides?: Partial<ProjectListDto>,
 ): ProjectListDto {

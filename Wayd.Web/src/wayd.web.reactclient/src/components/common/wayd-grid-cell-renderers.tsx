@@ -4,6 +4,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import './wayd-grid-cell-renderers.css'
 import PiObjectiveHealthCheckTag from '../../app/planning/planning-intervals/_components/pi-objective-health-check-tag'
 import ProjectHealthCheckTag from '../../app/ppm/projects/_components/project-health-check-tag'
+import { HealthCheckStatusTagData } from './health-check/health-check-tag'
 import {
   LifecycleNavigationDto,
   NavigationDto,
@@ -58,7 +59,7 @@ export const PiObjectiveHealthCheckStatusCellRenderer = (
 export const ProjectHealthCheckStatusCellRenderer = <
   T extends {
     id: string
-    healthCheck?: HealthCheckStatusColumn | null
+    healthCheck?: (HealthCheckStatusTagData & { id: string }) | null
   },
 >(
   props: CustomCellRendererProps<T>,
