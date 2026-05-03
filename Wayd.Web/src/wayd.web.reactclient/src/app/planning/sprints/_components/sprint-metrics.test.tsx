@@ -10,7 +10,7 @@ import SprintMetrics from './sprint-metrics'
 import { IterationState } from '@/src/components/types'
 import {
   SprintDetailsDto,
-  SprintMetricsDto,
+  SprintWorkItemMetricsDto,
   SizingMethod,
 } from '@/src/services/wayd-api'
 import { useGetSprintMetricsQuery } from '../../../../store/features/planning/sprints-api'
@@ -23,7 +23,7 @@ jest.mock('dayjs', () => {
     startOf: jest.fn().mockReturnThis(),
     format: jest.fn(() => '2025-01-01'),
     toDate: jest.fn(() => new Date()),
-  }))
+  })) as jest.Mock & { extend: jest.Mock }
   mockDayjs.extend = jest.fn()
   return mockDayjs
 })
@@ -109,10 +109,13 @@ describe('SprintMetrics', () => {
       id: 'team-1',
       key: 1,
       name: 'Team 1',
+      code: 'T1',
+      type: 'Team',
     },
   }
 
-  const mockMetrics: SprintMetricsDto = {
+  const mockMetrics: SprintWorkItemMetricsDto = {
+    sprintId: 'sprint-1',
     totalWorkItems: 10,
     completedWorkItems: 5,
     inProgressWorkItems: 3,
