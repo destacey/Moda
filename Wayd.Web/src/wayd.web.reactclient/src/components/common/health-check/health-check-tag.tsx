@@ -1,15 +1,20 @@
 'use client'
 
 import { Descriptions, Popover, Spin, Tag } from 'antd'
+import { FlagFilled } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { MarkdownRenderer } from '../markdown'
 import { healthCheckTagColor } from './health-check-utils'
 
 const { Item } = Descriptions
 
+export type HealthCheckVariant = 'tag' | 'flag'
+
 export interface HealthCheckStatusTagData {
   status: { name: string }
-  expiration: Date
+  expiration?: Date
+  reportedOn?: Date
+  note?: string
 }
 
 export interface HealthCheckDetailsData extends HealthCheckStatusTagData {
@@ -22,13 +27,28 @@ export interface HealthCheckTagProps {
   healthCheck?: HealthCheckStatusTagData | null
   details?: HealthCheckDetailsData | null
   isLoading?: boolean
+  variant?: HealthCheckVariant
   onOpenChange?: (open: boolean) => void
+}
+
+const statusToColorVar = (status: string): string => {
+  switch (status) {
+    case 'Healthy':
+      return 'var(--ant-color-success)'
+    case 'At Risk':
+      return 'var(--ant-color-warning)'
+    case 'Unhealthy':
+      return 'var(--ant-color-error)'
+    default:
+      return 'var(--ant-color-text-disabled)'
+  }
 }
 
 const HealthCheckTag = ({
   healthCheck,
   details,
   isLoading = false,
+  variant = 'tag',
   onOpenChange,
 }: HealthCheckTagProps) => {
   if (!healthCheck) return null
@@ -39,9 +59,11 @@ const HealthCheckTag = ({
     if (!details) {
       return (
         <Descriptions size="small" column={1} style={{ maxWidth: '250px' }}>
-          <Item label="Expires On">
-            {dayjs(healthCheck.expiration).format('M/D/YYYY hh:mm A')}
-          </Item>
+          {healthCheck.expiration && (
+            <Item label="Expires On">
+              {dayjs(healthCheck.expiration).format('M/D/YYYY hh:mm A')}
+            </Item>
+          )}
         </Descriptions>
       )
     }
@@ -68,6 +90,18 @@ const HealthCheckTag = ({
     )
   }
 
+  const trigger =
+    variant === 'flag' ? (
+      <FlagFilled
+        style={{ color: statusToColorVar(healthCheck.status.name), fontSize: 14 }}
+        aria-label={`Health: ${healthCheck.status.name}`}
+      />
+    ) : (
+      <Tag color={healthCheckTagColor(healthCheck.status.name)}>
+        {healthCheck.status.name}
+      </Tag>
+    )
+
   return (
     <Popover
       title="Health Check"
@@ -75,9 +109,7 @@ const HealthCheckTag = ({
       trigger="hover"
       onOpenChange={onOpenChange}
     >
-      <Tag color={healthCheckTagColor(healthCheck.status.name)}>
-        {healthCheck.status.name}
-      </Tag>
+      {trigger}
     </Popover>
   )
 }

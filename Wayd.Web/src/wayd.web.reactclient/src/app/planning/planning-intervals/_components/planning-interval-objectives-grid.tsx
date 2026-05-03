@@ -11,7 +11,7 @@ import EditPlanningIntervalObjectiveForm from '@/src/app/planning/planning-inter
 import dayjs from 'dayjs'
 import CreateHealthCheckForm from './create-pi-objective-health-check-form'
 import {
-  NestedHealthCheckStatusCellRenderer,
+  NestedPiObjectiveHealthCheckStatusCellRenderer,
   PlanningIntervalObjectiveLinkCellRenderer,
   RowMenuCellRenderer,
   NestedTeamNameLinkCellRenderer,
@@ -188,7 +188,7 @@ const PlanningIntervalObjectivesGrid = ({
         field: 'healthCheck.status.name',
         headerName: 'Health',
         width: 125,
-        cellRenderer: NestedHealthCheckStatusCellRenderer,
+        cellRenderer: NestedPiObjectiveHealthCheckStatusCellRenderer,
       },
       { field: 'progress', width: 250, cellRenderer: ProgressCellRenderer },
       {

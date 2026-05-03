@@ -1,12 +1,13 @@
 'use client'
 
-import { PlanningHealthCheckDto } from '@/src/services/wayd-api'
 import { useState } from 'react'
 import { useGetObjectiveHealthCheckQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
-import HealthCheckTag from '../../../../components/common/health-check/health-check-tag'
+import HealthCheckTag, {
+  HealthCheckStatusTagData,
+} from '../../../../components/common/health-check/health-check-tag'
 
 export interface PiObjectiveHealthCheckTagProps {
-  healthCheck?: PlanningHealthCheckDto
+  healthCheck?: HealthCheckStatusTagData & { id: string }
   /**
    * Parent context required to resolve the health check via the nested
    * /planning-intervals/{id}/objectives/{objectiveId}/health-checks endpoint.

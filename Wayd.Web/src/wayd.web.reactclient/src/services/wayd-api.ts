@@ -24571,6 +24571,7 @@ export interface ProjectListDto {
     strategicThemes: NavigationDto[];
     projectLifecycle?: NavigationDto | undefined;
     phases: ProjectPhaseListDto[];
+    healthCheck?: ProjectHealthCheckSummaryDto | undefined;
 }
 
 export interface ProjectPhaseListDto {
@@ -24581,6 +24582,11 @@ export interface ProjectPhaseListDto {
     start?: Date | undefined;
     end?: Date | undefined;
     progress: number;
+}
+
+export interface ProjectHealthCheckSummaryDto {
+    id: string;
+    status: SimpleNavigationDto;
 }
 
 export interface StrategicInitiativeListDto {

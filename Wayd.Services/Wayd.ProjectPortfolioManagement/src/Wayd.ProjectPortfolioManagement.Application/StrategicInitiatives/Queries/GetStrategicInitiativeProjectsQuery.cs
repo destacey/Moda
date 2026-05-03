@@ -15,10 +15,11 @@ public sealed record GetStrategicInitiativeProjectsQuery : IQuery<List<ProjectLi
     public Expression<Func<StrategicInitiative, bool>> StrategicInitiativeIdOrKeyFilter { get; }
 }
 
-internal sealed class GetStrategicInitiativeProjectsQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext)
+internal sealed class GetStrategicInitiativeProjectsQueryHandler(IProjectPortfolioManagementDbContext projectPortfolioManagementDbContext, IDateTimeProvider dateTimeProvider)
     : IQueryHandler<GetStrategicInitiativeProjectsQuery, List<ProjectListDto>?>
 {
     private readonly IProjectPortfolioManagementDbContext _ppmDbContext = projectPortfolioManagementDbContext;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<List<ProjectListDto>?> Handle(GetStrategicInitiativeProjectsQuery request, CancellationToken cancellationToken)
     {
@@ -30,9 +31,11 @@ internal sealed class GetStrategicInitiativeProjectsQueryHandler(IProjectPortfol
             return null;
         }
 
+        var now = _dateTimeProvider.Now;
+        var config = ProjectListDto.CreateTypeAdapterConfig(now);
         return await query
             .SelectMany(i => i.StrategicInitiativeProjects.Select(ip => ip.Project))
-            .ProjectToType<ProjectListDto>()
+            .ProjectToType<ProjectListDto>(config)
             .ToListAsync(cancellationToken);
     }
 }

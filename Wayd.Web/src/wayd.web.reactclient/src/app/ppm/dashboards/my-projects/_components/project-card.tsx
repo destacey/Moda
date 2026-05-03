@@ -2,6 +2,7 @@
 
 import { LifecycleStatusTag } from '@/src/components/common'
 import PhaseTimeline from '@/src/app/ppm/_components/phase-timeline'
+import ProjectHealthCheckTag from '@/src/app/ppm/projects/_components/project-health-check-tag'
 import { ProjectListDto, ProjectPlanSummaryDto } from '@/src/services/wayd-api'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
@@ -51,7 +52,14 @@ const ProjectCard: FC<ProjectCardProps> = ({
                 {roles.join(' · ')}
               </Text>
             )}
-            <LifecycleStatusTag status={project.status} />
+            <Flex align="center" gap="small">
+              <ProjectHealthCheckTag
+                healthCheck={project.healthCheck}
+                projectId={project.id}
+                variant="flag"
+              />
+              <LifecycleStatusTag status={project.status} />
+            </Flex>
           </Flex>
           <Text type="secondary" style={{ fontSize: 11 }}>
             {project.key}

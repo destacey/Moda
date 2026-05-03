@@ -11,7 +11,7 @@ interface LabeledContentProps {
 }
 
 const LabeledContent = ({ label, tooltip, children }: LabeledContentProps) => (
-  <Flex vertical gap={2}>
+  <Flex vertical gap={2} align="flex-start">
     {tooltip ? (
       <WaydTooltip title={tooltip}>
         <Text

@@ -1,23 +1,35 @@
 'use client'
 
-import { ProjectHealthCheckDto } from '@/src/services/wayd-api'
 import { useState } from 'react'
 import { useGetProjectHealthCheckQuery } from '@/src/store/features/ppm/project-health-checks-api'
-import HealthCheckTag from '../../../../components/common/health-check/health-check-tag'
+import HealthCheckTag, {
+  HealthCheckDetailsData,
+  HealthCheckStatusTagData,
+  HealthCheckVariant,
+} from '../../../../components/common/health-check/health-check-tag'
 
 export interface ProjectHealthCheckTagProps {
-  healthCheck?: ProjectHealthCheckDto
+  healthCheck?: HealthCheckStatusTagData & { id: string }
   projectId?: string
+  variant?: HealthCheckVariant
 }
+
+const isFullDetails = (
+  hc: HealthCheckStatusTagData & { id: string },
+): hc is HealthCheckDetailsData & { id: string } =>
+  'reportedBy' in hc && hc.reportedBy != null
 
 const ProjectHealthCheckTag = ({
   healthCheck,
   projectId,
+  variant,
 }: ProjectHealthCheckTagProps) => {
   const [hovered, setHovered] = useState(false)
-  const canFetchDetails = !!projectId && !!healthCheck?.id
 
-  const { data: healthCheckData, isLoading } = useGetProjectHealthCheckQuery(
+  const hasFullDetails = !!healthCheck && isFullDetails(healthCheck)
+  const canFetchDetails = !hasFullDetails && !!projectId && !!healthCheck?.id
+
+  const { data: fetchedDetails, isLoading } = useGetProjectHealthCheckQuery(
     {
       projectId: projectId ?? '',
       healthCheckId: healthCheck?.id ?? '',
@@ -25,11 +37,18 @@ const ProjectHealthCheckTag = ({
     { skip: !hovered || !canFetchDetails },
   )
 
+  const details = hasFullDetails
+    ? healthCheck
+    : canFetchDetails
+      ? fetchedDetails
+      : null
+
   return (
     <HealthCheckTag
       healthCheck={healthCheck}
-      details={canFetchDetails ? healthCheckData : null}
+      details={details}
       isLoading={canFetchDetails ? isLoading : false}
+      variant={variant}
       onOpenChange={setHovered}
     />
   )

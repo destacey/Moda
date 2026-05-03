@@ -22231,6 +22231,14 @@
             "items": {
               "$ref": "#/components/schemas/ProjectPhaseListDto"
             }
+          },
+          "healthCheck": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProjectHealthCheckSummaryDto"
+              }
+            ]
           }
         }
       },
@@ -22274,6 +22282,25 @@
           "progress": {
             "type": "number",
             "format": "decimal"
+          }
+        }
+      },
+      "ProjectHealthCheckSummaryDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
           }
         }
       },

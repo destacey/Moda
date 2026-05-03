@@ -1,8 +1,15 @@
+import React from 'react'
 import { render, screen } from '@testing-library/react'
 import HealthCheckTag, {
   HealthCheckDetailsData,
   HealthCheckStatusTagData,
 } from './health-check-tag'
+
+jest.mock('@ant-design/icons', () => ({
+  FlagFilled: ({ style, 'aria-label': ariaLabel }: { style?: React.CSSProperties; 'aria-label'?: string }) => (
+    <span data-testid="flag-icon" style={style} aria-label={ariaLabel} />
+  ),
+}))
 
 jest.mock('../markdown', () => ({
   MarkdownRenderer: ({ markdown }: { markdown?: string }) => (
@@ -80,5 +87,81 @@ describe('HealthCheckTag', () => {
     expect(screen.getByTestId('markdown-renderer')).toHaveTextContent(
       'Project remains on track',
     )
+  })
+})
+
+describe('HealthCheckTag variant=flag', () => {
+  const healthCheck: HealthCheckStatusTagData = {
+    status: { name: 'Healthy' },
+    expiration: new Date(2026, 0, 15, 14, 30),
+  }
+
+  it('should render a flag icon instead of a tag', () => {
+    render(<HealthCheckTag healthCheck={healthCheck} variant="flag" />)
+    expect(screen.getByTestId('flag-icon')).toBeInTheDocument()
+    expect(screen.queryByRole('group')).toBeNull()
+  })
+
+  it('should use success color for Healthy', () => {
+    render(<HealthCheckTag healthCheck={healthCheck} variant="flag" />)
+    expect(screen.getByTestId('flag-icon')).toHaveStyle({
+      color: 'var(--ant-color-success)',
+    })
+  })
+
+  it('should use warning color for At Risk', () => {
+    render(
+      <HealthCheckTag
+        healthCheck={{ ...healthCheck, status: { name: 'At Risk' } }}
+        variant="flag"
+      />,
+    )
+    expect(screen.getByTestId('flag-icon')).toHaveStyle({
+      color: 'var(--ant-color-warning)',
+    })
+  })
+
+  it('should use error color for Unhealthy', () => {
+    render(
+      <HealthCheckTag
+        healthCheck={{ ...healthCheck, status: { name: 'Unhealthy' } }}
+        variant="flag"
+      />,
+    )
+    expect(screen.getByTestId('flag-icon')).toHaveStyle({
+      color: 'var(--ant-color-error)',
+    })
+  })
+
+  it('should use disabled color for unknown status', () => {
+    render(
+      <HealthCheckTag
+        healthCheck={{ ...healthCheck, status: { name: 'Unknown' } }}
+        variant="flag"
+      />,
+    )
+    expect(screen.getByTestId('flag-icon')).toHaveStyle({
+      color: 'var(--ant-color-text-disabled)',
+    })
+  })
+
+  it('should set aria-label with the status name', () => {
+    render(<HealthCheckTag healthCheck={healthCheck} variant="flag" />)
+    expect(screen.getByTestId('flag-icon')).toHaveAttribute(
+      'aria-label',
+      'Health: Healthy',
+    )
+  })
+
+  it('should still render popover content on hover', () => {
+    render(<HealthCheckTag healthCheck={healthCheck} variant="flag" />)
+    expect(screen.getByText('Expires On')).toBeInTheDocument()
+  })
+
+  it('should return null when health check is not provided', () => {
+    const { container } = render(
+      <HealthCheckTag healthCheck={null} variant="flag" />,
+    )
+    expect(container.firstChild).toBeNull()
   })
 })

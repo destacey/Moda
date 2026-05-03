@@ -16,6 +16,7 @@ import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
 import { Divider, Drawer, Flex } from 'antd'
 import { WaydTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
+import ProjectHealthCheckTag from '../projects/_components/project-health-check-tag'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
 
@@ -87,6 +88,14 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           <LabeledContent label="Status">
             {projectData?.status.name}
           </LabeledContent>
+          {projectData?.healthCheck && (
+            <LabeledContent label="Health">
+              <ProjectHealthCheckTag
+                healthCheck={projectData.healthCheck}
+                projectId={projectData.id}
+              />
+            </LabeledContent>
+          )}
           {projectData?.program && (
             <LabeledContent label="Program">
               <Link href={`/ppm/programs/${projectData.program.key}`}>
