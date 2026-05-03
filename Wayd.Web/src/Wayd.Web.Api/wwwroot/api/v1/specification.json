@@ -4705,6 +4705,329 @@
         ]
       }
     },
+    "/api/ppm/projects/{id}/health-checks": {
+      "get": {
+        "tags": [
+          "ProjectHealthChecks"
+        ],
+        "summary": "Get all health checks for a project.",
+        "operationId": "ProjectHealthChecks_GetHealthChecks",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProjectHealthCheckDetailsDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ProjectHealthChecks"
+        ],
+        "summary": "Create a health check for a project.",
+        "operationId": "ProjectHealthChecks_CreateHealthCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProjectHealthCheckRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "format": "guid",
+                  "nullable": false,
+                  "example": "00000000-0000-0000-0000-000000000000"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/ppm/projects/{id}/health-checks/{healthCheckId}": {
+      "get": {
+        "tags": [
+          "ProjectHealthChecks"
+        ],
+        "summary": "Get a specific health check for a project.",
+        "operationId": "ProjectHealthChecks_GetHealthCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "healthCheckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectHealthCheckDetailsDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "ProjectHealthChecks"
+        ],
+        "summary": "Update a health check for a project.",
+        "operationId": "ProjectHealthChecks_UpdateHealthCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "healthCheckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectHealthCheckRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectHealthCheckDetailsDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ProjectHealthChecks"
+        ],
+        "summary": "Delete a health check from a project.",
+        "operationId": "ProjectHealthChecks_DeleteHealthCheck",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "healthCheckId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/project-lifecycles": {
       "get": {
         "tags": [
@@ -22345,6 +22668,114 @@
           }
         }
       },
+      "ProjectHealthCheckDetailsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "reportedBy",
+          "id",
+          "projectId",
+          "reportedOn",
+          "expiration"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "reportedBy": {
+            "$ref": "#/components/schemas/NavigationDto"
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CreateProjectHealthCheckRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "expiration"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1,
+            "nullable": false
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
+      "HealthStatus": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "Healthy",
+          "AtRisk",
+          "Unhealthy"
+        ],
+        "enum": [
+          "Healthy",
+          "AtRisk",
+          "Unhealthy"
+        ]
+      },
+      "UpdateProjectHealthCheckRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "expiration"
+        ],
+        "properties": {
+          "status": {
+            "$ref": "#/components/schemas/HealthStatus"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time",
+            "minLength": 1,
+            "nullable": false
+          },
+          "note": {
+            "type": "string",
+            "maxLength": 1024,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
       "ProjectLifecycleListDto": {
         "type": "object",
         "additionalProperties": false,
@@ -22659,7 +23090,8 @@
           "projectMembers",
           "strategicThemes",
           "id",
-          "phases"
+          "phases",
+          "canManageHealthChecks"
         ],
         "properties": {
           "id": {
@@ -22755,6 +23187,17 @@
             "items": {
               "$ref": "#/components/schemas/ProjectPhaseListDto"
             }
+          },
+          "healthCheck": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ProjectHealthCheckDto"
+              }
+            ]
+          },
+          "canManageHealthChecks": {
+            "type": "boolean"
           }
         }
       },
@@ -22794,6 +23237,39 @@
             "minLength": 1
           },
           "description": {
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ProjectHealthCheckDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "status",
+          "id",
+          "reportedOn",
+          "expiration"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SimpleNavigationDto"
+          },
+          "reportedOn": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expiration": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
             "type": "string",
             "nullable": true
           }
