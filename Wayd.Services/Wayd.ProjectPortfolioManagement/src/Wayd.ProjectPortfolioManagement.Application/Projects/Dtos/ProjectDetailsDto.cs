@@ -101,6 +101,18 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     /// </summary>
     public List<ProjectPhaseListDto> Phases { get; set; } = [];
 
+    /// <summary>
+    /// The current (non-expired) health check for this project, or null if none exists.
+    /// Populated post-projection — not mapped by Mapster.
+    /// </summary>
+    public ProjectHealthCheckDto? HealthCheck { get; set; }
+
+    /// <summary>
+    /// Whether the current user can manage health checks for this project.
+    /// Populated post-projection — not mapped by Mapster.
+    /// </summary>
+    public bool CanManageHealthChecks { get; set; }
+
     public void ConfigureMapping(TypeAdapterConfig config)
     {
         config.NewConfig<Project, ProjectDetailsDto>()
