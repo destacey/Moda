@@ -6,7 +6,6 @@
     <PackageReference Include="Microsoft.Graph" />
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" />
     <PackageReference Include="NodaTime" />
-    <PackageReference Include="System.Security.Cryptography.Xml" />
   </ItemGroup>
 
   <ItemGroup>

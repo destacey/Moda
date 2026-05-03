@@ -19,7 +19,7 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Work")
-                .HasAnnotation("ProductVersion", "10.0.6")
+                .HasAnnotation("ProductVersion", "10.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -2402,6 +2402,66 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("Projects", "Ppm");
+                });
+
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectHealthCheck", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Expiration")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ReportedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("ReportedOn")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("varchar");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportedById");
+
+                    b.HasIndex("ProjectId", "Expiration", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("ProjectHealthChecks", "Ppm");
                 });
 
             modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", b =>
@@ -5019,6 +5079,23 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("ProjectLifecycle");
                 });
 
+            modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectHealthCheck", b =>
+                {
+                    b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.Project", null)
+                        .WithMany("HealthChecks")
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "ReportedBy")
+                        .WithMany()
+                        .HasForeignKey("ReportedById")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("ReportedBy");
+                });
+
             modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectLifecyclePhase", b =>
                 {
                     b.HasOne("Wayd.ProjectPortfolioManagement.Domain.Models.ProjectLifecycle", null)
@@ -5814,6 +5891,8 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Wayd.ProjectPortfolioManagement.Domain.Models.Project", b =>
                 {
+                    b.Navigation("HealthChecks");
+
                     b.Navigation("Phases");
 
                     b.Navigation("Roles");

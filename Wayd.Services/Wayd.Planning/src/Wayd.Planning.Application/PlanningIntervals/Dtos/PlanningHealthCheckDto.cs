@@ -15,6 +15,11 @@ public sealed record PlanningHealthCheckDto
     public required SimpleNavigationDto Status { get; set; }
 
     /// <summary>
+    /// The employee who reported the health check.
+    /// </summary>
+    public required NavigationDto ReportedBy { get; set; }
+
+    /// <summary>
     /// The timestamp of when the health check was reported.
     /// </summary>
     public Instant ReportedOn { get; set; }
@@ -30,7 +35,7 @@ public sealed record PlanningHealthCheckDto
     public string? Note { get; set; }
 
     /// <summary>
-    /// Returns the most recent active (non-expired) health check projected from the supplied collection,
+    /// Returns the active (non-expired) health check from the supplied collection,
     /// or <c>null</c> if none are active. The domain invariant guarantees at most one active check at a time.
     /// </summary>
     public static PlanningHealthCheckDto? FromCurrent(IEnumerable<PlanningIntervalObjectiveHealthCheck> healthChecks, Instant now)
@@ -43,6 +48,7 @@ public sealed record PlanningHealthCheckDto
         {
             Id = current.Id,
             Status = SimpleNavigationDto.FromEnum(current.Status),
+            ReportedBy = NavigationDto.Create(current.ReportedBy.Id, current.ReportedBy.Key, current.ReportedBy.Name.FullName),
             ReportedOn = current.ReportedOn,
             Expiration = current.Expiration,
             Note = current.Note

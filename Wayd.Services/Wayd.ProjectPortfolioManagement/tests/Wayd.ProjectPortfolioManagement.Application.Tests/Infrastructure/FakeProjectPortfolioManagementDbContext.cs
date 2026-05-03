@@ -20,6 +20,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     private readonly List<ProjectPortfolio> _portfolios = [];
     private readonly List<Program> _programs = [];
     private readonly List<Project> _projects = [];
+    private readonly List<ProjectHealthCheck> _projectHealthChecks = [];
     private readonly List<ProjectTask> _projectTasks = [];
     private readonly List<ProjectTaskDependency> _projectTaskDependencies = [];
     private readonly List<PpmTeam> _ppmTeams = [];
@@ -39,6 +40,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public DbSet<ProjectPortfolio> Portfolios => _portfolios.AsDbSet();
     public DbSet<Program> Programs => _programs.AsDbSet();
     public DbSet<Project> Projects => _projects.AsDbSet();
+    public DbSet<ProjectHealthCheck> ProjectHealthChecks => _projectHealthChecks.AsDbSet();
     public DbSet<ProjectTask> ProjectTasks => _projectTasks.AsDbSet();
     public DbSet<ProjectTaskDependency> ProjectTaskDependencies => _projectTaskDependencies.AsDbSet();
     public DbSet<PpmTeam> PpmTeams => _ppmTeams.AsDbSet();
@@ -102,6 +104,10 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
     public void AddProject(Project project) => _projects.Add(project);
     public void AddProjects(IEnumerable<Project> projects) => _projects.AddRange(projects);
 
+    // ProjectHealthCheck
+    public void AddProjectHealthCheck(ProjectHealthCheck healthCheck) => _projectHealthChecks.Add(healthCheck);
+    public void AddProjectHealthChecks(IEnumerable<ProjectHealthCheck> healthChecks) => _projectHealthChecks.AddRange(healthChecks);
+
     // ProjectTask
     public void AddProjectTask(ProjectTask task) => _projectTasks.Add(task);
     public void AddProjectTasks(IEnumerable<ProjectTask> tasks) => _projectTasks.AddRange(tasks);
@@ -144,6 +150,7 @@ public class FakeProjectPortfolioManagementDbContext : IProjectPortfolioManageme
         _portfolios.Clear();
         _programs.Clear();
         _projects.Clear();
+        _projectHealthChecks.Clear();
         _projectTasks.Clear();
         _projectTaskDependencies.Clear();
         _ppmTeams.Clear();

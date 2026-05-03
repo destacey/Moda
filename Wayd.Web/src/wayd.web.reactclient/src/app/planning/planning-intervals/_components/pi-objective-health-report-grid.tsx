@@ -5,7 +5,7 @@ import WaydGrid from '../../../../components/common/wayd-grid'
 import Link from 'next/link'
 import dayjs from 'dayjs'
 import {
-  HealthCheckStatusCellRenderer,
+  PiObjectiveHealthCheckStatusCellRenderer,
   MarkdownCellRenderer,
 } from '../../../../components/common/wayd-grid-cell-renderers'
 import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
@@ -51,7 +51,7 @@ const PiObjectiveHealthReportGrid = (
         field: 'status.name',
         headerName: 'Health',
         width: 115,
-        cellRenderer: HealthCheckStatusCellRenderer,
+        cellRenderer: PiObjectiveHealthCheckStatusCellRenderer,
       },
       {
         field: 'note',

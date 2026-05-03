@@ -1,11 +1,12 @@
-﻿using Wayd.Common.Application.Dtos;
+﻿using Mapster;
+using Wayd.Common.Application.Dtos;
 using Wayd.Common.Application.Employees.Dtos;
 using Wayd.ProjectPortfolioManagement.Domain.Enums;
 using Wayd.ProjectPortfolioManagement.Domain.Models;
 
 namespace Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
-public sealed record ProjectDetailsDto : IMapFrom<Project>
+public sealed record ProjectDetailsDto
 {
     public Guid Id { get; set; }
 
@@ -101,9 +102,34 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
     /// </summary>
     public List<ProjectPhaseListDto> Phases { get; set; } = [];
 
-    public void ConfigureMapping(TypeAdapterConfig config)
+    /// <summary>
+    /// The current (non-expired) health check for this project, or null if none exists.
+    /// </summary>
+    public ProjectHealthCheckDto? HealthCheck { get; set; }
+
+    /// <summary>
+    /// Whether the current user can manage health checks for this project.
+    /// True when the user is a project Owner or Manager. May be elevated to true
+    /// by a second-pass portfolio/program check in the query handler.
+    /// </summary>
+    public bool CanManageHealthChecks { get; set; }
+
+    /// <summary>
+    /// Creates a TypeAdapterConfig that maps <see cref="Project"/> to <see cref="ProjectDetailsDto"/>,
+    /// including the current health check and project-level authorization.
+    /// <para>
+    /// This is the <b>only</b> supported mapping path for this DTO. There is no global Mapster
+    /// registration — calling <c>project.Adapt&lt;ProjectDetailsDto&gt;()</c> or
+    /// <c>ProjectToType&lt;ProjectDetailsDto&gt;()</c> without this config will produce incorrect
+    /// results (null health check, false CanManageHealthChecks).
+    /// </para>
+    /// Pass <paramref name="employeeId"/> as null when no user is authenticated.
+    /// </summary>
+    public static TypeAdapterConfig CreateTypeAdapterConfig(Instant now, Guid? employeeId)
     {
-        config.NewConfig<Project, ProjectDetailsDto>()
+        var cfg = new TypeAdapterConfig();
+
+        cfg.NewConfig<Project, ProjectDetailsDto>()
             .Map(dest => dest.Key, src => src.Key.Value)
             .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.ExpenditureCategory, src => SimpleNavigationDto.Create(src.ExpenditureCategory!.Id, src.ExpenditureCategory.Name))
@@ -117,6 +143,23 @@ public sealed record ProjectDetailsDto : IMapFrom<Project>
             .Map(dest => dest.ProjectMembers, src => src.Roles.Where(r => r.Role == ProjectRole.Member).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.StrategicThemes, src => src.StrategicThemeTags.Select(x => NavigationDto.Create(x.StrategicTheme!.Id, x.StrategicTheme.Key, x.StrategicTheme.Name)).ToList())
             .Map(dest => dest.ProjectLifecycle, src => src.ProjectLifecycle != null ? DescriptiveNavigationDto.Create(src.ProjectLifecycle.Id, src.ProjectLifecycle.Key, src.ProjectLifecycle.Name, src.ProjectLifecycle.Description) : null)
-            .Map(dest => dest.Phases, src => src.Phases.OrderBy(p => p.Order));
+            .Map(dest => dest.Phases, src => src.Phases.OrderBy(p => p.Order))
+            .Map(dest => dest.HealthCheck, src => src.HealthChecks
+                .Where(h => !h.IsDeleted && h.Expiration > now)
+                .Select(h => new ProjectHealthCheckDto
+                {
+                    Id = h.Id,
+                    Status = SimpleNavigationDto.FromEnum(h.Status),
+                    ReportedBy = NavigationDto.Create(h.ReportedBy.Id, h.ReportedBy.Key, h.ReportedBy.Name.FullName),
+                    ReportedOn = h.ReportedOn,
+                    Expiration = h.Expiration,
+                    Note = h.Note
+                })
+                .FirstOrDefault())
+            .Map(dest => dest.CanManageHealthChecks, src => employeeId.HasValue &&
+                src.Roles.Any(r => r.EmployeeId == employeeId.Value &&
+                    (r.Role == ProjectRole.Owner || r.Role == ProjectRole.Manager)));
+
+        return cfg;
     }
 }

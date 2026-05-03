@@ -3,6 +3,8 @@ import { Button, Dropdown } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import './wayd-grid-cell-renderers.css'
 import PiObjectiveHealthCheckTag from '../../app/planning/planning-intervals/_components/pi-objective-health-check-tag'
+import ProjectHealthCheckTag from '../../app/ppm/projects/_components/project-health-check-tag'
+import { HealthCheckStatusTagData } from './health-check/health-check-tag'
 import {
   LifecycleNavigationDto,
   NavigationDto,
@@ -26,7 +28,7 @@ export interface HealthCheckStatusColumn {
   expiration: Date
 }
 
-export const NestedHealthCheckStatusCellRenderer = <
+export const NestedPiObjectiveHealthCheckStatusCellRenderer = <
   T extends {
     id: string
     healthCheck: HealthCheckStatusColumn | null
@@ -46,12 +48,30 @@ export const NestedHealthCheckStatusCellRenderer = <
   )
 }
 
-export const HealthCheckStatusCellRenderer = (
+export const PiObjectiveHealthCheckStatusCellRenderer = (
   props: CustomCellRendererProps<HealthCheckStatusColumn>,
 ) => {
   const { data } = props
   if (!data) return null
   return <PiObjectiveHealthCheckTag healthCheck={data} />
+}
+
+export const ProjectHealthCheckStatusCellRenderer = <
+  T extends {
+    id: string
+    healthCheck?: (HealthCheckStatusTagData & { id: string }) | null
+  },
+>(
+  props: CustomCellRendererProps<T>,
+) => {
+  const { data } = props
+  if (!data?.healthCheck) return null
+  return (
+    <ProjectHealthCheckTag
+      healthCheck={data.healthCheck}
+      projectId={data.id}
+    />
+  )
 }
 
 export const WorkStatusTagCellRenderer = <

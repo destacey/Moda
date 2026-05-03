@@ -6,11 +6,12 @@ namespace Wayd.ProjectPortfolioManagement.Application.Projects.Queries;
 
 public sealed record GetProjectsQuery(ProjectStatus[]? StatusFilter = null, IdOrKey? PortfolioIdOrKey = null, IdOrKey? ProgramIdOrKey = null, ProjectMemberRole[]? RoleFilter = null) : IQuery<List<ProjectListDto>?>;
 
-internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext, ICurrentUser currentUser)
+internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbContext ppmDbContext, ICurrentUser currentUser, IDateTimeProvider dateTimeProvider)
     : IQueryHandler<GetProjectsQuery, List<ProjectListDto>?>
 {
     private readonly IProjectPortfolioManagementDbContext _ppmDbContext = ppmDbContext;
     private readonly ICurrentUser _currentUser = currentUser;
+    private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
 
     public async Task<List<ProjectListDto>?> Handle(GetProjectsQuery request, CancellationToken cancellationToken)
     {
@@ -89,7 +90,9 @@ internal sealed class GetProjectsQueryHandler(IProjectPortfolioManagementDbConte
             }
         }
 
-        var projects = await query.ProjectToType<ProjectListDto>().ToListAsync(cancellationToken);
+        var now = _dateTimeProvider.Now;
+        var config = ProjectListDto.CreateTypeAdapterConfig(now);
+        var projects = await query.ProjectToType<ProjectListDto>(config).ToListAsync(cancellationToken);
         return [.. projects.OrderBy(p => p.Name)];
     }
 }

@@ -98,6 +98,7 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<ProjectPortfolio> Portfolios => Set<ProjectPortfolio>();
     public DbSet<Program> Programs => Set<Program>();
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectHealthCheck> ProjectHealthChecks => Set<ProjectHealthCheck>();
     public DbSet<ProjectTask> ProjectTasks => Set<ProjectTask>();
     public DbSet<ProjectTaskDependency> ProjectTaskDependencies => Set<ProjectTaskDependency>();
     public DbSet<PpmTeam> PpmTeams => Set<PpmTeam>();
