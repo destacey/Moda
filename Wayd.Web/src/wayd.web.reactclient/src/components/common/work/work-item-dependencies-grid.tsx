@@ -81,7 +81,7 @@ const WorkItemDependenciesGrid: FC<WorkItemDependenciesGridProps> = (props) => {
           field: 'type',
           width: 125,
           tooltipValueGetter: (params) =>
-            dependencyTypeTooltip(params.data, workItem),
+            dependencyTypeTooltip(params.data!, workItem),
           sort: 'asc',
           sortIndex: 0,
         },

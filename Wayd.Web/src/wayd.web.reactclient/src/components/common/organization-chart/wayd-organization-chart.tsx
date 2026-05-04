@@ -38,7 +38,7 @@ const WaydOrganizationChart: FC<WaydOrganizationChartProps> = ({
     data: (data as Record<string, unknown>) || { nodes: [], edges: [] },
     node: {
       style: {
-        component: (nodeData) => (
+        component: (nodeData: any) => (
           <NodeComponent data={nodeData.data} themeToken={token} />
         ),
         size: nodeSize,

@@ -152,7 +152,7 @@ const TeamOfTeamsDetailsPage = (props: {
         } as RisksGridProps)
       case TeamOfTeamsTabs.TeamMemberships:
         return createElement(TeamMembershipsGrid, {
-          teamId: team?.id,
+          teamId: team?.id!,
           teamMemberships: teamMembershipsQuery.data,
           isLoading: teamMembershipsQuery.isLoading,
           refetch: teamMembershipsQuery.refetch,

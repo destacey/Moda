@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   type DraftItem,
+  type FilterOption,
   type MoveValidator,
   type TreeGridHandle,
   defaultMoveValidator,

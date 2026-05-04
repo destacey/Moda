@@ -11,7 +11,7 @@ import {
   useGetRoadmapItemQuery,
   useUpdateRoadmapItemMutation,
 } from '@/src/store/features/planning/roadmaps-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
@@ -56,7 +56,7 @@ const mapToRequestValues = (
   } satisfies UpdateRoadmapActivityRequest
 }
 
-const filterActivities = (activities: RoadmapActivityListDto[], activityId) => {
+const filterActivities = (activities: RoadmapActivityListDto[], activityId: string): RoadmapActivityListDto[] => {
   return activities
     .filter((a) => a.id !== activityId)
     .map((a) => ({
@@ -112,14 +112,14 @@ const EditRoadmapActivityForm = ({
             messageApi.success('Roadmap Activity updated successfully.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                apiError.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while updating the roadmap activity. Please try again.',
               )
             }
@@ -154,13 +154,13 @@ const EditRoadmapActivityForm = ({
   useEffect(() => {
     if (activityDataError) {
       messageApi.error(
-        activityDataError.supportMessage ??
+        (isApiError(activityDataError) ? activityDataError.supportMessage : undefined) ??
           'An error occurred while loading roadmap activity. Please try again.',
       )
     }
     if (activitiesError) {
       messageApi.error(
-        activitiesError.supportMessage ??
+        (isApiError(activitiesError) ? activitiesError.supportMessage : undefined) ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }

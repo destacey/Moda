@@ -9,7 +9,7 @@ import {
   MarkdownCellRenderer,
 } from '../../../../components/common/wayd-grid-cell-renderers'
 import { PlanningIntervalObjectiveHealthCheckDetailsDto } from '@/src/services/wayd-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { useGetObjectiveHealthChecksQuery } from '@/src/store/features/planning/pi-objective-health-checks-api'
 
 interface PiObjectiveHealthReportGridProps {
@@ -17,9 +17,9 @@ interface PiObjectiveHealthReportGridProps {
   objectiveId: string
 }
 
-const ReportedByLinkCellRenderer = ({ value, data }) => {
+const ReportedByLinkCellRenderer = ({ value, data }: ICellRendererParams<PlanningIntervalObjectiveHealthCheckDetailsDto>) => {
   return (
-    <Link href={`/organizations/employees/${data.reportedBy?.key}`}>
+    <Link href={`/organizations/employees/${data!.reportedBy?.key}`}>
       {value}
     </Link>
   )

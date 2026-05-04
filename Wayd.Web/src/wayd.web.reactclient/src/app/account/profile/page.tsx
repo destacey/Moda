@@ -42,7 +42,7 @@ const AccountProfilePage = () => {
     data: profileData,
     isLoading: profileLoading,
     error: profileError,
-  } = useGetProfileQuery(null, { skip: !user })
+  } = useGetProfileQuery(undefined, { skip: !user })
 
   const isLocalUser = authMethod === 'local'
 

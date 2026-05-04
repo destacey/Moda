@@ -8,7 +8,7 @@ import {
 } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProgramListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import { FC, useMemo } from 'react'
 
@@ -44,9 +44,9 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         headerName: 'Portfolio',
         width: 200,
         hide: props.hidePortfolio,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<ProgramListDto>) => {
           if (!params.data) return null
-          return PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio })
+          return PortfolioLinkCellRenderer({ ...(params as any), data: params.data.portfolio })
         },
       },
       {

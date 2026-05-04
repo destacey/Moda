@@ -13,7 +13,7 @@ export interface ModalFormProps<TFormValues> {
   onOk: (
     values: TFormValues,
   ) => Action | ThunkAction<void, RootState, unknown, Action<string>>
-  onCancel: Action
+  onCancel: Action | (() => Action)
 }
 
 export interface FormProps<TFormValues> {
@@ -58,7 +58,7 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
     }
 
     const handleCancel = () => {
-      dispatch(modalFormProps.onCancel)
+      dispatch(typeof modalFormProps.onCancel === 'function' ? modalFormProps.onCancel() : modalFormProps.onCancel)
       form.resetFields()
       props.onClose?.(false)
     }
@@ -96,7 +96,7 @@ const withModalForm = <P extends FormProps<TFormValues>, TFormValues>(
         keyboard={false} // disable esc key to close modal
         destroyOnHidden={true}
       >
-        <WrappedForm form={form} {...(props as P)} />
+        <WrappedForm {...(props as P)} form={form} />
       </Modal>
     )
   }

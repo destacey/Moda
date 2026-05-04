@@ -11,7 +11,7 @@ import {
   useGetVisibilityOptionsQuery,
 } from '@/src/store/features/planning/roadmaps-api'
 import useAuth from '@/src/components/contexts/auth'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useEffect } from 'react'
 
@@ -73,14 +73,14 @@ const CreateRoadmapForm = ({
             )
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                apiError.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while creating the roadmap. Please try again.',
               )
             }
@@ -108,13 +108,13 @@ const CreateRoadmapForm = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading visibility options. Please try again.',
       )
     }
     if (employeeOptionsError) {
       messageApi.error(
-        employeeOptionsError.supportMessage ??
+        (isApiError(employeeOptionsError) ? employeeOptionsError.supportMessage : undefined) ??
           'An error occurred while loading employee options. Please try again.',
       )
     }

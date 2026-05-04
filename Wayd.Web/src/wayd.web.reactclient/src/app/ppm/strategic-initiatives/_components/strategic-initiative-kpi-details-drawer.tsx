@@ -2,14 +2,19 @@
 
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { KpiHealth, KpiTrend } from '@/src/services/wayd-api'
+import {
+  KpiHealth,
+  KpiTrend,
+  StrategicInitiativeKpiCheckpointDetailsDto,
+  StrategicInitiativeKpiMeasurementDto,
+} from '@/src/services/wayd-api'
 import {
   useGetStrategicInitiativeKpiCheckpointPlanQuery,
   useGetStrategicInitiativeKpiMeasurementsQuery,
   useGetStrategicInitiativeKpiQuery,
   useRemoveStrategicInitiativeKpiMeasurementMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { getDrawerWidthPixels } from '@/src/utils'
+import { getDrawerWidthPixels, isApiError} from '@/src/utils'
 import {
   ArrowDownOutlined,
   ArrowUpOutlined,
@@ -165,7 +170,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
   useEffect(() => {
     if (kpiError) {
       messageApi.error(
-        kpiError.detail ??
+        (isApiError(kpiError) ? kpiError.detail : undefined) ??
           'An error occurred while loading KPI data. Please try again.',
       )
     }
@@ -174,7 +179,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
   useEffect(() => {
     if (checkpointsError) {
       messageApi.error(
-        checkpointsError.detail ??
+        (isApiError(checkpointsError) ? checkpointsError.detail : undefined) ??
           'An error occurred while loading checkpoint data. Please try again.',
       )
     }
@@ -183,7 +188,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
   useEffect(() => {
     if (measurementsError) {
       messageApi.error(
-        measurementsError.detail ??
+        (isApiError(measurementsError) ? measurementsError.detail : undefined) ??
           'An error occurred while loading measurement data. Please try again.',
       )
     }
@@ -269,7 +274,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       key: 'actual',
       width: 90,
       align: 'right' as const,
-      render: (_, record) =>
+      render: (_: unknown, record: StrategicInitiativeKpiCheckpointDetailsDto) =>
         record.measurement
           ? formatValue(record.measurement.actualValue, prefix, suffix)
           : '-',
@@ -313,7 +318,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
       title: 'Measured By',
       key: 'measuredBy',
       width: 140,
-      render: (_, record) => record.measuredBy?.name ?? '-',
+      render: (_: unknown, record: StrategicInitiativeKpiMeasurementDto) => record.measuredBy?.name ?? '-',
     },
     {
       title: 'Note',
@@ -327,7 +332,7 @@ const StrategicInitiativeKpiDetailsDrawer: FC<
             key: 'actions',
             width: 50,
             align: 'center' as const,
-            render: (_, record) => (
+            render: (_: unknown, record: StrategicInitiativeKpiMeasurementDto) => (
               <Popconfirm
                 title="Delete measurement?"
                 description="This action cannot be undone."

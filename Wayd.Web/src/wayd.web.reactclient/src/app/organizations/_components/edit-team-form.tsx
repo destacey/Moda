@@ -84,8 +84,8 @@ const ModalEditTeamForm = withModalForm(EditTeamForm, {
   title: 'Edit Team',
   okText: 'Save',
   useFormState: () => useAppSelector(selectEditTeamContext),
-  onOk: (values: EditTeamFormValues) => updateTeam(values),
-  onCancel: setEditMode(false),
+  onOk: (values: EditTeamFormValues) => updateTeam!(values),
+  onCancel: () => setEditMode(false),
 })
 
 export default ModalEditTeamForm

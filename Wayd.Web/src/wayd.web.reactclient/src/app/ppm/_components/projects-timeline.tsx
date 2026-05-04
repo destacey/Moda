@@ -121,8 +121,8 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
             objectData: project,
             group: project.program?.name ?? 'No Program',
             type: 'range',
-            start: new Date(project.start),
-            end: new Date(project.end),
+            start: new Date(project.start!),
+            end: new Date(project.end!),
             openProjectDrawer: openProjectDrawer,
           }))
 

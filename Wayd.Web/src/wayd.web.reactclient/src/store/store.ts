@@ -7,7 +7,8 @@ import workStatusReducer from './features/work-management/work-status-slice'
 import workTypeReducer from './features/work-management/work-type-slice'
 import { apiSlice } from './features/apiSlice'
 
-const middlewares = []
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const middlewares: any[] = []
 
 // if (process.env.NODE_ENV === 'development') {
 //   middlewares.push(logger)

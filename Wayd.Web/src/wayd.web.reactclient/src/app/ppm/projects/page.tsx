@@ -71,8 +71,8 @@ const ProjectsPage: FC = () => {
 
   const handleResetFilters = () => {
     setSelectedStatuses(DEFAULT_STATUSES)
-    setSelectedPortfolioId(undefined)
-    setSelectedRole(undefined)
+    setSelectedPortfolioId(null)
+    setSelectedRole(null)
   }
 
   const actions = !showActions ? null : (

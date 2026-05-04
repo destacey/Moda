@@ -8,7 +8,7 @@ import {
 } from '@/src/store/features/ppm/project-lifecycles-api'
 import { Modal, Space } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export enum ProjectLifecycleStateAction {
   Activate = 'Activate',
@@ -45,7 +45,7 @@ const ChangeProjectLifecycleStateForm = ({
           response = await archiveProjectLifecycleMutation(lifecycle.id)
         }
 
-        if (response.error) {
+        if (response?.error) {
           throw response.error
         }
 
@@ -55,7 +55,7 @@ const ChangeProjectLifecycleStateForm = ({
         )
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         const gerund = stateAction === ProjectLifecycleStateAction.Activate ? 'activating' : 'archiving'
         messageApi.error(
           apiError.detail ??

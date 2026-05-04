@@ -1,5 +1,6 @@
 'use client'
 
+import { isApiError } from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useConfirmModal } from '@/src/hooks'
 import {
@@ -47,7 +48,7 @@ const DeleteProjectTaskForm = ({
       } catch (error) {
         console.log('delete task error', error)
         messageApi.error(
-          error?.detail ??
+          (isApiError(error) ? error.detail : undefined) ??
             'An unexpected error occurred while deleting the task.',
         )
         return false

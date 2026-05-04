@@ -61,7 +61,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   useDocumentTitle(`${sprintData?.name ?? sprintKey} - Sprint Details`)
 
-  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData?.team.id, {
+  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData?.team.id!, {
     skip: !sprintData?.team.id,
   })
 

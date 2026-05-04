@@ -23,7 +23,7 @@ const authorizePage = <P extends object>(
   const AuthorizePage: ComponentType<P> = ({ ...props }) => {
     const { hasClaim } = useAuth()
 
-    return hasClaim(requiredClaimType ?? 'Permission', requiredClaimValue) ? (
+    return hasClaim(requiredClaimType ?? 'Permission', requiredClaimValue ?? '') ? (
       <WrappedPage {...(props as P)} />
     ) : (
       <NotAuthorized />

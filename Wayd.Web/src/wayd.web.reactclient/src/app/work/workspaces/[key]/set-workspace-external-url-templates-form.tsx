@@ -10,7 +10,7 @@ import {
   useGetWorkspaceQuery,
   useSetWorkspaceExternalUrlTemplatesMutation,
 } from '@/src/store/features/work-management/workspace-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
@@ -67,7 +67,7 @@ const SetWorkspaceExternalUrlTemplatesForm = (
             refetch()
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)

@@ -1,4 +1,54 @@
-import toFormErrors from './problem-details'
+import toFormErrors, { isApiError } from './problem-details'
+
+describe('isApiError', () => {
+  it('returns true for object with status', () => {
+    expect(isApiError({ status: 422 })).toBe(true)
+  })
+
+  it('returns true for object with detail', () => {
+    expect(isApiError({ detail: 'Not found' })).toBe(true)
+  })
+
+  it('returns true for object with errors', () => {
+    expect(isApiError({ errors: { Name: ['required'] } })).toBe(true)
+  })
+
+  it('returns true for fully populated ApiError', () => {
+    expect(
+      isApiError({ status: 422, detail: 'Validation failed', errors: { Key: ['must be unique'] } }),
+    ).toBe(true)
+  })
+
+  it('returns false for null', () => {
+    expect(isApiError(null)).toBe(false)
+  })
+
+  it('returns false for undefined', () => {
+    expect(isApiError(undefined)).toBe(false)
+  })
+
+  it('returns false for a string', () => {
+    expect(isApiError('something went wrong')).toBe(false)
+  })
+
+  it('returns false for a number', () => {
+    expect(isApiError(500)).toBe(false)
+  })
+
+  it('returns false for an object without recognized keys', () => {
+    expect(isApiError({ message: 'oops', code: 1 })).toBe(false)
+  })
+
+  it('narrows the type so ApiError fields are accessible after the guard', () => {
+    const error: unknown = { status: 404, detail: 'Not found' }
+    if (isApiError(error)) {
+      expect(error.status).toBe(404)
+      expect(error.detail).toBe('Not found')
+    } else {
+      fail('Expected isApiError to return true')
+    }
+  })
+})
 
 describe('toFormErrors', () => {
   it('should return correct form errors', () => {
@@ -64,7 +114,7 @@ describe('toFormErrors', () => {
   it('should handle null problem details', () => {
     const problemDetails = null
 
-    const result = toFormErrors(problemDetails)
+    const result = toFormErrors(problemDetails as any)
 
     expect(result).toEqual([])
   })
@@ -72,7 +122,7 @@ describe('toFormErrors', () => {
   it('should handle undefined problem details', () => {
     const problemDetails = undefined
 
-    const result = toFormErrors(problemDetails)
+    const result = toFormErrors(problemDetails as any)
 
     expect(result).toEqual([])
   })

@@ -24,7 +24,7 @@ const RoadmapMilestoneDrawerItem: FC<RoadmapMilestoneDrawerItemProps> = (
         <DescriptionsItem label="Parent">
           {milestone.parent && (
             <a
-              onClick={() => props.openRoadmapItemDrawer(milestone.parent?.id)}
+              onClick={() => props.openRoadmapItemDrawer(milestone.parent!.id)}
             >
               {milestone.parent?.name}
             </a>

@@ -3,7 +3,7 @@ import { InitWorkProcessIntegrationRequest } from '@/src/services/wayd-api'
 import { useInitAzdoConnectionWorkProcessMutation } from '@/src/store/features/app-integration/azdo-integration-api'
 import { Modal, Typography } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -40,7 +40,7 @@ const InitWorkProcessIntegrationForm = ({
         messageApi.success('Successfully initialized work process.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           `Failed to initialize work process. Error: ${apiError.detail}`,
         )

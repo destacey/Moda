@@ -72,8 +72,8 @@ export const ModalCreateTeamForm = withModalForm(CreateTeamForm, {
   okText: 'Create',
   useFormState: () => useAppSelector(selectEditTeamContext),
   // TODO: validation errors not showing up on the form
-  onOk: (values: CreateTeamFormValues) => createTeam(values),
-  onCancel: setEditMode(false),
+  onOk: (values: CreateTeamFormValues) => createTeam!(values),
+  onCancel: () => setEditMode(false),
 })
 
 export default ModalCreateTeamForm

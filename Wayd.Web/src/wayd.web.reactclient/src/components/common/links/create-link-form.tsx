@@ -2,7 +2,7 @@
 
 import { CreateLinkRequest } from '@/src/services/wayd-api'
 import { Form, Input, Modal } from 'antd'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { useCreateLinkMutation } from '@/src/store/features/common/links-api'
 import { useMessage } from '../../contexts/messaging'
 import { useModalForm } from '@/src/hooks'
@@ -52,7 +52,7 @@ const CreateLinkForm = ({
           messageApi.success('Successfully created link.')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

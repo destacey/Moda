@@ -93,8 +93,8 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
             ),
             objectData: initiative,
             type: 'range',
-            start: new Date(initiative.start),
-            end: new Date(initiative.end),
+            start: new Date(initiative.start!),
+            end: new Date(initiative.end!),
             openStrategicInitiativeDrawer: openStrategicInitiativeDrawer,
           }))
 

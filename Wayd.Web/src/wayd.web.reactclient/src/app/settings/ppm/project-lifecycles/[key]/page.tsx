@@ -19,6 +19,7 @@ import ChangeProjectLifecycleStateForm, {
 } from '../_components/change-project-lifecycle-state-form'
 import ProjectLifecyclePhasesList from '../_components/project-lifecycle-phases-list'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
+import { isApiError } from '@/src/utils'
 
 enum ProjectLifecycleTabs {
   Details = 'details',
@@ -155,7 +156,7 @@ const ProjectLifecycleDetailsPage = (props: {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading project lifecycle details',
       )
       console.error(error)

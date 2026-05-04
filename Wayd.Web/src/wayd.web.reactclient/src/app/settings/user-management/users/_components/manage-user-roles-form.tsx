@@ -9,7 +9,7 @@ import { Modal, Spin, Transfer, TransferProps } from 'antd'
 import { useEffect, useState } from 'react'
 import type { Key } from 'react'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface ManageUserRolesFormProps {
   userId: string
@@ -60,7 +60,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         messageApi.success('Successfully updated user roles.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         if (apiError.status === 422 && apiError.errors) {
           messageApi.error('Correct the validation error(s) to continue.')
         } else {
@@ -94,6 +94,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
     const activeRoleNames = userRolesData
       .filter((role) => role.enabled)
       .map((role) => role.roleName)
+      .filter((r): r is string => r !== undefined)
       .sort((a, b) => {
         const roleA =
           userRolesData.find((r) => r.roleName === a)?.roleName || ''

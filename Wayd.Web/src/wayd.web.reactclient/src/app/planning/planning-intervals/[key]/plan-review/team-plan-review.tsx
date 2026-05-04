@@ -175,7 +175,7 @@ const TeamPlanReview = ({
       ) : (
         <PlanningIntervalObjectivesTimeline
           objectivesData={objectivesData ?? []}
-          planningIntervalCalendar={calendarData}
+          planningIntervalCalendar={calendarData!}
         />
       )}
       {planningInterval?.key && selectedObjectiveKey && (

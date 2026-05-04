@@ -4,7 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useDeleteEstimationScaleMutation } from '@/src/store/features/planning/estimation-scales-api'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeleteEstimationScaleFormProps {
   estimationScale: { id: number; name: string }
@@ -31,7 +31,7 @@ const DeleteEstimationScaleForm = ({
         messageApi.success('Successfully deleted estimation scale.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             'An unexpected error occurred while deleting the estimation scale.',

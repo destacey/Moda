@@ -3,7 +3,7 @@
 import { DatePicker, Form, Input, Modal, Radio, Select } from 'antd'
 import { useEffect } from 'react'
 import { CreateRiskRequest } from '@/src/services/wayd-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { MarkdownEditor } from '../markdown'
 import {
   useCreateRiskMutation,
@@ -75,7 +75,7 @@ const CreateRiskForm = ({
 
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

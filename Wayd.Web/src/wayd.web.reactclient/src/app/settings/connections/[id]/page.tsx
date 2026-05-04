@@ -26,7 +26,7 @@ import {
 import { useGetConnectionQuery } from '@/src/store/features/app-integration/connections-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { AzureDevOpsConnectionDetailsDto } from '@/src/services/wayd-api'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -164,7 +164,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         }`,
       )
     } catch (error) {
-      const apiError = isApiError(error) ? error : {}
+      const apiError: ApiError = isApiError(error) ? error : {}
       console.error(error)
       messageApi.error(`Failed to change sync setting. Error: ${apiError.detail}`)
     }
@@ -180,7 +180,7 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         'Successfully imported organization processes and projects.',
       )
     } catch (error) {
-      const apiError = isApiError(error) ? error : {}
+      const apiError: ApiError = isApiError(error) ? error : {}
       console.error(error)
       messageApi.error(
         `Failed to initialize organization. Error: ${apiError.detail}`,

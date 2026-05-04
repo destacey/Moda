@@ -10,7 +10,7 @@ import {
 } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProjectListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import { FC, ReactNode, useMemo } from 'react'
 
@@ -53,9 +53,9 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
         headerName: 'Portfolio',
         width: 200,
         hide: props.hidePortfolio,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<ProjectListDto>) => {
           if (!params.data) return null
-          return PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio })
+          return PortfolioLinkCellRenderer({ ...(params as any), data: params.data.portfolio })
         },
       },
       {
@@ -63,9 +63,9 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
         headerName: 'Program',
         width: 200,
         hide: props.hideProgram,
-        cellRenderer: (params) =>
+        cellRenderer: (params: ICellRendererParams<ProjectListDto>) =>
           params.data?.program
-            ? ProgramLinkCellRenderer({ ...params, data: params.data.program })
+            ? ProgramLinkCellRenderer({ ...(params as any), data: params.data.program })
             : null,
       },
       {

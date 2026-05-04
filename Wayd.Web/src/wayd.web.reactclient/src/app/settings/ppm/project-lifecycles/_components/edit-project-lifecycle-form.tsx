@@ -6,7 +6,7 @@ import {
   useGetProjectLifecycleQuery,
   useUpdateProjectLifecycleMutation,
 } from '@/src/store/features/ppm/project-lifecycles-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useEffect } from 'react'
@@ -61,14 +61,14 @@ const EditProjectLifecycleForm = ({
             messageApi.success('Project Lifecycle updated successfully.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                apiError.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while updating the project lifecycle. Please try again.',
               )
             }
@@ -93,7 +93,7 @@ const EditProjectLifecycleForm = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading the project lifecycle. Please try again.',
       )
     }

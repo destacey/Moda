@@ -12,7 +12,7 @@ import {
   useGetStrategicInitiativeKpiQuery,
   useManageStrategicInitiativeKpiCheckpointPlanMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -111,7 +111,7 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = ({
           messageApi.success('KPI checkpoint plan updated successfully.')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

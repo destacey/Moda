@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useMemo } from 'react'
+import { createContext, useMemo, ReactNode } from 'react'
 import { MenuToggleContextType } from './types'
 import { useLocalStorageState } from '@/src/hooks'
 
@@ -8,7 +8,7 @@ export const MenuToggleContext = createContext<MenuToggleContextType | null>(
   null,
 )
 
-export const MenuToggleProvider = ({ children }) => {
+export const MenuToggleProvider = ({ children }: { children: ReactNode }) => {
   const [menuCollapsed, setMenuCollapsed] = useLocalStorageState<boolean>(
     'appMenuCollapsed',
     true,

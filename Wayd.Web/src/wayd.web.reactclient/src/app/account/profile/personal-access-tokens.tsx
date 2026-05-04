@@ -12,7 +12,7 @@ import { PersonalAccessTokenDto } from '@/src/services/wayd-api'
 import dayjs from 'dayjs'
 import WaydGrid from '@/src/components/common/wayd-grid'
 import { CustomCellRendererProps } from 'ag-grid-react'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import {
   CreatePersonalAccessTokenForm,
   EditPersonalAccessTokenForm,
@@ -186,7 +186,7 @@ const PersonalAccessTokens: FC = () => {
         filter: false,
         sortable: false,
         resizable: false,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<PersonalAccessTokenDto>) => {
           const menuItems = getRowMenuItems({
             tokenId: params.data?.id ?? '',
             tokenName: params.data?.name ?? '',
@@ -197,7 +197,7 @@ const PersonalAccessTokens: FC = () => {
             onRevokeTokenMenuClicked: handleRevoke,
             onDeleteTokenMenuClicked: handleDelete,
           })
-          return RowMenuCellRenderer({ ...params, menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems: menuItems ?? [] })
         },
       },
       {

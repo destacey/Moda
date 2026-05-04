@@ -39,7 +39,7 @@ const withAuthorization = <P extends object>(
 
     return hasClaim(
       claimType ?? defaultClaimType ?? 'Permission',
-      claimValue ?? defaultClaimValue,
+      (claimValue ?? defaultClaimValue ?? ''),
     ) ? (
       <WrappedComponent {...(props as P)} />
     ) : notAuthorizedBehavior === 'DoNotRender' ? (

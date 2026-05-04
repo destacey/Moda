@@ -3,7 +3,7 @@ import { useConfirmModal } from '@/src/hooks'
 import { PlanningIntervalObjectiveDetailsDto } from '@/src/services/wayd-api'
 import { useDeletePlanningIntervalObjectiveMutation } from '@/src/store/features/planning/planning-interval-api'
 import { Modal } from 'antd'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeletePlanningIntervalObjectiveFormProps {
   objective: PlanningIntervalObjectiveDetailsDto
@@ -36,7 +36,7 @@ const DeletePlanningIntervalObjectiveForm = ({
         messageApi.success('Successfully deleted PI objective.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             'An unexpected error occurred while deleting the objective.',

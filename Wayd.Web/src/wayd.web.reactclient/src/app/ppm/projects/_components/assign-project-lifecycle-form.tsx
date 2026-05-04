@@ -12,7 +12,7 @@ import {
   useGetProjectLifecyclesQuery,
 } from '@/src/store/features/ppm/project-lifecycles-api'
 import { useAssignProjectLifecycleMutation } from '@/src/store/features/ppm/projects-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Card, Flex, Form, Modal, Select, Timeline, Typography } from 'antd'
 import { useEffect } from 'react'
 
@@ -68,14 +68,14 @@ const AssignProjectLifecycleForm = ({
             messageApi.success('Project lifecycle assigned successfully.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                apiError.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while assigning the lifecycle. Please try again.',
               )
             }
@@ -112,7 +112,7 @@ const AssignProjectLifecycleForm = ({
     if (lifecyclesError) {
       console.error(lifecyclesError)
       messageApi.error(
-        lifecyclesError.detail ??
+        (isApiError(lifecyclesError) ? lifecyclesError.detail : undefined) ??
           'An error occurred while loading lifecycle options.',
       )
     }

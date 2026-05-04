@@ -7,13 +7,13 @@ import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkProcessListDto } from '@/src/services/wayd-api'
 import { useGetWorkProcessesQuery } from '@/src/store/features/work-management/work-process-api'
 import { setIncludeInactive } from '@/src/store/features/work-management/work-process-slice'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
 import { useEffect, useMemo } from 'react'
 
-const WorkProcessLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`./work-processes/${data.key}`}>{value}</Link>
+const WorkProcessLinkCellRenderer = ({ value, data }: ICellRendererParams<WorkProcessListDto>) => {
+  return <Link href={`./work-processes/${data!.key}`}>{value}</Link>
 }
 
 const WorkProcessesPage: React.FC = () => {

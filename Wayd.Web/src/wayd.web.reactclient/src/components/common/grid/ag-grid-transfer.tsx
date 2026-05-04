@@ -45,7 +45,7 @@ export const asDeletableColDefs = <TData extends object>(
     cellRenderer: (props: ICellRendererParams<TData>) => (
       <DeleteOutlined
         onClick={() => {
-          onDelete(props.data)
+          if (props.data) onDelete(props.data)
         }}
       />
     ),
@@ -97,9 +97,9 @@ export const AgGridTransfer = <TData extends object>(
 
   const onDragStopInternal = (params: RowDragEndEvent<TData>) => {
     if (onDragStop) {
-      onDragStop(params.nodes.map((node) => node.data))
+      onDragStop(params.nodes.map((node) => node.data).filter((d): d is TData => d !== undefined))
     } else
-      leftGridRef.current.api?.setNodesSelected({
+      leftGridRef.current?.api?.setNodesSelected({
         nodes: params.nodes,
         newValue: false,
       })
@@ -112,8 +112,8 @@ export const AgGridTransfer = <TData extends object>(
       onDragStop: onDragStopInternal,
     })
 
-    leftGridRef.current.api.removeRowDropZone(dropZoneParams)
-    leftGridRef.current.api.addRowDropZone(dropZoneParams)
+    leftGridRef.current.api.removeRowDropZone(dropZoneParams!)
+    leftGridRef.current.api.addRowDropZone(dropZoneParams!)
   }
 
   const getGrid = (isLeft: boolean) => (

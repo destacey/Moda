@@ -7,7 +7,7 @@ import { useModalForm } from '@/src/hooks'
 import { CreatePortfolioRequest } from '@/src/services/wayd-api'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useCreatePortfolioMutation } from '@/src/store/features/ppm/portfolios-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 
@@ -62,7 +62,7 @@ const CreatePortfolioForm = ({
           )
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

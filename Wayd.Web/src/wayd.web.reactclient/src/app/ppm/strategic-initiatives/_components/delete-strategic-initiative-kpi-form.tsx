@@ -5,7 +5,7 @@ import { useConfirmModal } from '@/src/hooks'
 import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
 import { useDeleteStrategicInitiativeKpiMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { Modal } from 'antd'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeleteStrategicInitiativeKpiFormProps {
   strategicInitiativeId: string
@@ -36,7 +36,7 @@ const DeleteStrategicInitiativeKpiForm = ({
         messageApi.success('Successfully deleted KPI.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             'An unexpected error occurred while deleting the KPI.',

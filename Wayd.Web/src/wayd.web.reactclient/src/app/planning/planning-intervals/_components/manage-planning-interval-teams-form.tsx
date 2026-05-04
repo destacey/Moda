@@ -131,7 +131,7 @@ const ManagePlanningIntervalTeamsForm = ({
     return [...teamsDtos, ...teamOfTeamsDtos].map((team: TeamListItem) => ({
       key: team.id,
       name: team.name,
-      code: team.code,
+      code: team.code ?? '',
       disabled: false,
       teamOfTeams: team.teamOfTeams?.name,
     }))

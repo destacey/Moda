@@ -14,7 +14,7 @@ import { ItemType } from 'antd/es/menu/interface'
 import EditTeamMembershipForm from './edit-team-membership-form'
 import { TeamTypeName } from '../types'
 import DeleteTeamMembershipForm from './delete-team-membership-form'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 
 export interface TeamMembershipsGridProps {
   teamId: string
@@ -24,11 +24,11 @@ export interface TeamMembershipsGridProps {
   teamType: TeamTypeName
 }
 
-const LocalChildTeamNameLinkCellRenderer = ({ data }) => {
+const LocalChildTeamNameLinkCellRenderer = ({ data }: ICellRendererParams<TeamMembershipDto>) => {
   return renderTeamLinkHelper(data?.child)
 }
 
-const LocalParentTeamNameLinkCellRenderer = ({ data }) => {
+const LocalParentTeamNameLinkCellRenderer = ({ data }: ICellRendererParams<TeamMembershipDto>) => {
   return renderTeamLinkHelper(data?.parent)
 }
 
@@ -101,19 +101,19 @@ const TeamMembershipsGrid = ({
         sortable: false,
         hide: !showRowActions,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<TeamMembershipDto>) => {
           // only allow editing memberships for current team
-          if (teamId != params.data.child.id) return null
+          if (teamId != params.data!.child.id) return null
 
           const menuItems = getRowMenuItems({
-            id: params.data.id,
-            membership: params.data,
+            id: params.data!.id,
+            membership: params.data!,
             canManageTeamMemberships,
             onEditTeamMembershipMenuClicked,
             onDeleteTeamMembershipMenuClicked,
           })
 
-          return RowMenuCellRenderer({ ...params, menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems: menuItems ?? [] })
         },
       },
       {

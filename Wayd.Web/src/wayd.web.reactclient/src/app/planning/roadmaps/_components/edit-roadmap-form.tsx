@@ -6,7 +6,7 @@ import {
   useGetVisibilityOptionsQuery,
   useGetRoadmapQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, Radio } from 'antd'
 import { useEffect } from 'react'
 import dayjs from 'dayjs'
@@ -82,7 +82,7 @@ const EditRoadmapForm = ({
             messageApi.success('Roadmap updated successfully.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             console.error('update error', error)
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
@@ -90,7 +90,7 @@ const EditRoadmapForm = ({
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                apiError.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while updating the roadmap. Please try again.',
               )
             }
@@ -122,19 +122,19 @@ const EditRoadmapForm = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading the roadmap. Please try again.',
       )
     }
     if (visibilityError) {
       messageApi.error(
-        visibilityError.supportMessage ??
+        (isApiError(visibilityError) ? visibilityError.supportMessage : undefined) ??
           'An error occurred while loading visibility options. Please try again.',
       )
     }
     if (employeeOptionsError) {
       messageApi.error(
-        employeeOptionsError.supportMessage ??
+        (isApiError(employeeOptionsError) ? employeeOptionsError.supportMessage : undefined) ??
           'An error occurred while loading employee options. Please try again.',
       )
     }

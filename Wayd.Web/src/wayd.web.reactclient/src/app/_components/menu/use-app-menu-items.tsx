@@ -36,7 +36,7 @@ const buildMenuItems = (featureFlags: {
   planningPoker: boolean
 }): (Item | MenuItem)[] => [
   menuItem('Home', 'home', '/', menuIcons.home),
-  menuItem('Organizations', 'org', null, menuIcons.org, [
+  menuItem('Organizations', 'org', undefined, menuIcons.org, [
     menuItem('Teams', 'org.teams', '/organizations/teams'),
     menuItem('Employees', 'org.employees', '/organizations/employees'),
     { key: 'org-settings-divider-1', type: 'divider' },
@@ -46,7 +46,7 @@ const buildMenuItems = (featureFlags: {
       '/organizations/functional-org-chart',
     ),
   ]),
-  restrictedMenuSection('Planning', 'plan', null, menuIcons.planning, [
+  restrictedMenuSection('Planning', 'plan', undefined, menuIcons.planning, [
     restrictedPermissionMenuItem(
       'Permissions.PlanningIntervals.View',
       'Planning Intervals',
@@ -77,7 +77,7 @@ const buildMenuItems = (featureFlags: {
         ]
       : []),
   ]),
-  restrictedMenuSection('Work Management', 'work', null, menuIcons.work, [
+  restrictedMenuSection('Work Management', 'work', undefined, menuIcons.work, [
     restrictedPermissionMenuItem(
       'Permissions.Workspaces.View',
       'Workspaces',
@@ -95,7 +95,7 @@ const buildMenuItems = (featureFlags: {
   //     { type: 'divider' },
   //     menuItem('Requirements Management', 'pdc.requirements-management'),
   // ]),
-  restrictedMenuSection('PPM', 'ppm', null, menuIcons.ppm, [
+  restrictedMenuSection('PPM', 'ppm', undefined, menuIcons.ppm, [
     restrictedPermissionMenuItem(
       'Permissions.Projects.View',
       'My Projects',
@@ -160,12 +160,13 @@ const useAppMenuItems = () => {
   const items = buildMenuItems({ planningPoker })
 
   const filteredMenuItems = items.reduce(
-    (acc, item) => filterAndTransformMenuItem(acc, item, hasClaim),
+    (acc, item) =>
+      item != null ? filterAndTransformMenuItem(acc, item, hasClaim) : acc,
     [] as ItemType<MenuItemType>[],
   )
 
   const routeKeyMap = buildRouteKeyMap(
-    items.filter((item): item is Item => 'display' in item),
+    items.filter((item): item is Item => item != null && 'display' in item),
   )
 
   return { menuItems: filteredMenuItems, routeKeyMap }

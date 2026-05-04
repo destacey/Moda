@@ -6,7 +6,7 @@ import {
   TeamMembershipDto,
   UpdateTeamMembershipRequest,
 } from '@/src/services/wayd-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { useUpdateTeamMembershipMutation } from '@/src/store/features/organizations/team-api'
 import { TeamTypeName } from '../types'
 import dayjs from 'dayjs'
@@ -65,7 +65,7 @@ const EditTeamMembershipForm = ({
           messageApi.success('Successfully updated team membership.')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

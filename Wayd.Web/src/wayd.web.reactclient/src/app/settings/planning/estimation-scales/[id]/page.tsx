@@ -19,6 +19,7 @@ import {
 } from '@/src/store/features/planning/estimation-scales-api'
 import { ItemType } from 'antd/es/menu/interface'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
 enum EstimationScaleTabs {
   Details = 'details',
@@ -126,7 +127,7 @@ const EstimationScaleDetailsPage = (props: {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading estimation scale details',
       )
       console.error(error)

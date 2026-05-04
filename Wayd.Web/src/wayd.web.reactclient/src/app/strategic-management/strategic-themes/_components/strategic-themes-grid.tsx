@@ -2,7 +2,7 @@
 
 import { WaydGrid } from '@/src/components/common'
 import { StrategicThemeListDto } from '@/src/services/wayd-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import Link from 'next/link'
 import { useMemo } from 'react'
 
@@ -13,9 +13,9 @@ export interface StrategicThemesGridProps {
   gridHeight?: number | undefined
 }
 
-const StrategicThemeCellRenderer = ({ value, data }) => {
+const StrategicThemeCellRenderer = ({ value, data }: ICellRendererParams<StrategicThemeListDto>) => {
   return (
-    <Link href={`/strategic-management/strategic-themes/${data.key}`}>
+    <Link href={`/strategic-management/strategic-themes/${data!.key}`}>
       {value}
     </Link>
   )

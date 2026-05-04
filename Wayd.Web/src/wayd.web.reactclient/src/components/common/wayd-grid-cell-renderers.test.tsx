@@ -98,8 +98,8 @@ describe('Work Item Cell Renderers', () => {
     })
 
     it('should return null when data is undefined', () => {
-      const props = createMockProps(undefined)
-      const result = WorkItemLinkCellRenderer(props)
+      const props = createMockProps(undefined as any)
+      const result = WorkItemLinkCellRenderer(props as any)
       expect(result).toBeNull()
     })
   })
@@ -421,7 +421,7 @@ describe('Status Cell Renderers', () => {
 
     it('should return null when status is missing', () => {
       const data = {
-        status: null,
+        status: null as unknown as string,
         statusCategory: { id: WorkStatusCategory.Active },
       }
       const props = createMockProps(data)

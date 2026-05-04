@@ -5,7 +5,7 @@ import {
   TeamOfTeamsDetailsDto,
 } from '@/src/services/wayd-api'
 import { useDeactivateTeamOfTeamsMutation } from '@/src/store/features/organizations/team-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
@@ -52,7 +52,7 @@ const DeactivateTeamOfTeamsForm = ({
           messageApi.success('Team deactivated successfully')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

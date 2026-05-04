@@ -104,7 +104,7 @@ export const buildRouteKeyMap = (items: Item[]): Map<string, string> => {
     }
     if (item.children) {
       const childItems = item.children.filter(
-        (child): child is Item => 'display' in child,
+        (child): child is Item => child != null && 'display' in child,
       )
       const childMap = buildRouteKeyMap(childItems)
       childMap.forEach((value, key) => map.set(key, value))
@@ -179,6 +179,7 @@ export const filterAndTransformMenuItem = (
   item: Item | MenuItem,
   claimCheck: (claimType: string, claimValue: string) => boolean,
 ): ItemType<MenuItemType>[] => {
+  if (item == null) return acc
   if ('type' in item) {
     // For items like dividers that already have a type.
     acc.push(item)
@@ -188,13 +189,15 @@ export const filterAndTransformMenuItem = (
     const children = menuItemItem.children
       ? menuItemItem.children.reduce(
           (childAcc, child) =>
-            filterAndTransformMenuItem(childAcc, child, claimCheck),
+            child != null
+              ? filterAndTransformMenuItem(childAcc, child, claimCheck)
+              : childAcc,
           [] as ItemType<MenuItemType>[],
         )
       : undefined
 
     if ('authClaimValue' in menuItemItem && menuItemItem.authClaimType) {
-      if (claimCheck(menuItemItem.authClaimType, menuItemItem.authClaimValue)) {
+      if (claimCheck(menuItemItem.authClaimType, menuItemItem.authClaimValue!)) {
         if (
           menuItemItem.restrictedSection &&
           (!children || children.length === 0)

@@ -8,13 +8,13 @@ import useAuth from '../../../components/contexts/auth'
 import CreateConnectionForm from './_components/create-connection-form'
 import Link from 'next/link'
 import { ConnectionListDto } from '@/src/services/wayd-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ItemType } from 'antd/es/menu/interface'
 import { useGetConnectionsQuery } from '@/src/store/features/app-integration/connections-api'
 import { ControlItemSwitch } from '../../../components/common/control-items-menu'
 
-const ConnectionLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/settings/connections/${data.id}`}>{value}</Link>
+const ConnectionLinkCellRenderer = ({ value, data }: ICellRendererParams<ConnectionListDto>) => {
+  return <Link href={`/settings/connections/${data!.id}`}>{value}</Link>
 }
 
 const ConnectionsPage = () => {

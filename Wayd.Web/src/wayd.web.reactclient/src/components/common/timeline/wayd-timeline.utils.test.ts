@@ -19,7 +19,7 @@ describe('getDefaultTemplate', () => {
     groups: [],
     isLoading: false,
     options: { start: new Date(), end: new Date(), min: new Date(), max: new Date() },
-  };
+  } as any;
 
   it('returns rangeItemTemplate for type "range"', () => {
     expect(getDefaultTemplate('range', props)).toBe(props.rangeItemTemplate);

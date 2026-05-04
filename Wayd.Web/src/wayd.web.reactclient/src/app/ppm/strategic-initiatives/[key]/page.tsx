@@ -99,7 +99,7 @@ const StrategicInitiativeDetailsPage = (props: {
     data: kpiData,
     isLoading: isLoadingKpis,
     refetch: refetchKpis,
-  } = useGetStrategicInitiativeKpisQuery(strategicInitiativeData?.id, {
+  } = useGetStrategicInitiativeKpisQuery(strategicInitiativeData?.id!, {
     skip: !strategicInitiativeData?.id,
   })
 
@@ -107,7 +107,7 @@ const StrategicInitiativeDetailsPage = (props: {
     data: projectData,
     isLoading: isLoadingProjects,
     refetch: refetchProjects,
-  } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeData?.id, {
+  } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeData?.id!, {
     skip: !strategicInitiativeData?.id,
   })
 

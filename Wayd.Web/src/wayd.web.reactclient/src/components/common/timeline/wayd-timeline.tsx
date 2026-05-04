@@ -434,7 +434,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     }
 
     processedItems.forEach((item) => {
-      const existing = datasetItemsRef.current!.get(item.id)
+      const existing = item.id !== undefined ? datasetItemsRef.current!.get(item.id) : undefined
       if (existing) {
         // Clear cached template so it re-renders with updated data
         const mapId = item.id ?? 0

@@ -73,7 +73,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       case WorkspaceTabs.WorkItems:
         return (
           <WorkItemsGrid
-            workItems={workItemsQuery.data}
+            workItems={workItemsQuery.data ?? []}
             isLoading={workItemsQuery.isLoading}
             refetch={workItemsQuery.refetch}
           />

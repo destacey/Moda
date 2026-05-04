@@ -48,10 +48,10 @@ export const useMarkdownComponents = (): Components => {
     del: (props) => <Text delete {...props} />,
     code: (props) => <Text code {...props} />,
     pre: ({ ...props }: MarkdownCodeBlockProps) => (
-      <MarkdownCodeBlock token={token} {...props} />
+      <MarkdownCodeBlock {...props} token={token} />
     ), // TODO: needs styling and syntax improvements
     blockquote: (props: MarkdownBlockquoteProps) => (
-      <MarkdownBlockquote token={token} {...props} />
+      <MarkdownBlockquote {...props} token={token} />
     ),
     a: ({ node, children, ...props }: MarkdownLinkProps) => (
       <AntDLink target="_blank" rel="noopener noreferrer" {...props}>

@@ -148,15 +148,15 @@ const TeamObjectivesListCard = ({
     return !lastObjectiveOrder ? undefined : lastObjectiveOrder + 1
   }
 
-  const getObjectivePosition = (id) => objectives.findIndex((o) => o.id === id)
+  const getObjectivePosition = (id: string | undefined) => objectives.findIndex((o) => o.id === id)
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id === over.id) return
+    if (active.id === over?.id) return
 
-    const originalPosition = getObjectivePosition(active.id)
-    const newPosition = getObjectivePosition(over.id)
+    const originalPosition = getObjectivePosition(String(active.id))
+    const newPosition = getObjectivePosition(over?.id !== undefined ? String(over.id) : undefined)
 
     const updatedObjectives = arrayMove(
       objectives,

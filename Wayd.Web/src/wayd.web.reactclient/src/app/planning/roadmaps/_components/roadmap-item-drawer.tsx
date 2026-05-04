@@ -16,6 +16,7 @@ import { FC, useEffect, useState } from 'react'
 import useAuth from '@/src/components/contexts/auth'
 import { getDrawerWidthPixels } from '@/src/utils/window-utils'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
 interface RoadmapItemDrawerProps {
   roadmapId: string
@@ -49,7 +50,7 @@ const RoadmapItemDrawer: FC<RoadmapItemDrawerProps> = (
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading roadmap item data. Please try again.',
       )
     }

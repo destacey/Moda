@@ -1,9 +1,10 @@
+import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
 // Mock the MsalProvider
 jest.mock('@azure/msal-react', () => ({
-  MsalProvider: ({ children }) => children,
+  MsalProvider: ({ children }: { children: React.ReactNode }) => children,
   useMsal: jest.fn(),
 }))
 
@@ -31,7 +32,7 @@ describe('withAuthorization', () => {
     claimValue: 'testClaim',
   }
 
-  const renderComponent = (component) => {
+  const renderComponent = (component: any) => {
     const authContext: AuthContextType = {
       user: null,
       isLoading: false,

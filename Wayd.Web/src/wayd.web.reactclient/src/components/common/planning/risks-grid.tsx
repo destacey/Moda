@@ -10,7 +10,7 @@ import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
 import { NestedTeamNameLinkCellRenderer } from '../wayd-grid-cell-renderers'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ControlItemSwitch } from '../control-items-menu'
 
 export interface RisksGridProps {
@@ -24,13 +24,13 @@ export interface RisksGridProps {
   gridHeight?: number
 }
 
-const RiskLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/planning/risks/${data.key}`}>{value}</Link>
+const RiskLinkCellRenderer = ({ value, data }: ICellRendererParams<RiskListDto>) => {
+  return <Link href={`/planning/risks/${data!.key}`}>{value}</Link>
 }
 
-const AssigneeLinkCellRenderer = ({ value, data }) => {
+const AssigneeLinkCellRenderer = ({ value, data }: ICellRendererParams<RiskListDto>) => {
   return (
-    <Link href={`/organizations/employees/${data.assignee?.key}`}>{value}</Link>
+    <Link href={`/organizations/employees/${data!.assignee?.key}`}>{value}</Link>
   )
 }
 
@@ -130,7 +130,7 @@ const RisksGrid = ({
       sortable: false,
       resizable: false,
       hide: !canUpdateRisks,
-      cellRenderer: (params) => {
+      cellRenderer: (params: ICellRendererParams<RiskListDto>) => {
         if (!params.data) return null
         return (
           canUpdateRisks && (
@@ -138,7 +138,7 @@ const RisksGrid = ({
               type="text"
               size="small"
               icon={<EditOutlined />}
-              onClick={() => editRiskButtonClicked(params.data.key)}
+              onClick={() => editRiskButtonClicked(params.data!.key)}
             />
           )
         )

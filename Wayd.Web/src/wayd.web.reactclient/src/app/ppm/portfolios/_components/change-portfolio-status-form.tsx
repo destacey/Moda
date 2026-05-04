@@ -9,7 +9,7 @@ import {
   useClosePortfolioMutation,
 } from '@/src/store/features/ppm/portfolios-api'
 import { Alert, Modal, Space } from 'antd'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export enum PortfolioStatusAction {
   Activate = 'Activate',
@@ -75,14 +75,14 @@ const ChangePortfolioStatusForm = ({
           response = await archivePortfolioMutation(request)
         }
 
-        if (response.error) throw response.error
+        if (response?.error) throw response.error
 
         messageApi.success(
           `Successfully ${statusActionToPastTense(statusAction)} Portfolio.`,
         )
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             `An unexpected error occurred while ${statusActionToPresentTense(statusAction)} the portfolio.`,

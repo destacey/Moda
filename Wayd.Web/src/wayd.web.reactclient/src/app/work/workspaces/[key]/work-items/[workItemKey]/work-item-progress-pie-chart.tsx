@@ -42,7 +42,7 @@ const WorkItemProgressPieChart = ({
     height: 250,
     width: 350,
     label: {
-      text: (datum) => {
+      text: (datum: any) => {
         return `${datum.count} (${((datum.count / progress.total) * 100).toFixed(0)}%)`
       },
     },

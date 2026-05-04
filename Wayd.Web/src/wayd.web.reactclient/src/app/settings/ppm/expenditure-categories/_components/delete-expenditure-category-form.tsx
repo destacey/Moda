@@ -5,7 +5,7 @@ import { ExpenditureCategoryDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeleteExpenditureCategoryFormProps {
   expenditureCategory: ExpenditureCategoryDetailsDto
@@ -33,7 +33,7 @@ const DeleteExpenditureCategoryForm = ({
         messageApi.success('Successfully deleted expenditure category.')
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             'An unexpected error occurred while deleting the expenditure category.',

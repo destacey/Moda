@@ -6,7 +6,7 @@ import {
   ProjectLifecyclePhaseRequest,
 } from '@/src/services/wayd-api'
 import { useUpdateProjectLifecyclePhaseMutation } from '@/src/store/features/ppm/project-lifecycles-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useEffect } from 'react'
@@ -62,7 +62,7 @@ const EditProjectLifecyclePhaseForm = ({
             messageApi.success('Phase updated successfully.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)

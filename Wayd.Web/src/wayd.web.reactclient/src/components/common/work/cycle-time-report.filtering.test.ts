@@ -29,10 +29,10 @@ describe('cycle-time-report.filtering', () => {
 
     it('should keep only items with non-null cycle time', () => {
       const data = [
-        createMockWorkItem('WI-1', null),
-        createMockWorkItem('WI-2', 3),
-        createMockWorkItem('WI-3', undefined),
-        createMockWorkItem('WI-4', 7),
+        createMockWorkItem('WI-1', undefined),
+        createMockWorkItem('WI-2',  3),
+        createMockWorkItem('WI-3',  undefined),
+        createMockWorkItem('WI-4',  7),
       ] as WorkItemListDto[]
 
       const result = getCycleTimeWorkItems(data)
@@ -66,9 +66,9 @@ describe('cycle-time-report.filtering', () => {
 
     it('should sort unsorted items ascending by cycle time', () => {
       const unsorted = [
-        createMockWorkItem('WI-1', 8),
-        createMockWorkItem('WI-2', 2),
-        createMockWorkItem('WI-3', 5),
+        createMockWorkItem('WI-1',  8),
+        createMockWorkItem('WI-2',  2),
+        createMockWorkItem('WI-3',  5),
       ] as WorkItemListDto[]
 
       const result = sortCycleTimeWorkItems(unsorted)
@@ -77,10 +77,10 @@ describe('cycle-time-report.filtering', () => {
 
     it('should treat null or undefined cycle time as 0 for sorting', () => {
       const mixed = [
-        createMockWorkItem('WI-1', 3),
-        createMockWorkItem('WI-2', null),
-        createMockWorkItem('WI-3', undefined),
-        createMockWorkItem('WI-4', 1),
+        createMockWorkItem('WI-1',  3),
+        createMockWorkItem('WI-2', undefined),
+        createMockWorkItem('WI-3',  undefined),
+        createMockWorkItem('WI-4',  1),
       ] as WorkItemListDto[]
 
       const result = sortCycleTimeWorkItems(mixed)
@@ -89,11 +89,11 @@ describe('cycle-time-report.filtering', () => {
   })
 
   const sortedItems = [
-    createMockWorkItem('WI-1', 1),
-    createMockWorkItem('WI-2', 2),
-    createMockWorkItem('WI-3', 3),
-    createMockWorkItem('WI-4', 4),
-    createMockWorkItem('WI-5', 100),
+    createMockWorkItem('WI-1',  1),
+    createMockWorkItem('WI-2',  2),
+    createMockWorkItem('WI-3',  3),
+    createMockWorkItem('WI-4',  4),
+    createMockWorkItem('WI-5',  100),
   ] as WorkItemListDto[]
 
   describe('applyBalancedPercentileFilter', () => {
@@ -103,15 +103,15 @@ describe('cycle-time-report.filtering', () => {
     })
 
     it('should keep single-item arrays for non-zero percentiles', () => {
-      const singleItem = [createMockWorkItem('WI-1', 5)] as WorkItemListDto[]
+      const singleItem = [createMockWorkItem('WI-1',  5)] as WorkItemListDto[]
       const result = applyBalancedPercentileFilter(singleItem, 0.6)
       expect(result.map((x) => x.key)).toEqual(['WI-1'])
     })
 
     it('should keep both items in a two-item array at 60%', () => {
       const twoItems = [
-        createMockWorkItem('WI-1', 1),
-        createMockWorkItem('WI-2', 2),
+        createMockWorkItem('WI-1',  1),
+        createMockWorkItem('WI-2',  2),
       ] as WorkItemListDto[]
       const result = applyBalancedPercentileFilter(twoItems, 0.6)
       expect(result.map((x) => x.key)).toEqual(['WI-1', 'WI-2'])
@@ -119,8 +119,8 @@ describe('cycle-time-report.filtering', () => {
 
     it('should return empty for a two-item array at 0%', () => {
       const twoItems = [
-        createMockWorkItem('WI-1', 1),
-        createMockWorkItem('WI-2', 2),
+        createMockWorkItem('WI-1',  1),
+        createMockWorkItem('WI-2',  2),
       ] as WorkItemListDto[]
       const result = applyBalancedPercentileFilter(twoItems, 0)
       expect(result).toEqual([])
@@ -145,15 +145,15 @@ describe('cycle-time-report.filtering', () => {
     })
 
     it('should keep single-item arrays for non-zero percentiles', () => {
-      const singleItem = [createMockWorkItem('WI-1', 5)] as WorkItemListDto[]
+      const singleItem = [createMockWorkItem('WI-1',  5)] as WorkItemListDto[]
       const result = applyForecastingPercentileFilter(singleItem, 0.6)
       expect(result.map((x) => x.key)).toEqual(['WI-1'])
     })
 
     it('should keep both items in a two-item array at 60%', () => {
       const twoItems = [
-        createMockWorkItem('WI-1', 1),
-        createMockWorkItem('WI-2', 2),
+        createMockWorkItem('WI-1',  1),
+        createMockWorkItem('WI-2',  2),
       ] as WorkItemListDto[]
       const result = applyForecastingPercentileFilter(twoItems, 0.6)
       expect(result.map((x) => x.key)).toEqual(['WI-1', 'WI-2'])
@@ -179,9 +179,9 @@ describe('cycle-time-report.filtering', () => {
   describe('filterCycleTimeWorkItems', () => {
     it('should return all cycle-time items when percentile is 100', () => {
       const data = [
-        createMockWorkItem('WI-1', 5),
-        createMockWorkItem('WI-2', null),
-        createMockWorkItem('WI-3', 2),
+        createMockWorkItem('WI-1',  5),
+        createMockWorkItem('WI-2', undefined),
+        createMockWorkItem('WI-3',  2),
       ] as WorkItemListDto[]
 
       const result = filterCycleTimeWorkItems(data, 100, 'Balanced')

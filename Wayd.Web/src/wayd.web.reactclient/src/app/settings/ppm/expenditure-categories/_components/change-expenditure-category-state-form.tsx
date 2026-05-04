@@ -8,7 +8,7 @@ import {
 } from '@/src/store/features/ppm/expenditure-categories-api'
 import { Modal, Space } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export enum ExpenditureCategoryStateAction {
   Activate = 'Activate',
@@ -45,7 +45,7 @@ const ChangeExpenditureCategoryStateForm = ({
           response = await archiveExpenditureCategoryMutation(expenditureCategory.id)
         }
 
-        if (response.error) {
+        if (response?.error) {
           throw response.error
         }
 
@@ -54,7 +54,7 @@ const ChangeExpenditureCategoryStateForm = ({
         )
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           apiError.detail ??
             `An unexpected error occurred while ${stateAction}ing the expenditure category.`,

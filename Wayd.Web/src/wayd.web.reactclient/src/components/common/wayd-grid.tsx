@@ -3,6 +3,7 @@
 import './grid/ag-grid-init'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import {
+  ChangeEvent,
   forwardRef,
   useImperativeHandle,
   useRef,
@@ -98,7 +99,7 @@ const WaydGrid = forwardRef<AgGridReact, ModaGridProps>(
       setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
     }
 
-    const onGlobalSearchChange = (e) => {
+    const onGlobalSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
       setSearchValue(value)
       gridRef.current?.api.setGridOption('quickFilterText', value)

@@ -76,11 +76,11 @@ Object.assign(navigator, {
 
 Object.defineProperty(window, 'crypto', {
   value: {
-    getRandomValues: (arr) => crypto.randomBytes(arr.length),
+    getRandomValues: (arr: Uint8Array) => crypto.randomBytes(arr.length),
     subtle: {
-      digest: async (algorithm, data) => {
+      digest: async (algorithm: string, data: ArrayBuffer) => {
         const hash = crypto.createHash(algorithm.toLowerCase().replace('-', ''))
-        hash.update(data)
+        hash.update(Buffer.from(data))
         return hash.digest()
       },
       importKey: async () => ({}),

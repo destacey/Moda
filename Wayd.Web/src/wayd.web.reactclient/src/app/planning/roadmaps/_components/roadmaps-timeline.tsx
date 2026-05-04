@@ -28,7 +28,7 @@ import { getLuminance } from '@/src/utils/color-helper'
 import { useUpdateRoadmapItemDatesMutation } from '@/src/store/features/planning/roadmaps-api'
 import { DateType, TimelineItem } from 'vis-timeline/standalone'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -111,7 +111,7 @@ function flattenRoadmapItems(
         if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
-              activityItem.children,
+              activityItem.children ?? [],
               openRoadmapItemDrawer,
               treeLevel + 1,
             ),
@@ -157,7 +157,7 @@ function flattenRoadmapItems(
         if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
-              activityItem.children,
+              activityItem.children ?? [],
               openRoadmapItemDrawer,
               1,
             ),
@@ -399,7 +399,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
     try {
       const value = mapToRequestValues(
         item.start,
-        item.end,
+        item.end!,
         objectData.$type,
         originalItem.id,
         objectData.roadmapId,
@@ -411,7 +411,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       }
       console.log('Update roadmap activity dates')
     } catch (error) {
-      const apiError = isApiError(error) ? error : {}
+      const apiError: ApiError = isApiError(error) ? error : {}
       messageApi.error(
         apiError.detail ??
           'An error occurred while updating the roadmap activity. Please try again.',

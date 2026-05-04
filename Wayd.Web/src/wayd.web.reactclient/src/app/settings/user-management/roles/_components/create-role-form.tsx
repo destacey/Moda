@@ -36,7 +36,7 @@ const CreateRoleForm = ({
   >(null)
   const messageApi = useMessage()
 
-  const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions, {
+  const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions!, {
     skip: !roleIdToCopyPermissions,
   })
 
@@ -70,7 +70,7 @@ const CreateRoleForm = ({
             }
 
             messageApi.success('Successfully created Role.')
-            onFormCreate(response.data)
+            onFormCreate(response.data!)
             return false // Don't call onComplete — we already called onFormCreate
           } catch (error: any) {
             if (error.status === 422 && error.errors) {

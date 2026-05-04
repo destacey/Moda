@@ -6,7 +6,7 @@ import {
   CreateRecurringJobRequest,
 } from '@/src/services/wayd-api'
 import { useCreateRecurringJobMutation } from '@/src/store/features/admin/background-jobs-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal, Select } from 'antd'
 import { useModalForm } from '@/src/hooks'
 
@@ -55,7 +55,7 @@ const CreateRecurringJobForm = ({
             messageApi.success('Successfully created recurring job.')
             return true
           } catch (error) {
-            const apiError = isApiError(error) ? error : {}
+            const apiError: ApiError = isApiError(error) ? error : {}
             if (apiError.status === 422 && apiError.errors) {
               const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)

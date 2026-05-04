@@ -4,6 +4,7 @@ export interface ApiError {
   status?: number
   detail?: string
   errors?: { [key: string]: string[] }
+  supportMessage?: string
   [key: string]: unknown
 }
 

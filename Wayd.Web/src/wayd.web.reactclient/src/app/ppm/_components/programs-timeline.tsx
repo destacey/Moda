@@ -86,8 +86,8 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
             itemColor: getLifecyclePhaseColorFromStatus(program.status, token),
             objectData: program,
             type: 'range',
-            start: new Date(program.start),
-            end: new Date(program.end),
+            start: new Date(program.start!),
+            end: new Date(program.end!),
             openProgramDrawer: openProgramDrawer,
           }))
 

@@ -13,7 +13,7 @@ import {
 } from 'antd'
 import { useEffect } from 'react'
 import { UpdatePlanningIntervalObjectiveRequest } from '@/src/services/wayd-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import { MarkdownEditor } from '@/src/components/common/markdown'
@@ -105,7 +105,7 @@ const EditPlanningIntervalObjectiveForm = ({
             values,
             objectiveKey,
             planningIntervalKey,
-            objectiveData?.team.id,
+            objectiveData?.team.id!,
           )
           const response = await updateObjective(request)
           if (response.error) {
@@ -114,7 +114,7 @@ const EditPlanningIntervalObjectiveForm = ({
           messageApi.success('PI objective updated successfully.')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)

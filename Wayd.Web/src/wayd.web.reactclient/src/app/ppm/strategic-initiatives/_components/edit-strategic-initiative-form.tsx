@@ -10,7 +10,7 @@ import {
   useGetStrategicInitiativeQuery,
   useUpdateStrategicInitiativeMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { toFormErrors, isApiError } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Modal } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import dayjs from 'dayjs'
@@ -83,14 +83,14 @@ const EditStrategicInitiativeForm = ({
           messageApi.success('Strategic initiative updated successfully.')
           return true
         } catch (error) {
-          const apiError = isApiError(error) ? error : {}
+          const apiError: ApiError = isApiError(error) ? error : {}
           if (apiError.status === 422 && apiError.errors) {
             const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              apiError.detail ??
+              (isApiError(apiError) ? apiError.detail : undefined) ??
                 'An error occurred while updating the strategic initiative. Please try again.',
             )
           }
@@ -128,8 +128,8 @@ const EditStrategicInitiativeForm = ({
     if (error || employeeOptionsError) {
       console.error(error || employeeOptionsError)
       messageApi.error(
-        error?.detail ||
-          employeeOptionsError?.detail ||
+        (isApiError(error) ? error.detail : undefined) ||
+          (isApiError(employeeOptionsError) ? employeeOptionsError.detail : undefined) ||
           'An error occurred while loading form data.',
       )
     }

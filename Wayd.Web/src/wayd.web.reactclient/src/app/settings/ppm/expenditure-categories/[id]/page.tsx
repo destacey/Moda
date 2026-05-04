@@ -19,6 +19,7 @@ import ChangeExpenditureCategoryStateForm, {
   ExpenditureCategoryStateAction,
 } from '../_components/change-expenditure-category-state-form'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
 enum ExpenditureCategoryTabs {
   Details = 'details',
@@ -158,7 +159,7 @@ const ExpenditureCategoryDetailsPage = (props: {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading expenditure category details',
       )
       console.error(error)

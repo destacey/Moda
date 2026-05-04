@@ -2,7 +2,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useChangeWorkProcessIsActiveMutation } from '@/src/store/features/work-management/work-process-api'
 import { Modal, Typography } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
-import { isApiError } from '@/src/utils'
+import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -42,7 +42,7 @@ const ChangeWorkProcessIsActiveForm = ({
         messageApi.success(`Successfully ${actionLowerCase}d work process.`)
         return true
       } catch (error) {
-        const apiError = isApiError(error) ? error : {}
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
           `Failed to ${actionLowerCase} work process. Error: ${apiError.detail}`,
         )
