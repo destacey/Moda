@@ -60,7 +60,7 @@ const EditExpenditureCategoryForm = ({
     useModalForm<UpdateExpenditureCategoryFormValues>({
       onSubmit: async (values: UpdateExpenditureCategoryFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, categoryData.id)
+            const request = mapToRequestValues(values, categoryData!.id)
             const response = await updateExpenditureCategory(request)
             if (response.error) {
               throw response.error

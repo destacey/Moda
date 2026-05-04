@@ -52,10 +52,10 @@ const EditStrategicThemeForm = ({
     useModalForm<UpdateStrategicThemeFormValues>({
       onSubmit: async (values: UpdateStrategicThemeFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, strategicThemeData.id)
+            const request = mapToRequestValues(values, strategicThemeData!.id)
             const response = await updateStrategicTheme({
               request,
-              cacheKey: strategicThemeData.key,
+              cacheKey: strategicThemeData!.key,
             })
             if (response.error) {
               throw response.error

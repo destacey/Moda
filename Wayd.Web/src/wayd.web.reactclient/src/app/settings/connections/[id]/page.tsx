@@ -98,12 +98,12 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case ConnectionTabs.Details:
-        return <AzdoConnectionDetails connection={azdoConnection} />
+        return <AzdoConnectionDetails connection={azdoConnection!} />
       case ConnectionTabs.OrganizationConfiguration:
         return (
           <AzdoOrganization
-            workProcesses={azdoConnection?.configuration?.workProcesses}
-            workspaces={azdoConnection?.configuration?.workspaces}
+            workProcesses={azdoConnection?.configuration?.workProcesses ?? []}
+            workspaces={azdoConnection?.configuration?.workspaces ?? []}
           />
         )
       default:
@@ -216,13 +216,13 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         {
           key: 'toggle-sync-setting',
           label: azdoConnection?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
-          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
+          disabled: !!azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => updateSyncState(),
         },
         {
           key: 'sync-organization',
           label: 'Sync Organization Configuration',
-          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
+          disabled: !!azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => {
             setIsSyncingOrganization(true)
             syncOrganizationConfiguration()
@@ -277,14 +277,14 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       </AzdoConnectionContext.Provider>
       {openEditConnectionForm && (
         <EditConnectionForm
-          id={azdoConnection?.id}
+          id={azdoConnection!.id}
           onFormUpdate={() => onEditConnectionFormClosed(true)}
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
       )}
       {openDeleteConnectionForm && (
         <DeleteAzdoConnectionForm
-          connection={azdoConnection}
+          connection={azdoConnection!}
           onFormSave={() => onDeleteConnectionFormClosed(true)}
           onFormCancel={() => onDeleteConnectionFormClosed(false)}
         />

@@ -87,10 +87,10 @@ const EditProjectForm = ({
     useModalForm<EditProjectFormValues>({
       onSubmit: async (values: EditProjectFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, projectData.id)
+            const request = mapToRequestValues(values, projectData!.id)
             const response = await updateProject({
               request,
-              cacheKey: projectData.key,
+              cacheKey: projectData!.key,
             })
             if (response.error) throw response.error
 

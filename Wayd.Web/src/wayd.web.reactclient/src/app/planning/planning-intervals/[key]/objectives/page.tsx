@@ -58,7 +58,7 @@ const PlanningIntervalObjectivesPage = (props: {
     refetch: refectObjectives,
   } = useGetPlanningIntervalObjectivesQuery({
     planningIntervalKey: piKey,
-    teamId: null,
+    teamId: undefined,
   })
 
   const { data: calendarData } = useGetPlanningIntervalCalendarQuery(piKey)
@@ -113,7 +113,7 @@ const PlanningIntervalObjectivesPage = (props: {
       <PageTitle title="PI Objectives" actions={showActions && actions()} />
       {currentView === 'List' && (
         <PlanningIntervalObjectivesGrid
-          objectivesData={objectivesData}
+          objectivesData={objectivesData ?? []}
           isLoading={isLoadingObjectives}
           refreshObjectives={refectObjectives}
           planningIntervalKey={piKey}

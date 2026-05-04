@@ -45,7 +45,7 @@ const PlanningIntervalRisksPage = (props: {
     <>
       <PageTitle title="PI Risks" />
       <RisksGrid
-        risks={risksData}
+        risks={risksData ?? []}
         updateIncludeClosed={onIncludeClosedRisksChanged}
         isLoadingRisks={risksIsLoading}
         refreshRisks={refetchRisks}

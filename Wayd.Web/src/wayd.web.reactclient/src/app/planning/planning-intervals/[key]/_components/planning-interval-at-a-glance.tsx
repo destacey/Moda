@@ -52,7 +52,7 @@ const PlanningIntervalAtAGlance = ({
   const { data: objectivesData } = useGetPlanningIntervalObjectivesQuery(
     {
       planningIntervalKey: planningInterval.key,
-      teamId: null,
+      teamId: undefined,
     },
     {
       skip:

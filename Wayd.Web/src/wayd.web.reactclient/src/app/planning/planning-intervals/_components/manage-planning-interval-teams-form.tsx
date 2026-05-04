@@ -9,6 +9,7 @@ import {
 } from '@/src/services/clients'
 import { Modal, Spin, Table, Transfer, TransferProps } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
+import type { Key } from 'react'
 import difference from 'lodash/difference'
 import {
   ManagePlanningIntervalTeamsRequest,
@@ -28,7 +29,7 @@ interface PlanningIntervalTeamModel {
   name: string
   code: string
   disabled: boolean
-  teamOfTeams: string
+  teamOfTeams: string | undefined
 }
 
 interface TableTransferProps extends TransferProps<PlanningIntervalTeamModel> {
@@ -117,7 +118,7 @@ const ManagePlanningIntervalTeamsForm = ({
 }: ManagePlanningIntervalTeamsFormProps) => {
   const [isLoading, setIsLoading] = useState(false)
   const [teams, setTeams] = useState<PlanningIntervalTeamModel[]>([])
-  const [targetKeys, setTargetKeys] = useState<string[]>([])
+  const [targetKeys, setTargetKeys] = useState<Key[]>([])
   const messageApi = useMessage()
 
   // TODO: should this be in a custom hook? The teams index page has a similar call.
@@ -153,7 +154,7 @@ const ManagePlanningIntervalTeamsForm = ({
       try {
         const request: ManagePlanningIntervalTeamsRequest = {
           id: id,
-          teamIds: targetKeys,
+          teamIds: targetKeys as string[],
         }
         await getPlanningIntervalsClient().manageTeams(id, request)
 
@@ -206,7 +207,7 @@ const ManagePlanningIntervalTeamsForm = ({
     }
   }, [isOpen, id, getTeams, getPlanningIntervalTeams, messageApi])
 
-  const onChange = (nextTargetKeys: string[]) => {
+  const onChange: TransferProps<PlanningIntervalTeamModel>['onChange'] = (nextTargetKeys) => {
     setTargetKeys(nextTargetKeys)
   }
 
@@ -234,10 +235,12 @@ const ManagePlanningIntervalTeamsForm = ({
                 -1 ||
               item.code!.toLowerCase().indexOf(inputValue.toLowerCase()) !==
                 -1 ||
-              (item.teamOfTeams &&
+              !!(
+                item.teamOfTeams &&
                 item.teamOfTeams
                   .toLowerCase()
-                  .indexOf(inputValue.toLowerCase()) !== -1)
+                  .indexOf(inputValue.toLowerCase()) !== -1
+              )
             }
             leftColumns={tableColumns}
             rightColumns={tableColumns}

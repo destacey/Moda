@@ -26,7 +26,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkTypeLevel,
-        ...result.map(({ id }) => ({ type: QueryTags.WorkTypeLevel, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkTypeLevel, id })) ?? []),
       ],
     }),
     getWorkTypeLevelOptions: builder.query<BaseOptionType[], null>({
@@ -58,10 +58,10 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkTypeLevelOption,
-        ...result.map(({ id }) => ({
+        ...(result?.map(({ id }) => ({
           type: QueryTags.WorkTypeLevelOption,
           id,
-        })),
+        })) ?? []),
       ],
     }),
     getWorkTypeLevel: builder.query<WorkTypeLevelDto, number>({
@@ -75,7 +75,7 @@ export const workTypeLevelApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result) => [
-        { type: QueryTags.WorkTypeLevel, id: result.id },
+        { type: QueryTags.WorkTypeLevel, id: result?.id },
       ],
     }),
     createWorkTypeLevel: builder.mutation<number, CreateWorkTypeLevelRequest>({

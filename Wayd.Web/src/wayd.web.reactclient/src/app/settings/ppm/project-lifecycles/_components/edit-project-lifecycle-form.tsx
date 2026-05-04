@@ -52,7 +52,7 @@ const EditProjectLifecycleForm = ({
           try {
             const request = mapToRequestValues(values)
             const response = await updateProjectLifecycle({
-              id: lifecycleData.id,
+              id: lifecycleData!.id,
               ...request,
             })
             if (response.error) {

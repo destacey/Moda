@@ -67,7 +67,7 @@ const EstimationScaleDetailsPage = (props: {
   const renderTabContent = () => {
     switch (activeTab) {
       case EstimationScaleTabs.Details:
-        return <EstimationScaleDetails estimationScale={scaleData} />
+        return <EstimationScaleDetails estimationScale={scaleData!} />
       default:
         return null
     }

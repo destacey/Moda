@@ -10,7 +10,7 @@ import { WorkItemListDto } from '@/src/services/wayd-api'
 
 const createMockWorkItem = (
   key: string,
-  cycleTime: number | null | undefined,
+  cycleTime: number | undefined,
 ): Partial<WorkItemListDto> => ({
   key,
   cycleTime,

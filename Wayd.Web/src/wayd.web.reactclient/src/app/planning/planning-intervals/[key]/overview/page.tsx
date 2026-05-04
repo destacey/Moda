@@ -48,14 +48,14 @@ const PlanningIntervalOverviewPage = (props: {
   }
 
   const isFuturePlanningInterval =
-    planningIntervalData.state.id === IterationState.Future
+    planningIntervalData!.state.id === IterationState.Future
   const isActivePlanningInterval =
-    planningIntervalData.state.id === IterationState.Active
+    planningIntervalData!.state.id === IterationState.Active
 
   return (
     <Flex vertical gap="middle">
       <PageTitle title="PI Overview" />
-      <PlanningIntervalAtAGlance planningInterval={planningIntervalData} />
+      <PlanningIntervalAtAGlance planningInterval={planningIntervalData!} />
       <IterationCards piKey={piKey} />
       {!isFuturePlanningInterval && <PlanningIntervalTeamCards piKey={piKey} />}
       {isActivePlanningInterval && <PlanningIntervalNeedsAttentionCard piKey={piKey} />}

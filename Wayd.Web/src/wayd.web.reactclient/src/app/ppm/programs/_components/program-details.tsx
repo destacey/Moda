@@ -87,8 +87,8 @@ const ProgramDetails: FC<ProgramDetailsProps> = ({ program }) => {
           <>
             <Divider />
             <TimelineProgress
-              start={program.start}
-              end={program.end}
+              start={program.start ?? null}
+              end={program.end ?? null}
               variant="borderless"
               style={{ width: '100%' }}
               dateFormat={timelineFormat}

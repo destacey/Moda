@@ -117,7 +117,7 @@ const EditRiskForm = ({
     const mapToFormValues = (risk: RiskDetailsDto) => {
       form.setFieldsValue({
         riskId: risk.id,
-        teamId: risk.team.id,
+        teamId: risk.team?.id,
         summary: risk.summary,
         description: risk.description || '',
         statusId: risk.status.id,
@@ -129,7 +129,7 @@ const EditRiskForm = ({
         response: risk.response || '',
       })
     }
-    setTeamName(riskData.team.name)
+    setTeamName(riskData.team?.name ?? '')
     mapToFormValues(riskData)
   }, [form, riskData, isOpen])
 

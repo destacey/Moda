@@ -84,8 +84,8 @@ const StrategicInitiativeDetails: FC<StrategicInitiativeDetailsProps> = ({
           <>
             <Divider />
             <TimelineProgress
-              start={strategicInitiative.start}
-              end={strategicInitiative.end}
+              start={strategicInitiative.start ?? null}
+              end={strategicInitiative.end ?? null}
               variant="borderless"
               style={{ width: '100%' }}
               dateFormat={timelineFormat}

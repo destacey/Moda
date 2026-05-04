@@ -42,7 +42,7 @@ const EditFeatureFlagForm = ({
             const response = await updateFeatureFlag({
               id: featureFlagId,
               displayName: values.displayName,
-              description: values.description || null,
+              description: values.description || undefined,
             })
 
             if (response.error) {

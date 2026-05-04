@@ -60,7 +60,7 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case EmployeeTabs.Details:
-        return <EmployeeDetails employee={employeeData} />
+        return <EmployeeDetails employee={employeeData!} />
       default:
         return null
     }

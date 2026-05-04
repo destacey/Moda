@@ -17,7 +17,7 @@ const TeamSprints: FC<TeamSprintsProps> = (props) => {
 
   return (
     <SprintsGrid
-      sprints={sprintData}
+      sprints={sprintData ?? []}
       isLoading={isLoading}
       refetch={refetch}
       hideTeam={true}

@@ -117,7 +117,7 @@ const PlanningIntervalDetailsPage = (props: {
     switch (activeTab) {
       case PlanningIntervalTabs.Details:
         return (
-          <PlanningIntervalDetails planningInterval={planningIntervalData} />
+          <PlanningIntervalDetails planningInterval={planningIntervalData!} />
         )
       case PlanningIntervalTabs.Teams:
         return createElement(TeamsGrid, {
@@ -128,7 +128,7 @@ const PlanningIntervalDetailsPage = (props: {
       case PlanningIntervalTabs.SprintMappings:
         return (
           <PlanningIntervalTeamSprintMappings
-            planningInterval={planningIntervalData}
+            planningInterval={planningIntervalData!}
           />
         )
       default:
@@ -205,7 +205,7 @@ const PlanningIntervalDetailsPage = (props: {
       )}
       {openManagePlanningIntervalDatesForm && (
         <ManagePlanningIntervalDatesForm
-          id={planningIntervalData?.id}
+          id={planningIntervalData!.id}
           planningIntervalKey={piKey}
           onFormSave={() => onManagePlanningIntervalDatesFormClosed(true)}
           onFormCancel={() => onManagePlanningIntervalDatesFormClosed(false)}
@@ -213,7 +213,7 @@ const PlanningIntervalDetailsPage = (props: {
       )}
       {openManageTeamsForm && (
         <ManagePlanningIntervalTeamsForm
-          id={planningIntervalData?.id}
+          id={planningIntervalData!.id}
           onFormSave={() => onManageTeamsFormClosed(true)}
           onFormCancel={() => onManageTeamsFormClosed(false)}
         />

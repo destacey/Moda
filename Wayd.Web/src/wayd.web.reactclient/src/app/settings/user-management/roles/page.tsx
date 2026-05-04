@@ -65,7 +65,7 @@ const RoleListPage = () => {
 
       {openCreateRoleForm && (
         <CreateRoleForm
-          roles={roleData}
+          roles={roleData ?? []}
           onFormCreate={(id: string) => {
             setOpenCreateRoleForm(false)
             router.push(`/settings/user-management/roles/${id}`)

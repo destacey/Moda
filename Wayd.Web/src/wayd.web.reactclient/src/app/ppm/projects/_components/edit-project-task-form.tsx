@@ -208,7 +208,7 @@ const EditProjectTaskForm = ({
                 node.title
                   ?.toString()
                   .toLowerCase()
-                  .includes(input.toLowerCase()),
+                  .includes(input.toLowerCase()) ?? false,
             }}
           />
         </Item>

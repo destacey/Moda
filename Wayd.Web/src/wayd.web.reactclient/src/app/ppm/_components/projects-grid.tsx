@@ -53,8 +53,10 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
         headerName: 'Portfolio',
         width: 200,
         hide: props.hidePortfolio,
-        cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
+        cellRenderer: (params) => {
+          if (!params.data) return null
+          return PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio })
+        },
       },
       {
         field: 'program.name',
@@ -62,40 +64,41 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
         width: 200,
         hide: props.hideProgram,
         cellRenderer: (params) =>
-          params.data.program &&
-          ProgramLinkCellRenderer({ ...params, data: params.data.program }),
+          params.data?.program
+            ? ProgramLinkCellRenderer({ ...params, data: params.data.program })
+            : null,
       },
       {
         field: 'start',
         width: 125,
         valueGetter: (params) =>
-          params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
+          params.data?.start && dayjs(params.data.start).format('MMM D, YYYY'),
       },
       {
         field: 'end',
         width: 125,
         valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
+          params.data?.end && dayjs(params.data.end).format('MMM D, YYYY'),
       },
       {
         field: 'projectManagers',
         headerName: 'PMs',
-        valueGetter: (params) => getSortedNames(params.data.projectManagers),
+        valueGetter: (params) => getSortedNames(params.data?.projectManagers ?? []),
       },
       {
         field: 'projectOwners',
         headerName: 'Owners',
-        valueGetter: (params) => getSortedNames(params.data.projectOwners),
+        valueGetter: (params) => getSortedNames(params.data?.projectOwners ?? []),
       },
       {
         field: 'projectSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.projectSponsors),
+        valueGetter: (params) => getSortedNames(params.data?.projectSponsors ?? []),
       },
       {
         field: 'strategicThemes',
         headerName: 'Strategic Themes',
-        valueGetter: (params) => getSortedNames(params.data.strategicThemes),
+        valueGetter: (params) => getSortedNames(params.data?.strategicThemes ?? []),
       },
       {
         field: 'projectLifecycle.name',

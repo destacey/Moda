@@ -17,7 +17,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkStatus,
-        ...result.map(({ id }) => ({ type: QueryTags.WorkType, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkType, id })) ?? []),
       ],
     }),
     getWorkStatus: builder.query<WorkStatusDto, number>({
@@ -30,7 +30,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result) => [{ type: QueryTags.WorkStatus, id: result.id }],
+      providesTags: (result) => [{ type: QueryTags.WorkStatus, id: result?.id }],
     }),
   }),
   overrideExisting: false,

@@ -164,8 +164,8 @@ const EditPlanningIntervalObjectiveForm = ({
 
   const isDateWithinPiRange = (date: Date) => {
     return (
-      dayjs(planningIntervalData.start) <= dayjs(date) &&
-      dayjs(date) <= dayjs(planningIntervalData.end)
+      dayjs(planningIntervalData!.start) <= dayjs(date) &&
+      dayjs(date) <= dayjs(planningIntervalData!.end)
     )
   }
 

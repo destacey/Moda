@@ -53,8 +53,8 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const { data: teamOperatingModel } = useGetTeamOperatingModelAsOfQuery(
     {
-      teamId: sprintData?.team.id,
-      asOfDate: sprintData?.start,
+      teamId: sprintData?.team.id!,
+      asOfDate: sprintData?.start ?? '',
     },
     { skip: !sprintData || !sprintData?.team.id },
   )
@@ -128,7 +128,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             Backlog
           </Title>
           <SprintBacklogGrid
-            workItems={workItemsData}
+            workItems={workItemsData ?? []}
             isLoading={workItemsDataIsLoading}
             refetch={refetchWorkItemsData}
             hideTeamColumn={true}

@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -18,6 +18,7 @@ import {
   WaydTimelineOptions,
 } from '@/src/components/common/timeline'
 import {
+  ItemTemplateProps,
   WaydDataItem,
   TimelineTemplate,
 } from '@/src/components/common/timeline/types'
@@ -107,7 +108,7 @@ function flattenRoadmapItems(
 
         acc.push(timelineItem)
 
-        if (activityItem.children?.length > 0) {
+        if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
               activityItem.children,
@@ -153,7 +154,7 @@ function flattenRoadmapItems(
 
         acc.push(timelineItem)
 
-        if (activityItem.children?.length > 0) {
+        if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
               activityItem.children,
@@ -276,7 +277,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [updateRoadmapItemDates, { error: updateDatesError }] =
     useUpdateRoadmapItemDatesMutation()
 
-  const processedData: ProcessedRoadmapData = (() => {
+  const processedData: ProcessedRoadmapData | null = (() => {
     if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
       return null
     }
@@ -327,8 +328,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
     const potentialGroups = processedData.items.filter(
       (item) =>
-        item.objectData.$type === RoadmapItemType.Activity ||
-        item.objectData.$type === RoadmapItemType.Roadmap,
+        item.objectData?.$type === RoadmapItemType.Activity ||
+        item.objectData?.$type === RoadmapItemType.Roadmap,
     )
 
     return createNestedGroups(potentialGroups, currentLevel)
@@ -339,8 +340,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       (item) =>
         item.treeLevel === currentLevel ||
         (item.treeLevel < currentLevel &&
-          item.objectData.$type !== RoadmapItemType.Roadmap &&
-          item.objectData.$type !== RoadmapItemType.Activity),
+          item.objectData?.$type !== RoadmapItemType.Roadmap &&
+          item.objectData?.$type !== RoadmapItemType.Activity),
     ) ?? []
 
   // Compute timeline window synchronously from props so the timeline receives values on first render
@@ -393,6 +394,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
     const { objectData } = originalItem
 
+    if (!objectData) return
+
     try {
       const value = mapToRequestValues(
         item.start,
@@ -440,8 +443,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           data={filteredItems}
           groups={processedGroups}
           isLoading={props.isRoadmapItemsLoading}
-          options={timelineOptions}
-          rangeItemTemplate={RoadmapRangeItemTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={RoadmapRangeItemTemplate as FC<ItemTemplateProps<WaydDataItem>>}
           allowFullScreen={true}
           allowSaveAsImage={true}
           onMove={props.isRoadmapManager ? onMove : undefined}

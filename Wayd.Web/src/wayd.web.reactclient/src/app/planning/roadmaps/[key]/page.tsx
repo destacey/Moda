@@ -283,7 +283,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <Divider />
       <RoadmapViewManager
         roadmap={roadmapData}
-        roadmapItems={roadmapItems}
+        roadmapItems={roadmapItems ?? []}
         isRoadmapItemsLoading={isRoadmapItemsLoading}
         refreshRoadmapItems={refetchRoadmapItems}
         canUpdateRoadmap={canUpdateRoadmap && isRoadmapManager && !isArchived}

@@ -96,25 +96,25 @@ const WorkItemDetailsPage = (props: {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
 
-  const tabs = getWorkItemTabs(workItemData)
+  const tabs = getWorkItemTabs(workItemData!)
 
   const renderTabContent = () => {
     switch (activeTab) {
       case WorkItemTabs.Details:
-        return <WorkItemDetails workItem={workItemData} />
+        return <WorkItemDetails workItem={workItemData!} />
       case WorkItemTabs.WorkItems:
         return (
           <WorkItemsGrid
-            workItems={childWorkItemsQuery.data}
+            workItems={childWorkItemsQuery.data ?? []}
             isLoading={childWorkItemsQuery.isLoading}
             refetch={childWorkItemsQuery.refetch}
             hideParentColumn={true}
           />
         )
       case WorkItemTabs.Dashboard:
-        return <WorkItemDashboard workItem={workItemData} />
+        return <WorkItemDashboard workItem={workItemData!} />
       case WorkItemTabs.Dependencies:
-        return <WorkItemDependencies workItem={workItemData} />
+        return <WorkItemDependencies workItem={workItemData!} />
       default:
         return null
     }
@@ -156,7 +156,7 @@ const WorkItemDetailsPage = (props: {
       },
       {
         title: upperWorkItemKey,
-        href: null,
+        href: undefined,
       },
     ]
 
@@ -180,12 +180,12 @@ const WorkItemDetailsPage = (props: {
       <PageTitle
         title={
           <ExternalIconLink
-            content={workItemData?.title}
-            url={workItemData.externalViewWorkItemUrl}
+            content={workItemData!.title}
+            url={workItemData!.externalViewWorkItemUrl}
             tooltip="Open in external system"
           />
         }
-        subtitle={`${workItemData?.type.name ?? 'Work Item'} Details`}
+        subtitle={`${workItemData!.type.name ?? 'Work Item'} Details`}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
@@ -198,9 +198,9 @@ const WorkItemDetailsPage = (props: {
       </Card>
       {openEditWorkItemProjectForm && (
         <EditWorkItemProjectForm
-          workItemId={workItemData.id}
-          workItemKey={workItemData.key}
-          workspaceId={workItemData.workspace.id}
+          workItemId={workItemData!.id}
+          workItemKey={workItemData!.key}
+          workspaceId={workItemData!.workspace.id}
           onFormCancel={() => setOpenEditWorkItemProjectForm(false)}
           onFormComplete={() => {
             setOpenEditWorkItemProjectForm(false)

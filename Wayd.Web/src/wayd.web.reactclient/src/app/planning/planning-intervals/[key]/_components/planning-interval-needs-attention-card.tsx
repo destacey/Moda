@@ -37,7 +37,7 @@ const PlanningIntervalNeedsAttentionCard = ({
   } = useGetPlanningIntervalObjectivesQuery(
     {
       planningIntervalKey: piKey,
-      teamId: null,
+      teamId: undefined,
     },
     {
       skip: !piKey,

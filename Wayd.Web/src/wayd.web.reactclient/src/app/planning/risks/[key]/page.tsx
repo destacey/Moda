@@ -44,7 +44,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case RiskTabs.Details:
-        return <RiskDetails risk={riskData} />
+        return <RiskDetails risk={riskData!} />
       default:
         return null
     }
@@ -72,7 +72,7 @@ const RiskDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     breadcrumbRoute.push(
       {
         href: `/organizations/${teamRoute}/${riskData.team?.key}`,
-        title: riskData.team?.name,
+        title: riskData.team?.name ?? '',
       },
       {
         title: riskData.summary,

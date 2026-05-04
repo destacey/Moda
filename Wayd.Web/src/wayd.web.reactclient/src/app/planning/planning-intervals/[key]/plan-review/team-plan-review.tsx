@@ -138,7 +138,7 @@ const TeamPlanReview = ({
           <Title level={3} style={{ margin: '0' }}>
             <Link href={`/organizations/teams/${team?.key}`}>{team?.name}</Link>
           </Title>
-          {objectivesData?.length > 0 && teamPredictabilityData != null && (
+          {(objectivesData?.length ?? 0) > 0 && teamPredictabilityData != null && (
             <Tag title="PI Predictability">{`${teamPredictabilityData}%`}</Tag>
           )}
         </Space>
@@ -148,7 +148,7 @@ const TeamPlanReview = ({
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={24} md={24} lg={12}>
             <TeamObjectivesListCard
-              objectivesData={objectivesData}
+              objectivesData={objectivesData ?? []}
               refreshObjectives={refetchObjectives}
               teamId={team?.id}
               planningIntervalId={planningInterval?.id}
@@ -164,7 +164,7 @@ const TeamPlanReview = ({
           </Col>
           <Col xs={24} sm={24} md={24} lg={12}>
             <TeamRisksListCard
-              risks={risksData}
+              risks={risksData ?? []}
               teamId={team?.id}
               canCreateRisks={canCreateRisks}
               canUpdateRisks={canUpdateRisks}
@@ -174,7 +174,7 @@ const TeamPlanReview = ({
         </Row>
       ) : (
         <PlanningIntervalObjectivesTimeline
-          objectivesData={objectivesData}
+          objectivesData={objectivesData ?? []}
           planningIntervalCalendar={calendarData}
         />
       )}

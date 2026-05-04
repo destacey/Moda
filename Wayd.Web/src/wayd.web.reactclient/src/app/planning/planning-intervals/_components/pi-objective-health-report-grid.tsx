@@ -67,12 +67,12 @@ const PiObjectiveHealthReportGrid = (
       {
         field: 'reportedOn',
         valueGetter: (params) =>
-          dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
+          params.data?.reportedOn ? dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A') : null,
       },
       {
         field: 'expiration',
         valueGetter: (params) =>
-          dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
+          params.data?.expiration ? dayjs(params.data.expiration).format('M/D/YYYY h:mm A') : null,
       },
     ],
     [],

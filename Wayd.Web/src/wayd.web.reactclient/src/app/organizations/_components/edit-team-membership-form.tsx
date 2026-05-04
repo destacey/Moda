@@ -90,8 +90,8 @@ const EditTeamMembershipForm = ({
   useEffect(() => {
     if (!membership) return
     form.setFieldsValue({
-      start: membership.start ? dayjs(membership.start) : null,
-      end: membership.end ? dayjs(membership.end) : null,
+      start: membership.start ? dayjs(membership.start) : undefined,
+      end: membership.end ? dayjs(membership.end) : undefined,
     })
   }, [membership, form])
 

@@ -48,7 +48,7 @@ const CreateStrategicThemeForm = ({
             }
             messageApi.success(
               'Strategic Theme created successfully. Strategic Theme key: ' +
-                response.data.key,
+                response.data!.key,
             )
             return true
           } catch (error) {

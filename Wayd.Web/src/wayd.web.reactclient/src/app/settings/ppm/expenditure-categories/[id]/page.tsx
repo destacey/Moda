@@ -81,7 +81,7 @@ const ExpenditureCategoryDetailsPage = (props: {
   const renderTabContent = () => {
     switch (activeTab) {
       case ExpenditureCategoryTabs.Details:
-        return <ExpenditureCategoryDetails expenditureCategory={categoryData} />
+        return <ExpenditureCategoryDetails expenditureCategory={categoryData!} />
       default:
         return null
     }

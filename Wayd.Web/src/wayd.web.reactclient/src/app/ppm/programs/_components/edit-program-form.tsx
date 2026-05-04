@@ -72,10 +72,10 @@ const EditProgramForm = ({
     useModalForm<EditProgramFormValues>({
       onSubmit: async (values: EditProgramFormValues, form) => {
         try {
-          const request = mapToRequestValues(values, programData.id)
+          const request = mapToRequestValues(values, programData!.id)
           const response = await updateProgram({
             request,
-            cacheKey: programData.key,
+            cacheKey: programData!.key,
           })
           if (response.error) throw response.error
 

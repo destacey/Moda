@@ -157,7 +157,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         try {
           const data = await getPortfoliosClient().getPrograms(
             portfolioIdOrKey,
-            status?.length > 0 ? status : undefined,
+            (status?.length ?? 0) > 0 ? status : undefined,
           )
           return { data }
         } catch (error) {
@@ -199,7 +199,7 @@ export const portfoliosApi = apiSlice.injectEndpoints({
         try {
           const data = await getPortfoliosClient().getStrategicInitiatives(
             portfolioIdOrKey,
-            status?.length > 0 ? status : undefined,
+            (status?.length ?? 0) > 0 ? status : undefined,
           )
           return { data }
         } catch (error) {

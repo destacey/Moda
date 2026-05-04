@@ -75,7 +75,7 @@ const WaydGrid = forwardRef<AgGridReact, ModaGridProps>(
     const [searchValue, setSearchValue] = useState('')
     const showGlobalSearch = includeGlobalSearch ?? true
     const showExportButton = includeExportButton ?? true
-    const showGridControls = gridControlMenuItems?.length > 0
+    const showGridControls = (gridControlMenuItems?.length ?? 0) > 0
 
     const gridRef = useRef<AgGridReact>(null)
     const [gridContainerRef, autoHeight] = useRemainingHeight()

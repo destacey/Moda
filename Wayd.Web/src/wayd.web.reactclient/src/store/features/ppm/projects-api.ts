@@ -265,7 +265,7 @@ export const projectsApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkItem,
-        ...result.map(({ key }) => ({ type: QueryTags.ProjectWorkItems, key })),
+        ...(result?.map(({ key }) => ({ type: QueryTags.ProjectWorkItems, key })) ?? []),
       ],
     }),
 

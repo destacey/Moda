@@ -340,7 +340,7 @@ const createCrudSlice = <
             state.data as EntityState<TItem, EntityId>,
             action.payload,
           )
-          state.detail.item = null
+          ;(state.detail.item as TDetail | null) = null
           state.detail.isSaving = false
           additionalThunkReducers[action.type] &&
             additionalThunkReducers[action.type](state, action)

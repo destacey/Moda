@@ -50,7 +50,7 @@ const mapToRequestValues = (
     planningIntervalId: values.planningIntervalId,
     teamId: values.teamId,
     name: values.name,
-    description: values.description,
+    description: values.description ?? undefined,
     isStretch: values.isStretch,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
@@ -83,7 +83,7 @@ const CreatePlanningIntervalObjectiveForm = ({
           const request = mapToRequestValues(values, order)
           const response = await createObjective({
             request,
-            planningIntervalKey: planningIntervalData?.key,
+            planningIntervalKey: planningIntervalData!.key,
           })
           if (response.error) {
             throw response.error
@@ -137,8 +137,8 @@ const CreatePlanningIntervalObjectiveForm = ({
 
   const isDateWithinPiRange = (date: Date) => {
     return (
-      dayjs(planningIntervalData.start) <= dayjs(date) &&
-      dayjs(date) <= dayjs(planningIntervalData.end)
+      dayjs(planningIntervalData!.start) <= dayjs(date) &&
+      dayjs(date) <= dayjs(planningIntervalData!.end)
     )
   }
 

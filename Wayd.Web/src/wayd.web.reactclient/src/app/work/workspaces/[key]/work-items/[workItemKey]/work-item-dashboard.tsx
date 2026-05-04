@@ -29,7 +29,7 @@ const WorkItemDashboard = ({ workItem }: WorkItemDashboardProps) => {
   if (!workItem) return null
 
   // get the last item from the CFD data
-  const progress: WorkItemProgressDailyRollupDto =
+  const progress: WorkItemProgressDailyRollupDto | null =
     metricsData && metricsData.length > 0
       ? metricsData[metricsData.length - 1]
       : null

@@ -19,7 +19,7 @@ const TeamDependencyManagement: FC<TeamDependencyManagementProps> = (props) => {
   return (
     <TeamDependenciesGrid
       team={props.team}
-      dependencies={dependencyData}
+      dependencies={dependencyData ?? []}
       isLoading={isLoading}
       refetch={refetch}
     />

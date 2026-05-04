@@ -20,7 +20,7 @@ const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
   const [openUpdateWorkTypeForm, setOpenUpdateWorkTypeForm] =
     useState<boolean>(false)
-  const [editWorkTypeId, setEditWorkTypeId] = useState<number | null>(null)
+  const [editWorkTypeId, setEditWorkTypeId] = useState<number | undefined>(undefined)
 
   const { includeInactive } = useAppSelector((state) => state.workType)
 
@@ -116,7 +116,7 @@ const WorkTypesPage = () => {
 
   const onEditWorkTypeFormClosed = (wasSaved: boolean) => {
     setOpenUpdateWorkTypeForm(false)
-    setEditWorkTypeId(null)
+    setEditWorkTypeId(undefined)
     if (wasSaved) {
       refresh()
     }
@@ -136,7 +136,7 @@ const WorkTypesPage = () => {
       />
       {openUpdateWorkTypeForm && (
         <EditWorkTypeForm
-          workTypeId={editWorkTypeId}
+          workTypeId={editWorkTypeId!}
           onFormSave={() => onEditWorkTypeFormClosed(true)}
           onFormCancel={() => onEditWorkTypeFormClosed(false)}
         />

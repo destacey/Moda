@@ -51,7 +51,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Filter Your Projects',
       description:
         'Use these filters to narrow down projects by your role (Sponsor, Owner, PM, Member, or Task Assignee) and by project status. Leadership roles (Sponsor, Owner, PM) show all tasks, while Member and Task Assignee show only your assigned tasks. Your filter selections are saved automatically.',
-      target: () => filterBarRef.current,
+      target: (() => filterBarRef.current) as () => HTMLElement,
       placement: 'bottom',
       style: stepStyle,
     },
@@ -59,7 +59,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Summary Metrics',
       description:
         'See aggregated task metrics across your visible projects at a glance. These counts update based on your role and status filters.',
-      target: () => summaryBarRef.current,
+      target: (() => summaryBarRef.current) as () => HTMLElement,
       placement: 'bottom',
       style: stepStyle,
     },
@@ -67,7 +67,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Project List',
       description:
         'Your projects are grouped by portfolio. Each card shows your role, project status, phase timeline, task statistics, and team members. Task statistics on each card reflect your role filters, not your actual roles on the project.',
-      target: () => leftPanelRef.current,
+      target: (() => leftPanelRef.current) as () => HTMLElement,
       placement: 'right',
       style: stepStyle,
     },
@@ -75,7 +75,7 @@ export const useMyProjectsTour = (): MyProjectsTourResult => {
       title: 'Project Details',
       description:
         'Clicking a project card opens its details here, including phases, task summary, and the full project plan with deliverables and tasks. Click any task row to view additional task details.',
-      target: () => rightPanelRef.current,
+      target: (() => rightPanelRef.current) as () => HTMLElement,
       placement: 'left',
       style: stepStyle,
     },

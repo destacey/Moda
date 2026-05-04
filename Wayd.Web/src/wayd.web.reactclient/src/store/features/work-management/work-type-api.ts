@@ -17,7 +17,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkType,
-        ...result.map(({ id }) => ({ type: QueryTags.WorkType, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkType, id })) ?? []),
       ],
     }),
     getWorkType: builder.query<WorkTypeDto, number>({
@@ -30,7 +30,7 @@ export const workTypeApi = apiSlice.injectEndpoints({
           return { error }
         }
       },
-      providesTags: (result) => [{ type: QueryTags.WorkType, id: result.id }],
+      providesTags: (result) => [{ type: QueryTags.WorkType, id: result?.id }],
     }),
     updateWorkType: builder.mutation<void, UpdateWorkTypeRequest>({
       queryFn: async (request) => {

@@ -54,7 +54,7 @@ const HierarchyPage = () => {
             <WorkTypeTierCard
               key={tier.id}
               tier={tier}
-              levels={workLevels?.filter((level) => level.tier.id === tier.id)}
+              levels={workLevels?.filter((level) => level.tier.id === tier.id) ?? []}
               refreshLevels={refetchLevels}
               canCreateWorkTypeLevels={canCreateWorkTypeLevels}
               canUpdateWorkTypeLevels={canUpdateWorkTypeLevels}

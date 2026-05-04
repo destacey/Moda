@@ -75,11 +75,11 @@ const CopyRoadmapForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              `Roadmap copied successfully. Roadmap key ${response.data.key}`,
+              `Roadmap copied successfully. Roadmap key ${response.data!.key}`,
             )
 
             // Navigate to the new roadmap
-            router.push(`/planning/roadmaps/${response.data.key}`)
+            router.push(`/planning/roadmaps/${response.data!.key}`)
 
             return true
           } catch (error) {

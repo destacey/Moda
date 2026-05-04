@@ -90,13 +90,13 @@ const TeamOfTeamsDetailsPage = (props: {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const teamMembershipsQuery = useGetTeamOfTeamsMembershipsQuery(
-    { teamId: team?.id, enabled: teamMembershipsQueryEnabled },
+    { teamId: team?.id!, enabled: teamMembershipsQueryEnabled },
     { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
   const risksQuery = useGetTeamOfTeamsRisksQuery(
     {
-      id: team?.id,
+      id: team?.id!,
       includeClosed: includeClosedRisks,
       enabled: risksQueryEnabled,
     },
@@ -139,7 +139,7 @@ const TeamOfTeamsDetailsPage = (props: {
   const renderTabContent = () => {
     switch (activeTab) {
       case TeamOfTeamsTabs.Details:
-        return <TeamOfTeamsDetails team={team} />
+        return <TeamOfTeamsDetails team={team!} />
       case TeamOfTeamsTabs.RiskManagement:
         return createElement(RisksGrid, {
           risks: risksQuery.data,
@@ -209,7 +209,7 @@ const TeamOfTeamsDetailsPage = (props: {
   }
 
   const teamName = !team
-    ? null
+    ? undefined
     : team.isActive
       ? team?.name
       : `${team?.name} (Inactive)`
@@ -219,7 +219,7 @@ const TeamOfTeamsDetailsPage = (props: {
       <PageTitle
         title={teamName}
         subtitle="Team of Teams Details"
-        tags={<InactiveTag isActive={team?.isActive} />}
+        tags={<InactiveTag isActive={team?.isActive ?? false} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
@@ -233,7 +233,7 @@ const TeamOfTeamsDetailsPage = (props: {
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
-          teamId={team?.id}
+          teamId={team!.id!}
           teamType={'Team of Teams'}
           onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
           onFormCancel={() => onCreateTeamMembershipFormClosed(false)}
@@ -241,7 +241,7 @@ const TeamOfTeamsDetailsPage = (props: {
       )}
       {openDeactivateTeamForm && (
         <DeactivateTeamOfTeamsForm
-          team={team}
+          team={team!}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
         />

@@ -58,7 +58,7 @@ const authorizeMenuItems = (
         )
       : undefined
     if (item.type === 'group' && children && children.length > 0) {
-      acc.push({ ...item, children })
+      acc.push({ ...item, children } as ItemType<MenuItemType>)
     }
   } else if ('claimValue' in item) {
     if (claimCheck(item.claimValue)) {
@@ -225,7 +225,7 @@ export default function SettingsMenu() {
       style={{
         borderRight: 0,
       }}
-      items={menuItems}
+      items={menuItems as ItemType[]}
     />
   )
 }

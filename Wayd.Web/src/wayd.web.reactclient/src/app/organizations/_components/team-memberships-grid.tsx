@@ -129,12 +129,12 @@ const TeamMembershipsGrid = ({
       { field: 'state' },
       {
         field: 'start',
-        valueGetter: (params) => dayjs(params.data.start).format('M/D/YYYY'),
+        valueGetter: (params) => params.data?.start ? dayjs(params.data.start).format('M/D/YYYY') : null,
       },
       {
         field: 'end',
         valueGetter: (params) =>
-          params.data.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
+          params.data?.end ? dayjs(params.data.end).format('M/D/YYYY') : null,
       },
     ]},
     [
@@ -168,7 +168,7 @@ const TeamMembershipsGrid = ({
         loading={isLoading}
         loadData={refresh}
       />
-      {openEditTeamMembershipForm && (
+      {openEditTeamMembershipForm && selectedTeamMembership && (
         <EditTeamMembershipForm
           membership={selectedTeamMembership}
           teamType={teamType}
@@ -176,7 +176,7 @@ const TeamMembershipsGrid = ({
           onFormCancel={() => onEditTeamMembershipFormClosed(false)}
         />
       )}
-      {openDeleteTeamMembershipForm && (
+      {openDeleteTeamMembershipForm && selectedTeamMembership && (
         <DeleteTeamMembershipForm
           membership={selectedTeamMembership}
           teamType={teamType}

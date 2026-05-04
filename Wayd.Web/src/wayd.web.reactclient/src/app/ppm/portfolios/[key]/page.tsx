@@ -203,7 +203,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case PortfolioTabs.Details:
-        return <PortfolioDetails portfolio={portfolioData} />
+        return <PortfolioDetails portfolio={portfolioData!} />
       case PortfolioTabs.Programs:
         return (
           <>
@@ -213,7 +213,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               showPortfolioFilter={false}
             />
             <ProgramViewManager
-              programs={programData}
+              programs={programData ?? []}
               isLoading={isLoadingPrograms}
               refetch={refetchPrograms}
             />
@@ -228,7 +228,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               showPortfolioFilter={false}
             />
             <ProjectViewManager
-              projects={projectData}
+              projects={projectData ?? []}
               isLoading={isLoadingProjects}
               refetch={refetchProjects}
               groupByProgram={true}
@@ -244,7 +244,7 @@ const PortfolioDetailsPage = (props: { params: Promise<{ key: string }> }) => {
               showPortfolioFilter={false}
             />
             <StrategicInitiativeViewManager
-              strategicInitiatives={strategicInitiativeData}
+              strategicInitiatives={strategicInitiativeData ?? []}
               isLoading={isLoadingStrategicInitiatives}
               refetch={refetchStrategicInitiatives}
             />

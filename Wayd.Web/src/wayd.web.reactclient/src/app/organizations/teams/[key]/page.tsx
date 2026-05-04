@@ -151,7 +151,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   })
 
   const teamMembershipsQuery = useGetTeamMembershipsQuery(
-    { teamId: team?.id, enabled: teamMembershipsQueryEnabled },
+    { teamId: team?.id!, enabled: teamMembershipsQueryEnabled },
     { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
@@ -159,7 +159,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const risksQuery = useGetTeamRisksQuery(
     {
-      id: team?.id,
+      id: team?.id!,
       includeClosed: includeClosedRisks,
       enabled: risksQueryEnabled,
     },
@@ -297,13 +297,13 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case TeamTabs.Details:
-        return <TeamDetails team={team} />
+        return <TeamDetails team={team!} />
       case TeamTabs.Backlog:
-        return <TeamBacklog teamId={team?.id} />
+        return <TeamBacklog teamId={team!.id!} />
       case TeamTabs.Sprints:
-        return <TeamSprints teamId={team?.id} />
+        return <TeamSprints teamId={team!.id!} />
       case TeamTabs.DependencyManagement:
-        return <TeamDependencyManagement team={team} />
+        return <TeamDependencyManagement team={team!} />
       case TeamTabs.RiskManagement:
         return createElement(RisksGrid, {
           risks: risksQuery.data,
@@ -311,12 +311,12 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           isLoadingRisks: risksQuery.isLoading,
           refreshRisks: risksQuery.refetch,
           newRisksAllowed: true,
-          teamId: team?.id,
+          teamId: team!.id!,
           hideTeamColumn: true,
         } as RisksGridProps)
       case TeamTabs.TeamMemberships:
         return createElement(TeamMembershipsGrid, {
-          teamId: team?.id,
+          teamId: team!.id!,
           teamMemberships: teamMembershipsQuery.data,
           isLoading: teamMembershipsQuery.isLoading,
           refetch: teamMembershipsQuery.refetch,
@@ -325,7 +325,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       case TeamTabs.OperatingModelHistory:
         return (
           <TeamOperatingModelsGrid
-            teamId={team?.id}
+            teamId={team!.id!}
             canUpdate={canUpdateTeam}
           />
         )
@@ -437,7 +437,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       <PageTitle
         title={team?.name}
         subtitle="Team Details"
-        tags={<InactiveTag isActive={team?.isActive} />}
+        tags={<InactiveTag isActive={team?.isActive ?? false} />}
         actions={<PageActions actionItems={actionsMenuItems} />}
       />
       <Card
@@ -451,7 +451,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
-          teamId={team?.id}
+          teamId={team!.id!}
           teamType={'Team'}
           onFormCreate={() => onCreateTeamMembershipFormClosed(true)}
           onFormCancel={() => onCreateTeamMembershipFormClosed(false)}
@@ -459,7 +459,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       )}
       {openDeactivateTeamForm && (
         <DeactivateTeamForm
-          team={team}
+          team={team!}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
         />

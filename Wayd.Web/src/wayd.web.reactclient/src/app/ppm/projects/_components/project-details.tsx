@@ -115,8 +115,8 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
           <>
             <Divider />
             <TimelineProgress
-              start={project.start}
-              end={project.end}
+              start={project.start ?? null}
+              end={project.end ?? null}
               variant="borderless"
               style={{ width: '100%' }}
               dateFormat={timelineFormat}

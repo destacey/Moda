@@ -2,6 +2,7 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
+  ItemTemplateProps,
   WaydDataItem,
   WaydTimeline,
   WaydTimelineOptions,
@@ -41,7 +42,7 @@ export const ProjectRangeItemTemplate: TimelineTemplate<
   return (
     <Text style={{ padding: '5px' }}>
       <a
-        onClick={() => item.openProjectDrawer(item.objectData.key)}
+        onClick={() => item.openProjectDrawer(item.objectData!.key)}
         style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
@@ -194,8 +195,8 @@ const ProjectsTimeline: FC<ProjectsTimelineProps> = (props) => {
           data={processedProjects}
           groups={groups.length > 0 ? groups : undefined}
           isLoading={props.isLoading}
-          options={timelineOptions}
-          rangeItemTemplate={ProjectRangeItemTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={ProjectRangeItemTemplate as FC<ItemTemplateProps<WaydDataItem>>}
           allowFullScreen={true}
           allowSaveAsImage={true}
         />

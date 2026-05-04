@@ -48,7 +48,7 @@ const RisksGrid = ({
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
-  const [editRiskKey, setEditRiskKey] = useState<number | null>(null)
+  const [editRiskKey, setEditRiskKey] = useState<number | undefined>(undefined)
 
   const { hasPermissionClaim } = useAuth()
   const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
@@ -66,7 +66,7 @@ const RisksGrid = ({
 
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
-    setEditRiskKey(null)
+    setEditRiskKey(undefined)
     if (wasSaved) {
       refreshRisks()
     }
@@ -131,6 +131,7 @@ const RisksGrid = ({
       resizable: false,
       hide: !canUpdateRisks,
       cellRenderer: (params) => {
+        if (!params.data) return null
         return (
           canUpdateRisks && (
             <Button
@@ -158,7 +159,7 @@ const RisksGrid = ({
     {
       field: 'followUpDate',
       valueGetter: (params) =>
-        params.data.followUpDate
+        params.data?.followUpDate
           ? dayjs(params.data.followUpDate).format('M/D/YYYY')
           : null,
     },
@@ -170,7 +171,7 @@ const RisksGrid = ({
     {
       field: 'reportedOn',
       valueGetter: (params) =>
-        dayjs(params.data.reportedOn).format('M/D/YYYY'),
+        params.data?.reportedOn ? dayjs(params.data.reportedOn).format('M/D/YYYY') : null,
     },
   ]}, [canUpdateRisks, hideTeam, includeClosed])
 
@@ -193,7 +194,7 @@ const RisksGrid = ({
           onFormCancel={() => onCreateRiskFormClosed(false)}
         />
       )}
-      {openUpdateRiskForm && (
+      {openUpdateRiskForm && editRiskKey !== undefined && (
         <EditRiskForm
           riskKey={editRiskKey}
           onFormSave={() => onEditRiskFormClosed(true)}

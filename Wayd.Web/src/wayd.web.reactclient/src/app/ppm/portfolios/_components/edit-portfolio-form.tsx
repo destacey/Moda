@@ -68,10 +68,10 @@ const EditPortfolioForm = ({
     useModalForm<UpdatePortfolioFormValues>({
       onSubmit: async (values: UpdatePortfolioFormValues, form) => {
         try {
-          const request = mapToRequestValues(values, portfolioData.id)
+          const request = mapToRequestValues(values, portfolioData!.id)
           const response = await updatePortfolio({
             request,
-            cacheKey: portfolioData.key,
+            cacheKey: portfolioData!.key,
           })
           if (response.error) throw response.error
 

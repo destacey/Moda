@@ -58,7 +58,7 @@ const CreatePortfolioForm = ({
 
           messageApi.success(
             'Portfolio created successfully. Portfolio key: ' +
-              response.data.key,
+              response.data!.key,
           )
           return true
         } catch (error) {

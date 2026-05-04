@@ -19,7 +19,7 @@ const MyAssignedRisks = () => {
     skip: !user?.username,
   })
 
-  const hasAssignedRisks = risks?.length > 0
+  const hasAssignedRisks = (risks?.length ?? 0) > 0
 
   if (!hasAssignedRisks) return null
 
@@ -27,7 +27,7 @@ const MyAssignedRisks = () => {
     <>
       <Card size="small" title="My Assigned Risks">
         <List size="small">
-          {risks.map((r) => (
+          {(risks ?? []).map((r) => (
             <Item key={r.key}>
               <Link href={`/planning/risks/${r.key}`}>{riskMessage(r)}</Link>
             </Item>

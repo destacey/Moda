@@ -47,7 +47,7 @@ const ChangeProjectKeyForm = ({
             }
 
             const response = await changeProjectKey({
-              id: projectData.id,
+              id: projectData!.id,
               request,
             })
 

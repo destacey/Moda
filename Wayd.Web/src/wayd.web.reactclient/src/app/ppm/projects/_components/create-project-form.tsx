@@ -121,7 +121,7 @@ const CreateProjectForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              'Project created successfully. Project key: ' + response.data.key,
+              'Project created successfully. Project key: ' + response.data!.key,
             )
             return true
           } catch (error) {

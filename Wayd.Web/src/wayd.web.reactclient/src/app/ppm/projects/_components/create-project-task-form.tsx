@@ -98,7 +98,7 @@ const CreateProjectTaskForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              'Task created successfully. Task key: ' + response.data.key,
+              'Task created successfully. Task key: ' + response.data!.key,
             )
             return true
           } catch (error) {
@@ -193,7 +193,7 @@ const CreateProjectTaskForm = ({
                 node.title
                   ?.toString()
                   .toLowerCase()
-                  .includes(input.toLowerCase()),
+                  .includes(input.toLowerCase()) ?? false,
             }}
           />
         </Item>

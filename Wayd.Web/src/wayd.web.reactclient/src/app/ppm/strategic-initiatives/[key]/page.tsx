@@ -342,7 +342,7 @@ const StrategicInitiativeDetailsPage = (props: {
       <Row gutter={16}>
         <Col xs={24} md={9} xxl={6}>
           <StrategicInitiativeDetails
-            strategicInitiative={strategicInitiativeData}
+            strategicInitiative={strategicInitiativeData!}
           />
         </Col>
         <Col xs={24} md={15} xxl={18}>
@@ -373,7 +373,7 @@ const StrategicInitiativeDetailsPage = (props: {
                 <Badge count={projectData?.length ?? 0} showZero color="blue" />
               </Flex>
               <ProjectViewManager
-                projects={projectData}
+                projects={projectData ?? []}
                 isLoading={isLoadingProjects}
                 refetch={refetchProjects}
                 hidePortfolio={true}

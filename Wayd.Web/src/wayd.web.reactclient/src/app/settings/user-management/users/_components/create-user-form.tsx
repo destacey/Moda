@@ -88,7 +88,7 @@ const CreateUserForm = ({
             // Assign roles if any were selected (Basic is always assigned by the backend)
             const selectedRoles = values.roles ?? []
             if (selectedRoles.length > 0) {
-              const userId = response.data
+              const userId = response.data!
               const roleNames = selectedRoles.includes('Basic')
                 ? selectedRoles
                 : ['Basic', ...selectedRoles]

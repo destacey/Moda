@@ -1,6 +1,6 @@
 'use client'
 
-import React from 'react'
+import React, { FC } from 'react'
 import { Card, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
@@ -10,6 +10,7 @@ import {
   PlanningIntervalObjectiveListDto,
 } from '@/src/services/wayd-api'
 import {
+  ItemTemplateProps,
   WaydDataGroup,
   WaydDataItem,
   WaydTimeline,
@@ -156,8 +157,8 @@ const PlanningIntervalObjectivesTimeline = ({
               : undefined
           }
           isLoading={derivedIsLoading}
-          options={timelineOptions}
-          rangeItemTemplate={ObjectiveTimelineTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={ObjectiveTimelineTemplate as FC<ItemTemplateProps<WaydDataItem>>}
         />
       </Card>
     </>

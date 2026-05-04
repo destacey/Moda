@@ -35,8 +35,8 @@ const StrategicInitiativesPage: FC = () => {
   const [selectedStatuses, setSelectedStatuses] =
     useState<number[]>(DEFAULT_STATUSES)
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<
-    string | undefined
-  >(undefined)
+    string | null
+  >(null)
 
   const messageApi = useMessage()
 
@@ -53,7 +53,7 @@ const StrategicInitiativesPage: FC = () => {
     refetch,
   } = useGetStrategicInitiativesQuery({
     status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
-    portfolioId: selectedPortfolioId,
+    portfolioId: selectedPortfolioId ?? undefined,
   })
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const StrategicInitiativesPage: FC = () => {
         onPortfolioChange={setSelectedPortfolioId}
       />
       <StrategicInitiativesGrid
-        strategicInitiatives={strategicInitiativeData}
+        strategicInitiatives={strategicInitiativeData ?? []}
         isLoading={isLoading}
         refetch={refetch}
       />

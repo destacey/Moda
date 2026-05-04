@@ -74,7 +74,7 @@ const CreateStrategicInitiativeForm = ({
 
           messageApi.success(
             'Strategic initiative created successfully. Strategic initiative key: ' +
-              response.data.key,
+              response.data!.key,
           )
           return true
         } catch (error) {

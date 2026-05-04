@@ -73,10 +73,10 @@ const EditRoadmapForm = ({
     useModalForm<EditRoadmapFormValues>({
       onSubmit: async (values: EditRoadmapFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, roadmapData.id)
+            const request = mapToRequestValues(values, roadmapData!.id)
             const response = await updateRoadmap({
               request,
-              cacheKey: roadmapData.key,
+              cacheKey: roadmapData!.key,
             })
             if (response.error) throw response.error
             messageApi.success('Roadmap updated successfully.')

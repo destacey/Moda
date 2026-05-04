@@ -31,8 +31,8 @@ jest.mock('../../contexts/theme', () => ({
 // Helper to create mock work items
 const createMockWorkItem = (
   key: string,
-  storyPoints: number | null | undefined,
-  cycleTime: number | null | undefined,
+  storyPoints: number | undefined,
+  cycleTime: number | undefined,
 ): Partial<WorkItemListDto> => ({
   key,
   storyPoints,

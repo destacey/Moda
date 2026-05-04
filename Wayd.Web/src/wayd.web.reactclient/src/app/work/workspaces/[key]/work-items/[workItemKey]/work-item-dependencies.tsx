@@ -32,7 +32,7 @@ const WorkItemDependencies: React.FC<WorkItemDependenciesProps> = ({
   return (
     <WorkItemDependenciesGrid
       workItem={workItem}
-      dependencies={dependencyData}
+      dependencies={dependencyData ?? []}
       isLoading={isLoading}
       refetch={refetch}
     />

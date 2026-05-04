@@ -73,12 +73,12 @@ const WaydOrganizationChart: FC<WaydOrganizationChartProps> = ({
       rankdir: 'TB',
       controlPoints: false,
     },
-    transforms: (transforms: TransformOption[]) =>
+    transforms: ((transforms: TransformOption[]) =>
       transforms.filter(
         (transform) =>
           typeof transform === 'string' ||
           transform.type !== 'collapse-expand-react-node',
-      ),
+      )) as any,
   }
 
   if (!data || !data.nodes || data.nodes.length === 0) {

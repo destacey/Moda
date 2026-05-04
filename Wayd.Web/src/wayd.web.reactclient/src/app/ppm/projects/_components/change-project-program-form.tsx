@@ -45,7 +45,7 @@ const ChangeProjectProgramForm = ({
       onSubmit: async (values: ChangeProjectProgramFormValues, form) => {
           try {
             const request: ChangeProjectProgramRequest = {
-              programId: values.programId ?? null,
+              programId: values.programId ?? undefined,
             }
             const response = await changeProjectProgram({
               id: project.id,

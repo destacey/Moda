@@ -388,6 +388,7 @@ export const AssignedToLinkCellRenderer = <
 export const UserLinkCellRenderer = (
   props: CustomCellRendererProps<UserDetailsDto>,
 ) => {
+  if (!props.data) return null
   return (
     <Link href={`/settings/user-management/users/${props.data.id}`}>
       {props.data.userName}

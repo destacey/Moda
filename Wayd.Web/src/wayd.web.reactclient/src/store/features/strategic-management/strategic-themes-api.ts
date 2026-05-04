@@ -22,7 +22,7 @@ export const strategicThemesApi = apiSlice.injectEndpoints({
           const data = await (
             await getStrategicThemesClient()
           ).getStrategicThemes(
-            request?.state?.length > 0 ? request.state : undefined,
+            (request?.state?.length ?? 0) > 0 ? request!.state : undefined,
           )
           return { data }
         } catch (error) {

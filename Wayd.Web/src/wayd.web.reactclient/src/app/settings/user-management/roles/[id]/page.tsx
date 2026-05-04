@@ -123,8 +123,8 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       case RoleDetailsTabs.Permissions:
         return (
           <Permissions
-            role={roleData}
-            permissions={roleData?.permissions}
+            role={roleData!}
+            permissions={roleData?.permissions ?? []}
             isSystemRole={isSystemRole}
             onDirtyChange={setPermissionsDirty}
           />
@@ -193,7 +193,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       </Card>
       {openEditRoleForm && (
         <EditRoleForm
-          role={roleData}
+          role={roleData!}
           onFormComplete={() => {
             setOpenEditRoleForm(false)
             refetch()
@@ -211,7 +211,7 @@ const RoleDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       )}
       {openDeleteRoleForm && (
         <DeleteRoleForm
-          role={roleData}
+          role={roleData!}
           onFormComplete={() => onDeleteRoleFormClosed(true)}
           onFormCancel={() => onDeleteRoleFormClosed(false)}
         />

@@ -69,7 +69,7 @@ const CreateRoadmapForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              `Roadmap created successfully. Roadmap key ${response.data.key}`,
+              `Roadmap created successfully. Roadmap key ${response.data!.key}`,
             )
             return true
           } catch (error) {

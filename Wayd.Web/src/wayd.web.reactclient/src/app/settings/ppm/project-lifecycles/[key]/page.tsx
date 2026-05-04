@@ -77,11 +77,11 @@ const ProjectLifecycleDetailsPage = (props: {
   const renderTabContent = () => {
     switch (activeTab) {
       case ProjectLifecycleTabs.Details:
-        return <ProjectLifecycleDetails lifecycle={lifecycleData} />
+        return <ProjectLifecycleDetails lifecycle={lifecycleData!} />
       case ProjectLifecycleTabs.Phases:
         return (
           <ProjectLifecyclePhasesList
-            lifecycle={lifecycleData}
+            lifecycle={lifecycleData!}
             canManagePhases={
               canUpdate && lifecycleData?.state?.name === 'Proposed'
             }

@@ -73,7 +73,7 @@ const CreateProgramForm = ({
           if (response.error) throw response.error
 
           messageApi.success(
-            'Program created successfully. Program key: ' + response.data.key,
+            'Program created successfully. Program key: ' + response.data!.key,
           )
           return true
         } catch (error) {

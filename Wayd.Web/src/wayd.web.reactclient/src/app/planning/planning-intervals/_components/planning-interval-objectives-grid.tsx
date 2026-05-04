@@ -149,6 +149,7 @@ const PlanningIntervalObjectivesGrid = ({
         resizable: false,
         hide: !canManageObjectives,
         cellRenderer: (params) => {
+          if (!params.data) return null
           const menuItems = getRowMenuItems({
             planningIntervalId: params.data.planningInterval.id,
             planningIntervalKey: planningIntervalKey,
@@ -194,14 +195,14 @@ const PlanningIntervalObjectivesGrid = ({
       {
         field: 'startDate',
         valueGetter: (params) =>
-          params.data.startDate
+          params.data?.startDate
             ? dayjs(params.data.startDate).format('M/D/YYYY')
             : null,
       },
       {
         field: 'targetDate',
         valueGetter: (params) =>
-          params.data.targetDate
+          params.data?.targetDate
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },

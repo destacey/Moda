@@ -68,7 +68,7 @@ const ObjectiveDetailsPage = (props: {
       case ObjectiveTabs.Details:
         return (
           <PlanningIntervalObjectiveDetails
-            objective={objectiveData}
+            objective={objectiveData!}
             canManageObjectives={canManageObjectives}
           />
         )
@@ -175,15 +175,15 @@ const ObjectiveDetailsPage = (props: {
       </Card>
       {openUpdateObjectiveForm && (
         <EditPlanningIntervalObjectiveForm
-          objectiveKey={objectiveData?.key}
-          planningIntervalKey={objectiveData?.planningInterval?.key}
+          objectiveKey={objectiveData!.key}
+          planningIntervalKey={objectiveData!.planningInterval?.key}
           onFormSave={() => onUpdateObjectiveFormClosed(true)}
           onFormCancel={() => onUpdateObjectiveFormClosed(false)}
         />
       )}
       {openDeleteObjectiveForm && (
         <DeletePlanningIntervalObjectiveForm
-          objective={objectiveData}
+          objective={objectiveData!}
           onFormSave={() => onDeleteObjectiveFormClosed(true)}
           onFormCancel={() => onDeleteObjectiveFormClosed(false)}
         />

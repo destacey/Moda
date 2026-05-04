@@ -40,7 +40,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
       queryFn: async (request = undefined) => {
         try {
           const data = await getRoadmapsClient().getRoadmaps(
-            request?.state?.length > 0 ? request.state : undefined,
+            (request?.state?.length ?? 0) > 0 ? request!.state : undefined,
           )
           return { data }
         } catch (error) {
@@ -269,7 +269,7 @@ export const roadmapApi = apiSlice.injectEndpoints({
             }
           }
 
-          return { data: null }
+          return { data: undefined as void }
         } catch (error: any) {
           console.error('API Error:', error)
           return {

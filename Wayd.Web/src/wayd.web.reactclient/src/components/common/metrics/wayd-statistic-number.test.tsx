@@ -16,7 +16,7 @@ describe('WaydStatisticNumber', () => {
   })
 
   it('renders nothing when value is null', () => {
-    const { container } = render(<WaydStatisticNumber value={null} />)
+    const { container } = render(<WaydStatisticNumber value={null as unknown as undefined} />)
     expect(container.firstChild).toBeNull()
   })
 

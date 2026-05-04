@@ -42,7 +42,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
       //providesTags: (result, error, arg) => providesList(result, QueryTags.WorkProcess),
       providesTags: (result) => [
         QueryTags.WorkProcess,
-        ...result.map(({ id }) => ({ type: QueryTags.WorkProcess, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkProcess, id })) ?? []),
       ],
     }),
     getWorkProcess: builder.query<WorkProcessDto, string>({
@@ -65,13 +65,12 @@ export const workProcessApi = apiSlice.injectEndpoints({
     >({
       queryFn: async ({ id, isActive }) => {
         try {
-          let data
           if (isActive) {
-            data = await getWorkProcessesClient().activate(id)
+            await getWorkProcessesClient().activate(id)
           } else {
-            data = await getWorkProcessesClient().deactivate(id)
+            await getWorkProcessesClient().deactivate(id)
           }
-          return { data }
+          return { data: null }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -96,7 +95,7 @@ export const workProcessApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         { type: QueryTags.WorkProcessScheme, id: arg },
-        ...result.map(({ id }) => ({ type: QueryTags.WorkProcessScheme, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkProcessScheme, id })) ?? []),
       ],
     }),
   }),

@@ -237,7 +237,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
       <Row gutter={16}>
         <Col xs={24} md={9} xxl={6}>
-          <ProgramDetails program={programData} />
+          <ProgramDetails program={programData!} />
         </Col>
         <Col xs={24} md={15} xxl={18}>
           <Flex vertical gap="large">
@@ -251,7 +251,7 @@ const ProgramDetailsPage = (props: { params: Promise<{ key: string }> }) => {
                 />
               </Flex>
               <ProjectViewManager
-                projects={projectsData}
+                projects={projectsData ?? []}
                 isLoading={projectsDataIsLoading}
                 refetch={refetchProjectsData}
                 hidePortfolio={true}

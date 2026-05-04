@@ -65,7 +65,7 @@ const mapToRequestValues = (
     kpiId,
     checkpoints: values.checkpoints.map(
       (c): KpiCheckpointPlanItemRequest => ({
-        checkpointId: c.checkpointId,
+        checkpointId: c.checkpointId!,
         targetValue: c.targetValue,
         atRiskValue: c.atRiskValue ?? undefined,
         checkpointDate: (c.checkpointDate as any)?.toISOString(),

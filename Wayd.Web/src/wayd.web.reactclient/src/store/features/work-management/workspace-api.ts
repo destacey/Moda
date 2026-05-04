@@ -42,11 +42,12 @@ export const workspaceApi = apiSlice.injectEndpoints({
           return { data }
         } catch (error) {
           console.error('API Error:', error)
+          return { error }
         }
       },
       providesTags: (result) => [
         QueryTags.Workspace,
-        ...result.map(({ key }) => ({ type: QueryTags.Workspace, key })),
+        ...(result?.map(({ key }) => ({ type: QueryTags.Workspace, key })) ?? []),
       ],
     }),
     getWorkspace: builder.query<WorkspaceDto, string>({
@@ -95,7 +96,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkItem,
-        ...result.map(({ key }) => ({ type: QueryTags.WorkItem, key })),
+        ...(result?.map(({ key }) => ({ type: QueryTags.WorkItem, key })) ?? []),
       ],
     }),
     getWorkItem: builder.query<WorkItemDetailsDto, GetWorkItemRequest>({
@@ -180,7 +181,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkItemChildren,
-        ...result.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })),
+        ...(result?.map(({ key }) => ({ type: QueryTags.WorkItemChildren, key })) ?? []),
       ],
     }),
     getWorkItemDependencies: builder.query<
@@ -243,7 +244,7 @@ export const workspaceApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkItemSearch,
-        ...result.map(({ key }) => ({ type: QueryTags.WorkItemSearch, key })),
+        ...(result?.map(({ key }) => ({ type: QueryTags.WorkItemSearch, key })) ?? []),
       ],
     }),
   }),

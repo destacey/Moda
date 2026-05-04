@@ -42,7 +42,7 @@ const CreatePersonalAccessTokenForm = ({
           }
 
           messageApi.success('Personal access token created successfully')
-          onFormCreate(response.data.token!)
+          onFormCreate(response.data!.token!)
           return false
         } catch (error) {
           const apiError = isApiError(error) ? error : {}

@@ -122,7 +122,7 @@ const CreateRoadmapActivityForm = ({
         <Item
           name="parentId"
           label="Parent Activity"
-          hidden={activities?.length < 1}
+          hidden={(activities?.length ?? 0) < 1}
         >
           <TreeSelect
             //showSearch // TODO: not working

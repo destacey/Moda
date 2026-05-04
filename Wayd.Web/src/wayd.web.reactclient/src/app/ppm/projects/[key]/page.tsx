@@ -219,20 +219,20 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case ProjectTabs.Details:
-        return <ProjectDetailsTab project={projectData} />
+        return <ProjectDetailsTab project={projectData!} />
       case ProjectTabs.Team:
         return <ProjectTeamGrid projectIdOrKey={projectKey} />
       case ProjectTabs.Plan:
         return (
           <ProjectPlan
-            project={projectData}
+            project={projectData!}
             canManageTasks={canUpdateProject}
           />
         )
       case ProjectTabs.WorkItems:
         return (
           <ProjectWorkItemsViewManager
-            workItems={workItemsData}
+            workItems={workItemsData ?? []}
             isLoading={workItemsDataIsLoading}
             refetch={refetchWorkItemsData}
             hideProjectColumn={true}

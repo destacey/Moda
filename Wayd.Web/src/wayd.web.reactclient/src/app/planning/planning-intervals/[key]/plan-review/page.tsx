@@ -103,9 +103,9 @@ const PlanningIntervalPlanReviewPage = (props: {
     tab: team.code,
   }))
 
-  const activeTeam: PlanningIntervalTeamResponse =
+  const activeTeam: PlanningIntervalTeamResponse | undefined =
     !teams || teams.length === 0 || !activeTab
-      ? null
+      ? undefined
       : teams?.find((t) => t.code.toLowerCase() === activeTab)
 
   if (!isLoading && !planningIntervalData) {
@@ -139,7 +139,7 @@ const PlanningIntervalPlanReviewPage = (props: {
         ) : (
           <TeamPlanReview
             planningInterval={planningIntervalData}
-            team={activeTeam}
+            team={activeTeam!}
             refreshPlanningInterval={refetchPlanningInterval}
           />
         )}

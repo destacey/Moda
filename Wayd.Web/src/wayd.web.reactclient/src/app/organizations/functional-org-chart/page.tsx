@@ -110,7 +110,9 @@ const FunctionalOrgChartPage: React.FC = () => {
     skip: !asOfDate,
   })
 
-  const data: TeamOrganizationGraphData = orgChartData ? transformOrganizationToGraph(orgChartData) : undefined
+  const data: TeamOrganizationGraphData = orgChartData
+    ? transformOrganizationToGraph(orgChartData)
+    : { nodes: [], edges: [] }
 
   useEffect(() => {
     dispatch(disableBreadcrumb(pathname))

@@ -275,7 +275,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       {openDeleteKpiForm && selectedKpiId && (
         <DeleteStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
-          kpi={kpis.find((kpi) => kpi.id === selectedKpiId)}
+          kpi={kpis.find((kpi) => kpi.id === selectedKpiId)!}
           onFormComplete={() => onDeleteKpiFormClosed(true)}
           onFormCancel={() => onDeleteKpiFormClosed(false)}
         />

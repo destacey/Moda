@@ -71,7 +71,7 @@ const CreateStrategicInitiativeKpiForm = ({
           if (response.error) throw response.error
 
           messageApi.success(
-            'KPI created successfully. KPI key: ' + response.data.key,
+            'KPI created successfully. KPI key: ' + response.data!.key,
           )
           return true
         } catch (error) {

@@ -72,11 +72,11 @@ const EditStrategicInitiativeForm = ({
         try {
           const request = mapToRequestValues(
             values,
-            strategicInitiativeData.id,
+            strategicInitiativeData!.id,
           )
           const response = await updateStrategicInitiative({
             request,
-            cacheKey: strategicInitiativeData.key,
+            cacheKey: strategicInitiativeData!.key,
           })
           if (response.error) throw response.error
 

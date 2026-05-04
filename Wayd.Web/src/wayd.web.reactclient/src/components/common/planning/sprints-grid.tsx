@@ -23,9 +23,10 @@ export interface SprintsGridProps {
   gridHeight?: number | undefined
 }
 
-const sprintLinkCellRenderer = (params: ICellRendererParams<SprintListDto>) => (
-  <Link href={`/planning/sprints/${params.data.key}`}>{params.value}</Link>
-)
+const sprintLinkCellRenderer = (params: ICellRendererParams<SprintListDto>) => {
+  if (!params.data) return null
+  return <Link href={`/planning/sprints/${params.data.key}`}>{params.value}</Link>
+}
 
 const teamCellRenderer = (params: ICellRendererParams<SprintListDto>) =>
   renderTeamLinkHelper(params.data?.team)

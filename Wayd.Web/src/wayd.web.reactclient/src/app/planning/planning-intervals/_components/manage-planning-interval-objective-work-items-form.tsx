@@ -143,8 +143,8 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
     onSubmit: async () => {
       try {
         const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
-          planningIntervalId: objectiveData?.planningInterval.id,
-          objectiveId: objectiveData?.id,
+          planningIntervalId: objectiveData?.planningInterval.id ?? '',
+          objectiveId: objectiveData?.id ?? '',
           workItemIds: targetWorkItems.map((item) => item.id),
         }
         await manageObjectiveWorkItems({

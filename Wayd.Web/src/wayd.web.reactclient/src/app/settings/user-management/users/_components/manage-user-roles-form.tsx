@@ -7,6 +7,7 @@ import {
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
 import { useEffect, useState } from 'react'
+import type { Key } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 import { isApiError } from '@/src/utils'
 
@@ -86,7 +87,7 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         key: role.roleName,
         title: role.roleName,
       }))
-      .sort((a, b) => a.title.localeCompare(b.title)) as RecordType[]
+      .sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '')) as RecordType[]
 
     setRoles(transformedRoles)
 
@@ -115,8 +116,9 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
     setSelectedKeys([])
   }, [userRolesData])
 
-  const onChange = (nextTargetKeys: string[]) => {
-    const sortedTargetKeys = nextTargetKeys.sort((a, b) => {
+  const onChange = (nextTargetKeys: Key[]) => {
+    const keys = nextTargetKeys as string[]
+    const sortedTargetKeys = keys.sort((a, b) => {
       const roleA = roles.find((r) => r.title === a)?.title || ''
       const roleB = roles.find((r) => r.title === b)?.title || ''
       return roleA.localeCompare(roleB)
