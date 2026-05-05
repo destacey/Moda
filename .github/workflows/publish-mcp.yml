@@ -44,5 +44,5 @@ jobs:
                   VERSION=$(node -p "require('./Wayd.Web/src/Wayd.Mcp/package.json').version")
                   git config user.name "github-actions[bot]"
                   git config user.email "github-actions[bot]@users.noreply.github.com"
-                  git tag "mcp-v${VERSION}"
-                  git push origin "mcp-v${VERSION}"
+                  git tag "wayd-mcp-v${VERSION}"
+                  git push origin "wayd-mcp-v${VERSION}"
