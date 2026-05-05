@@ -1,6 +1,6 @@
 # @modanpm/moda-mcp
 
-A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Wayd](https://destacey.github.io/Wayd) work management API. Exposes Wayd's project portfolio management, planning, and work item data to AI assistants.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Wayd](https://wayd.dev) work management API. Exposes Wayd's project portfolio management, planning, and work item data to AI assistants.
 
 ## Requirements
 
@@ -179,6 +179,6 @@ Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or
 
 ## Links
 
-- [Wayd documentation](https://destacey.github.io/Wayd)
+- [Wayd documentation](https://wayd.dev)
 - [GitHub repository](https://github.com/destacey/Wayd)
 - [Report an issue](https://github.com/destacey/Wayd/issues)
