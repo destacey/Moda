@@ -92,7 +92,7 @@
         Condition=" '$(Configuration)' == 'Debug' ">
         <Exec ConsoleToMSBuild="true" ContinueOnError="true" WorkingDirectory="$(ProjectDir)"
             EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-            Command="npx openapi-mcp-generator -i wwwroot\api\v1\specification.json -o $(RepoRoot)/Wayd.MCP -t stdio -n moda-mcp">
+            Command="npx openapi-mcp-generator -i wwwroot\api\v1\specification.json -o $(RepoRoot)/Wayd.MCP -t stdio -n wayd-mcp">
             <Output TaskParameter="ExitCode" PropertyName="OpenAPIMCPGeneratorExitCode" />
             <Output TaskParameter="ConsoleOutput" PropertyName="OpenAPIMCPGeneratorOutput" />
         </Exec>

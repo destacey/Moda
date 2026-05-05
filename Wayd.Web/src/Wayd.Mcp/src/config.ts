@@ -15,7 +15,7 @@ const { values: cliArgs } = parseArgs({
   strict: false, // ignore unknown args passed by MCP clients
 });
 
-export const SERVER_NAME    = 'moda-mcp';
+export const SERVER_NAME    = 'wayd-mcp';
 export const SERVER_VERSION = packageVersion;
-export const API_BASE_URL   = (cliArgs['base-url'] as string | undefined) || process.env.MODA_API_BASE_URL || '';
-export const MODA_API_KEY   = (cliArgs['api-key']  as string | undefined) || process.env.MODA_API_KEY  || '';
+export const API_BASE_URL   = (cliArgs['base-url'] as string | undefined) || process.env.WAYD_API_BASE_URL || '';
+export const WAYD_API_KEY   = (cliArgs['api-key']  as string | undefined) || process.env.WAYD_API_KEY  || '';

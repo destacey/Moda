@@ -1,4 +1,4 @@
-# @modanpm/moda-mcp
+# @wayd/mcp
 
 ## 0.1.0
 

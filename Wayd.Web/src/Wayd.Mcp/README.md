@@ -1,4 +1,4 @@
-# @modanpm/moda-mcp
+# @wayd/mcp
 
 A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for the [Wayd](https://wayd.dev) work management API. Exposes Wayd's project portfolio management, planning, and work item data to AI assistants.
 
@@ -14,8 +14,8 @@ The server requires two values: the base URL of your Wayd instance and an API ke
 
 | | Environment variable | CLI argument |
 |---|---|---|
-| Base URL | `MODA_API_BASE_URL` | `--base-url` |
-| API key | `MODA_API_KEY` | `--api-key` |
+| Base URL | `WAYD_API_BASE_URL` | `--base-url` |
+| API key | `WAYD_API_KEY` | `--api-key` |
 
 ## Installation
 
@@ -26,12 +26,12 @@ CLI arguments are not supported in Claude Desktop — use environment variables.
 ```json
 {
   "mcpServers": {
-    "moda": {
+    "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/moda-mcp"],
+      "args": ["-y", "@wayd/mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-moda-instance.com",
-        "MODA_API_KEY": "your-personal-access-token"
+        "WAYD_API_BASE_URL": "https://your-wayd-instance.com",
+        "WAYD_API_KEY": "your-personal-access-token"
       }
     }
   }
@@ -46,25 +46,25 @@ CLI args enable the `inputs` pattern, which prompts for values at connection tim
 {
   "inputs": [
     {
-      "id": "modaBaseUrl",
+      "id": "waydBaseUrl",
       "description": "Wayd base URL",
       "type": "promptString"
     },
     {
-      "id": "modaApiKey",
+      "id": "waydApiKey",
       "description": "Wayd API key (Personal Access Token)",
       "type": "promptString",
       "password": true
     }
   ],
   "servers": {
-    "moda": {
+    "wayd": {
       "type": "stdio",
       "command": "npx",
       "args": [
-        "-y", "@modanpm/moda-mcp",
-        "--base-url", "${input:modaBaseUrl}",
-        "--api-key",  "${input:modaApiKey}"
+        "-y", "@wayd/mcp",
+        "--base-url", "${input:waydBaseUrl}",
+        "--api-key",  "${input:waydApiKey}"
       ]
     }
   }
@@ -76,13 +76,13 @@ Or with environment variables directly:
 ```json
 {
   "servers": {
-    "moda": {
+    "wayd": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@modanpm/moda-mcp"],
+      "args": ["-y", "@wayd/mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-moda-instance.com",
-        "MODA_API_KEY": "your-personal-access-token"
+        "WAYD_API_BASE_URL": "https://your-wayd-instance.com",
+        "WAYD_API_KEY": "your-personal-access-token"
       }
     }
   }
@@ -96,14 +96,14 @@ Claude Code doesn't support the `inputs` prompt pattern, so the recommended way 
 Add to `~/.zshrc` / `~/.bashrc` (or equivalent):
 
 ```bash
-export MODA_API_BASE_URL="https://your-moda-instance.com"
-export MODA_API_KEY="your-personal-access-token"
+export WAYD_API_BASE_URL="https://your-wayd-instance.com"
+export WAYD_API_KEY="your-personal-access-token"
 ```
 
 Then register the server via the CLI (values are read from your environment at connection time):
 
 ```bash
-claude mcp add moda -- npx -y @modanpm/moda-mcp
+claude mcp add wayd -- npx -y @wayd/mcp
 ```
 
 Or add it to a project-level `.mcp.json` that reads from the same environment variables:
@@ -111,23 +111,23 @@ Or add it to a project-level `.mcp.json` that reads from the same environment va
 ```json
 {
   "mcpServers": {
-    "moda": {
+    "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/moda-mcp"]
+      "args": ["-y", "@wayd/mcp"]
     }
   }
 }
 ```
 
-Because the server reads `MODA_API_BASE_URL` and `MODA_API_KEY` from the environment automatically, no credentials appear in any config file.
+Because the server reads `WAYD_API_BASE_URL` and `WAYD_API_KEY` from the environment automatically, no credentials appear in any config file.
 
 ### Global install
 
 ```bash
-npm install -g @modanpm/moda-mcp
+npm install -g @wayd/mcp
 ```
 
-Then use `moda-mcp` as the command instead of `npx -y @modanpm/moda-mcp` in any of the configs above.
+Then use `wayd-mcp` as the command instead of `npx -y @wayd/mcp` in any of the configs above.
 
 ## Agent Skills (Claude Code)
 
@@ -137,19 +137,19 @@ Three self-contained skills are available:
 
 | Skill | Trigger |
 | --- | --- |
-| `moda-ppm` | Portfolios, programs, projects — lookup, create, update, lifecycle |
-| `moda-pi` | Planning intervals, iterations, objectives, health reports, risks |
-| `moda-roadmaps` | Roadmap exploration — activities, timeboxes, milestones |
+| `wayd-ppm` | Portfolios, programs, projects — lookup, create, update, lifecycle |
+| `wayd-pi` | Planning intervals, iterations, objectives, health reports, risks |
+| `wayd-roadmaps` | Roadmap exploration — activities, timeboxes, milestones |
 
 ### Installing the skills
 
 From your project root:
 
 ```bash
-npx skills add destacey/moda
+npx skills add destacey/wayd
 ```
 
-Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or `/moda-roadmaps`.
+Once installed, activate a skill in Claude Code with `/wayd-ppm`, `/wayd-pi`, or `/wayd-roadmaps`.
 
 ## Available Tools
 

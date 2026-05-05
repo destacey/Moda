@@ -1,11 +1,11 @@
 {
-  "name": "@modanpm/moda-mcp",
+  "name": "@wayd/mcp",
   "version": "0.1.0",
-  "description": "MCP server for the Moda work management API",
+  "description": "MCP server for the Wayd work management API",
   "type": "module",
   "main": "build/index.js",
   "bin": {
-    "moda-mcp": "build/index.js"
+    "wayd-mcp": "build/index.js"
   },
   "files": [
     "build",
@@ -25,7 +25,7 @@
   },
   "keywords": [
     "mcp",
-    "moda",
+    "wayd",
     "model-context-protocol",
     "work-management",
     "project-management"
@@ -38,7 +38,7 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/destacey/Wayd.git",
-    "directory": "Moda.Web/src/Moda.Mcp"
+    "directory": "Wayd.Web/src/Wayd.Mcp"
   },
   "publishConfig": {
     "access": "public"

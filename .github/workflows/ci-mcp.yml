@@ -59,7 +59,7 @@ jobs:
               uses: changesets/action@v1.5.1
               with:
                   cwd: Wayd.Web/src/Wayd.Mcp
-                  title: "chore: release @modanpm/moda-mcp"
+                  title: "chore: release @wayd/mcp"
                   commit: "chore: version mcp package"
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
