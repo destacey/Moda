@@ -58,4 +58,9 @@ public interface IUserService : ITransientService
 
     Task<Result> UpdatePreferences(string userId, UserPreferencesDto preferences, CancellationToken cancellationToken);
 
+    Task<Result> StageTenantMigration(StageTenantMigrationCommand command, CancellationToken cancellationToken);
+
+    Task<Result> CancelTenantMigration(string userId, CancellationToken cancellationToken);
+
+    Task<List<UserIdentityDto>> GetIdentityHistory(string userId, CancellationToken cancellationToken);
 }

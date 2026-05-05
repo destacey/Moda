@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
+using Wayd.Common.Application.Identity;
 
 namespace Wayd.Infrastructure.Identity;
 
@@ -139,5 +140,68 @@ internal partial class UserService(
 
         _logger.LogInformation("User {UserId} deactivated.", command.UserId);
         return Result.Success();
+    }
+
+    public async Task<Result> StageTenantMigration(StageTenantMigrationCommand command, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (user.LoginProvider != LoginProviders.MicrosoftEntraId)
+            return Result.Failure("Tenant migration is only available for Microsoft Entra ID users.");
+
+        if (!await _userIdentityStore.ExistsActive(user.Id, LoginProviders.MicrosoftEntraId, cancellationToken))
+            return Result.Failure("User has no active Microsoft Entra ID identity to migrate.");
+
+        // Last-write-wins. Re-staging silently overwrites the previous target — admin's
+        // most recent decision is the one we honor, matching the spec's stated semantics.
+        user.PendingMigrationTenantId = command.TargetTenantId;
+        await _userManager.UpdateAsync(user);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation(
+            "Tenant migration staged for user {UserId}: target tenant {TenantId}.",
+            user.Id, command.TargetTenantId);
+        return Result.Success();
+    }
+
+    public async Task<Result> CancelTenantMigration(string userId, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (user.PendingMigrationTenantId is null)
+        {
+            // Idempotent: clearing a flag that's already clear is a no-op. Returning
+            // success keeps the admin UI simple — they can click Cancel without
+            // worrying about whether the migration just completed in another tab.
+            return Result.Success();
+        }
+
+        user.PendingMigrationTenantId = null;
+        await _userManager.UpdateAsync(user);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation("Tenant migration canceled for user {UserId}.", user.Id);
+        return Result.Success();
+    }
+
+    public async Task<List<UserIdentityDto>> GetIdentityHistory(string userId, CancellationToken cancellationToken)
+    {
+        var userExists = await _userManager.Users.AnyAsync(u => u.Id == userId, cancellationToken);
+        if (!userExists)
+            throw new NotFoundException("User Not Found.");
+
+        return await _db.UserIdentities
+            .AsNoTracking()
+            .Where(ui => ui.UserId == userId)
+            .OrderByDescending(ui => ui.IsActive)
+            .ThenByDescending(ui => ui.LinkedAt)
+            .ProjectToType<UserIdentityDto>()
+            .ToListAsync(cancellationToken);
     }
 }

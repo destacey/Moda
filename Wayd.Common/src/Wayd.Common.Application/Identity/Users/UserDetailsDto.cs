@@ -23,6 +23,8 @@ public sealed record UserDetailsDto
 
     public string LoginProvider { get; set; } = null!;
 
+    public string? PendingMigrationTenantId { get; set; }
+
     public Instant? LastActivityAt { get; set; }
 
     public NavigationDto? Employee { get; set; }

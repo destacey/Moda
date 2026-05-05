@@ -15,6 +15,13 @@ public class ApplicationUser : IdentityUser
 
     public string LoginProvider { get; set; } = null!;
 
+    /// <summary>
+    /// Staged tenant migration target. When set, an Entra login from this tenant
+    /// triggers a transactional rebind of the user's active <see cref="UserIdentity"/>
+    /// row in the exchange handler. Cleared on completion or admin cancellation.
+    /// </summary>
+    public string? PendingMigrationTenantId { get; set; }
+
     public bool MustChangePassword { get; set; }
 
     public string? RefreshToken { get; set; }

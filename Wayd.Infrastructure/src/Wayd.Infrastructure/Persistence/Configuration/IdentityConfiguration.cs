@@ -23,6 +23,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
 
         builder.Property(u => u.LoginProvider).HasMaxLength(50).IsRequired();
 
+        builder.Property(u => u.PendingMigrationTenantId).HasMaxLength(100);
+
         builder.Property(u => u.MustChangePassword).HasDefaultValue(false);
 
         builder.Property(u => u.RefreshToken).HasMaxLength(256);

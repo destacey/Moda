@@ -17,6 +17,7 @@ public class IdentityMappingConfig : IRegister
                 .Map(dest => dest.Email, src => src.Email)
                 .Map(dest => dest.PhoneNumber, src => src.PhoneNumber)
                 .Map(dest => dest.LoginProvider, src => src.LoginProvider)
+                .Map(dest => dest.PendingMigrationTenantId, src => src.PendingMigrationTenantId)
                 .Map(dest => dest.IsActive, src => src.IsActive)
                 .Map(dest => dest.LockoutEnd, src => src.LockoutEnd != null && src.LockoutEnd > DateTimeOffset.UtcNow
                     ? Instant.FromDateTimeOffset(src.LockoutEnd.Value)
@@ -37,6 +38,17 @@ public class IdentityMappingConfig : IRegister
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Name, src => src.Name!)
                 .Map(dest => dest.Description, src => src.Description);
+
+        config
+            .NewConfig<UserIdentity, UserIdentityDto>()
+                .Map(dest => dest.Id, src => src.Id)
+                .Map(dest => dest.Provider, src => src.Provider)
+                .Map(dest => dest.ProviderTenantId, src => src.ProviderTenantId)
+                .Map(dest => dest.ProviderSubject, src => src.ProviderSubject)
+                .Map(dest => dest.IsActive, src => src.IsActive)
+                .Map(dest => dest.LinkedAt, src => src.LinkedAt)
+                .Map(dest => dest.UnlinkedAt, src => src.UnlinkedAt)
+                .Map(dest => dest.UnlinkReason, src => src.UnlinkReason);
     }
 }
 
