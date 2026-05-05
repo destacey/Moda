@@ -105,7 +105,7 @@ const EditPlanningIntervalObjectiveForm = ({
             values,
             objectiveKey,
             planningIntervalKey,
-            objectiveData?.team.id!,
+            objectiveData!.team.id,
           )
           const response = await updateObjective(request)
           if (response.error) {

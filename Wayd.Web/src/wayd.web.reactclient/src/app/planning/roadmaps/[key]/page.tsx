@@ -76,7 +76,7 @@ const RoadmapDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     data: roadmapItems,
     isLoading: isRoadmapItemsLoading,
     refetch: refetchRoadmapItems,
-  } = useGetRoadmapItemsQuery(roadmapData?.id!, {
+  } = useGetRoadmapItemsQuery(roadmapData!.id, {
     skip: !roadmapData,
   })
 

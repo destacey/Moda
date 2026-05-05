@@ -31,7 +31,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
 
   const skip = !props?.workProcess?.integrationState?.internalId
   const { data: workProcessData } = useGetWorkProcessQuery(
-    props?.workProcess?.integrationState?.internalId!,
+    props.workProcess.integrationState!.internalId,
     { skip },
   )
 
@@ -135,7 +135,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
       </Flex>
       {openInitWorkProcessIntegrationForm && (
         <InitWorkProcessIntegrationForm
-          connectionId={azdoConnection?.connectionId!}
+          connectionId={azdoConnection!.connectionId}
           externalId={props.workProcess.externalId}
           onFormSave={() => onInitWorkProcessIntegrationFormClosed(true)}
           onFormCancel={() => onInitWorkProcessIntegrationFormClosed(false)}

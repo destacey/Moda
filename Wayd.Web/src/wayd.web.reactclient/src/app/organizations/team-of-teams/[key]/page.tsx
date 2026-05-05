@@ -90,13 +90,13 @@ const TeamOfTeamsDetailsPage = (props: {
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const teamMembershipsQuery = useGetTeamOfTeamsMembershipsQuery(
-    { teamId: team?.id!, enabled: teamMembershipsQueryEnabled },
+    { teamId: team!.id, enabled: teamMembershipsQueryEnabled },
     { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
   const risksQuery = useGetTeamOfTeamsRisksQuery(
     {
-      id: team?.id!,
+      id: team!.id,
       includeClosed: includeClosedRisks,
       enabled: risksQueryEnabled,
     },
@@ -152,7 +152,7 @@ const TeamOfTeamsDetailsPage = (props: {
         } as RisksGridProps)
       case TeamOfTeamsTabs.TeamMemberships:
         return createElement(TeamMembershipsGrid, {
-          teamId: team?.id!,
+          teamId: team!.id,
           teamMemberships: teamMembershipsQuery.data,
           isLoading: teamMembershipsQuery.isLoading,
           refetch: teamMembershipsQuery.refetch,

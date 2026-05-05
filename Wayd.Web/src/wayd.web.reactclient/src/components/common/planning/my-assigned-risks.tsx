@@ -15,7 +15,7 @@ const riskMessage = (risk: RiskListDto) => {
 
 const MyAssignedRisks = () => {
   const { user } = useAuth()
-  const { data: risks } = useGetMyRisksQuery(user?.username!, {
+  const { data: risks } = useGetMyRisksQuery(user!.username, {
     skip: !user?.username,
   })
 

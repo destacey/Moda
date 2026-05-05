@@ -18,9 +18,8 @@ const EmployeeLinkCellRenderer = ({ value, data }: ICellRendererParams<EmployeeL
 }
 
 const ManagerLinkCellRenderer = ({ value, data }: ICellRendererParams<EmployeeListDto>) => {
-  return (
-    <Link href={`/organizations/employees/${data!.manager?.key}`}>{value}</Link>
-  )
+  if (!data?.manager?.key) return value ?? null
+  return <Link href={`/organizations/employees/${data.manager.key}`}>{value}</Link>
 }
 
 const EmployeeListPage = () => {

@@ -17,7 +17,7 @@ export const workStatusApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.WorkStatus,
-        ...(result?.map(({ id }) => ({ type: QueryTags.WorkType, id })) ?? []),
+        ...(result?.map(({ id }) => ({ type: QueryTags.WorkStatus, id })) ?? []),
       ],
     }),
     getWorkStatus: builder.query<WorkStatusDto, number>({

@@ -141,7 +141,7 @@ const ProjectDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     data: workItemsData,
     isLoading: workItemsDataIsLoading,
     refetch: refetchWorkItemsData,
-  } = useGetProjectWorkItemsQuery(projectData?.id!, { skip: !projectData?.id })
+  } = useGetProjectWorkItemsQuery(projectData!.id, { skip: !projectData?.id })
 
   useEffect(() => {
     if (!projectData) return

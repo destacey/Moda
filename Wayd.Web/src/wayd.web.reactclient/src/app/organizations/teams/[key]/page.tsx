@@ -146,12 +146,12 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const pathname = usePathname()
   const isScrumTeam = team?.operatingModel?.methodology === Methodology.Scrum
 
-  const { data: hasEverBeenScrum } = useGetTeamHasEverBeenScrumQuery(team?.id!, {
+  const { data: hasEverBeenScrum } = useGetTeamHasEverBeenScrumQuery(team!.id, {
     skip: !team?.id,
   })
 
   const teamMembershipsQuery = useGetTeamMembershipsQuery(
-    { teamId: team?.id!, enabled: teamMembershipsQueryEnabled },
+    { teamId: team!.id, enabled: teamMembershipsQueryEnabled },
     { skip: !team?.id || !teamMembershipsQueryEnabled },
   )
 
@@ -159,7 +159,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const risksQuery = useGetTeamRisksQuery(
     {
-      id: team?.id!,
+      id: team!.id,
       includeClosed: includeClosedRisks,
       enabled: risksQueryEnabled,
     },
@@ -330,7 +330,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           />
         )
       case TeamTabs.CycleTimeReport:
-        return <CycleTimeReport teamCode={team?.code!} />
+        return <CycleTimeReport teamCode={team!.code} />
       default:
         return null
     }
