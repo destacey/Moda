@@ -25,9 +25,11 @@ jobs:
               with:
                   node-version: 22
                   registry-url: "https://registry.npmjs.org"
-
+            # npm trusted publishing (OIDC) requires npm >= 11.5.1
+            # due to a bug (https://github.com/nodejs/node/issues/62425#issuecomment-4200715930)
+            # NPM 10 has to be installed first for NPM 11 to successfully install
             - name: Update npm to v11 for OIDC support
-              run: npm install -g npm@11
+              run: npm install -g npm@10.9.8 && npm install -g npm@11
 
             - name: Install dependencies
               run: npm ci
