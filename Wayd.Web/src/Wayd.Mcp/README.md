@@ -137,19 +137,19 @@ Three self-contained skills are available:
 
 | Skill | Trigger |
 | --- | --- |
-| `wayd-ppm` | Portfolios, programs, projects — lookup, create, update, lifecycle |
-| `wayd-pi` | Planning intervals, iterations, objectives, health reports, risks |
-| `wayd-roadmaps` | Roadmap exploration — activities, timeboxes, milestones |
+| `moda-ppm` | Portfolios, programs, projects — lookup, create, update, lifecycle |
+| `moda-pi` | Planning intervals, iterations, objectives, health reports, risks |
+| `moda-roadmaps` | Roadmap exploration — activities, timeboxes, milestones |
 
 ### Installing the skills
 
 From your project root:
 
 ```bash
-npx skills add destacey/wayd
+npx skills add destacey/Wayd
 ```
 
-Once installed, activate a skill in Claude Code with `/wayd-ppm`, `/wayd-pi`, or `/wayd-roadmaps`.
+Once installed, activate a skill in Claude Code with `/moda-ppm`, `/moda-pi`, or `/moda-roadmaps`.
 
 ## Available Tools
 
