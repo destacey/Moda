@@ -3,7 +3,9 @@ import {
   AssignUserRolesRequest,
   CreateUserRequest,
   ManageRoleUsersRequest,
+  StageTenantMigrationRequest,
   UserDetailsDto,
+  UserIdentityDto,
   UserRoleDto,
 } from '@/src/services/wayd-api'
 import { authenticatedFetch, getUsersClient } from '@/src/services/clients'
@@ -287,6 +289,62 @@ export const usersApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getUserIdentityHistory: builder.query<UserIdentityDto[], string>({
+      queryFn: async (id: string) => {
+        try {
+          const data = await getUsersClient().getIdentityHistory(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, id) => [
+        { type: QueryTags.UserIdentityHistory, id },
+      ],
+    }),
+
+    stageTenantMigration: builder.mutation<
+      void,
+      { userId: string; targetTenantId: string }
+    >({
+      queryFn: async ({ userId, targetTenantId }) => {
+        try {
+          const request: StageTenantMigrationRequest = { targetTenantId }
+          const data = await getUsersClient().stageTenantMigration(
+            userId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg.userId },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserIdentityHistory, id: arg.userId },
+      ],
+    }),
+
+    cancelTenantMigration: builder.mutation<void, string>({
+      queryFn: async (userId) => {
+        try {
+          const data = await getUsersClient().cancelTenantMigration(userId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, userId) => [
+        { type: QueryTags.User, id: userId },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserIdentityHistory, id: userId },
+      ],
+    }),
+
     getUserOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -322,5 +380,8 @@ export const {
   useActivateUserMutation,
   useDeactivateUserMutation,
   useUnlockUserMutation,
+  useGetUserIdentityHistoryQuery,
+  useStageTenantMigrationMutation,
+  useCancelTenantMigrationMutation,
   useGetUserOptionsQuery,
 } = usersApi

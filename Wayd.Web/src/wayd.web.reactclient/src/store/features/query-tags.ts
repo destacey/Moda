@@ -113,6 +113,7 @@ export enum QueryTags {
 
   // USER MANAGEMENT
   User = 'UserManagement.User',
+  UserIdentityHistory = 'UserManagement.UserIdentityHistory',
   UserPermission = 'UserManagement.UserPermission',
   UserRole = 'UserManagement.UserRole',
   UserOption = 'UserManagement.UserOption',
