@@ -3,6 +3,7 @@
 import './grid/ag-grid-init'
 import { AgGridReact, AgGridReactProps } from 'ag-grid-react'
 import {
+  ChangeEvent,
   forwardRef,
   useImperativeHandle,
   useRef,
@@ -75,7 +76,7 @@ const WaydGrid = forwardRef<AgGridReact, ModaGridProps>(
     const [searchValue, setSearchValue] = useState('')
     const showGlobalSearch = includeGlobalSearch ?? true
     const showExportButton = includeExportButton ?? true
-    const showGridControls = gridControlMenuItems?.length > 0
+    const showGridControls = (gridControlMenuItems?.length ?? 0) > 0
 
     const gridRef = useRef<AgGridReact>(null)
     const [gridContainerRef, autoHeight] = useRemainingHeight()
@@ -98,7 +99,7 @@ const WaydGrid = forwardRef<AgGridReact, ModaGridProps>(
       setDisplayedRowCount(gridRef.current?.api.getDisplayedRowCount() ?? 0)
     }
 
-    const onGlobalSearchChange = (e) => {
+    const onGlobalSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value
       setSearchValue(value)
       gridRef.current?.api.setGridOption('quickFilterText', value)

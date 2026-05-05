@@ -28,8 +28,8 @@ const ProgramsPage: FC = () => {
   const [selectedStatuses, setSelectedStatuses] =
     useState<number[]>(DEFAULT_STATUSES)
   const [selectedPortfolioId, setSelectedPortfolioId] = useState<
-    string | undefined
-  >(undefined)
+    string | null
+  >(null)
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -43,7 +43,7 @@ const ProgramsPage: FC = () => {
     refetch,
   } = useGetProgramsQuery({
     status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
-    portfolioId: selectedPortfolioId,
+    portfolioId: selectedPortfolioId ?? undefined,
   })
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const ProgramsPage: FC = () => {
         onPortfolioChange={setSelectedPortfolioId}
       />
       <ProgramsGrid
-        programs={programData}
+        programs={programData ?? []}
         isLoading={isLoading}
         refetch={refetch}
       />

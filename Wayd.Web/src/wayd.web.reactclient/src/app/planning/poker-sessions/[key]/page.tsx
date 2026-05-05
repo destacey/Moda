@@ -188,7 +188,7 @@ const PokerSessionDetailPage: FC = () => {
         if (vote.participant && !map.has(vote.participant.id)) {
           map.set(vote.participant.id, {
             id: vote.participant.id,
-            name: vote.participant.name,
+            name: vote.participant.name!,
           })
         }
       }

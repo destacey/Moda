@@ -146,7 +146,7 @@ const createCrudSlice = <
   >,
 ) => {
   const itemsAdapter = createEntityAdapter<TItem, EntityId>(
-    options.createAdapterOptions,
+    options.createAdapterOptions!,
   )
   const initialState: State = options.initialState({
     data: itemsAdapter.getInitialState(),
@@ -224,9 +224,9 @@ const createCrudSlice = <
       })
       builder.addCase(
         getData.rejected,
-        (state, action: PayloadAction<{ error?: any }>) => {
+        (state, action) => {
           state.isLoading = false
-          state.error = action.payload.error
+          state.error = (action.payload as any)?.error
           additionalThunkReducers[action.type] &&
             additionalThunkReducers[action.type](state, action)
         },
@@ -251,10 +251,10 @@ const createCrudSlice = <
       })
       builder.addCase(
         getDetail.rejected,
-        (state, action: PayloadAction<{ error?: any }>) => {
+        (state, action) => {
           state.detail.isLoading = false
-          state.detail.error = action.payload?.error
-          if (action.payload?.error?.status === 404) {
+          state.detail.error = (action.payload as any)?.error
+          if ((action.payload as any)?.error?.status === 404) {
             state.detail.notFound = true
           }
           additionalThunkReducers[action.type] &&
@@ -282,9 +282,9 @@ const createCrudSlice = <
         })
         builder.addCase(
           updateDetail.rejected,
-          (state, action: PayloadAction<{ error?: any }>) => {
+          (state, action) => {
             state.detail.isSaving = false
-            const error = action.payload?.error
+            const error = (action.payload as any)?.error
             if (error?.status === 422 && error?.errors) {
               state.detail.validationErrors = toFormErrors(error.errors)
             } else {
@@ -315,9 +315,9 @@ const createCrudSlice = <
         })
         builder.addCase(
           createDetail.rejected,
-          (state, action: PayloadAction<{ error?: any }>) => {
+          (state, action) => {
             state.detail.isSaving = false
-            const error = action.payload?.error
+            const error = (action.payload as any)?.error
             if (error?.status === 422 && error?.errors) {
               state.detail.validationErrors = toFormErrors(error.errors)
             } else {
@@ -340,16 +340,16 @@ const createCrudSlice = <
             state.data as EntityState<TItem, EntityId>,
             action.payload,
           )
-          state.detail.item = null
+          ;(state.detail.item as TDetail | null) = null
           state.detail.isSaving = false
           additionalThunkReducers[action.type] &&
             additionalThunkReducers[action.type](state, action)
         })
         builder.addCase(
           deleteDetail.rejected,
-          (state, action: PayloadAction<{ error?: any }>) => {
+          (state, action) => {
             state.detail.isSaving = false
-            state.detail.error = action.payload?.error
+            state.detail.error = (action.payload as any)?.error
             additionalThunkReducers[action.type] &&
               additionalThunkReducers[action.type](state, action)
           },
@@ -373,9 +373,9 @@ const createCrudSlice = <
           })
           builder.addCase(
             refreshDetail.rejected,
-            (state, action: PayloadAction<{ error?: any }>) => {
+            (state, action) => {
               state.detail.isLoading = false
-              state.detail.error = action.payload?.error
+              state.detail.error = (action.payload as any)?.error
               additionalThunkReducers[action.type] &&
                 additionalThunkReducers[action.type](state, action)
             },

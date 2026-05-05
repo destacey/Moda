@@ -10,7 +10,7 @@ import CreateRiskForm from './create-risk-form'
 import { EditOutlined } from '@ant-design/icons'
 import EditRiskForm from './edit-risk-form'
 import { NestedTeamNameLinkCellRenderer } from '../wayd-grid-cell-renderers'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ControlItemSwitch } from '../control-items-menu'
 
 export interface RisksGridProps {
@@ -24,13 +24,13 @@ export interface RisksGridProps {
   gridHeight?: number
 }
 
-const RiskLinkCellRenderer = ({ value, data }) => {
-  return <Link href={`/planning/risks/${data.key}`}>{value}</Link>
+const RiskLinkCellRenderer = ({ value, data }: ICellRendererParams<RiskListDto>) => {
+  return <Link href={`/planning/risks/${data!.key}`}>{value}</Link>
 }
 
-const AssigneeLinkCellRenderer = ({ value, data }) => {
+const AssigneeLinkCellRenderer = ({ value, data }: ICellRendererParams<RiskListDto>) => {
   return (
-    <Link href={`/organizations/employees/${data.assignee?.key}`}>{value}</Link>
+    <Link href={`/organizations/employees/${data!.assignee?.key}`}>{value}</Link>
   )
 }
 
@@ -48,7 +48,7 @@ const RisksGrid = ({
   const [hideTeam, setHideTeam] = useState<boolean>(hideTeamColumn)
   const [openCreateRiskForm, setOpenCreateRiskForm] = useState<boolean>(false)
   const [openUpdateRiskForm, setOpenUpdateRiskForm] = useState<boolean>(false)
-  const [editRiskKey, setEditRiskKey] = useState<number | null>(null)
+  const [editRiskKey, setEditRiskKey] = useState<number | undefined>(undefined)
 
   const { hasPermissionClaim } = useAuth()
   const canCreateRisks = hasPermissionClaim('Permissions.Risks.Create')
@@ -66,7 +66,7 @@ const RisksGrid = ({
 
   const onEditRiskFormClosed = (wasSaved: boolean) => {
     setOpenUpdateRiskForm(false)
-    setEditRiskKey(null)
+    setEditRiskKey(undefined)
     if (wasSaved) {
       refreshRisks()
     }
@@ -130,14 +130,15 @@ const RisksGrid = ({
       sortable: false,
       resizable: false,
       hide: !canUpdateRisks,
-      cellRenderer: (params) => {
+      cellRenderer: (params: ICellRendererParams<RiskListDto>) => {
+        if (!params.data) return null
         return (
           canUpdateRisks && (
             <Button
               type="text"
               size="small"
               icon={<EditOutlined />}
-              onClick={() => editRiskButtonClicked(params.data.key)}
+              onClick={() => editRiskButtonClicked(params.data!.key)}
             />
           )
         )
@@ -158,7 +159,7 @@ const RisksGrid = ({
     {
       field: 'followUpDate',
       valueGetter: (params) =>
-        params.data.followUpDate
+        params.data?.followUpDate
           ? dayjs(params.data.followUpDate).format('M/D/YYYY')
           : null,
     },
@@ -170,7 +171,7 @@ const RisksGrid = ({
     {
       field: 'reportedOn',
       valueGetter: (params) =>
-        dayjs(params.data.reportedOn).format('M/D/YYYY'),
+        params.data?.reportedOn ? dayjs(params.data.reportedOn).format('M/D/YYYY') : null,
     },
   ]}, [canUpdateRisks, hideTeam, includeClosed])
 
@@ -193,7 +194,7 @@ const RisksGrid = ({
           onFormCancel={() => onCreateRiskFormClosed(false)}
         />
       )}
-      {openUpdateRiskForm && (
+      {openUpdateRiskForm && editRiskKey !== undefined && (
         <EditRiskForm
           riskKey={editRiskKey}
           onFormSave={() => onEditRiskFormClosed(true)}

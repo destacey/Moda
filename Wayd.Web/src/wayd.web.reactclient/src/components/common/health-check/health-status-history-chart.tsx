@@ -100,16 +100,16 @@ const HealthStatusHistoryChart = ({
       shape: 'circle',
     },
     tooltip: {
-      title: (datum) => dayjs(datum.date).format('MMM D, YYYY'),
+      title: (datum: any) => dayjs(datum.date).format('MMM D, YYYY'),
       items: [
         {
           channel: 'y',
-          valueFormatter: (value) => healthStatusMap[value],
+          valueFormatter: (value: any) => healthStatusMap[value],
           name: 'Status',
         },
         {
           channel: 'x',
-          valueFormatter: (value) => dayjs(value).format('h:mm A'),
+          valueFormatter: (value: any) => dayjs(value).format('h:mm A'),
           name: 'Time',
         },
       ],
@@ -121,7 +121,7 @@ const HealthStatusHistoryChart = ({
         tickCount: seriesData.length,
       },
       y: {
-        labelFormatter: (value) => healthStatusMap[value],
+        labelFormatter: (value: any) => healthStatusMap[value],
         gridStrokeOpacity: 0.3,
       },
     },

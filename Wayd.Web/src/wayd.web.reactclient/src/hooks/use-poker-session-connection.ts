@@ -64,6 +64,7 @@ export function usePokerSessionConnection(
         const connection = new HubConnectionBuilder()
           .withUrl(`${API_BASE_URL}/hubs/planning-poker`, {
             accessTokenFactory: async () => {
+              if (!msalInstance) return ''
               const accounts = msalInstance.getAllAccounts()
               if (accounts.length === 0) return ''
               const tokenResponse = await msalInstance.acquireTokenSilent({

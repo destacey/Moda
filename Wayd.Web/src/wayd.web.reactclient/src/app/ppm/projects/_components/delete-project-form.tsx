@@ -5,6 +5,7 @@ import { useConfirmModal } from '@/src/hooks'
 import { ProjectDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { Modal } from 'antd'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeleteProjectFormProps {
   project: ProjectDetailsDto
@@ -30,8 +31,9 @@ const DeleteProjectForm = ({
         messageApi.success('Successfully deleted Project.')
         return true
       } catch (error) {
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             'An unexpected error occurred while deleting the project.',
         )
         console.log(error)

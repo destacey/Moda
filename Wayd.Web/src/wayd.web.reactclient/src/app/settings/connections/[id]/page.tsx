@@ -26,6 +26,7 @@ import {
 import { useGetConnectionQuery } from '@/src/store/features/app-integration/connections-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { AzureDevOpsConnectionDetailsDto } from '@/src/services/wayd-api'
+import { isApiError, type ApiError } from '@/src/utils'
 
 enum ConnectionTabs {
   Details = 'details',
@@ -97,12 +98,12 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case ConnectionTabs.Details:
-        return <AzdoConnectionDetails connection={azdoConnection} />
+        return <AzdoConnectionDetails connection={azdoConnection!} />
       case ConnectionTabs.OrganizationConfiguration:
         return (
           <AzdoOrganization
-            workProcesses={azdoConnection?.configuration?.workProcesses}
-            workspaces={azdoConnection?.configuration?.workspaces}
+            workProcesses={azdoConnection?.configuration?.workProcesses ?? []}
+            workspaces={azdoConnection?.configuration?.workspaces ?? []}
           />
         )
       default:
@@ -163,8 +164,9 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         }`,
       )
     } catch (error) {
+      const apiError: ApiError = isApiError(error) ? error : {}
       console.error(error)
-      messageApi.error(`Failed to change sync setting. Error: ${error.detail}`)
+      messageApi.error(`Failed to change sync setting. Error: ${apiError.detail}`)
     }
   }
 
@@ -178,9 +180,10 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         'Successfully imported organization processes and projects.',
       )
     } catch (error) {
+      const apiError: ApiError = isApiError(error) ? error : {}
       console.error(error)
       messageApi.error(
-        `Failed to initialize organization. Error: ${error.detail}`,
+        `Failed to initialize organization. Error: ${apiError.detail}`,
       )
     }
     setIsSyncingOrganization(false)
@@ -213,13 +216,13 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         {
           key: 'toggle-sync-setting',
           label: azdoConnection?.isSyncEnabled ? 'Disable Sync' : 'Enable Sync',
-          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
+          disabled: !!azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => updateSyncState(),
         },
         {
           key: 'sync-organization',
           label: 'Sync Organization Configuration',
-          disabled: azdoConnection && !azdoConnection.isValidConfiguration,
+          disabled: !!azdoConnection && !azdoConnection.isValidConfiguration,
           onClick: () => {
             setIsSyncingOrganization(true)
             syncOrganizationConfiguration()
@@ -274,14 +277,14 @@ const ConnectionDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       </AzdoConnectionContext.Provider>
       {openEditConnectionForm && (
         <EditConnectionForm
-          id={azdoConnection?.id}
+          id={azdoConnection!.id}
           onFormUpdate={() => onEditConnectionFormClosed(true)}
           onFormCancel={() => onEditConnectionFormClosed(false)}
         />
       )}
       {openDeleteConnectionForm && (
         <DeleteAzdoConnectionForm
-          connection={azdoConnection}
+          connection={azdoConnection!}
           onFormSave={() => onDeleteConnectionFormClosed(true)}
           onFormCancel={() => onDeleteConnectionFormClosed(false)}
         />

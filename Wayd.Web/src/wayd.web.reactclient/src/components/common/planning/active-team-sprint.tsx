@@ -26,9 +26,10 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
   const { data: sprintData, isLoading: sprintIsLoading } =
     useGetActiveSprintQuery(teamId)
 
+  const sprintKey = sprintData?.key
   const { data: metrics, isLoading: metricsIsLoading } =
-    useGetSprintMetricsQuery(sprintData?.key, {
-      skip: !sprintData?.key,
+    useGetSprintMetricsQuery(sprintKey!, {
+      skip: !sprintKey,
     })
 
   const displayValues = (() => {

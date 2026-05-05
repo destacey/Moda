@@ -21,7 +21,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.BackgroundJob,
-        ...result.map(({ id }) => ({ type: QueryTags.BackgroundJob, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.BackgroundJob, id })) ?? []),
       ],
     }),
     getJobTypes: builder.query<BackgroundJobTypeDto[], void>({
@@ -36,7 +36,7 @@ export const backgroundJobsApi = apiSlice.injectEndpoints({
       },
       providesTags: (result) => [
         QueryTags.BackgroundJobType,
-        ...result.map(({ id }) => ({ type: QueryTags.BackgroundJobType, id })),
+        ...(result?.map(({ id }) => ({ type: QueryTags.BackgroundJobType, id })) ?? []),
       ],
     }),
     runJob: builder.mutation<void, number>({

@@ -5,6 +5,7 @@ import { useConfirmModal } from '@/src/hooks'
 import { StrategicThemeDetailsDto } from '@/src/services/wayd-api'
 import { useDeleteStrategicThemeMutation } from '@/src/store/features/strategic-management/strategic-themes-api'
 import { Modal } from 'antd'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeleteStrategicThemeFormProps {
   strategicTheme: StrategicThemeDetailsDto
@@ -34,8 +35,9 @@ const DeleteStrategicThemeForm = ({
         messageApi.success('Successfully deleted Strategic Theme.')
         return true
       } catch (error) {
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             'An unexpected error occurred while deleting the strategic theme.',
         )
         console.error(error)

@@ -31,7 +31,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
 
   const skip = !props?.workProcess?.integrationState?.internalId
   const { data: workProcessData } = useGetWorkProcessQuery(
-    props?.workProcess?.integrationState?.internalId,
+    props.workProcess.integrationState?.internalId ?? '',
     { skip },
   )
 
@@ -43,13 +43,13 @@ const AzdoProcess = (props: AzdoProcessProps) => {
     setOpenInitWorkProcessIntegrationForm(false)
     if (wasSaved) {
       // TODO: make this a better experience
-      azdoConnection.reloadConnectionData
+      azdoConnection?.reloadConnectionData
     }
   }
 
   const workspaceSection = (
     processWorkspaces: AzureDevOpsWorkspaceDto[],
-    processIntegrationIsActive: boolean,
+    processIntegrationIsActive: boolean | undefined,
   ) => (
     <>
       <Title level={5}>Workspaces</Title>
@@ -72,7 +72,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
             <AzdoWorkspaceCard
               workspace={item}
               enableInit={
-                !item.integrationState?.isActive && processIntegrationIsActive
+                !(item.integrationState?.isActive ?? false) && (processIntegrationIsActive ?? false)
               }
             />
           </Item>
@@ -117,7 +117,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
               <Title level={5} style={{ marginTop: '0px' }}>
                 {props.workProcess.name}
               </Title>
-              {azdoConnection.organizationUrl && (
+              {azdoConnection?.organizationUrl && (
                 <Link
                   href={`${azdoConnection.organizationUrl}/_settings/process?process-name=${props.workProcess.name}&_a=workitemtypes`}
                   target="_blank"
@@ -135,7 +135,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
       </Flex>
       {openInitWorkProcessIntegrationForm && (
         <InitWorkProcessIntegrationForm
-          connectionId={azdoConnection.connectionId}
+          connectionId={azdoConnection!.connectionId}
           externalId={props.workProcess.externalId}
           onFormSave={() => onInitWorkProcessIntegrationFormClosed(true)}
           onFormCancel={() => onInitWorkProcessIntegrationFormClosed(false)}

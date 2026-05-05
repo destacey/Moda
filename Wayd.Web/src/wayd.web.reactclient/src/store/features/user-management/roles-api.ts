@@ -83,7 +83,7 @@ export const rolesApi = apiSlice.injectEndpoints({
       queryFn: async (id: string) => {
         try {
           const data = await getRolesClient().getUsers(id)
-          data.sort((a, b) => a.userName.localeCompare(b.userName))
+          data.sort((a, b) => (a.userName ?? '').localeCompare(b.userName ?? ''))
           return { data }
         } catch (error) {
           console.error('API Error:', error)

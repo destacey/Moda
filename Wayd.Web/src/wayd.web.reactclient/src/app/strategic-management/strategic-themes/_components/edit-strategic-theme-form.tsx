@@ -7,7 +7,7 @@ import {
   useGetStrategicThemeQuery,
   useUpdateStrategicThemeMutation,
 } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
 import { useEffect } from 'react'
 import { useModalForm } from '@/src/hooks'
@@ -52,10 +52,10 @@ const EditStrategicThemeForm = ({
     useModalForm<UpdateStrategicThemeFormValues>({
       onSubmit: async (values: UpdateStrategicThemeFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, strategicThemeData.id)
+            const request = mapToRequestValues(values, strategicThemeData!.id)
             const response = await updateStrategicTheme({
               request,
-              cacheKey: strategicThemeData.key,
+              cacheKey: strategicThemeData!.key,
             })
             if (response.error) {
               throw response.error
@@ -63,13 +63,14 @@ const EditStrategicThemeForm = ({
             messageApi.success('Strategic Theme updated successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while updating the Strategic Theme. Please try again.',
               )
             }
@@ -94,7 +95,7 @@ const EditStrategicThemeForm = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading the Strategic Theme. Please try again.',
       )
     }

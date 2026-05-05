@@ -23,10 +23,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = React.memo(
           remarkPlugins={[remarkGfm]}
           rehypePlugins={[
             rehypeRaw, // To parse raw HTML
-            () => (tree) => {
+            () => (tree: any) => {
               // Filter out comment nodes
               tree.children = tree.children.filter(
-                (node) => node.type !== 'comment',
+                (node: any) => node.type !== 'comment',
               )
             },
           ]}

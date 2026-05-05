@@ -45,7 +45,7 @@ describe('SprintsGrid', () => {
       state: { id: 1, name: 'Active' },
       start: new Date('2025-01-01'),
       end: new Date('2025-01-15'),
-      team: { id: '1', key: 1, name: 'Team Alpha', type: 'Team' },
+      team: { id: '1', key: 1, name: 'Team Alpha', code: 'TA', type: 'Team' },
     },
     {
       id: '2',
@@ -54,7 +54,7 @@ describe('SprintsGrid', () => {
       state: { id: 2, name: 'Planned' },
       start: new Date('2025-01-16'),
       end: new Date('2025-01-30'),
-      team: { id: '2', key: 2, name: 'Team Beta', type: 'Team' },
+      team: { id: '2', key: 2, name: 'Team Beta', code: 'TB', type: 'Team' },
     },
   ]
 
@@ -203,7 +203,7 @@ describe('SprintsGrid', () => {
   })
 
   it('respects hideTeam prop when provided', () => {
-    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as unknown as jest.Mock
 
     render(
       <SprintsGrid
@@ -225,7 +225,7 @@ describe('SprintsGrid', () => {
   })
 
   it('does not hide team column by default', () => {
-    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as unknown as jest.Mock
 
     render(
       <SprintsGrid
@@ -246,7 +246,7 @@ describe('SprintsGrid', () => {
   })
 
   it('defines all expected columns with correct fields', () => {
-    const WaydGrid = ModaGridModule.WaydGrid as jest.Mock
+    const WaydGrid = ModaGridModule.WaydGrid as unknown as jest.Mock
 
     render(
       <SprintsGrid

@@ -18,12 +18,12 @@ describe('InactiveTag', () => {
   })
 
   it('should return null when isActive is undefined', () => {
-    const { container } = render(<InactiveTag isActive={undefined} />)
+    const { container } = render(<InactiveTag isActive={undefined as unknown as boolean} />)
     expect(container.firstChild).toBeNull()
   })
 
   it('should return null when isActive is null', () => {
-    const { container } = render(<InactiveTag isActive={null} />)
+    const { container } = render(<InactiveTag isActive={null as unknown as boolean} />)
     expect(container.firstChild).toBeNull()
   })
 

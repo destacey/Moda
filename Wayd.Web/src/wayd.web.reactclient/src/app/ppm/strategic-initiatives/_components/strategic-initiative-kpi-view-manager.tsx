@@ -152,7 +152,7 @@ const StrategicInitiativeKpiViewManager: FC<
       {currentView === 'List' && (
         <StrategicInitiativeKpisGrid
           strategicInitiativeId={strategicInitiativeId}
-          kpis={kpis}
+          kpis={kpis ?? []}
           canManageKpis={canManageKpis}
           isLoading={isLoading}
           refetch={refetch}

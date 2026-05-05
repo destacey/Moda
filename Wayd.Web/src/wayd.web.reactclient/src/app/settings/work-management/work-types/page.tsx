@@ -3,7 +3,7 @@
 import { WaydGrid, PageTitle } from '@/src/components/common'
 import { useAppDispatch, useAppSelector, useDocumentTitle } from '@/src/hooks'
 import { WorkTypeDto } from '@/src/services/wayd-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { Button } from 'antd'
 import { useEffect, useMemo, useState } from 'react'
 import { setIncludeInactive } from '../../../../store/features/work-management/work-type-slice'
@@ -20,7 +20,7 @@ const WorkTypesPage = () => {
   useDocumentTitle('Work Management - Work Types')
   const [openUpdateWorkTypeForm, setOpenUpdateWorkTypeForm] =
     useState<boolean>(false)
-  const [editWorkTypeId, setEditWorkTypeId] = useState<number | null>(null)
+  const [editWorkTypeId, setEditWorkTypeId] = useState<number | undefined>(undefined)
 
   const { includeInactive } = useAppSelector((state) => state.workType)
 
@@ -59,14 +59,14 @@ const WorkTypesPage = () => {
         sortable: false,
         resizable: false,
         hide: !canUpdateWorkTypes,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<WorkTypeDto>) => {
           return (
             canUpdateWorkTypes && (
               <Button
                 type="text"
                 size="small"
                 icon={<EditOutlined />}
-                onClick={() => editWorkTypeButtonClicked(params.data.id)}
+                onClick={() => editWorkTypeButtonClicked(params.data!.id)}
               />
             )
           )
@@ -116,7 +116,7 @@ const WorkTypesPage = () => {
 
   const onEditWorkTypeFormClosed = (wasSaved: boolean) => {
     setOpenUpdateWorkTypeForm(false)
-    setEditWorkTypeId(null)
+    setEditWorkTypeId(undefined)
     if (wasSaved) {
       refresh()
     }
@@ -136,7 +136,7 @@ const WorkTypesPage = () => {
       />
       {openUpdateWorkTypeForm && (
         <EditWorkTypeForm
-          workTypeId={editWorkTypeId}
+          workTypeId={editWorkTypeId!}
           onFormSave={() => onEditWorkTypeFormClosed(true)}
           onFormCancel={() => onEditWorkTypeFormClosed(false)}
         />

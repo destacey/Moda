@@ -16,7 +16,7 @@ import { Tag } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
 import EditTeamOperatingModelForm from './edit-team-operating-model-form'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 
 interface TeamOperatingModelsGridProps {
   teamId: string
@@ -137,9 +137,9 @@ const TeamOperatingModelsGrid = ({
         sortable: false,
         hide: !canUpdate,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<TeamOperatingModelDetailsDto>) => {
           const menuItems = getRowMenuItems({
-            operatingModel: params.data,
+            operatingModel: params.data!,
             canUpdate,
             totalModelsCount,
             onEditClicked: handleEdit,

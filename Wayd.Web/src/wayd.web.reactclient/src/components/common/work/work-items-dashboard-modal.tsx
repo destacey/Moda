@@ -41,7 +41,7 @@ const WorkItemsDashboardModal = (props: WorkItemsDashboardModalProps) => {
         destroyOnHidden={true}
       >
         <WorkItemsCumulativeFlowChart
-          workItems={workItemsData}
+          workItems={workItemsData ?? []}
           isLoading={isLoading}
         />
       </Modal>

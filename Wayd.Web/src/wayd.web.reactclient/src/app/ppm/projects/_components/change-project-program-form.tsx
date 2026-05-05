@@ -8,7 +8,7 @@ import {
 } from '@/src/services/wayd-api'
 import { useGetPortfolioProgramOptionsQuery } from '@/src/store/features/ppm/portfolios-api'
 import { useChangeProjectProgramMutation } from '@/src/store/features/ppm/projects-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Flex, Form, Modal, Select, Typography } from 'antd'
 import { useEffect } from 'react'
 
@@ -45,7 +45,7 @@ const ChangeProjectProgramForm = ({
       onSubmit: async (values: ChangeProjectProgramFormValues, form) => {
           try {
             const request: ChangeProjectProgramRequest = {
-              programId: values.programId ?? null,
+              programId: values.programId ?? undefined,
             }
             const response = await changeProjectProgram({
               id: project.id,
@@ -57,13 +57,14 @@ const ChangeProjectProgramForm = ({
             messageApi.success('Project program changed successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while changing the project program. Please try again.',
               )
             }
@@ -90,7 +91,7 @@ const ChangeProjectProgramForm = ({
     if (programOptionsError) {
       console.error(programOptionsError)
       messageApi.error(
-        programOptionsError.detail ??
+        (isApiError(programOptionsError) ? programOptionsError.detail : undefined) ??
           'An error occurred while loading program options. Please try again.',
       )
     }

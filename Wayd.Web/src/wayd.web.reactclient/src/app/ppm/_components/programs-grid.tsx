@@ -8,7 +8,7 @@ import {
 } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProgramListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import { FC, useMemo } from 'react'
 
@@ -44,40 +44,42 @@ const ProgramsGrid: FC<ProgramsGridProps> = (props: ProgramsGridProps) => {
         headerName: 'Portfolio',
         width: 200,
         hide: props.hidePortfolio,
-        cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
+        cellRenderer: (params: ICellRendererParams<ProgramListDto>) => {
+          if (!params.data) return null
+          return PortfolioLinkCellRenderer({ ...(params as any), data: params.data.portfolio })
+        },
       },
       {
         field: 'start',
         width: 125,
         valueGetter: (params) =>
-          params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
+          params.data?.start && dayjs(params.data.start).format('MMM D, YYYY'),
       },
       {
         field: 'end',
         width: 125,
         valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
+          params.data?.end && dayjs(params.data.end).format('MMM D, YYYY'),
       },
       {
         field: 'programManagers',
         headerName: 'PMs',
-        valueGetter: (params) => getSortedNames(params.data.programManagers),
+        valueGetter: (params) => getSortedNames(params.data?.programManagers ?? []),
       },
       {
         field: 'programOwners',
         headerName: 'Owners',
-        valueGetter: (params) => getSortedNames(params.data.programOwners),
+        valueGetter: (params) => getSortedNames(params.data?.programOwners ?? []),
       },
       {
         field: 'programSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.programSponsors),
+        valueGetter: (params) => getSortedNames(params.data?.programSponsors ?? []),
       },
       {
         field: 'strategicThemes',
         headerName: 'Strategic Themes',
-        valueGetter: (params) => getSortedNames(params.data.strategicThemes),
+        valueGetter: (params) => getSortedNames(params.data?.strategicThemes ?? []),
       },
     ],
     [props.hidePortfolio],

@@ -7,7 +7,7 @@ import {
   useChangeProjectKeyMutation,
   useGetProjectQuery,
 } from '@/src/store/features/ppm/projects-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Flex, Form, Input, Modal, Typography } from 'antd'
 import { useEffect } from 'react'
 
@@ -47,7 +47,7 @@ const ChangeProjectKeyForm = ({
             }
 
             const response = await changeProjectKey({
-              id: projectData.id,
+              id: projectData!.id,
               request,
             })
 
@@ -58,13 +58,14 @@ const ChangeProjectKeyForm = ({
             onFormComplete(newKey)
             return false // Don't call onComplete again from the hook
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while updating the project key. Please try again.',
               )
             }

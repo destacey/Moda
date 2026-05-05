@@ -6,15 +6,16 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { ProjectLifecycleListDto } from '@/src/services/wayd-api'
 import { useGetProjectLifecyclesQuery } from '@/src/store/features/ppm/project-lifecycles-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { Button } from 'antd'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import CreateProjectLifecycleForm from './_components/create-project-lifecycle-form'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
-const ProjectLifecycleCellRenderer = ({ value, data }) => {
-  return <Link href={`./project-lifecycles/${data.key}`}>{value}</Link>
+const ProjectLifecycleCellRenderer = ({ value, data }: ICellRendererParams<ProjectLifecycleListDto>) => {
+  return <Link href={`./project-lifecycles/${data!.key}`}>{value}</Link>
 }
 
 const ProjectLifecyclesPage = () => {
@@ -39,7 +40,7 @@ const ProjectLifecyclesPage = () => {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading project lifecycles',
       )
       console.error(error)

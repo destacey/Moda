@@ -72,7 +72,7 @@ const TeamPredictabilityRadarChart: React.FC<
         items: [
           {
             channel: 'y',
-            valueFormatter: (value) => `${value.toFixed(0)}%`,
+            valueFormatter: (value: any) => `${value.toFixed(0)}%`,
             name: 'Predictability',
           },
         ],

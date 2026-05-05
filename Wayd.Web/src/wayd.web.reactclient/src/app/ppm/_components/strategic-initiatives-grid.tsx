@@ -10,7 +10,7 @@ import {
   StrategicInitiativeListDto,
 } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { FC, useMemo } from 'react'
@@ -59,32 +59,34 @@ const StrategicInitiativesGrid: FC<StrategicInitiativesGridProps> = (
       headerName: 'Portfolio',
       width: 200,
       hide: props.hidePortfolio,
-      cellRenderer: (params) =>
-        PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
+      cellRenderer: (params: ICellRendererParams<StrategicInitiativeListDto>) => {
+        if (!params.data) return null
+        return PortfolioLinkCellRenderer({ ...(params as any), data: params.data.portfolio })
+      },
     },
     {
       field: 'start',
       width: 125,
       valueGetter: (params) =>
-        params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
+        params.data?.start && dayjs(params.data.start).format('MMM D, YYYY'),
     },
     {
       field: 'end',
       width: 125,
       valueGetter: (params) =>
-        params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
+        params.data?.end && dayjs(params.data.end).format('MMM D, YYYY'),
     },
     {
       field: 'strategicInitiativeSponsors',
       headerName: 'Sponsors',
       valueGetter: (params) =>
-        getSortedNames(params.data.strategicInitiativeSponsors),
+        getSortedNames(params.data?.strategicInitiativeSponsors ?? []),
     },
     {
       field: 'strategicInitiativeOwners',
       headerName: 'Owners',
       valueGetter: (params) =>
-        getSortedNames(params.data.strategicInitiativeOwners),
+        getSortedNames(params.data?.strategicInitiativeOwners ?? []),
     },
   ], [props.hidePortfolio])
 

@@ -97,7 +97,7 @@ const PortfolioGroupList: FC<PortfolioGroupListProps> = ({
             key={group.portfolioId}
             group={group}
             selectedProjectKey={selectedProjectKey}
-            employeeId={user.employeeId}
+            employeeId={user?.employeeId ?? null}
             planSummaries={planSummaries}
             onSelectProject={onSelectProject}
           />

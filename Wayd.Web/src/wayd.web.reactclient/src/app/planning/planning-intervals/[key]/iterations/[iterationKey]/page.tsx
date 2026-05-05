@@ -120,7 +120,7 @@ const PlanningIntervalIterationDetailsPage = (props: {
       case IterationTabs.Overview:
         return (
           <PlanningIntervalIterationOverview
-            iteration={iterationData}
+            iteration={iterationData!}
             onHealthIndicatorReady={setHealthIndicator}
           />
         )

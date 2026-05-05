@@ -12,7 +12,7 @@ import {
   useUpdateProjectMutation,
 } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { projectHelpText } from './project-help-text'
 import { DatePicker, Form, Modal, Select } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
@@ -87,23 +87,24 @@ const EditProjectForm = ({
     useModalForm<EditProjectFormValues>({
       onSubmit: async (values: EditProjectFormValues, form) => {
           try {
-            const request = mapToRequestValues(values, projectData.id)
+            const request = mapToRequestValues(values, projectData!.id)
             const response = await updateProject({
               request,
-              cacheKey: projectData.key,
+              cacheKey: projectData!.key,
             })
             if (response.error) throw response.error
 
             messageApi.success('Project updated successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while updating the project. Please try again.',
               )
             }
@@ -153,10 +154,10 @@ const EditProjectForm = ({
           strategicThemeOptionsError,
       )
       messageApi.error(
-        expenditureOptionsError.detail ??
-          error.detail ??
-          employeeOptionsError.detail ??
-          strategicThemeOptionsError.detail ??
+        (isApiError(expenditureOptionsError) ? expenditureOptionsError.detail : undefined) ??
+          (isApiError(error) ? error.detail : undefined) ??
+          (isApiError(employeeOptionsError) ? employeeOptionsError.detail : undefined) ??
+          (isApiError(strategicThemeOptionsError) ? strategicThemeOptionsError.detail : undefined) ??
           'An error occurred while loading form data. Please try again.',
       )
     }

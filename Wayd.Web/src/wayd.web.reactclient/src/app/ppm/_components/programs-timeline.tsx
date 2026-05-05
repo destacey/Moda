@@ -2,6 +2,7 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
+  ItemTemplateProps,
   WaydDataItem,
   WaydTimeline,
   WaydTimelineOptions,
@@ -11,7 +12,7 @@ import { ProgramListDto } from '@/src/services/wayd-api'
 import { Card, Divider, Flex, Space, Switch, theme, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import dayjs from 'dayjs'
-import { ReactNode, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { ProgramDrawer } from '.'
 import { getLifecyclePhaseColorFromStatus, getLuminance } from '@/src/utils'
 
@@ -39,7 +40,7 @@ export const ProgramRangeItemTemplate: TimelineTemplate<
   return (
     <Text style={{ padding: '5px' }}>
       <a
-        onClick={() => item.openProgramDrawer(item.objectData.key)}
+        onClick={() => item.openProgramDrawer(item.objectData!.key)}
         style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
@@ -85,8 +86,8 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
             itemColor: getLifecyclePhaseColorFromStatus(program.status, token),
             objectData: program,
             type: 'range',
-            start: new Date(program.start),
-            end: new Date(program.end),
+            start: new Date(program.start!),
+            end: new Date(program.end!),
             openProgramDrawer: openProgramDrawer,
           }))
 
@@ -156,8 +157,8 @@ const ProgramsTimeline: React.FC<ProgramsTimelineProps> = (props) => {
         <WaydTimeline
           data={processedPrograms}
           isLoading={isLoading}
-          options={timelineOptions}
-          rangeItemTemplate={ProgramRangeItemTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={ProgramRangeItemTemplate as FC<ItemTemplateProps<WaydDataItem>>}
           allowFullScreen={true}
           allowSaveAsImage={true}
         />

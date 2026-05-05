@@ -10,7 +10,7 @@ import {
   useGetEstimationScalesQuery,
   useSetEstimationScaleActiveStatusMutation,
 } from '@/src/store/features/planning/estimation-scales-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams, ValueGetterParams } from 'ag-grid-community'
 import { Button } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import Link from 'next/link'
@@ -21,9 +21,10 @@ import {
   EditEstimationScaleForm,
 } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
-const EstimationScaleCellRenderer = ({ value, data }) => {
-  return <Link href={`./estimation-scales/${data.id}`}>{value}</Link>
+const EstimationScaleCellRenderer = ({ value, data }: ICellRendererParams<EstimationScaleDto>) => {
+  return <Link href={`./estimation-scales/${data!.id}`}>{value}</Link>
 }
 
 interface RowMenuProps {
@@ -97,7 +98,7 @@ const EstimationScalesPage = () => {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ?? 'An error occurred while loading estimation scales',
+        (isApiError(error) ? error.detail : undefined) ?? 'An error occurred while loading estimation scales',
       )
       console.error(error)
     }
@@ -140,9 +141,9 @@ const EstimationScalesPage = () => {
         resizable: false,
         hide: !showRowMenu,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<EstimationScaleDto>) => {
           const menuItems = getRowMenuItems({
-            scale: params.data,
+            scale: params.data!,
             canUpdate: canUpdateEstimationScale,
             canDelete: canDeleteEstimationScale,
             onEditClicked: handleEdit,
@@ -159,13 +160,13 @@ const EstimationScalesPage = () => {
         field: 'isActive',
         headerName: 'Active',
         width: 100,
-        cellRenderer: (params) => (params.value ? 'Yes' : 'No'),
+        cellRenderer: (params: ICellRendererParams<EstimationScaleDto>) => (params.value ? 'Yes' : 'No'),
       },
       {
         field: 'values',
         headerName: 'Values',
         width: 100,
-        valueGetter: (params) => params.data?.values?.length ?? 0,
+        valueGetter: (params: ValueGetterParams<EstimationScaleDto>) => params.data?.values?.length ?? 0,
       },
     ]}, [showRowMenu, canUpdateEstimationScale, canDeleteEstimationScale, setActiveStatus, messageApi])
 

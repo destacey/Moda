@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   type DraftItem,
+  type FilterOption,
   type MoveValidator,
   type TreeGridHandle,
   defaultMoveValidator,
@@ -166,7 +167,7 @@ const ProjectPlanTable = ({
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
+        .filter((x): x is FilterOption => x !== null),
     [taskTypeOptions],
   )
 
@@ -177,7 +178,7 @@ const ProjectPlanTable = ({
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
+        .filter((x): x is FilterOption => x !== null),
     [taskStatusOptions],
   )
 
@@ -188,7 +189,7 @@ const ProjectPlanTable = ({
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter(Boolean),
+        .filter((x): x is FilterOption => x !== null),
     [taskPriorityOptions],
   )
 
@@ -408,7 +409,7 @@ const ProjectPlanTable = ({
 
           if (response.error) throw response.error
 
-          messageApi.success(`Task created: ${response.data.key}`)
+          messageApi.success(`Task created: ${response.data!.key}`)
           await refetch()
           return true
         } catch (error: any) {

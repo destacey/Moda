@@ -2,6 +2,7 @@
 
 import { ControlItemsMenu } from '@/src/components/common/control-items-menu'
 import {
+  ItemTemplateProps,
   WaydDataItem,
   WaydTimeline,
   WaydTimelineOptions,
@@ -42,7 +43,7 @@ export const StrategicInitiativeRangeItemTemplate: TimelineTemplate<
   return (
     <Text style={{ padding: '5px' }}>
       <a
-        onClick={() => item.openStrategicInitiativeDrawer(item.objectData.key)}
+        onClick={() => item.openStrategicInitiativeDrawer(item.objectData!.key)}
         style={{ color: adjustedfontColor, textDecoration: 'none' }}
         onMouseOver={(e) =>
           (e.currentTarget.style.textDecoration = 'underline')
@@ -92,8 +93,8 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
             ),
             objectData: initiative,
             type: 'range',
-            start: new Date(initiative.start),
-            end: new Date(initiative.end),
+            start: new Date(initiative.start!),
+            end: new Date(initiative.end!),
             openStrategicInitiativeDrawer: openStrategicInitiativeDrawer,
           }))
 
@@ -162,8 +163,8 @@ const StrategicInitiativesTimeline: FC<StrategicInitiativesTimelineProps> = (
         <WaydTimeline
           data={processedStrategicInitiatives}
           isLoading={props.isLoading}
-          options={timelineOptions}
-          rangeItemTemplate={StrategicInitiativeRangeItemTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={StrategicInitiativeRangeItemTemplate as FC<ItemTemplateProps<WaydDataItem>>}
           allowFullScreen={true}
           allowSaveAsImage={true}
         />

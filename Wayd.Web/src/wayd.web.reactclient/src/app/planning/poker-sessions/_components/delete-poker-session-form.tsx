@@ -4,6 +4,7 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import { useDeletePokerSessionMutation } from '@/src/store/features/planning/poker-sessions-api'
 import { Modal } from 'antd'
 import { useConfirmModal } from '@/src/hooks'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface DeletePokerSessionFormProps {
   session: { id: string; key: number; name: string }
@@ -30,8 +31,9 @@ const DeletePokerSessionForm = ({
         messageApi.success('Successfully deleted poker session.')
         return true
       } catch (error) {
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ??
+          apiError.detail ??
             'An unexpected error occurred while deleting the poker session.',
         )
         return false

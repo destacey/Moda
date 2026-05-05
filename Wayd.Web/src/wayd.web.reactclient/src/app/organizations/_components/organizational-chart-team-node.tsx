@@ -43,7 +43,7 @@ const OrganizationalChartTeamNode: React.FC<WaydOrganizationChartNodeProps> = ({
         style={{
           width: '100%',
           height: 4,
-          backgroundColor: colorMap[type.name] || themeToken.colorBgContainer,
+          backgroundColor: colorMap[type.name as keyof typeof colorMap] || themeToken.colorBgContainer,
           borderRadius: '4px 4px 0 0',
         }}
       />

@@ -3,7 +3,7 @@
 import { DatePicker, Form, Input, Modal, Select, Switch } from 'antd'
 import { useEffect, useState } from 'react'
 import { CreatePlanningIntervalObjectiveRequest } from '@/src/services/wayd-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import dayjs from 'dayjs'
 import { RangePickerProps } from 'antd/es/date-picker'
 import { MarkdownEditor } from '@/src/components/common/markdown'
@@ -50,7 +50,7 @@ const mapToRequestValues = (
     planningIntervalId: values.planningIntervalId,
     teamId: values.teamId,
     name: values.name,
-    description: values.description,
+    description: values.description ?? undefined,
     isStretch: values.isStretch,
     startDate: (values.startDate as any)?.format('YYYY-MM-DD'),
     targetDate: (values.targetDate as any)?.format('YYYY-MM-DD'),
@@ -83,7 +83,7 @@ const CreatePlanningIntervalObjectiveForm = ({
           const request = mapToRequestValues(values, order)
           const response = await createObjective({
             request,
-            planningIntervalKey: planningIntervalData?.key,
+            planningIntervalKey: planningIntervalData!.key,
           })
           if (response.error) {
             throw response.error
@@ -91,13 +91,14 @@ const CreatePlanningIntervalObjectiveForm = ({
           messageApi.success('Successfully created PI objective.')
           return true
         } catch (error) {
-          if (error.status === 422 && error.errors) {
-            const formErrors = toFormErrors(error.errors)
+          const apiError: ApiError = isApiError(error) ? error : {}
+          if (apiError.status === 422 && apiError.errors) {
+            const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              error.detail ??
+              apiError.detail ??
                 'An unexpected error occurred while creating the PI objective.',
             )
             console.error(error)
@@ -136,8 +137,8 @@ const CreatePlanningIntervalObjectiveForm = ({
 
   const isDateWithinPiRange = (date: Date) => {
     return (
-      dayjs(planningIntervalData.start) <= dayjs(date) &&
-      dayjs(date) <= dayjs(planningIntervalData.end)
+      dayjs(planningIntervalData!.start) <= dayjs(date) &&
+      dayjs(date) <= dayjs(planningIntervalData!.end)
     )
   }
 

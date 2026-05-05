@@ -9,7 +9,7 @@ import {
   MarkdownCellRenderer,
 } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProjectHealthCheckDetailsDto } from '@/src/services/wayd-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 
 interface ProjectHealthReportGridProps {
   data?: ProjectHealthCheckDetailsDto[]
@@ -17,8 +17,11 @@ interface ProjectHealthReportGridProps {
   refetch: () => void
 }
 
-const ReportedByLinkCellRenderer = ({ value, data }) => (
-  <Link href={`/organizations/employees/${data.reportedBy?.key}`}>{value}</Link>
+const ReportedByLinkCellRenderer = ({
+  value,
+  data,
+}: ICellRendererParams<ProjectHealthCheckDetailsDto>) => (
+  <Link href={`/organizations/employees/${data?.reportedBy?.key}`}>{value}</Link>
 )
 
 const ProjectHealthReportGrid = ({
@@ -49,12 +52,12 @@ const ProjectHealthReportGrid = ({
       {
         field: 'reportedOn',
         valueGetter: (params) =>
-          dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
+          params.data?.reportedOn ? dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A') : null,
       },
       {
         field: 'expiration',
         valueGetter: (params) =>
-          dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
+          params.data?.expiration ? dayjs(params.data.expiration).format('M/D/YYYY h:mm A') : null,
       },
     ],
     [],

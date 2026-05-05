@@ -126,10 +126,10 @@ export const azdoIntegrationApi = apiSlice.injectEndpoints({
       },
       providesTags: (result, error, arg) => [
         QueryTags.AzdoConnectionTeam,
-        ...result.map(() => ({
+        ...(result?.map(() => ({
           type: QueryTags.AzdoConnectionTeam,
           id: arg.connectionId,
-        })),
+        })) ?? []),
       ],
     }),
 

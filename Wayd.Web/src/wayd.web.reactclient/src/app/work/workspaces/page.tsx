@@ -55,13 +55,13 @@ const WorkspacesPage: React.FC = () => {
       <PageTitle title="Workspaces" />
       {currentView === Views.Cards ? (
         <WorkspacesCardGrid
-          workspaces={workspaceData}
+          workspaces={workspaceData ?? []}
           viewSelector={viewSelector}
           isLoading={isLoading}
         />
       ) : (
         <WorkspacesGrid
-          workspaces={workspaceData}
+          workspaces={workspaceData ?? []}
           viewSelector={viewSelector}
           isLoading={isLoading}
           refetch={refetch}

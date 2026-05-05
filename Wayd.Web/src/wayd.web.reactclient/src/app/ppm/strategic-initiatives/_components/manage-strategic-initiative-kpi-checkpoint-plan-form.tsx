@@ -12,7 +12,7 @@ import {
   useGetStrategicInitiativeKpiQuery,
   useManageStrategicInitiativeKpiCheckpointPlanMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import {
   Button,
@@ -65,7 +65,7 @@ const mapToRequestValues = (
     kpiId,
     checkpoints: values.checkpoints.map(
       (c): KpiCheckpointPlanItemRequest => ({
-        checkpointId: c.checkpointId,
+        checkpointId: c.checkpointId!,
         targetValue: c.targetValue,
         atRiskValue: c.atRiskValue ?? undefined,
         checkpointDate: (c.checkpointDate as any)?.toISOString(),
@@ -111,13 +111,14 @@ const ManageStrategicInitiativeKpiCheckpointPlanForm = ({
           messageApi.success('KPI checkpoint plan updated successfully.')
           return true
         } catch (error) {
-          if (error.status === 422 && error.errors) {
-            const formErrors = toFormErrors(error.errors)
+          const apiError: ApiError = isApiError(error) ? error : {}
+          if (apiError.status === 422 && apiError.errors) {
+            const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              error.detail ??
+              apiError.detail ??
                 'An error occurred while updating the KPI checkpoint plan. Please try again.',
             )
             console.error(error)

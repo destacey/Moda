@@ -12,7 +12,7 @@ import {
 } from 'antd'
 import { useEffect, useState } from 'react'
 import { RiskDetailsDto, UpdateRiskRequest } from '@/src/services/wayd-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import dayjs from 'dayjs'
 import { MarkdownEditor } from '../markdown'
 import {
@@ -95,8 +95,9 @@ const EditRiskForm = ({
 
           return true
         } catch (error) {
-          if (error.status === 422 && error.errors) {
-            const formErrors = toFormErrors(error.errors)
+          const apiError: ApiError = isApiError(error) ? error : {}
+          if (apiError.status === 422 && apiError.errors) {
+            const formErrors = toFormErrors(apiError.errors)
             form.setFields(formErrors)
           } else {
             throw error
@@ -116,7 +117,7 @@ const EditRiskForm = ({
     const mapToFormValues = (risk: RiskDetailsDto) => {
       form.setFieldsValue({
         riskId: risk.id,
-        teamId: risk.team.id,
+        teamId: risk.team?.id,
         summary: risk.summary,
         description: risk.description || '',
         statusId: risk.status.id,
@@ -128,7 +129,7 @@ const EditRiskForm = ({
         response: risk.response || '',
       })
     }
-    setTeamName(riskData.team.name)
+    setTeamName(riskData.team?.name ?? '')
     mapToFormValues(riskData)
   }, [form, riskData, isOpen])
 

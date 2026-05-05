@@ -11,7 +11,7 @@ const ClaimsGrid = () => {
     [],
   )
 
-  return <WaydGrid columnDefs={columnDefs} rowData={user.claims} />
+  return <WaydGrid columnDefs={columnDefs} rowData={user?.claims} />
 }
 
 export default ClaimsGrid

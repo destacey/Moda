@@ -12,7 +12,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProjectQuery } from '@/src/store/features/ppm/projects-api'
-import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList, isApiError} from '@/src/utils'
 import { Divider, Drawer, Flex } from 'antd'
 import { WaydTooltip } from '@/src/components/common'
 import { projectHelpText } from '../projects/_components/project-help-text'
@@ -49,7 +49,7 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading project data. Please try again.',
       )
     }
@@ -178,8 +178,8 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           )}
         </Flex>
 
-        {projectData?.phases?.length > 0 && (
-          <PhaseTimeline phases={projectData.phases} />
+        {(projectData?.phases?.length ?? 0) > 0 && (
+          <PhaseTimeline phases={projectData!.phases} />
         )}
 
         {projectData?.id && (

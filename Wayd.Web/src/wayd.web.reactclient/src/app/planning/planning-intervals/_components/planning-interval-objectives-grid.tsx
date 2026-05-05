@@ -17,7 +17,7 @@ import {
   NestedTeamNameLinkCellRenderer,
   NestedPlanningIntervalLinkCellRenderer,
 } from '../../../../components/common/wayd-grid-cell-renderers'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { ControlItemSwitch } from '../../../../components/common/control-items-menu'
 
 export interface PlanningIntervalObjectivesGridProps {
@@ -35,8 +35,8 @@ interface SelectedObjective {
   key: number
 }
 
-const ProgressCellRenderer = ({ value, data }) => {
-  const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
+const ProgressCellRenderer = ({ value, data }: ICellRendererParams<PlanningIntervalObjectiveListDto>) => {
+  const progressStatus = ['Canceled', 'Missed'].includes(data?.status?.name ?? '')
     ? 'exception'
     : undefined
   return <Progress percent={value} size="small" status={progressStatus} />
@@ -148,7 +148,8 @@ const PlanningIntervalObjectivesGrid = ({
         sortable: false,
         resizable: false,
         hide: !canManageObjectives,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<PlanningIntervalObjectiveListDto>) => {
+          if (!params.data) return null
           const menuItems = getRowMenuItems({
             planningIntervalId: params.data.planningInterval.id,
             planningIntervalKey: planningIntervalKey,
@@ -160,7 +161,7 @@ const PlanningIntervalObjectivesGrid = ({
             onCreateHealthCheckMenuClicked,
           })
 
-          return RowMenuCellRenderer({ ...params, menuItems })
+          return RowMenuCellRenderer({ ...params, menuItems: menuItems ?? [] })
         },
       },
       { field: 'id', hide: true },
@@ -194,14 +195,14 @@ const PlanningIntervalObjectivesGrid = ({
       {
         field: 'startDate',
         valueGetter: (params) =>
-          params.data.startDate
+          params.data?.startDate
             ? dayjs(params.data.startDate).format('M/D/YYYY')
             : null,
       },
       {
         field: 'targetDate',
         valueGetter: (params) =>
-          params.data.targetDate
+          params.data?.targetDate
             ? dayjs(params.data.targetDate).format('M/D/YYYY')
             : null,
       },
@@ -292,7 +293,7 @@ const PlanningIntervalObjectivesGrid = ({
         gridControlMenuItems={controlItems()}
         toolbarActions={viewSelector}
       />
-      {openUpdateObjectiveForm && (
+      {openUpdateObjectiveForm && selectedObjective && (
         <EditPlanningIntervalObjectiveForm
           objectiveKey={selectedObjective.key}
           planningIntervalKey={planningIntervalKey}

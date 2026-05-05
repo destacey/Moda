@@ -36,13 +36,14 @@ const AppBreadcrumb = () => {
     pathname === breadcrumbRoute.forPath ? breadcrumbRoute.isVisible : true
 
   const itemRender = (
-    route: BreadcrumbItem,
+    route: ItemType,
     params: any,
     routes: ItemType[],
     paths: string[],
   ) => {
+    const item = route as BreadcrumbItem
     const last = routes.indexOf(route) === routes.length - 1
-    return <BreadcrumbSegment route={route} paths={paths} last={last} />
+    return <BreadcrumbSegment route={item} paths={paths} last={last} />
   }
 
   // TODO: how do we make this more configurable without having to use a hook in static scenarios?  Example: We don't want breadcrumbs to show on the Settings page.
@@ -61,7 +62,7 @@ const AppBreadcrumb = () => {
       className="app-breadcrumb"
       separator=">"
       itemRender={itemRender}
-      items={pathItems}
+      items={pathItems as ItemType[]}
     />
   )
 }

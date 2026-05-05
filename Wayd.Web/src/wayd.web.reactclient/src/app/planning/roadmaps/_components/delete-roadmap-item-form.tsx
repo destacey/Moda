@@ -6,6 +6,7 @@ import {
 } from '@/src/store/features/planning/roadmaps-api'
 import { Modal } from 'antd'
 import { useEffect } from 'react'
+import { isApiError } from '@/src/utils'
 
 export interface DeleteRoadmapItemFormProps {
   roadmapId: string
@@ -62,7 +63,7 @@ const DeleteRoadmapItemForm = ({
   useEffect(() => {
     if (itemDataError) {
       messageApi.error(
-        itemDataError.supportMessage ??
+        (isApiError(itemDataError) ? itemDataError.supportMessage : undefined) ??
           'An error occurred while loading roadmap item. Please try again.',
       )
     }

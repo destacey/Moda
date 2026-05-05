@@ -10,7 +10,7 @@ import {
 } from '@/src/components/common/wayd-grid-cell-renderers'
 import { ProjectListDto } from '@/src/services/wayd-api'
 import { getSortedNames } from '@/src/utils'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import { FC, ReactNode, useMemo } from 'react'
 
@@ -53,49 +53,52 @@ const ProjectsGrid: FC<ProjectsGridProps> = (props: ProjectsGridProps) => {
         headerName: 'Portfolio',
         width: 200,
         hide: props.hidePortfolio,
-        cellRenderer: (params) =>
-          PortfolioLinkCellRenderer({ ...params, data: params.data.portfolio }),
+        cellRenderer: (params: ICellRendererParams<ProjectListDto>) => {
+          if (!params.data) return null
+          return PortfolioLinkCellRenderer({ ...(params as any), data: params.data.portfolio })
+        },
       },
       {
         field: 'program.name',
         headerName: 'Program',
         width: 200,
         hide: props.hideProgram,
-        cellRenderer: (params) =>
-          params.data.program &&
-          ProgramLinkCellRenderer({ ...params, data: params.data.program }),
+        cellRenderer: (params: ICellRendererParams<ProjectListDto>) =>
+          params.data?.program
+            ? ProgramLinkCellRenderer({ ...(params as any), data: params.data.program })
+            : null,
       },
       {
         field: 'start',
         width: 125,
         valueGetter: (params) =>
-          params.data.start && dayjs(params.data.start).format('MMM D, YYYY'),
+          params.data?.start && dayjs(params.data.start).format('MMM D, YYYY'),
       },
       {
         field: 'end',
         width: 125,
         valueGetter: (params) =>
-          params.data.end && dayjs(params.data.end).format('MMM D, YYYY'),
+          params.data?.end && dayjs(params.data.end).format('MMM D, YYYY'),
       },
       {
         field: 'projectManagers',
         headerName: 'PMs',
-        valueGetter: (params) => getSortedNames(params.data.projectManagers),
+        valueGetter: (params) => getSortedNames(params.data?.projectManagers ?? []),
       },
       {
         field: 'projectOwners',
         headerName: 'Owners',
-        valueGetter: (params) => getSortedNames(params.data.projectOwners),
+        valueGetter: (params) => getSortedNames(params.data?.projectOwners ?? []),
       },
       {
         field: 'projectSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.projectSponsors),
+        valueGetter: (params) => getSortedNames(params.data?.projectSponsors ?? []),
       },
       {
         field: 'strategicThemes',
         headerName: 'Strategic Themes',
-        valueGetter: (params) => getSortedNames(params.data.strategicThemes),
+        valueGetter: (params) => getSortedNames(params.data?.strategicThemes ?? []),
       },
       {
         field: 'projectLifecycle.name',

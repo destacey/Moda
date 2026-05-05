@@ -23,7 +23,7 @@ const RoadmapTimeboxDrawerItem: FC<RoadmapTimeboxDrawerItemProps> = (
         <DescriptionsItem label="Type">{timebox.type.name}</DescriptionsItem>
         <DescriptionsItem label="Parent">
           {timebox.parent && (
-            <a onClick={() => props.openRoadmapItemDrawer(timebox.parent?.id)}>
+            <a onClick={() => props.openRoadmapItemDrawer(timebox.parent!.id)}>
               {timebox.parent?.name}
             </a>
           )}

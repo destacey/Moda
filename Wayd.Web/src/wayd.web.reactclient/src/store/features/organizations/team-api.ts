@@ -285,7 +285,7 @@ export const teamApi = apiSlice.injectEndpoints({
       providesTags: (result, error, arg) => [
         {
           type: QueryTags.FunctionalOrganizationChart,
-          id: arg,
+          id: arg ?? undefined,
         },
       ],
     }),

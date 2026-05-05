@@ -20,7 +20,7 @@ import {
 } from '@/src/store/features/ppm/portfolios-api'
 import { useCreateProjectMutation } from '@/src/store/features/ppm/projects-api'
 import { useGetStrategicThemeOptionsQuery } from '@/src/store/features/strategic-management/strategic-themes-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { projectHelpText } from './project-help-text'
 import {
   Card,
@@ -121,17 +121,18 @@ const CreateProjectForm = ({
             if (response.error) throw response.error
 
             messageApi.success(
-              'Project created successfully. Project key: ' + response.data.key,
+              'Project created successfully. Project key: ' + response.data!.key,
             )
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while creating the project. Please try again.',
               )
             }
@@ -167,7 +168,7 @@ const CreateProjectForm = ({
     if (firstError) {
       console.error(firstError)
       messageApi.error(
-        firstError.detail ??
+        (isApiError(firstError) ? firstError.detail : undefined) ??
           'An error occurred while loading form data. Please try again.',
       )
     }
@@ -184,7 +185,7 @@ const CreateProjectForm = ({
   const selectedLifecycleId = Form.useWatch('lifecycleId', form)
 
   const { data: selectedLifecycle } = useGetProjectLifecycleQuery(
-    selectedLifecycleId,
+    selectedLifecycleId!,
     { skip: !selectedLifecycleId },
   )
 

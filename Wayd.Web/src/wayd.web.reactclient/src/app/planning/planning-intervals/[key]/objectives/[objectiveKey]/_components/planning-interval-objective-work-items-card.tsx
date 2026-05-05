@@ -83,7 +83,7 @@ const PlanningIntervalObjectiveWorkItemsCard = (
             <WorkProgress progress={workItemsData.progressSummary} />
           )}
         <WorkItemsListCard
-          workItems={workItemsData?.workItems}
+          workItems={workItemsData?.workItems ?? []}
           isLoading={isLoading}
         />
       </Card>

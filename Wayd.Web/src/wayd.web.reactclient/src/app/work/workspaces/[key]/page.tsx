@@ -69,11 +69,11 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case WorkspaceTabs.Details:
-        return <WorkspaceDetails workspace={workspaceData} />
+        return <WorkspaceDetails workspace={workspaceData!} />
       case WorkspaceTabs.WorkItems:
         return (
           <WorkItemsGrid
-            workItems={workItemsQuery.data}
+            workItems={workItemsQuery.data ?? []}
             isLoading={workItemsQuery.isLoading}
             refetch={workItemsQuery.refetch}
           />
@@ -129,7 +129,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   return (
     <>
       <PageTitle
-        title={workspaceData.name}
+        title={workspaceData!.name}
         subtitle="Workspace Details"
         actions={actions()}
       />
@@ -143,7 +143,7 @@ const WorkspaceDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       </Card>
       {openSetWorkspaceExternalUrlTemplatesForm && (
         <SetWorkspaceExternalUrlTemplatesForm
-          workspaceId={workspaceData.id}
+          workspaceId={workspaceData!.id}
           onFormUpdate={() =>
             onSetWorkspaceExternalUrlTemplatesFormClosed(true)
           }

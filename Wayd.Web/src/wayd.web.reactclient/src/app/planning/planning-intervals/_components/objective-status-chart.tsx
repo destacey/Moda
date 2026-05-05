@@ -93,7 +93,7 @@ const ObjectiveStatusChart = (props: ObjectiveStatusChartProps) => {
     height: props.height ?? 280,
     padding: props.embedded ? 0 : 'auto',
     label: {
-      text: (d) =>
+      text: (d: any) =>
         props.embedded
           ? `${d.count} (${Math.round((d.count / total) * 100)}%)`
           : `${d.type}\n ${d.count} (${Math.round((d.count / total) * 100)}%)`,

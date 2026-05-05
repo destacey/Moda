@@ -13,7 +13,7 @@ import {
 import { useSearchWorkItemsQuery } from '@/src/store/features/work-management/workspace-api'
 import { SearchOutlined } from '@ant-design/icons'
 import { Flex, Input, Modal, Typography } from 'antd'
-import { useState } from 'react'
+import { ChangeEvent, useState } from 'react'
 import { ColDef } from 'ag-grid-community'
 import {
   AgGridTransfer,
@@ -22,6 +22,7 @@ import {
 } from '@/src/components/common/grid/ag-grid-transfer'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { workItemKeyComparator } from '@/src/components/common/work'
+import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -142,8 +143,8 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
     onSubmit: async () => {
       try {
         const request: ManagePlanningIntervalObjectiveWorkItemsRequest = {
-          planningIntervalId: objectiveData?.planningInterval.id,
-          objectiveId: objectiveData?.id,
+          planningIntervalId: objectiveData?.planningInterval.id ?? '',
+          objectiveId: objectiveData?.id ?? '',
           workItemIds: targetWorkItems.map((item) => item.id),
         }
         await manageObjectiveWorkItems({
@@ -153,8 +154,9 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
         messageApi.success('Successfully updated objective work items.')
         return true
       } catch (error) {
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
-          `Failed to update objective work items. Error: ${error.detail}`,
+          `Failed to update objective work items. Error: ${apiError.detail}`,
         )
         console.error(error)
         return false
@@ -197,7 +199,7 @@ const ManagePlanningIntervalObjectiveWorkItemsForm = ({
 
   const rightColDefs = asDeletableColDefs(workItemColDefs, handleDelete)
 
-  const handleSearch = (e) => {
+  const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value)
   }
 

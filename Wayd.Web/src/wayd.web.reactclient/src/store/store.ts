@@ -7,12 +7,6 @@ import workStatusReducer from './features/work-management/work-status-slice'
 import workTypeReducer from './features/work-management/work-type-slice'
 import { apiSlice } from './features/apiSlice'
 
-const middlewares = []
-
-// if (process.env.NODE_ENV === 'development') {
-//   middlewares.push(logger)
-// }
-
 export const store = configureStore({
   reducer: {
     team: teamReducer,
@@ -24,7 +18,7 @@ export const store = configureStore({
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(...middlewares, apiSlice.middleware),
+    getDefaultMiddleware().concat(apiSlice.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

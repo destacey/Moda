@@ -58,7 +58,7 @@ const PlanningIntervalObjectivesPage = (props: {
     refetch: refectObjectives,
   } = useGetPlanningIntervalObjectivesQuery({
     planningIntervalKey: piKey,
-    teamId: null,
+    teamId: undefined,
   })
 
   const { data: calendarData } = useGetPlanningIntervalCalendarQuery(piKey)
@@ -73,7 +73,7 @@ const PlanningIntervalObjectivesPage = (props: {
     canManageObjectives &&
     planningIntervalData &&
     !planningIntervalData.objectivesLocked &&
-    teamData?.filter((t) => t.type == 'Team').length > 0
+    (teamData?.filter((t) => t.type == 'Team').length ?? 0) > 0
   const showActions = canCreateObjectives
 
   const viewSelector = (
@@ -113,7 +113,7 @@ const PlanningIntervalObjectivesPage = (props: {
       <PageTitle title="PI Objectives" actions={showActions && actions()} />
       {currentView === 'List' && (
         <PlanningIntervalObjectivesGrid
-          objectivesData={objectivesData}
+          objectivesData={objectivesData ?? []}
           isLoading={isLoadingObjectives}
           refreshObjectives={refectObjectives}
           planningIntervalKey={piKey}
@@ -124,8 +124,8 @@ const PlanningIntervalObjectivesPage = (props: {
       )}
       {currentView === 'Timeline' && (
         <PlanningIntervalObjectivesTimeline
-          objectivesData={objectivesData}
-          planningIntervalCalendar={calendarData}
+          objectivesData={objectivesData ?? []}
+          planningIntervalCalendar={calendarData!}
           enableGroups={true}
           teamNames={teamData
             ?.filter((t) => t.type == 'Team')

@@ -21,7 +21,7 @@ export const programsApi = apiSlice.injectEndpoints({
       queryFn: async (request = undefined) => {
         try {
           const data = await getProgramsClient().getPrograms(
-            request?.status?.length > 0 ? request.status : undefined,
+            (request?.status?.length ?? 0) > 0 ? request!.status : undefined,
             request?.portfolioId,
           )
           return { data }
@@ -163,7 +163,7 @@ export const programsApi = apiSlice.injectEndpoints({
         try {
           const data = await getProgramsClient().getProjects(
             programIdOrKey,
-            status?.length > 0 ? status : null,
+            (status?.length ?? 0) > 0 ? status : null,
           )
           return { data }
         } catch (error) {

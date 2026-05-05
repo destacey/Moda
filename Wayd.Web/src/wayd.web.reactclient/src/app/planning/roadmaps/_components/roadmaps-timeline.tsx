@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, useState } from 'react'
+import { FC, ReactNode, useState } from 'react'
 import { Button, Card, Divider, Flex, Space, Switch, Typography } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import {
@@ -18,6 +18,7 @@ import {
   WaydTimelineOptions,
 } from '@/src/components/common/timeline'
 import {
+  ItemTemplateProps,
   WaydDataItem,
   TimelineTemplate,
 } from '@/src/components/common/timeline/types'
@@ -27,6 +28,7 @@ import { getLuminance } from '@/src/utils/color-helper'
 import { useUpdateRoadmapItemDatesMutation } from '@/src/store/features/planning/roadmaps-api'
 import { DateType, TimelineItem } from 'vis-timeline/standalone'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
 
@@ -106,10 +108,10 @@ function flattenRoadmapItems(
 
         acc.push(timelineItem)
 
-        if (activityItem.children?.length > 0) {
+        if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
-              activityItem.children,
+              activityItem.children ?? [],
               openRoadmapItemDrawer,
               treeLevel + 1,
             ),
@@ -152,10 +154,10 @@ function flattenRoadmapItems(
 
         acc.push(timelineItem)
 
-        if (activityItem.children?.length > 0) {
+        if ((activityItem.children?.length ?? 0) > 0) {
           acc.push(
             ...flattenRoadmapItems(
-              activityItem.children,
+              activityItem.children ?? [],
               openRoadmapItemDrawer,
               1,
             ),
@@ -275,7 +277,7 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
   const [updateRoadmapItemDates, { error: updateDatesError }] =
     useUpdateRoadmapItemDatesMutation()
 
-  const processedData: ProcessedRoadmapData = (() => {
+  const processedData: ProcessedRoadmapData | null = (() => {
     if (!props.roadmap || props.isRoadmapItemsLoading || !props.roadmapItems) {
       return null
     }
@@ -326,8 +328,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
     const potentialGroups = processedData.items.filter(
       (item) =>
-        item.objectData.$type === RoadmapItemType.Activity ||
-        item.objectData.$type === RoadmapItemType.Roadmap,
+        item.objectData?.$type === RoadmapItemType.Activity ||
+        item.objectData?.$type === RoadmapItemType.Roadmap,
     )
 
     return createNestedGroups(potentialGroups, currentLevel)
@@ -338,8 +340,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       (item) =>
         item.treeLevel === currentLevel ||
         (item.treeLevel < currentLevel &&
-          item.objectData.$type !== RoadmapItemType.Roadmap &&
-          item.objectData.$type !== RoadmapItemType.Activity),
+          item.objectData?.$type !== RoadmapItemType.Roadmap &&
+          item.objectData?.$type !== RoadmapItemType.Activity),
     ) ?? []
 
   // Compute timeline window synchronously from props so the timeline receives values on first render
@@ -392,10 +394,12 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
 
     const { objectData } = originalItem
 
+    if (!objectData) return
+
     try {
       const value = mapToRequestValues(
         item.start,
-        item.end,
+        item.end!,
         objectData.$type,
         originalItem.id,
         objectData.roadmapId,
@@ -407,8 +411,9 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
       }
       console.log('Update roadmap activity dates')
     } catch (error) {
+      const apiError: ApiError = isApiError(error) ? error : {}
       messageApi.error(
-        error.detail ??
+        apiError.detail ??
           'An error occurred while updating the roadmap activity. Please try again.',
       )
       console.error('Error updating roadmap activity dates', error)
@@ -438,8 +443,8 @@ const RoadmapsTimeline = (props: RoadmapsTimelineProps) => {
           data={filteredItems}
           groups={processedGroups}
           isLoading={props.isRoadmapItemsLoading}
-          options={timelineOptions}
-          rangeItemTemplate={RoadmapRangeItemTemplate}
+          options={timelineOptions as WaydTimelineOptions<WaydDataItem>}
+          rangeItemTemplate={RoadmapRangeItemTemplate as FC<ItemTemplateProps<WaydDataItem>>}
           allowFullScreen={true}
           allowSaveAsImage={true}
           onMove={props.isRoadmapManager ? onMove : undefined}

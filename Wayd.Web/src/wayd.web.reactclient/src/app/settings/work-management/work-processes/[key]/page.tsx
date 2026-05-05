@@ -52,7 +52,7 @@ const WorkProcessDetailsPage = (props: {
   const renderTabContent = () => {
     switch (activeTab) {
       case WorkProcessDetailsTabs.Details:
-        return <WorkProcessDetails workProcess={workProcessData} />
+        return <WorkProcessDetails workProcess={workProcessData!} />
       default:
         return null
     }

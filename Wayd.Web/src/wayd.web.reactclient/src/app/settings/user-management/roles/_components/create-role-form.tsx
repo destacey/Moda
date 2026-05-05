@@ -3,7 +3,7 @@
 import { Form, Input, Modal, Select } from 'antd'
 import { useState } from 'react'
 import { toFormErrors } from '@/src/utils'
-import { RoleDto, UpdateRolePermissionsRequest } from '@/src/services/wayd-api'
+import { RoleListDto, UpdateRolePermissionsRequest } from '@/src/services/wayd-api'
 import {
   useGetRoleQuery,
   useUpdatePermissionsMutation,
@@ -16,7 +16,7 @@ const { Item } = Form
 const { TextArea } = Input
 
 export interface CreateRoleFormProps {
-  roles: RoleDto[]
+  roles: RoleListDto[]
   onFormCreate: (id: string) => void
   onFormCancel: () => void
 }
@@ -36,7 +36,7 @@ const CreateRoleForm = ({
   >(null)
   const messageApi = useMessage()
 
-  const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions, {
+  const { data: roleData } = useGetRoleQuery(roleIdToCopyPermissions!, {
     skip: !roleIdToCopyPermissions,
   })
 
@@ -56,10 +56,10 @@ const CreateRoleForm = ({
               throw response.error
             }
 
-            if (roleIdToCopyPermissions && roleData.permissions) {
+            if (roleIdToCopyPermissions && roleData?.permissions) {
               const request: UpdateRolePermissionsRequest = {
-                roleId: response.data,
-                permissions: roleData.permissions,
+                roleId: response.data!,
+                permissions: roleData.permissions!,
               }
               const updatePermissionsResponse = await updatePermissions(request)
               if (response.error) {
@@ -70,7 +70,7 @@ const CreateRoleForm = ({
             }
 
             messageApi.success('Successfully created Role.')
-            onFormCreate(response.data)
+            onFormCreate(response.data!)
             return false // Don't call onComplete — we already called onFormCreate
           } catch (error: any) {
             if (error.status === 422 && error.errors) {

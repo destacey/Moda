@@ -33,7 +33,7 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         try {
           const data =
             await getStrategicInitiativesClient().getStrategicInitiatives(
-              request?.status?.length > 0 ? request.status : undefined,
+              (request?.status?.length ?? 0) > 0 ? request!.status : undefined,
               request?.portfolioId,
             )
           return { data }

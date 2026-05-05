@@ -34,6 +34,7 @@ describe('SprintLink', () => {
       id: 'team-2',
       key: 2,
       name: 'Team Beta',
+      code: undefined as unknown as string,
       type: 'Team',
     },
   }

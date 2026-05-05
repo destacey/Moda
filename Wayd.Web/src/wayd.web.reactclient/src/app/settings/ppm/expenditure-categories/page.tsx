@@ -6,15 +6,16 @@ import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { ExpenditureCategoryListDto } from '@/src/services/wayd-api'
 import { useGetExpenditureCategoriesQuery } from '@/src/store/features/ppm/expenditure-categories-api'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { Button } from 'antd'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { CreateExpenditureCategoryForm } from './_components'
 import { useMessage } from '@/src/components/contexts/messaging'
+import { isApiError } from '@/src/utils'
 
-const ExpenditureCategoryCellRenderer = ({ value, data }) => {
-  return <Link href={`./expenditure-categories/${data.id}`}>{value}</Link>
+const ExpenditureCategoryCellRenderer = ({ value, data }: ICellRendererParams<ExpenditureCategoryListDto>) => {
+  return <Link href={`./expenditure-categories/${data!.id}`}>{value}</Link>
 }
 
 const ExpenditureCategoriesPage = () => {
@@ -42,7 +43,7 @@ const ExpenditureCategoriesPage = () => {
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading expenditure categories',
       )
       console.error(error)

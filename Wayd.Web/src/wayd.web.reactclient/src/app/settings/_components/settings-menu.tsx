@@ -51,14 +51,14 @@ const authorizeMenuItems = (
 ) => {
   if ('type' in item) {
     const children = item.children
-      ? item.children.reduce(
-          (acc, item: RestrictedMenuItem | SubMenuType) =>
+      ? (item.children as (RestrictedMenuItem | SubMenuType)[]).reduce(
+          (acc, item) =>
             authorizeMenuItems(acc, item, claimCheck),
-          [],
+          [] as ItemType<MenuItemType>[],
         )
       : undefined
-    if (item.type === 'group' && children && children.length > 0) {
-      acc.push({ ...item, children })
+    if (item.type === 'group' && Array.isArray(children) && children.length > 0) {
+      acc.push({ ...item, children } as unknown as ItemType<MenuItemType>)
     }
   } else if ('claimValue' in item) {
     if (claimCheck(item.claimValue)) {
@@ -213,10 +213,10 @@ export default function SettingsMenu() {
   const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
 
   // Derive menu items based on user's permissions and feature flags
-  const menuItems = buildSettingsMenuItems({ planningPoker }).reduce(
+  const menuItems = (buildSettingsMenuItems({ planningPoker }) as SectionMenuItem[]).reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
-      [],
+      [] as ItemType<MenuItemType>[],
     )
 
   return (
@@ -225,7 +225,7 @@ export default function SettingsMenu() {
       style={{
         borderRight: 0,
       }}
-      items={menuItems}
+      items={menuItems as unknown as ItemType[]}
     />
   )
 }

@@ -23,7 +23,7 @@ const RoadmapActivityDrawerItem: FC<RoadmapActivityDrawerItemProps> = (
         <DescriptionsItem label="Type">{activity.type.name}</DescriptionsItem>
         <DescriptionsItem label="Parent">
           {activity.parent && (
-            <a onClick={() => props.openRoadmapItemDrawer(activity.parent?.id)}>
+            <a onClick={() => props.openRoadmapItemDrawer(activity.parent!.id)}>
               {activity.parent?.name}
             </a>
           )}

@@ -77,17 +77,17 @@ const WorkTypeTierCard = (props: WorkTypeTierCardProps) => {
     }
   }
 
-  const getLevelPosition = (id) => orderedLevels.findIndex((o) => o.id === id)
+  const getLevelPosition = (id: string | undefined) => orderedLevels.findIndex((o) => String(o.id) === id)
 
   const onDragEnd = (event: DragEndEvent) => {
     if (!canOrder) return
 
     const { active, over } = event
 
-    if (active.id === over.id) return
+    if (active.id === over?.id) return
 
-    const originalPosition = getLevelPosition(active.id)
-    const newPosition = getLevelPosition(over.id)
+    const originalPosition = getLevelPosition(String(active.id))
+    const newPosition = getLevelPosition(over?.id !== undefined ? String(over.id) : undefined)
 
     const updatedLevels = arrayMove(
       orderedLevels,

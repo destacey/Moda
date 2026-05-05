@@ -1,5 +1,16 @@
 import { FieldData } from '@rc-component/form/lib/interface'
 
+export interface ApiError {
+  status?: number
+  detail?: string
+  errors?: { [key: string]: string[] }
+  supportMessage?: string
+  [key: string]: unknown
+}
+
+export const isApiError = (error: unknown): error is ApiError =>
+  typeof error === 'object' && error !== null && ('status' in error || 'detail' in error || 'errors' in error)
+
 const normalizeName = (raw: string) => {
   const trimmed = (raw ?? '').trim()
   if (!trimmed) return trimmed

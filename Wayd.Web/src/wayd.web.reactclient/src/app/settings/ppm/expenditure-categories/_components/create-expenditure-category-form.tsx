@@ -3,7 +3,7 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { CreateExpenditureCategoryRequest } from '@/src/services/wayd-api'
 import { useCreateExpenditureCategoryMutation } from '@/src/store/features/ppm/expenditure-categories-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal, Switch } from 'antd'
 import TextArea from 'antd/es/input/TextArea'
 import { useModalForm } from '@/src/hooks'
@@ -59,13 +59,14 @@ const CreateExpenditureCategoryForm = ({
             )
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                apiError.detail ??
                   'An error occurred while creating the expenditure category. Please try again.',
               )
             }

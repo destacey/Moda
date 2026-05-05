@@ -25,7 +25,7 @@ const DEFAULT_STATUSES = [PROJECT_STATUS.Approved, PROJECT_STATUS.Active]
 const ALL_ROLES = [1, 2, 3, 4, 5]
 
 const getRoleFilterValues = (
-  selectedRole: string | null,
+  selectedRole: string | undefined,
 ): number[] | undefined => {
   if (!selectedRole) return undefined
   if (selectedRole === 'all') return ALL_ROLES
@@ -42,10 +42,9 @@ const ProjectsPage: FC = () => {
   const [selectedPortfolioId, setSelectedPortfolioId] = useLocalStorageState<
     string | null
   >('projects-filter-portfolio', null)
-  const [selectedRole, setSelectedRole] = useLocalStorageState<string | null>(
-    'projects-filter-role',
-    null,
-  )
+  const [selectedRole, setSelectedRole] = useLocalStorageState<
+    string | null
+  >('projects-filter-role', null)
   const messageApi = useMessage()
 
   const { hasPermissionClaim } = useAuth()
@@ -59,8 +58,8 @@ const ProjectsPage: FC = () => {
     refetch,
   } = useGetProjectsQuery({
     status: selectedStatuses.length > 0 ? selectedStatuses : undefined,
-    portfolioId: selectedPortfolioId,
-    role: getRoleFilterValues(selectedRole),
+    portfolioId: selectedPortfolioId ?? undefined,
+    role: getRoleFilterValues(selectedRole ?? undefined),
   })
 
   useEffect(() => {
@@ -106,7 +105,7 @@ const ProjectsPage: FC = () => {
         onReset={handleResetFilters}
       />
       <ProjectsGrid
-        projects={projectData}
+        projects={projectData ?? []}
         isLoading={isLoading}
         refetch={refetch}
       />

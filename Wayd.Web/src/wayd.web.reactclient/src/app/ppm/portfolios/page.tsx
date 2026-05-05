@@ -89,13 +89,13 @@ const PortfoliosPage: FC = () => {
       <PageTitle title="Portfolios" actions={actions} />
       {currentView === Views.Cards ? (
         <PortfoliosCardGrid
-          portfolios={portfolioData}
+          portfolios={portfolioData ?? []}
           viewSelector={viewSelector}
           isLoading={isLoading}
         />
       ) : (
         <PortfoliosGrid
-          portfolios={portfolioData}
+          portfolios={portfolioData ?? []}
           viewSelector={viewSelector}
           isLoading={isLoading}
           refetch={refetch}

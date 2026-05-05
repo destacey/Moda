@@ -119,7 +119,7 @@ const PokerSessionsPage = () => {
       <br />
       <PageTitle title="Planning Poker" actions={canCreate && actions()} />
       <PokerSessionsGrid
-        sessions={sessionsData}
+        sessions={sessionsData ?? []}
         isLoading={isLoading}
         refetch={refresh}
         canUpdate={canUpdate}

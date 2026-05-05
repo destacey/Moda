@@ -32,17 +32,17 @@ const PortfoliosGrid: React.FC<PortfoliosGridProps> = (
       {
         field: 'portfolioManagers',
         headerName: 'PMs',
-        valueGetter: (params) => getSortedNames(params.data.portfolioManagers),
+        valueGetter: (params) => getSortedNames(params.data?.portfolioManagers ?? []),
       },
       {
         field: 'portfolioOwners',
         headerName: 'Owners',
-        valueGetter: (params) => getSortedNames(params.data.portfolioOwners),
+        valueGetter: (params) => getSortedNames(params.data?.portfolioOwners ?? []),
       },
       {
         field: 'portfolioSponsors',
         headerName: 'Sponsors',
-        valueGetter: (params) => getSortedNames(params.data.portfolioSponsors),
+        valueGetter: (params) => getSortedNames(params.data?.portfolioSponsors ?? []),
       },
     ],
     [],

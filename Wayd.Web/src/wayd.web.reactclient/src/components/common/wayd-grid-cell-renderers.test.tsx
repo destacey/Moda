@@ -39,7 +39,7 @@ jest.mock('next/link', () => {
 
 // Helper to create mock cell renderer props
 const createMockProps = <T,>(
-  data: T | null,
+  data: T | undefined,
   value?: any,
 ): CustomCellRendererProps<T> => {
   return {
@@ -97,9 +97,9 @@ describe('Work Item Cell Renderers', () => {
       expect(links[1]).toHaveAttribute('target', '_blank')
     })
 
-    it('should return null when data is null', () => {
-      const props = createMockProps(null)
-      const result = WorkItemLinkCellRenderer(props)
+    it('should return null when data is undefined', () => {
+      const props = createMockProps(undefined as any)
+      const result = WorkItemLinkCellRenderer(props as any)
       expect(result).toBeNull()
     })
   })
@@ -421,7 +421,7 @@ describe('Status Cell Renderers', () => {
 
     it('should return null when status is missing', () => {
       const data = {
-        status: null,
+        status: null as unknown as string,
         statusCategory: { id: WorkStatusCategory.Active },
       }
       const props = createMockProps(data)

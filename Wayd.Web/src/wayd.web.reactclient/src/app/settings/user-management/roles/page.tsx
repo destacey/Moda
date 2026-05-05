@@ -11,9 +11,11 @@ import { useRouter } from 'next/navigation'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetRolesQuery } from '@/src/store/features/user-management/roles-api'
 import { CreateRoleForm } from './_components'
+import { RoleListDto } from '@/src/services/wayd-api'
+import { ICellRendererParams } from 'ag-grid-community'
 
-const LinkCellRenderer = ({ value, data }) => {
-  return <Link href={`roles/${data.id}`}>{value}</Link>
+const LinkCellRenderer = ({ value, data }: ICellRendererParams<RoleListDto>) => {
+  return <Link href={`roles/${data!.id}`}>{value}</Link>
 }
 
 const RoleListPage = () => {
@@ -65,7 +67,7 @@ const RoleListPage = () => {
 
       {openCreateRoleForm && (
         <CreateRoleForm
-          roles={roleData}
+          roles={roleData ?? []}
           onFormCreate={(id: string) => {
             setOpenCreateRoleForm(false)
             router.push(`/settings/user-management/roles/${id}`)

@@ -11,7 +11,7 @@ export interface BreadcrumbItem {
   key?: string | number
   className?: string
   dropdownProps?: any
-  onClick?: (e?: React.MouseEvent<HTMLAnchorElement>) => void
+  onClick?: React.MouseEventHandler<HTMLAnchorElement | HTMLSpanElement>
   // Add index signature for data attributes
   [key: `data-${string}`]: any
 }

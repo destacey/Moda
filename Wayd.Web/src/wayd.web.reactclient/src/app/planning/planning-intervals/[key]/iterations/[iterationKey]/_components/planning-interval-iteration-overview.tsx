@@ -53,7 +53,7 @@ const PlanningIntervalIterationOverview: FC<
   const { data: operatingModels, isLoading: isOperatingModelsLoading } =
     useGetTeamOperatingModelsForTeamsQuery(
       {
-        teamIds: metrics?.sprintMetrics.map((s) => s.team.id),
+        teamIds: metrics?.sprintMetrics.map((s) => s.team.id) ?? [],
         asOfDate: iteration.start,
       },
       { skip: !metrics || metrics.sprintMetrics.length === 0 },

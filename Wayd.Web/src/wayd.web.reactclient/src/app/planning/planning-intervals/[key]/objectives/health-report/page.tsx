@@ -15,14 +15,16 @@ import dayjs from 'dayjs'
 import { WaydGrid } from '@/src/components/common'
 import { Progress } from 'antd'
 import { useGetPlanningIntervalObjectivesHealthReportQuery } from '@/src/store/features/planning/planning-interval-api'
+import { PlanningIntervalObjectiveHealthCheckDto } from '@/src/services/wayd-api'
+import { ICellRendererParams, ValueGetterParams } from 'ag-grid-community'
 
-const LocalHealthCheckCellRenderer = (params) => {
+const LocalHealthCheckCellRenderer = (params: ICellRendererParams<PlanningIntervalObjectiveHealthCheckDto>) => {
   if (!params.data?.healthCheckId) return null
   return (
     <PiObjectiveHealthCheckTag
       healthCheck={{
         id: params.data.healthCheckId,
-        status: params.data.healthStatus,
+        status: params.data.healthStatus!,
         reportedOn: params.data.reportedOn,
         expiration: params.data.expiration,
         note: params.data.note,
@@ -33,8 +35,8 @@ const LocalHealthCheckCellRenderer = (params) => {
   )
 }
 
-const ProgressCellRenderer = ({ value, data }) => {
-  const progressStatus = ['Canceled', 'Missed'].includes(data.status?.name)
+const ProgressCellRenderer = ({ value, data }: ICellRendererParams<PlanningIntervalObjectiveHealthCheckDto>) => {
+  const progressStatus = ['Canceled', 'Missed'].includes(data!.status?.name)
     ? 'exception'
     : undefined
   return <Progress percent={value} size="small" status={progressStatus} />
@@ -93,17 +95,17 @@ const ObjectiveHealthReportPage = (props: {
       },
       {
         field: 'reportedOn',
-        valueGetter: (params) =>
-          !params.data.reportedOn
+        valueGetter: (params: ValueGetterParams<PlanningIntervalObjectiveHealthCheckDto>) =>
+          !params.data!.reportedOn
             ? null
-            : dayjs(params.data.reportedOn).format('M/D/YYYY h:mm A'),
+            : dayjs(params.data!.reportedOn).format('M/D/YYYY h:mm A'),
       },
       {
         field: 'Expiration',
-        valueGetter: (params) =>
-          !params.data.expiration
+        valueGetter: (params: ValueGetterParams<PlanningIntervalObjectiveHealthCheckDto>) =>
+          !params.data!.expiration
             ? null
-            : dayjs(params.data.expiration).format('M/D/YYYY h:mm A'),
+            : dayjs(params.data!.expiration).format('M/D/YYYY h:mm A'),
       },
     ],
     [],

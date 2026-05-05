@@ -4,7 +4,7 @@ import { WaydGrid } from '@/src/components/common'
 import { WaydStatisticNumber } from '@/src/components/common/metrics'
 import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
-import { ColDef, GetRowIdParams } from 'ag-grid-community'
+import { ColDef, GetRowIdParams, ICellRendererParams } from 'ag-grid-community'
 import { Button, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
 import { FC, useState, useMemo } from 'react'
@@ -27,7 +27,7 @@ export interface StrategicInitiativeKpisGridProps {
   viewSelector?: React.ReactNode
 }
 
-const StatisticNumberCellRenderer = (params) => {
+const StatisticNumberCellRenderer = (params: ICellRendererParams<StrategicInitiativeKpiListDto>) => {
   return <WaydStatisticNumber value={params.value} />
 }
 
@@ -169,9 +169,9 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         sortable: false,
         resizable: false,
         hide: !canManageKpis || isReadOnly,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<StrategicInitiativeKpiListDto>) => {
           const menuItems = getRowMenuItems({
-            kpiId: params.data.id,
+            kpiId: params.data!.id,
             strategicInitiativeId: strategicInitiativeId,
             canManageKpis,
             onEditKpiMenuClicked,
@@ -187,12 +187,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       {
         field: 'name',
         width: 300,
-        cellRenderer: (params) => (
+        cellRenderer: (params: ICellRendererParams<StrategicInitiativeKpiListDto>) => (
           <Button
             type="link"
             size="small"
             style={{ padding: 0 }}
-            onClick={() => onViewDetailsMenuClicked(params.data.id)}
+            onClick={() => onViewDetailsMenuClicked(params.data!.id)}
           >
             {params.value}
           </Button>
@@ -275,7 +275,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
       {openDeleteKpiForm && selectedKpiId && (
         <DeleteStrategicInitiativeKpiForm
           strategicInitiativeId={strategicInitiativeId}
-          kpi={kpis.find((kpi) => kpi.id === selectedKpiId)}
+          kpi={kpis.find((kpi) => kpi.id === selectedKpiId)!}
           onFormComplete={() => onDeleteKpiFormClosed(true)}
           onFormCancel={() => onDeleteKpiFormClosed(false)}
         />

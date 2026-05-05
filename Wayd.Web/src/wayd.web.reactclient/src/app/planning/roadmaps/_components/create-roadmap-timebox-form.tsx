@@ -8,7 +8,7 @@ import {
   useCreateRoadmapItemMutation,
   useGetRoadmapActivitiesQuery,
 } from '@/src/store/features/planning/roadmaps-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { useEffect } from 'react'
 
@@ -71,13 +71,14 @@ const CreateRoadmapTimeboxForm = ({
             messageApi.success('Roadmap Timebox created successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while creating the roadmap timebox. Please try again.',
               )
             }
@@ -95,7 +96,7 @@ const CreateRoadmapTimeboxForm = ({
   useEffect(() => {
     if (activitiesError) {
       messageApi.error(
-        activitiesError.supportMessage ??
+        (isApiError(activitiesError) ? activitiesError.supportMessage : undefined) ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }
@@ -122,7 +123,7 @@ const CreateRoadmapTimeboxForm = ({
         <Item
           name="parentId"
           label="Parent Activity"
-          hidden={activities?.length < 1}
+          hidden={(activities?.length ?? 0) < 1}
         >
           <TreeSelect
             //showSearch // TODO: not working

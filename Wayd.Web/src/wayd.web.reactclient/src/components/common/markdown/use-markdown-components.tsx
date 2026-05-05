@@ -35,7 +35,7 @@ interface MarkdownLinkProps
 export const useMarkdownComponents = (): Components => {
   const { token } = useTheme()
 
-  return {
+  return ({
     h1: (props) => <Title level={1} {...props} />,
     h2: (props) => <Title level={2} {...props} />,
     h3: (props) => <Title level={3} {...props} />,
@@ -48,10 +48,10 @@ export const useMarkdownComponents = (): Components => {
     del: (props) => <Text delete {...props} />,
     code: (props) => <Text code {...props} />,
     pre: ({ ...props }: MarkdownCodeBlockProps) => (
-      <MarkdownCodeBlock token={token} {...props} />
+      <MarkdownCodeBlock {...props} token={token} />
     ), // TODO: needs styling and syntax improvements
     blockquote: (props: MarkdownBlockquoteProps) => (
-      <MarkdownBlockquote token={token} {...props} />
+      <MarkdownBlockquote {...props} token={token} />
     ),
     a: ({ node, children, ...props }: MarkdownLinkProps) => (
       <AntDLink target="_blank" rel="noopener noreferrer" {...props}>
@@ -59,19 +59,19 @@ export const useMarkdownComponents = (): Components => {
       </AntDLink>
     ),
     hr: (props) => <Divider {...props} />,
-    img: (props) => {
-      const src = typeof props.src === 'string' ? props.src : undefined
+    img: ({ node: _node, src: rawSrc, alt, ...rest }) => {
+      const src = typeof rawSrc === 'string' ? rawSrc : undefined
       return (
         <Image
-          {...props}
           src={src}
-          alt={props.alt || 'Image'}
+          alt={alt || 'Image'}
           fallback="/images/fallback-image.png"
+          {...(rest as object)}
         />
       )
     }, // TODO: needs improvement, especially for background
     table: (props) => <MarkdownTable {...props} />,
-  }
+  }) as Components
 }
 
 // Type-safe adapter for MDEditor compatibility

@@ -33,7 +33,7 @@ export const msalConfig: Configuration = {
 }
 
 export const tokenRequest = {
-  scopes: [process.env.NEXT_PUBLIC_API_SCOPE],
+  scopes: [process.env.NEXT_PUBLIC_API_SCOPE].filter((s): s is string => s !== undefined),
   forceRefresh: false,
 }
 

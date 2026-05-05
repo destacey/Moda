@@ -11,7 +11,7 @@ import useAuth from '@/src/components/contexts/auth'
 import { useDocumentTitle } from '@/src/hooks'
 import { useGetUsersQuery } from '@/src/store/features/user-management/users-api'
 import { RoleListDto, UserDetailsDto } from '@/src/services/wayd-api'
-import { ColDef, ValueFormatterParams } from 'ag-grid-community'
+import { ColDef, ICellRendererParams, ValueFormatterParams } from 'ag-grid-community'
 import dayjs from 'dayjs'
 import {
   RowMenuCellRenderer,
@@ -26,9 +26,9 @@ import {
 } from './_components'
 import { ItemType } from 'antd/es/menu/interface'
 
-const EmployeeLinkCellRenderer = ({ value, data }) => {
+const EmployeeLinkCellRenderer = ({ value, data }: ICellRendererParams<UserDetailsDto>) => {
   return (
-    <Link href={`/organizations/employees/${data.employee?.key}`}>{value}</Link>
+    <Link href={`/organizations/employees/${data!.employee?.key}`}>{value}</Link>
   )
 }
 
@@ -65,40 +65,40 @@ const UsersListPage = () => {
         sortable: false,
         hide: !showRowActions,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<UserDetailsDto>) => {
           const menuItems: ItemType[] = []
           if (canUpdateUser) {
             menuItems.push({
               key: 'edit',
               label: 'Edit',
-              onClick: () => setEditingUser(params.data),
+              onClick: () => setEditingUser(params.data ?? null),
             })
             menuItems.push(
               ...getAccountActionMenuItems({
-                id: params.data.id,
-                userName: params.data.userName,
-                firstName: params.data.firstName,
-                lastName: params.data.lastName,
-                isActive: params.data.isActive,
+                id: params.data!.id,
+                userName: params.data!.userName!,
+                firstName: params.data!.firstName!,
+                lastName: params.data!.lastName!,
+                isActive: params.data!.isActive,
                 isLockedOut:
-                  !!params.data.lockoutEnd &&
-                  new Date(params.data.lockoutEnd) > new Date(),
+                  !!params.data!.lockoutEnd &&
+                  new Date(params.data!.lockoutEnd) > new Date(),
               }),
             )
           }
           const secondaryItems: ItemType[] = []
-          if (canUpdateUser && params.data.loginProvider === 'Wayd') {
+          if (canUpdateUser && params.data!.loginProvider === 'Wayd') {
             secondaryItems.push({
               key: 'reset-password',
               label: 'Reset Password',
-              onClick: () => setResettingPasswordUser(params.data),
+              onClick: () => setResettingPasswordUser(params.data ?? null),
             })
           }
           if (canUpdateUserRoles) {
             secondaryItems.push({
               key: 'manage-roles',
               label: 'Manage Roles',
-              onClick: () => setManagingRolesUserId(params.data.id),
+              onClick: () => setManagingRolesUserId(params.data!.id),
             })
           }
           if (secondaryItems.length > 0 && menuItems.length > 0) {

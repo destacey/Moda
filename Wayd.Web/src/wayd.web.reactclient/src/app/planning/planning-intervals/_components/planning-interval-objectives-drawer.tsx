@@ -8,7 +8,7 @@ import PlanningIntervalObjectiveWorkItemsCard from '../[key]/objectives/[objecti
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { FC, useEffect, useState } from 'react'
 import { EditPlanningIntervalObjectiveForm } from '.'
-import { getDrawerWidthPixels } from '@/src/utils'
+import { getDrawerWidthPixels, isApiError} from '@/src/utils'
 import { useMessage } from '@/src/components/contexts/messaging'
 
 const { Item: DescriptionsItem } = Descriptions
@@ -44,7 +44,7 @@ const PlanningIntervalObjectiveDetailsDrawer: FC<
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading objective data. Please try again.',
       )
     }

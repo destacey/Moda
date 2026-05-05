@@ -16,7 +16,7 @@ export const usersApi = apiSlice.injectEndpoints({
       queryFn: async () => {
         try {
           const data = await getUsersClient().getUsers()
-          data.sort((a, b) => a.userName.localeCompare(b.userName))
+          data.sort((a, b) => (a.userName ?? '').localeCompare(b.userName ?? ''))
           return { data }
         } catch (error) {
           console.error('API Error:', error)
@@ -135,7 +135,7 @@ export const usersApi = apiSlice.injectEndpoints({
               },
             }
           }
-          return { data: null }
+          return { data: undefined as void }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -187,7 +187,7 @@ export const usersApi = apiSlice.injectEndpoints({
               },
             }
           }
-          return { data: null }
+          return { data: undefined as void }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -215,7 +215,7 @@ export const usersApi = apiSlice.injectEndpoints({
               },
             }
           }
-          return { data: null }
+          return { data: undefined as void }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -244,7 +244,7 @@ export const usersApi = apiSlice.injectEndpoints({
               },
             }
           }
-          return { data: null }
+          return { data: undefined as void }
         } catch (error) {
           console.error('API Error:', error)
           return { error }
@@ -275,7 +275,7 @@ export const usersApi = apiSlice.injectEndpoints({
               },
             }
           }
-          return { data: null }
+          return { data: undefined as void }
         } catch (error) {
           console.error('API Error:', error)
           return { error }

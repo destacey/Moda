@@ -67,9 +67,9 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
       items.push(
         ...getAccountActionMenuItems({
           id: userData.id,
-          userName: userData.userName,
-          firstName: userData.firstName,
-          lastName: userData.lastName,
+          userName: userData.userName!,
+          firstName: userData.firstName!,
+          lastName: userData.lastName!,
           isActive: userData.isActive,
           isLockedOut:
             !!userData.lockoutEnd && new Date(userData.lockoutEnd) > new Date(),
@@ -101,7 +101,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const renderTabContent = () => {
     switch (activeTab) {
       case UserDetailsTabs.Details:
-        return <UserDetails user={userData} />
+        return <UserDetails user={userData!} />
       default:
         return null
     }

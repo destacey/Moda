@@ -53,15 +53,15 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const { data: teamOperatingModel } = useGetTeamOperatingModelAsOfQuery(
     {
-      teamId: sprintData?.team.id,
-      asOfDate: sprintData?.start,
+      teamId: sprintData?.team.id ?? '',
+      asOfDate: sprintData?.start ?? '',
     },
     { skip: !sprintData || !sprintData?.team.id },
   )
 
   useDocumentTitle(`${sprintData?.name ?? sprintKey} - Sprint Details`)
 
-  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData?.team.id, {
+  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData?.team.id ?? '', {
     skip: !sprintData?.team.id,
   })
 
@@ -128,7 +128,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
             Backlog
           </Title>
           <SprintBacklogGrid
-            workItems={workItemsData}
+            workItems={workItemsData ?? []}
             isLoading={workItemsDataIsLoading}
             refetch={refetchWorkItemsData}
             hideTeamColumn={true}

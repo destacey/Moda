@@ -7,7 +7,9 @@ import {
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, TransferProps } from 'antd'
 import { useEffect, useState } from 'react'
+import type { Key } from 'react'
 import { useConfirmModal } from '@/src/hooks'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface ManageUserRolesFormProps {
   userId: string
@@ -58,11 +60,12 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         messageApi.success('Successfully updated user roles.')
         return true
       } catch (error) {
-        if (error.status === 422 && error.errors) {
+        const apiError: ApiError = isApiError(error) ? error : {}
+        if (apiError.status === 422 && apiError.errors) {
           messageApi.error('Correct the validation error(s) to continue.')
         } else {
           messageApi.error(
-            error.detail ??
+            apiError.detail ??
               'An error occurred while updating the user roles. Please try again.',
           )
         }
@@ -84,13 +87,14 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
         key: role.roleName,
         title: role.roleName,
       }))
-      .sort((a, b) => a.title.localeCompare(b.title)) as RecordType[]
+      .sort((a, b) => (a.title ?? '').localeCompare(b.title ?? '')) as RecordType[]
 
     setRoles(transformedRoles)
 
     const activeRoleNames = userRolesData
       .filter((role) => role.enabled)
       .map((role) => role.roleName)
+      .filter((r): r is string => r !== undefined)
       .sort((a, b) => {
         const roleA =
           userRolesData.find((r) => r.roleName === a)?.roleName || ''
@@ -113,8 +117,9 @@ const ManageUserRolesForm: React.FC<ManageUserRolesFormProps> = ({
     setSelectedKeys([])
   }, [userRolesData])
 
-  const onChange = (nextTargetKeys: string[]) => {
-    const sortedTargetKeys = nextTargetKeys.sort((a, b) => {
+  const onChange = (nextTargetKeys: Key[]) => {
+    const keys = nextTargetKeys as string[]
+    const sortedTargetKeys = keys.sort((a, b) => {
       const roleA = roles.find((r) => r.title === a)?.title || ''
       const roleB = roles.find((r) => r.title === b)?.title || ''
       return roleA.localeCompare(roleB)

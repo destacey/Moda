@@ -16,7 +16,7 @@ const SprintsPage: FC = () => {
     <>
       <PageTitle title="Sprints" />
       <SprintsGrid
-        sprints={sprintsData}
+        sprints={sprintsData ?? []}
         isLoading={isLoading}
         refetch={refetch}
       />

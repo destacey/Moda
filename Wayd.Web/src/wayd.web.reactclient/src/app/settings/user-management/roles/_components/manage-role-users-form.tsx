@@ -8,6 +8,7 @@ import {
 } from '@/src/store/features/user-management/users-api'
 import { Modal, Spin, Transfer, Typography, Flex, theme } from 'antd'
 import { useEffect, useState } from 'react'
+import type { Key } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
 const { Text } = Typography
@@ -125,8 +126,9 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
       }))
       .sort((a, b) => a.title.localeCompare(b.title))
 
-  const onChange = (nextTargetKeys: string[]) => {
-    const sortedTargetKeys = nextTargetKeys.sort(
+  const onChange = (nextTargetKeys: Key[]) => {
+    const keys = nextTargetKeys as string[]
+    const sortedTargetKeys = keys.sort(
       (a, b) =>
         (dataSource.findIndex((item) => item.key === a) || 0) -
         (dataSource.findIndex((item) => item.key === b) || 0),
@@ -134,8 +136,8 @@ const ManageRoleUsersForm: React.FC<ManageRoleUsersFormProps> = ({
     setTargetKeys(sortedTargetKeys)
   }
 
-  const onSelectChange = (sourceSelectedKeys: string[], targetSelectedKeys: string[]) => {
-    setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys])
+  const onSelectChange = (sourceSelectedKeys: Key[], targetSelectedKeys: Key[]) => {
+    setSelectedKeys([...sourceSelectedKeys, ...targetSelectedKeys] as string[])
   }
 
   const filterOption = (inputValue: string, option: TransferItem) => {

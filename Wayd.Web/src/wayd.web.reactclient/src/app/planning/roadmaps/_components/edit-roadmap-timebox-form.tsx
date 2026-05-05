@@ -8,7 +8,7 @@ import {
   useGetRoadmapItemQuery,
   useUpdateRoadmapItemMutation,
 } from '@/src/store/features/planning/roadmaps-api'
-import { toFormErrors } from '@/src/utils'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { DatePicker, Form, Input, Modal, TreeSelect } from 'antd'
 import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
@@ -93,13 +93,14 @@ const EditRoadmapTimeboxForm = ({
             messageApi.success('Roadmap Timebox updated successfully.')
             return true
           } catch (error) {
-            if (error.status === 422 && error.errors) {
-              const formErrors = toFormErrors(error.errors)
+            const apiError: ApiError = isApiError(error) ? error : {}
+            if (apiError.status === 422 && apiError.errors) {
+              const formErrors = toFormErrors(apiError.errors)
               form.setFields(formErrors)
               messageApi.error('Correct the validation error(s) to continue.')
             } else {
               messageApi.error(
-                error.detail ??
+                (isApiError(apiError) ? apiError.detail : undefined) ??
                   'An error occurred while updating the roadmap timebox. Please try again.',
               )
             }
@@ -133,13 +134,13 @@ const EditRoadmapTimeboxForm = ({
   useEffect(() => {
     if (timeboxDataError) {
       messageApi.error(
-        timeboxDataError.supportMessage ??
+        (isApiError(timeboxDataError) ? timeboxDataError.supportMessage : undefined) ??
           'An error occurred while loading roadmap timebox. Please try again.',
       )
     }
     if (activitiesError) {
       messageApi.error(
-        activitiesError.supportMessage ??
+        (isApiError(activitiesError) ? activitiesError.supportMessage : undefined) ??
           'An error occurred while loading roadmap activities. Please try again.',
       )
     }

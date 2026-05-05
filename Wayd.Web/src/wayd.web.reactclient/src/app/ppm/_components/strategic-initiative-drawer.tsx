@@ -11,7 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetStrategicInitiativeQuery } from '@/src/store/features/ppm/strategic-initiatives-api'
-import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList, isApiError} from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
@@ -53,7 +53,7 @@ const StrategicInitiativeDrawer: FC<StrategicInitiativeDrawerProps> = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading strategic initiative data. Please try again.',
       )
     }

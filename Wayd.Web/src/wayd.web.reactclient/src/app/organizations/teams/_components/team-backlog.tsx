@@ -13,7 +13,7 @@ const TeamBacklog: FC<TeamBacklogProps> = ({ teamId }) => {
 
   return (
     <WorkItemsBacklogGrid
-      workItems={backlogQuery.data}
+      workItems={backlogQuery.data ?? []}
       hideTeamColumn={true}
       isLoading={backlogQuery.isLoading}
       refetch={backlogQuery.refetch}

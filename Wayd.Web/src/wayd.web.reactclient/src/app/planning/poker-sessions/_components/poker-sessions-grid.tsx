@@ -61,11 +61,14 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
 
 const sessionLinkCellRenderer = (
   params: ICellRendererParams<PokerSessionListDto>,
-) => (
-  <Link href={`/planning/poker-sessions/${params.data.key}`}>
-    {params.value}
-  </Link>
-)
+) => {
+  if (!params.data) return null
+  return (
+    <Link href={`/planning/poker-sessions/${params.data.key}`}>
+      {params.value}
+    </Link>
+  )
+}
 
 const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
   sessions = [],
@@ -90,6 +93,7 @@ const PokerSessionsGrid: FC<PokerSessionsGridProps> = ({
         hide: !showRowMenu,
         suppressHeaderMenuButton: true,
         cellRenderer: (params: ICellRendererParams<PokerSessionListDto>) => {
+          if (!params.data) return null
           const menuItems = getRowMenuItems({
             session: params.data,
             canUpdate,

@@ -52,6 +52,8 @@ const teamSlice = createCrudSlice({
           return await getTeamsClient().getById(teamRequest.key)
         case 'Team of Teams':
           return await getTeamsOfTeamsClient().getById(teamRequest.key)
+        default:
+          return rejectWithValue({ error: 'Unknown team type' })
       }
     } catch (error) {
       return rejectWithValue({ error })
@@ -69,6 +71,8 @@ const teamSlice = createCrudSlice({
           return await getTeamsClient().getById(activeTeam.key)
         case 'Team of Teams':
           return await getTeamsOfTeamsClient().getById(activeTeam.key)
+        default:
+          return rejectWithValue({ error: 'Unknown team type' })
       }
     } catch (error) {
       return rejectWithValue({ error })
@@ -101,7 +105,7 @@ const teamSlice = createCrudSlice({
 
       await teamClient.update(team.id, team)
       const { team: teamState } = getState() as { team: TeamState }
-      return await teamClient.getById(teamState.detail.item.key)
+      return await teamClient.getById(teamState.detail.item!.key)
     } catch (error) {
       return rejectWithValue({ error })
     }

@@ -45,11 +45,11 @@ const sortOrderedObjectives = (
 ) => {
   // .slice() is used to prevent: TypeError: Cannot assign to read only property '0' of object '[object Array]'
   return objectivesData.slice().sort((a, b) => {
-    if (a.order === null && b.order === null) return a.key - b.key
-    if (a.order === null) return 1
-    if (b.order === null) return -1
+    if ((a.order ?? null) === null && (b.order ?? null) === null) return a.key - b.key
+    if ((a.order ?? null) === null) return 1
+    if ((b.order ?? null) === null) return -1
     if (a.order === b.order) return a.key - b.key
-    return a.order - b.order
+    return (a.order ?? 0) - (b.order ?? 0)
   })
 }
 
@@ -141,22 +141,22 @@ const TeamObjectivesListCard = ({
   }
 
   const newObjectiveOrderValue = () => {
-    if (!objectives || objectives.length === 0) return null
+    if (!objectives || objectives.length === 0) return undefined
 
     const lastObjectiveOrder = objectives[objectives.length - 1].order
 
-    return !lastObjectiveOrder ? null : lastObjectiveOrder + 1
+    return !lastObjectiveOrder ? undefined : lastObjectiveOrder + 1
   }
 
-  const getObjectivePosition = (id) => objectives.findIndex((o) => o.id === id)
+  const getObjectivePosition = (id: string | undefined) => objectives.findIndex((o) => o.id === id)
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id === over.id) return
+    if (active.id === over?.id) return
 
-    const originalPosition = getObjectivePosition(active.id)
-    const newPosition = getObjectivePosition(over.id)
+    const originalPosition = getObjectivePosition(String(active.id))
+    const newPosition = getObjectivePosition(over?.id !== undefined ? String(over.id) : undefined)
 
     const updatedObjectives = arrayMove(
       objectives,

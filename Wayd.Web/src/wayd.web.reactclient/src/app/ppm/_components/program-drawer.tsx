@@ -11,7 +11,7 @@ import { MarkdownRenderer } from '@/src/components/common/markdown'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useGetProgramQuery } from '@/src/store/features/ppm/programs-api'
-import { getDrawerWidthPixels, getSortedNameList } from '@/src/utils'
+import { getDrawerWidthPixels, getSortedNameList, isApiError} from '@/src/utils'
 import { Drawer, Flex } from 'antd'
 import Link from 'next/link'
 import { FC, useEffect, useState } from 'react'
@@ -45,7 +45,7 @@ const ProgramDrawer: FC<ProgramDrawerProps> = ({
   useEffect(() => {
     if (error) {
       messageApi.error(
-        error.detail ??
+        (isApiError(error) ? error.detail : undefined) ??
           'An error occurred while loading program data. Please try again.',
       )
     }

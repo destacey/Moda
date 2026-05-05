@@ -31,8 +31,8 @@ jest.mock('../../contexts/theme', () => ({
 // Helper to create mock work items
 const createMockWorkItem = (
   key: string,
-  storyPoints: number | null | undefined,
-  cycleTime: number | null | undefined,
+  storyPoints: number | undefined,
+  cycleTime: number | undefined,
 ): Partial<WorkItemListDto> => ({
   key,
   storyPoints,
@@ -75,8 +75,8 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Chart Rendering', () => {
     it('should render chart when work items are provided', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
-        createMockWorkItem('WI-2', 5, 8),
+        createMockWorkItem('WI-1',  3,  5),
+        createMockWorkItem('WI-2',  5,  8),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -87,7 +87,7 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should default isLoading to false when not provided', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} />)
@@ -100,9 +100,9 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Data Processing', () => {
     it('should group work items by story points', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
-        createMockWorkItem('WI-2', 3, 7),
-        createMockWorkItem('WI-3', 5, 10),
+        createMockWorkItem('WI-1',  3,  5),
+        createMockWorkItem('WI-2',  3,  7),
+        createMockWorkItem('WI-3',  5,  10),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -119,8 +119,8 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should calculate average cycle time correctly', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 4),
-        createMockWorkItem('WI-2', 3, 8),
+        createMockWorkItem('WI-1',  3,  4),
+        createMockWorkItem('WI-2',  3,  8),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -135,9 +135,9 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should handle work items with no story points', () => {
       const workItems = [
-        createMockWorkItem('WI-1', null, 5),
-        createMockWorkItem('WI-2', undefined, 7),
-        createMockWorkItem('WI-3', 3, 9),
+        createMockWorkItem('WI-1', undefined,  5),
+        createMockWorkItem('WI-2',  undefined,  7),
+        createMockWorkItem('WI-3',  3,  9),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -153,9 +153,9 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should handle work items with null or undefined cycle time', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, null),
-        createMockWorkItem('WI-2', 3, undefined),
-        createMockWorkItem('WI-3', 3, 6),
+        createMockWorkItem('WI-1',  3, undefined),
+        createMockWorkItem('WI-2',  3,  undefined),
+        createMockWorkItem('WI-3',  3,  6),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -170,8 +170,8 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should round average cycle time to 2 decimal places', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5.555),
-        createMockWorkItem('WI-2', 3, 7.777),
+        createMockWorkItem('WI-1',  3,  5.555),
+        createMockWorkItem('WI-2',  3,  7.777),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -187,10 +187,10 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Data Sorting', () => {
     it('should sort story points numerically in ascending order', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 13, 5),
-        createMockWorkItem('WI-2', 1, 3),
-        createMockWorkItem('WI-3', 5, 7),
-        createMockWorkItem('WI-4', 3, 4),
+        createMockWorkItem('WI-1',  13,  5),
+        createMockWorkItem('WI-2',  1,  3),
+        createMockWorkItem('WI-3',  5,  7),
+        createMockWorkItem('WI-4',  3,  4),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -204,8 +204,8 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should place "No Story Points" before "Overall"', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
-        createMockWorkItem('WI-2', null, 7),
+        createMockWorkItem('WI-1',  3,  5),
+        createMockWorkItem('WI-2', undefined,  7),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -219,9 +219,9 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should place "Overall" at the end', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 8, 5),
-        createMockWorkItem('WI-2', 2, 3),
-        createMockWorkItem('WI-3', null, 7),
+        createMockWorkItem('WI-1',  8,  5),
+        createMockWorkItem('WI-2',  2,  3),
+        createMockWorkItem('WI-3', undefined,  7),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -237,9 +237,9 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Overall Category', () => {
     it('should calculate overall average across all work items', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 4),
-        createMockWorkItem('WI-2', 5, 8),
-        createMockWorkItem('WI-3', null, 12),
+        createMockWorkItem('WI-1',  3,  4),
+        createMockWorkItem('WI-2',  5,  8),
+        createMockWorkItem('WI-3', undefined,  12),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -254,7 +254,7 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should include Overall category even with single work item', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -272,7 +272,7 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Chart Configuration', () => {
     it('should configure correct x and y fields', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -286,7 +286,7 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should configure axis titles', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -300,7 +300,7 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should configure tooltip with correct fields', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -318,7 +318,7 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should use theme from useTheme hook', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -333,7 +333,7 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Bar Colors', () => {
     it('should configure style.fill as a function', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
+        createMockWorkItem('WI-1',  3,  5),
       ] as WorkItemListDto[]
 
       const { container } = render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -345,8 +345,8 @@ describe('CycleTimeAnalysisChart', () => {
 
     it('should render chart with Overall, No Story Points, and regular categories', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 3, 5),
-        createMockWorkItem('WI-2', null, 7),
+        createMockWorkItem('WI-1',  3,  5),
+        createMockWorkItem('WI-2', undefined,  7),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)
@@ -365,13 +365,13 @@ describe('CycleTimeAnalysisChart', () => {
   describe('Complex Scenarios', () => {
     it('should handle mixed story points and null values correctly', () => {
       const workItems = [
-        createMockWorkItem('WI-1', 1, 2),
-        createMockWorkItem('WI-2', 2, 3),
-        createMockWorkItem('WI-3', 3, 5),
-        createMockWorkItem('WI-4', 5, 8),
-        createMockWorkItem('WI-5', null, 4),
-        createMockWorkItem('WI-6', undefined, 6),
-        createMockWorkItem('WI-7', 1, 3),
+        createMockWorkItem('WI-1',  1,  2),
+        createMockWorkItem('WI-2',  2,  3),
+        createMockWorkItem('WI-3',  3,  5),
+        createMockWorkItem('WI-4',  5,  8),
+        createMockWorkItem('WI-5', undefined,  4),
+        createMockWorkItem('WI-6',  undefined,  6),
+        createMockWorkItem('WI-7',  1,  3),
       ] as WorkItemListDto[]
 
       render(<CycleTimeAnalysisChart workItems={workItems} isLoading={false} />)

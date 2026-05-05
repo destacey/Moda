@@ -13,10 +13,11 @@ import {
 } from '@/src/store/features/ppm/project-lifecycles-api'
 import { App, Button } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { ColDef } from 'ag-grid-community'
+import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import { useMemo, useState } from 'react'
 import AddProjectLifecyclePhaseForm from './add-project-lifecycle-phase-form'
 import EditProjectLifecyclePhaseForm from './edit-project-lifecycle-phase-form'
+import { isApiError, type ApiError } from '@/src/utils'
 
 export interface ProjectLifecyclePhasesListProps {
   lifecycle: ProjectLifecycleDetailsDto
@@ -122,8 +123,9 @@ const ProjectLifecyclePhasesList = ({
             }
             messageApi.success('Phase deleted successfully.')
           } catch (error) {
+            const apiError: ApiError = isApiError(error) ? error : {}
             messageApi.error(
-              error.detail ??
+              apiError.detail ??
                 'An unexpected error occurred while deleting the phase.',
             )
             console.log(error)
@@ -151,8 +153,9 @@ const ProjectLifecyclePhasesList = ({
           throw response.error
         }
       } catch (error) {
+        const apiError: ApiError = isApiError(error) ? error : {}
         messageApi.error(
-          error.detail ?? 'An error occurred while reordering phases.',
+          apiError.detail ?? 'An error occurred while reordering phases.',
         )
         console.error(error)
       }
@@ -166,9 +169,9 @@ const ProjectLifecyclePhasesList = ({
         resizable: false,
         hide: !canManagePhases,
         suppressHeaderMenuButton: true,
-        cellRenderer: (params) => {
+        cellRenderer: (params: ICellRendererParams<ProjectLifecyclePhaseDto>) => {
           const menuItems = getRowMenuItems({
-            phase: params.data,
+            phase: params.data!,
             sortedPhases,
             onEditClicked: handleEdit,
             onDeleteClicked: handleDeletePhase,
