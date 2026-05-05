@@ -1,6 +1,4 @@
-﻿using Wayd.Common.Application.Interfaces;
-
-namespace Wayd.ProjectPortfolioManagement.Application.Projects.HealthChecks.Commands;
+﻿namespace Wayd.ProjectPortfolioManagement.Application.Projects.HealthChecks.Commands;
 
 public sealed record DeleteProjectHealthCheckCommand(
     Guid ProjectId,
@@ -39,6 +37,7 @@ internal sealed class DeleteProjectHealthCheckCommandHandler(
 
         var project = await _ppmDbContext.Projects
             .AsSplitQuery()
+            .Include(p => p.Roles)
             .Include(p => p.HealthChecks)
             .Include(p => p.Portfolio).ThenInclude(p => p!.Roles)
             .Include(p => p.Program).ThenInclude(p => p!.Roles)

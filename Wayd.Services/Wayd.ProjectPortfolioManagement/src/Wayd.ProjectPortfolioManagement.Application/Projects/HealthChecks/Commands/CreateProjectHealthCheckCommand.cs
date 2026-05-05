@@ -52,6 +52,7 @@ internal sealed class CreateProjectHealthCheckCommandHandler(
 
         var project = await _ppmDbContext.Projects
             .AsSplitQuery()
+            .Include(p => p.Roles)
             .Include(p => p.HealthChecks)
             .Include(p => p.Portfolio).ThenInclude(p => p!.Roles)
             .Include(p => p.Program).ThenInclude(p => p!.Roles)
