@@ -1,9 +1,9 @@
 ---
-name: moda-users
-description: Guides agents working with Moda Users via the Moda MCP server. Use when looking up users or resolving a user name to a UUID for assignees or project team roles.
+name: wayd-users
+description: Guides agents working with Wayd Users via the Wayd MCP server. Use when looking up users or resolving a user name to a UUID for assignees or project team roles.
 ---
 
-# Moda Users
+# Wayd Users
 
 ## When to use
 
@@ -17,7 +17,7 @@ description: Guides agents working with Moda Users via the Moda MCP server. Use 
 
 ### User
 
-- Represents a Moda user account
+- Represents a Wayd user account
 - User `id` is a **UUID** (string)
 - Users can be active or inactive; `Users_GetUsers` returns all users
 

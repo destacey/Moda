@@ -1,9 +1,9 @@
 ---
-name: moda-pi
-description: Guides agents working with Moda Planning Intervals — iterations, sprint metrics, team objectives, health reports, predictability, and risks.
+name: wayd-pi
+description: Guides agents working with Wayd Planning Intervals — iterations, sprint metrics, team objectives, health reports, predictability, and risks.
 ---
 
-# Moda Planning Intervals (PI)
+# Wayd Planning Intervals (PI)
 
 ## When to use
 
