@@ -31,7 +31,7 @@ const AzdoProcess = (props: AzdoProcessProps) => {
 
   const skip = !props?.workProcess?.integrationState?.internalId
   const { data: workProcessData } = useGetWorkProcessQuery(
-    props.workProcess.integrationState!.internalId,
+    props.workProcess.integrationState?.internalId ?? '',
     { skip },
   )
 

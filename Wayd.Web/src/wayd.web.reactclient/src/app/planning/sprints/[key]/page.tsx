@@ -53,7 +53,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   const { data: teamOperatingModel } = useGetTeamOperatingModelAsOfQuery(
     {
-      teamId: sprintData!.team.id,
+      teamId: sprintData?.team.id ?? '',
       asOfDate: sprintData?.start ?? '',
     },
     { skip: !sprintData || !sprintData?.team.id },
@@ -61,7 +61,7 @@ const SprintDetailsPage = (props: { params: Promise<{ key: string }> }) => {
 
   useDocumentTitle(`${sprintData?.name ?? sprintKey} - Sprint Details`)
 
-  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData!.team.id, {
+  const { data: teamSprints } = useGetTeamSprintsQuery(sprintData?.team.id ?? '', {
     skip: !sprintData?.team.id,
   })
 
