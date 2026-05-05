@@ -14,7 +14,7 @@ const config: Config = {
 
   // GitHub Pages deployment
   // Use DOCS_BASE_URL env var for local dev (defaults to /Wayd/ for GitHub Pages)
-  url: "https://destacey.github.io",
+  url: "https://wayd.dev",
   baseUrl: process.env.DOCS_BASE_URL || "/Wayd/",
   organizationName: "destacey",
   projectName: "Wayd",
