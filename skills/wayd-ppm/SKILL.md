@@ -1,9 +1,9 @@
 ---
-name: moda-ppm
-description: Guides agents working with Moda Portfolio, Program, Project, and Task management via the Moda MCP server. Use when looking up portfolios, programs, or projects, exploring project lifecycles and phases, viewing the project plan or team, or creating, updating, or managing tasks within a project.
+name: wayd-ppm
+description: Guides agents working with Wayd Portfolio, Program, Project, and Task management via the Wayd MCP server. Use when looking up portfolios, programs, or projects, exploring project lifecycles and phases, viewing the project plan or team, or creating, updating, or managing tasks within a project.
 ---
 
-# Moda PPM (Portfolio / Program / Project / Task Management)
+# Wayd PPM (Portfolio / Program / Project / Task Management)
 
 ## When to use
 

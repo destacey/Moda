@@ -9,7 +9,7 @@ audience: [user, developer, agent]
 
 Wayd provides an [MCP (Model Context Protocol)](https://modelcontextprotocol.io) server that lets AI assistants like Claude interact directly with your Wayd instance. The MCP server exposes Wayd's API as structured tools that AI agents can call to read and manage your delivery data.
 
-**Package:** [`@modanpm/wayd-mcp`](https://www.npmjs.com/package/@modanpm/wayd-mcp)
+**Package:** [`@wayd/mcp`](https://www.npmjs.com/package/@wayd/mcp)
 
 ## What Can It Do?
 
@@ -42,10 +42,10 @@ Add the following to your Claude Desktop configuration file:
   "mcpServers": {
     "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/wayd-mcp"],
+      "args": ["-y", "@wayd/mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-wayd-instance.com",
-        "MODA_API_KEY": "your-personal-access-token"
+        "WAYD_API_BASE_URL": "https://your-wayd-instance.com",
+        "WAYD_API_KEY": "your-personal-access-token"
       }
     }
   }
@@ -61,10 +61,10 @@ Add a `.mcp.json` file to your project root:
   "mcpServers": {
     "wayd": {
       "command": "npx",
-      "args": ["-y", "@modanpm/wayd-mcp"],
+      "args": ["-y", "@wayd/mcp"],
       "env": {
-        "MODA_API_BASE_URL": "https://your-wayd-instance.com",
-        "MODA_API_KEY": "your-personal-access-token"
+        "WAYD_API_BASE_URL": "https://your-wayd-instance.com",
+        "WAYD_API_KEY": "your-personal-access-token"
       }
     }
   }
@@ -74,8 +74,8 @@ Add a `.mcp.json` file to your project root:
 Or set environment variables in your shell and omit the `env` block:
 
 ```bash
-export MODA_API_BASE_URL="https://your-wayd-instance.com"
-export MODA_API_KEY="your-personal-access-token"
+export WAYD_API_BASE_URL="https://your-wayd-instance.com"
+export WAYD_API_KEY="your-personal-access-token"
 ```
 
 ### VS Code / Cursor
@@ -86,12 +86,12 @@ Add to your `.vscode/mcp.json` or workspace settings:
 {
   "inputs": [
     {
-      "id": "modaBaseUrl",
+      "id": "waydBaseUrl",
       "description": "Wayd API base URL",
       "type": "promptString"
     },
     {
-      "id": "modaApiKey",
+      "id": "waydApiKey",
       "description": "Wayd API key (Personal Access Token)",
       "type": "promptString",
       "password": true
@@ -102,9 +102,9 @@ Add to your `.vscode/mcp.json` or workspace settings:
       "type": "stdio",
       "command": "npx",
       "args": [
-        "-y", "@modanpm/wayd-mcp",
-        "--base-url", "${input:modaBaseUrl}",
-        "--api-key", "${input:modaApiKey}"
+        "-y", "@wayd/mcp",
+        "--base-url", "${input:waydBaseUrl}",
+        "--api-key", "${input:waydApiKey}"
       ]
     }
   }
@@ -117,18 +117,20 @@ The MCP server accepts configuration via environment variables or CLI arguments:
 
 | Environment Variable | CLI Argument | Description |
 |---------------------|-------------|-------------|
-| `MODA_API_BASE_URL` | `--base-url` | The base URL of your Wayd API instance |
-| `MODA_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile.mdx#personal-access-tokens) |
+| `WAYD_API_BASE_URL` | `--base-url` | The base URL of your Wayd API instance |
+| `WAYD_API_KEY` | `--api-key` | Your [Personal Access Token](./your-profile.mdx#personal-access-tokens) |
 
 CLI arguments take precedence over environment variables.
 
 ## Agent Skills
 
-For Claude Code users, three pre-built skills provide guided workflows:
+For Claude Code users, five pre-built skills provide guided workflows:
 
 - **`/wayd-ppm`** — Portfolio, program, and project operations
 - **`/wayd-pi`** — Planning intervals, iterations, objectives, and risks
 - **`/wayd-roadmaps`** — Roadmap exploration with activities and milestones
+- **`/wayd-teams`** — Team lookup and resolving team names to IDs
+- **`/wayd-users`** — User lookup and resolving names to UUIDs for assignees and project roles
 
 Install the skills:
 

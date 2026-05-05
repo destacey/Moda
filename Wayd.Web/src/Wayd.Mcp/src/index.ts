@@ -39,7 +39,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request: CallToolRequest)
 
 async function main() {
   if (!API_BASE_URL) {
-    console.error('Error: MODA_API_BASE_URL environment variable or --base-url argument is required.');
+    console.error('Error: WAYD_API_BASE_URL environment variable or --base-url argument is required.');
     process.exit(1);
   }
 

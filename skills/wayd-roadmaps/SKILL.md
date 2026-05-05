@@ -1,9 +1,9 @@
 ---
-name: moda-roadmaps
-description: Guides agents working with Moda Roadmaps — exploring activities, timeboxes, milestones, and roadmap item details.
+name: wayd-roadmaps
+description: Guides agents working with Wayd Roadmaps — exploring activities, timeboxes, milestones, and roadmap item details.
 ---
 
-# Moda Roadmaps
+# Wayd Roadmaps
 
 ## When to use
 

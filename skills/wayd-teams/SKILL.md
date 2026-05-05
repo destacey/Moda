@@ -1,9 +1,9 @@
 ---
-name: moda-teams
-description: Guides agents working with Moda Teams via the Moda MCP server. Use when looking up teams or resolving a team name to an ID.
+name: wayd-teams
+description: Guides agents working with Wayd Teams via the Wayd MCP server. Use when looking up teams or resolving a team name to an ID.
 ---
 
-# Moda Teams
+# Wayd Teams
 
 ## When to use
 
@@ -17,8 +17,8 @@ description: Guides agents working with Moda Teams via the Moda MCP server. Use 
 
 ### Team
 
-- Represents an organizational team in Moda
-- Team `id` is an **integer** (not a UUID) — this is different from most other Moda entities
+- Represents an organizational team in Wayd
+- Team `id` is an **integer** (not a UUID) — this is different from most other Wayd entities
 - Teams can be active or inactive; `Teams_GetTeams` returns active teams by default
 - Pass `includeInactive: true` to include inactive teams
 

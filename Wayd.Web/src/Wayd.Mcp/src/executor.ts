@@ -2,7 +2,7 @@ import { z, ZodError } from 'zod';
 import axios, { type AxiosRequestConfig, type AxiosError } from 'axios';
 import { zodSchemas } from './generated/zod-schemas.js';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
-import { API_BASE_URL, MODA_API_KEY } from './config.js';
+import { API_BASE_URL, WAYD_API_KEY } from './config.js';
 import type { McpToolDefinition, JsonObject } from './types.js';
 
 export const securitySchemes = {
@@ -79,7 +79,7 @@ export async function executeApiTool(
         const scheme = allSecuritySchemes[schemeName];
         if (scheme?.type !== 'apiKey') continue;
 
-        const apiKey = MODA_API_KEY;
+        const apiKey = WAYD_API_KEY;
         if (!apiKey) continue;
 
         if (scheme.in === 'header') {

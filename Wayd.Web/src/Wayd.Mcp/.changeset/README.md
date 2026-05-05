@@ -1,6 +1,6 @@
 # Changesets
 
-This directory manages versioning and changelog generation for the `@modanpm/moda-mcp` npm package.
+This directory manages versioning and changelog generation for the `@wayd/mcp` npm package.
 
 ## What is a changeset?
 
