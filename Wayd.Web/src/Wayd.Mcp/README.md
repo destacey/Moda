@@ -148,7 +148,7 @@ Five self-contained skills are available:
 From your project root:
 
 ```bash
-npx skills add destacey/wayd
+npx skills add destacey/Wayd
 ```
 
 Once installed, activate a skill in Claude Code with `/wayd-ppm`, `/wayd-pi`, `/wayd-roadmaps`, `/wayd-teams`, or `/wayd-users`.
