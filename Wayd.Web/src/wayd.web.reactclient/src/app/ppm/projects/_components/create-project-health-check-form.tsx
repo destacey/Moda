@@ -43,7 +43,7 @@ const CreateProjectHealthCheckForm = ({
   const statusOptions = useMemo(
     () =>
       healthStatuses?.map((status) => ({
-        value: HealthStatus[status.name as keyof typeof HealthStatus],
+        value: HealthStatus[status.name.replace(' ', '') as keyof typeof HealthStatus],
         label: status.name,
       })) ?? [],
     [healthStatuses],
