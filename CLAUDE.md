@@ -10,7 +10,7 @@ Wayd is an intelligent delivery management platform designed to give engineering
 **For domain terminology**: See [docs/ai/domain-glossary.mdx](docs/ai/domain-glossary.mdx)
 **For user-facing documentation**: See [docs/](docs/) (shared by Docusaurus and Next.js in-app docs)
 
-Documentation site: <https://destacey.github.io/Wayd>
+Documentation site: <https://wayd.dev>
 
 ## Build and Test Commands
 

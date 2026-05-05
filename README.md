@@ -10,7 +10,7 @@ When delivery spans multiple teams, projects, and systems, visibility breaks dow
 
 ## 📚 Documentation
 
-[Full Documentation](https://destacey.github.io/Wayd) | [Contributing Guide](CONTRIBUTING.md)
+[Full Documentation](https://wayd.dev) | [Contributing Guide](CONTRIBUTING.md)
 
 ## ✨ Key Features
 
@@ -287,7 +287,7 @@ See our [Contributing Guide](CONTRIBUTING.md) for detailed instructions on how t
 
 ## 📖 Additional Resources
 
-- **Full Documentation**: <https://destacey.github.io/Wayd>
+- **Full Documentation**: <https://wayd.dev>
 - **Architecture Guide**: [CLAUDE.md](CLAUDE.md)
 - **API Documentation**: Available at `/swagger` when API is running
 
