@@ -40,8 +40,6 @@ jobs:
       - name: Build Docusaurus site
         working-directory: docs-site
         run: npm run build
-        env:
-          DOCS_BASE_URL: /
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
