@@ -21329,7 +21329,9 @@
         ],
         "properties": {
           "targetTenantId": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
           }
         }
       },

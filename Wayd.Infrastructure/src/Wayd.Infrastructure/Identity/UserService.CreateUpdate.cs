@@ -133,7 +133,12 @@ internal partial class UserService
     /// Returns the user on success; null if no migration was staged or no match found.
     /// The user's <c>Id</c> is preserved, so all downstream FKs remain valid.
     /// </summary>
-    private async Task<ApplicationUser?> TryApplyPendingTenantMigration(string tenantId, string objectId, string? upn)
+    /// <remarks>
+    /// Internal (rather than private) so unit tests can exercise the rebind decision
+    /// directly, without driving the surrounding <see cref="GetOrCreateFromPrincipalAsync"/>
+    /// which depends on the Graph client.
+    /// </remarks>
+    internal async Task<ApplicationUser?> TryApplyPendingTenantMigration(string tenantId, string objectId, string? upn)
     {
         if (string.IsNullOrWhiteSpace(upn))
         {
@@ -158,7 +163,10 @@ internal partial class UserService
 
         // Run the deactivate + insert + flag-clear together. Failure of any step
         // rolls back the others — without the transaction we could deactivate the
-        // old identity then fail to insert the new one, locking the user out.
+        // old identity then fail to insert the new one (locking the user out), or
+        // commit identity changes but leave PendingMigrationTenantId set (which would
+        // cause the rebind path to re-trigger on the next login and produce a
+        // duplicate-active-row error).
         await _userIdentityStore.ExecuteInTransaction(async ct =>
         {
             await _userIdentityStore.DeactivateAllActive(candidate.Id, _dateTimeProvider.Now, UserIdentityUnlinkReasons.TenantMigration, ct);
@@ -175,7 +183,15 @@ internal partial class UserService
             }, ct);
 
             candidate.PendingMigrationTenantId = null;
-            await _userManager.UpdateAsync(candidate);
+            var updateResult = await _userManager.UpdateAsync(candidate);
+            if (!updateResult.Succeeded)
+            {
+                // Throw so ExecuteInTransaction rolls back — the deactivate + insert
+                // above must not commit if we couldn't clear the flag.
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to clear pending migration flag for user {candidate.Id}: {errors}");
+            }
         });
 
         _logger.LogInformation(

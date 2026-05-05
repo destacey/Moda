@@ -157,7 +157,13 @@ internal partial class UserService(
         // Last-write-wins. Re-staging silently overwrites the previous target — admin's
         // most recent decision is the one we honor, matching the spec's stated semantics.
         user.PendingMigrationTenantId = command.TargetTenantId;
-        await _userManager.UpdateAsync(user);
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to stage tenant migration for user {UserId}: {Errors}", user.Id, errors);
+            return Result.Failure(errors);
+        }
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
 
@@ -182,7 +188,13 @@ internal partial class UserService(
         }
 
         user.PendingMigrationTenantId = null;
-        await _userManager.UpdateAsync(user);
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to cancel tenant migration for user {UserId}: {Errors}", user.Id, errors);
+            return Result.Failure(errors);
+        }
 
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
 

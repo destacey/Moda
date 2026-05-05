@@ -1093,7 +1093,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task GetOrCreateFromPrincipalAsync_ShouldNotRebind_WhenPendingTenantDoesNotMatchToken()
+    public async Task TryApplyPendingTenantMigration_ShouldNotRebind_WhenPendingTenantDoesNotMatchToken()
     {
         var stagedTenant = Guid.NewGuid().ToString();
         var unrelatedTenant = Guid.NewGuid().ToString();
@@ -1106,37 +1106,26 @@ public class UserServiceTests
         // Staged for a different tenant than the token's tid.
         user.PendingMigrationTenantId = stagedTenant;
 
-        _mockUserIdentityStore.Setup(s => s.FindActive(LoginProviders.MicrosoftEntraId, unrelatedTenant, newObjectId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserIdentity?)null);
-        _mockUserIdentityStore.Setup(s => s.FindActiveByNullTenant(LoginProviders.MicrosoftEntraId, newObjectId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<UserIdentity>());
-
         _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
 
-        // Side effects of falling through to create — make sure they don't run.
         var sut = CreateSut();
 
-        // Act: we don't drive CreateOrUpdateFromPrincipalAsync here because GraphServiceClient
-        // is null. Confirming the rebind path didn't fire is enough — it would short-circuit
-        // before touching Graph.
-        try
-        {
-            await sut.GetOrCreateFromPrincipalAsync(CreateEntraPrincipal(newObjectId, unrelatedTenant, upn));
-        }
-        catch (NullReferenceException)
-        {
-            // Expected: fell through to CreateOrUpdateFromPrincipalAsync, which uses Graph.
-            // The fact that we got past the rebind path *into* the create path is the proof.
-        }
+        // Exercise the rebind decision directly so the test doesn't depend on the
+        // surrounding GetOrCreateFromPrincipalAsync (which calls into Graph on the
+        // create path). Returning null here is what causes the caller to fall through
+        // to CreateOrUpdateFromPrincipalAsync.
+        var result = await sut.TryApplyPendingTenantMigration(unrelatedTenant, newObjectId, upn);
 
+        result.Should().BeNull();
         user.PendingMigrationTenantId.Should().Be(stagedTenant);
         _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
             It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), UserIdentityUnlinkReasons.TenantMigration, It.IsAny<CancellationToken>()),
             Times.Never);
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Never);
     }
 
     [Fact]
-    public async Task GetOrCreateFromPrincipalAsync_ShouldNotRebind_WhenDifferentUserHasMatchingEmailButNoFlag()
+    public async Task TryApplyPendingTenantMigration_ShouldNotRebind_WhenDifferentUserHasMatchingEmailButNoFlag()
     {
         var newTenantId = Guid.NewGuid().ToString();
         var newObjectId = Guid.NewGuid().ToString();
@@ -1148,27 +1137,98 @@ public class UserServiceTests
         unrelatedUser.NormalizedEmail = "ALICE@EXAMPLE.COM";
         unrelatedUser.PendingMigrationTenantId = null;
 
-        _mockUserIdentityStore.Setup(s => s.FindActive(LoginProviders.MicrosoftEntraId, newTenantId, newObjectId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((UserIdentity?)null);
-        _mockUserIdentityStore.Setup(s => s.FindActiveByNullTenant(LoginProviders.MicrosoftEntraId, newObjectId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Array.Empty<UserIdentity>());
-
         _mockUserManager.Setup(x => x.Users).Returns(new[] { unrelatedUser }.AsQueryable().BuildMockDbSet().Object);
 
         var sut = CreateSut();
 
-        try
-        {
-            await sut.GetOrCreateFromPrincipalAsync(CreateEntraPrincipal(newObjectId, newTenantId, upn));
-        }
-        catch (NullReferenceException)
-        {
-            // Expected: fell through to create path (Graph is null).
-        }
+        var result = await sut.TryApplyPendingTenantMigration(newTenantId, newObjectId, upn);
 
+        result.Should().BeNull();
         _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
             It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), UserIdentityUnlinkReasons.TenantMigration, It.IsAny<CancellationToken>()),
             Times.Never);
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task TryApplyPendingTenantMigration_ShouldReturnNull_WhenUpnIsMissing()
+    {
+        // Defensive: a token without a UPN claim should not match any user, even if
+        // one happens to have a pending migration for the token's tenant.
+        var newTenantId = Guid.NewGuid().ToString();
+        var newObjectId = Guid.NewGuid().ToString();
+
+        var user = CreateUser(id: "user-with-pending", loginProvider: LoginProviders.MicrosoftEntraId);
+        user.PendingMigrationTenantId = newTenantId;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.TryApplyPendingTenantMigration(newTenantId, newObjectId, upn: null);
+
+        result.Should().BeNull();
+        user.PendingMigrationTenantId.Should().Be(newTenantId);
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task TryApplyPendingTenantMigration_ShouldThrowAndRollBackTransaction_WhenClearingFlagFails()
+    {
+        // If UserManager.UpdateAsync fails inside the rebind transaction (e.g.,
+        // concurrency token mismatch), the deactivate+insert must NOT commit — otherwise
+        // the user has a fresh active identity row but PendingMigrationTenantId is still
+        // set, which would re-trigger the rebind path on next login and explode against
+        // the unique-active-row index.
+        var newTenantId = Guid.NewGuid().ToString();
+        var newObjectId = Guid.NewGuid().ToString();
+        var upn = "alice@newtenant.com";
+
+        var user = CreateUser(id: "user-rebind-fail", userName: upn, loginProvider: LoginProviders.MicrosoftEntraId);
+        user.NormalizedUserName = upn.ToUpperInvariant();
+        user.NormalizedEmail = "ALICE@NEWTENANT.COM";
+        user.PendingMigrationTenantId = newTenantId;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Concurrency failure." }));
+
+        // Track what happened inside the transaction lambda. We can't inspect EF's
+        // Database.BeginTransactionAsync rollback directly with the mocked store, but
+        // we can verify (a) the action threw — which is what triggers rollback in the
+        // real ExecuteInTransaction — and (b) Add was called before the failing
+        // UpdateAsync, proving the rebind logic ran to the failing step rather than
+        // bailing out earlier.
+        Exception? captured = null;
+        _mockUserIdentityStore
+            .Setup(s => s.ExecuteInTransaction(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>(async (action, ct) =>
+            {
+                try
+                {
+                    await action(ct);
+                }
+                catch (Exception ex)
+                {
+                    captured = ex;
+                    throw;
+                }
+            });
+
+        var sut = CreateSut();
+
+        var act = () => sut.TryApplyPendingTenantMigration(newTenantId, newObjectId, upn);
+
+        await act.Should().ThrowAsync<InternalServerException>()
+            .WithMessage("*Failed to clear pending migration flag*Concurrency failure*");
+
+        captured.Should().NotBeNull("the transaction lambda must throw so ExecuteInTransaction rolls back");
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Once);
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            user.Id, It.IsAny<NodaTime.Instant>(), UserIdentityUnlinkReasons.TenantMigration, It.IsAny<CancellationToken>()),
+            Times.Once);
     }
 
     #endregion
