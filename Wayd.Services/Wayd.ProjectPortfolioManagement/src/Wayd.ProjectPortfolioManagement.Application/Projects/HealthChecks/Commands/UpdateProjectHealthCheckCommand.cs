@@ -1,5 +1,4 @@
-﻿using Wayd.Common.Application.Interfaces;
-using Wayd.Common.Domain.Enums;
+﻿using Wayd.Common.Domain.Enums;
 using Wayd.ProjectPortfolioManagement.Application.Projects.Dtos;
 
 namespace Wayd.ProjectPortfolioManagement.Application.Projects.HealthChecks.Commands;
@@ -58,6 +57,7 @@ internal sealed class UpdateProjectHealthCheckCommandHandler(
 
         var project = await _ppmDbContext.Projects
             .AsSplitQuery()
+            .Include(p => p.Roles)
             .Include(p => p.HealthChecks).ThenInclude(h => h.ReportedBy)
             .Include(p => p.Portfolio).ThenInclude(p => p!.Roles)
             .Include(p => p.Program).ThenInclude(p => p!.Roles)
