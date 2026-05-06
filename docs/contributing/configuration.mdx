@@ -19,10 +19,6 @@ Wayd.Web/src/Wayd.Web.Api/Configurations/database.json
 
 Wayd supports two authentication providers:
 
-:::info Ongoing refactor
-The identity model that links users to their login providers is being generalized to support multiple OIDC providers, multi-tenant Entra, tenant migrations, and a future token-exchange flow. See [Identity Model Refactor](./specs/identity-model-refactor.mdx) for the multi-PR spec.
-:::
-
 ### Microsoft Entra ID (Azure AD)
 
 :::tip Setting up a new environment
@@ -148,7 +144,69 @@ Permissions travel as `permission` claims inside the Wayd JWT — no separate `/
 
 The login page consults `GET /api/auth/providers` to decide which provider buttons to show; a deployment with `SecuritySettings:Providers:Entra:Enabled = false` hides the Microsoft button entirely.
 
-See [Identity Model Refactor](./specs/identity-model-refactor.mdx) for the full design rationale.
+### Identity model
+
+User → login-provider linkage lives in a `UserIdentity` table. One row per (user, provider-identity) pair, keyed by `(Provider, ProviderTenantId, ProviderSubject)`:
+
+```mermaid
+erDiagram
+    ApplicationUser ||--o{ UserIdentity : has
+    ApplicationUser {
+        string Id PK
+        string UserName
+        string Email
+        string LoginProvider "primary provider (default)"
+        string PendingMigrationTenantId "nullable; staged tenant move"
+    }
+    UserIdentity {
+        guid Id PK
+        string UserId FK
+        string Provider "MicrosoftEntraId | Wayd"
+        string ProviderTenantId "Entra tid; null for Wayd local"
+        string ProviderSubject "Entra oid; ApplicationUser.Id for Wayd local"
+        bool IsActive
+        Instant LinkedAt
+        Instant UnlinkedAt "nullable"
+        string UnlinkReason "nullable; TenantMigration | AdminRevoked | UserUnlinked | ProviderRelinked"
+    }
+```
+
+Every authentication path resolves a user through the same lookup, regardless of provider:
+
+```csharp
+var identity = db.UserIdentities.SingleOrDefault(i =>
+    i.IsActive &&
+    i.Provider == provider &&
+    i.ProviderTenantId == tenantId &&
+    i.ProviderSubject == subject);
+```
+
+Provider-specific logic is confined to *how the incoming credential is validated* (OIDC token vs. username/password), not how the user is resolved.
+
+**Invariants:**
+
+- Filtered unique index on `(Provider, ProviderTenantId, ProviderSubject) WHERE IsActive = 1`. NULL tenants are distinct under SQL Server's filtered-unique-index semantics, so local users (which have `ProviderTenantId = NULL`) coexist with Entra rows that haven't yet had their tenant populated.
+- **At most one** active `UserIdentity` per `ApplicationUser` at rest. Every authenticable user has **exactly one**; pre-provisioned-but-not-yet-linked users (e.g., admin-created Entra users who haven't signed in via SSO yet) can have zero.
+- This invariant is enforced in application code via `IUserIdentityStore.DeactivateAllActive`, not at the schema level. Any write path that adds a new active row must first deactivate any prior active rows, setting `UnlinkedAt` + an `UnlinkReason` (`ProviderRelinked` for relink, `TenantMigration` for the rebind below).
+- Multi-provider account linking (one user, multiple active identities) is deliberately **not** supported. Relaxing the invariant later is a forward-compatible change; retrofitting it after multiple-active rows hit prod would not be.
+
+**Local users in `UserIdentity`:** local (Wayd) users get a row with `Provider = "Wayd"`, `ProviderTenantId = NULL`, `ProviderSubject = ApplicationUser.Id.ToString()`. The stable `ApplicationUser.Id` is the subject — not the username, which is mutable. The local-login flow resolves by username first, verifies the password, and then asserts that an active `Wayd` identity row exists. That last check enables "disable local login for this specific user" by deactivating the identity row — no separate flag needed.
+
+`ApplicationUser.LoginProvider` is retained as a "primary provider" indicator (it mirrors the active `UserIdentity.Provider`) so code that needs a cheap provider check doesn't have to join.
+
+### Tenant migration rebind
+
+When an org moves their users from one Entra tenant to another, an admin can pre-stage the migration per user via the [User Management UI](../user-guide/settings/index.mdx#tenant-migration). The rebind completes automatically when the user next signs in from the new tenant. The `ApplicationUser.Id` never changes, so all downstream FKs (permissions, work items, audit) are preserved.
+
+During Entra token exchange, `UserService.ResolveUserByEntraIdentity` tries lookups in order: `FindActive(provider, tid, sub)` → null-tid upgrade (one-time tenant population for backfilled rows) → **pending-migration rebind** → fall through to create-new-user. The rebind path matches a user by `PendingMigrationTenantId == token.tid` AND `LoginProvider == MicrosoftEntraId` AND (`NormalizedUserName == token.upn` OR `NormalizedEmail == token.upn`). On match, inside one transaction:
+
+1. Deactivate all active identity rows for the user (`UnlinkReason = TenantMigration`).
+2. Insert a new active row with `(MicrosoftEntraId, token.tid, token.sub)`.
+3. Clear `PendingMigrationTenantId`.
+
+Re-staging an already-pending migration silently overwrites the previous target — last-write-wins on the flag. Cancellation (clearing the flag) is idempotent.
+
+If staging is skipped and the user signs in from the new tenant first, the exchange creates a brand-new `ApplicationUser` with a separate `UserId` and FKs — there is no admin "merge users" UI to recover from this; it requires manual DB work. Cross-provider migration (e.g., Entra → Auth0) is not supported.
 
 ## Environment Variables
 

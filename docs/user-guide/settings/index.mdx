@@ -26,8 +26,28 @@ User accounts control access to Wayd. Each user has:
 - **Deactivate** — Disable a user account
 - **Unlock** — Unlock an account locked due to failed login attempts
 - **Reset Password** — Admin-initiated password reset (local auth only, forces change on next login)
+- **Migrate to New Tenant** — Stage a Microsoft Entra ID tenant migration for the user (see below)
 
 Local users created by an administrator have a **Must Change Password** flag that requires them to set a new password on first login.
+
+#### Tenant migration
+
+When your organization moves users from one Microsoft Entra ID tenant to another, you can pre-stage the migration on a per-user basis. The rebind completes automatically the next time the user signs in from the new tenant — they don't need to do anything special, and their `UserId`, permissions, and links to other records (work items, audit history, etc.) are all preserved.
+
+**Workflow:**
+
+1. On the user detail page (**Settings → User Management → Users → \[user]**), open the **Actions** menu and pick **Migrate to New Tenant**. Enter the target tenant id (a GUID — the new Entra directory id) and confirm.
+2. The user's details now show a **Tenant migration pending** banner with the target tenant id, and the Actions menu offers **Cancel Pending Migration** alongside **Replace Pending Migration**.
+3. Nothing else changes until the user signs in. Sign-ins from the *old* tenant continue to work normally with the flag still pending.
+4. When the user next signs in from the new tenant, Wayd detects the staged migration and atomically swaps their identity binding. The user notices nothing.
+5. After the rebind, the **Identity History** tab on the user detail page shows the old binding (Inactive, reason: Tenant Migration) alongside the new active one — a permanent audit trail of which tenant the user used to belong to.
+
+**Things to know:**
+
+- **Stage before the user signs in from the new tenant.** If you skip staging and the user signs in from the new tenant first, Wayd creates a brand-new account with a separate user id, and there's no in-app way to merge it back with the original — it requires manual database work to recover.
+- Tenant migration is **Microsoft Entra ID only**. Local (Wayd) users have no tenant to migrate. Cross-provider migration (e.g., moving from Entra to a different identity provider) is not supported.
+- Re-staging a migration with a different target tenant silently replaces the previous one — the most recent stage wins.
+- Bulk migration (CSV/API import) and self-service migration (with email verification) are not currently supported. Migrations are staged one user at a time by an administrator.
 
 ### Roles
 

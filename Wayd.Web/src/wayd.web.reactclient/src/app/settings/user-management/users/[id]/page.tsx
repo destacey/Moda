@@ -6,30 +6,30 @@ import { authorizePage } from '@/src/components/hoc'
 import { notFound } from 'next/navigation'
 import UserDetailsLoading from './loading'
 import { use, useEffect, useState } from 'react'
-import { Card, MenuProps } from 'antd'
+import { App, Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
-import { useGetUserQuery } from '@/src/store/features/user-management/users-api'
+import {
+  useCancelTenantMigrationMutation,
+  useGetUserQuery,
+} from '@/src/store/features/user-management/users-api'
+import { useMessage } from '@/src/components/contexts/messaging'
 import {
   EditUserForm,
   ManageUserRolesForm,
   ResetPasswordForm,
+  StageTenantMigrationForm,
   useUserAccountActions,
   UserDetails,
+  UserIdentityHistory,
 } from '../_components'
 import { ItemType } from 'antd/es/menu/interface'
 import { useDocumentTitle } from '@/src/hooks'
 
 enum UserDetailsTabs {
   Details = 'details',
+  IdentityHistory = 'identity-history',
 }
-
-const tabs = [
-  {
-    key: UserDetailsTabs.Details,
-    tab: 'Details',
-  },
-]
 
 const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { id } = use(props.params)
@@ -38,6 +38,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const [openEditUserForm, setOpenEditUserForm] = useState(false)
   const [openManageUserRolesForm, setOpenManageUserRolesForm] = useState(false)
   const [openResetPasswordForm, setOpenResetPasswordForm] = useState(false)
+  const [openStageMigrationForm, setOpenStageMigrationForm] = useState(false)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
@@ -45,8 +46,25 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
 
   const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: userData, isLoading, error } = useGetUserQuery(id)
+  const [cancelTenantMigration] = useCancelTenantMigrationMutation()
+  const { modal } = App.useApp()
+  const messageApi = useMessage()
 
   const isLocalUser = userData?.loginProvider === 'Wayd'
+  const isEntraUser = userData?.loginProvider === 'MicrosoftEntraId'
+  const hasPendingMigration = !!userData?.pendingMigrationTenantId
+
+  const tabs = [
+    { key: UserDetailsTabs.Details, tab: 'Details' },
+    ...(isEntraUser
+      ? [
+          {
+            key: UserDetailsTabs.IdentityHistory,
+            tab: 'Identity History',
+          },
+        ]
+      : []),
+  ]
 
   const fullName = userData
     ? `${userData?.firstName} ${userData?.lastName}`
@@ -84,6 +102,44 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         onClick: () => setOpenResetPasswordForm(true),
       })
     }
+    if (canUpdateUser && isEntraUser) {
+      secondaryItems.push({
+        key: 'stage-migration',
+        label: hasPendingMigration
+          ? 'Replace Pending Migration'
+          : 'Migrate to New Tenant',
+        onClick: () => setOpenStageMigrationForm(true),
+      })
+      if (hasPendingMigration) {
+        secondaryItems.push({
+          key: 'cancel-migration',
+          label: 'Cancel Pending Migration',
+          onClick: () => {
+            modal.confirm({
+              title: 'Cancel Pending Migration',
+              content: `Cancel the pending tenant migration for ${fullName}?`,
+              okText: 'Cancel Migration',
+              okButtonProps: { danger: true },
+              cancelText: 'Keep Pending',
+              onOk: async () => {
+                try {
+                  const result = await cancelTenantMigration(userData.id)
+                  if ('error' in result) {
+                    throw result.error
+                  }
+                  messageApi.success('Pending migration canceled.')
+                } catch (err: any) {
+                  messageApi.error(
+                    err?.data?.detail ??
+                      'Failed to cancel the pending migration.',
+                  )
+                }
+              },
+            })
+          },
+        })
+      }
+    }
     if (canUpdateUserRoles) {
       secondaryItems.push({
         key: 'manage-roles',
@@ -102,6 +158,8 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
     switch (activeTab) {
       case UserDetailsTabs.Details:
         return <UserDetails user={userData!} />
+      case UserDetailsTabs.IdentityHistory:
+        return <UserIdentityHistory userId={userData!.id} />
       default:
         return null
     }
@@ -166,6 +224,15 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           userName={fullName}
           onFormComplete={() => setOpenResetPasswordForm(false)}
           onFormCancel={() => setOpenResetPasswordForm(false)}
+        />
+      )}
+      {openStageMigrationForm && (
+        <StageTenantMigrationForm
+          userId={userData.id}
+          userName={fullName}
+          currentPendingTenantId={userData.pendingMigrationTenantId}
+          onFormComplete={() => setOpenStageMigrationForm(false)}
+          onFormCancel={() => setOpenStageMigrationForm(false)}
         />
       )}
     </>

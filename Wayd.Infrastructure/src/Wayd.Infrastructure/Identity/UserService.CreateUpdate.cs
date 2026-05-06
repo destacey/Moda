@@ -22,6 +22,9 @@ internal partial class UserService
     /// If no active identity matches and exactly one identity matches (MicrosoftEntraId, NULL, oid),
     /// that row's ProviderTenantId is populated from the token — the one-time upgrade
     /// path for users backfilled before tenant was persisted.
+    /// If still no match and a user has a staged tenant migration whose target matches
+    /// the token's tenant, that user's active identity is rebound to (tid, oid) inside
+    /// a transaction (see <see cref="TryApplyPendingTenantMigration"/>).
     /// If still no match, the user is created and a new UserIdentity row is inserted.
     /// </summary>
     public async Task<(string Id, string? EmployeeId)> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal)
@@ -40,9 +43,14 @@ internal partial class UserService
             throw new InternalServerException("Invalid tenantId");
         }
 
+        // UPN is the signed-in-token identifier we trust for matching a staged
+        // migration. Falls back to the email claim if absent (some tokens don't
+        // emit UPN). Null means no migration rebind will be attempted.
+        string? upn = principal.FindFirstValue(ClaimTypes.Upn) ?? principal.FindFirstValue(ClaimTypes.Email);
+
         var isFirstUser = !await _userManager.Users.AnyAsync();
 
-        var user = await ResolveUserByEntraIdentityAsync(tenantId, objectId)
+        var user = await ResolveUserByEntraIdentityAsync(tenantId, objectId, upn)
             ?? await CreateOrUpdateFromPrincipalAsync(principal, isFirstUser);
 
         if (isFirstUser)
@@ -63,7 +71,7 @@ internal partial class UserService
         return (user.Id, user.EmployeeId?.ToString());
     }
 
-    private async Task<ApplicationUser?> ResolveUserByEntraIdentityAsync(string tenantId, string objectId)
+    private async Task<ApplicationUser?> ResolveUserByEntraIdentityAsync(string tenantId, string objectId, string? upn)
     {
         var identity = await _userIdentityStore.FindActive(LoginProviders.MicrosoftEntraId, tenantId, objectId);
         if (identity is not null)
@@ -77,11 +85,6 @@ internal partial class UserService
         // oid collision across tenants), bail out — do not auto-link.
         var pending = await _userIdentityStore.FindActiveByNullTenant(LoginProviders.MicrosoftEntraId, objectId);
 
-        if (pending.Count == 0)
-        {
-            return null;
-        }
-
         if (pending.Count > 1)
         {
             _logger.LogError(
@@ -90,26 +93,114 @@ internal partial class UserService
             throw new InternalServerException("Identity resolution ambiguous. Contact an administrator.");
         }
 
-        var row = pending[0];
-
-        // Conditional UPDATE guards against a concurrent login racing us. If another
-        // login populated the tenant first, TryPopulateTenant returns false and we
-        // re-resolve — the other login may have set a tenant that matches ours (fine,
-        // both users converge on the same row) or a different one (our token has no
-        // matching active row, so we fall into the create path).
-        var won = await _userIdentityStore.TryPopulateTenant(row.Id, tenantId);
-        if (!won)
+        if (pending.Count == 1)
         {
-            _logger.LogInformation(
-                "Tenant upgrade for Entra subject {ObjectId} lost the race to a concurrent login; re-resolving.",
-                objectId);
-            return await _userIdentityStore.FindActive(LoginProviders.MicrosoftEntraId, tenantId, objectId)
-                is { } winnerIdentity
-                ? winnerIdentity.User
-                : null;
+            var row = pending[0];
+
+            // Conditional UPDATE guards against a concurrent login racing us. If another
+            // login populated the tenant first, TryPopulateTenant returns false and we
+            // re-resolve — the other login may have set a tenant that matches ours (fine,
+            // both users converge on the same row) or a different one (our token has no
+            // matching active row, so we fall into the create path).
+            var won = await _userIdentityStore.TryPopulateTenant(row.Id, tenantId);
+            if (!won)
+            {
+                _logger.LogInformation(
+                    "Tenant upgrade for Entra subject {ObjectId} lost the race to a concurrent login; re-resolving.",
+                    objectId);
+                return await _userIdentityStore.FindActive(LoginProviders.MicrosoftEntraId, tenantId, objectId)
+                    is { } winnerIdentity
+                    ? winnerIdentity.User
+                    : null;
+            }
+
+            return row.User;
         }
 
-        return row.User;
+        // No active identity for (tid, oid) and no NULL-tenant backfill row to upgrade.
+        // Last resort before falling through to create: an admin may have staged a
+        // tenant migration for this user, in which case we rebind their existing
+        // identity to (tid, oid) instead of creating a duplicate user.
+        return await TryApplyPendingTenantMigration(tenantId, objectId, upn);
+    }
+
+    /// <summary>
+    /// If a user has <c>PendingMigrationTenantId == tenantId</c> and a UPN matching the
+    /// signed-in token, atomically:
+    ///   1. Deactivate their active <see cref="UserIdentity"/> row (UnlinkReason = TenantMigration).
+    ///   2. Insert a new active row with (provider, tenantId, objectId).
+    ///   3. Clear PendingMigrationTenantId.
+    /// Returns the user on success; null if no migration was staged or no match found.
+    /// The user's <c>Id</c> is preserved, so all downstream FKs remain valid.
+    /// </summary>
+    /// <remarks>
+    /// Internal (rather than private) so unit tests can exercise the rebind decision
+    /// directly, without driving the surrounding <see cref="GetOrCreateFromPrincipalAsync"/>
+    /// which depends on the Graph client.
+    /// </remarks>
+    internal async Task<ApplicationUser?> TryApplyPendingTenantMigration(string tenantId, string objectId, string? upn)
+    {
+        if (string.IsNullOrWhiteSpace(upn))
+        {
+            return null;
+        }
+
+        // Match on UPN (case-insensitive) to scope the lookup. A bare email match
+        // would risk rebinding the wrong user if two ApplicationUser rows share an
+        // email — match by both UserName (UPN-shaped) and NormalizedEmail to cover
+        // tokens whose UPN is the email and accounts whose Email isn't UPN-shaped.
+        var normalized = upn.ToUpperInvariant();
+        var candidate = await _userManager.Users
+            .FirstOrDefaultAsync(u =>
+                u.PendingMigrationTenantId == tenantId &&
+                u.LoginProvider == LoginProviders.MicrosoftEntraId &&
+                (u.NormalizedUserName == normalized || u.NormalizedEmail == normalized));
+
+        if (candidate is null)
+        {
+            return null;
+        }
+
+        // Run the deactivate + insert + flag-clear together. Failure of any step
+        // rolls back the others — without the transaction we could deactivate the
+        // old identity then fail to insert the new one (locking the user out), or
+        // commit identity changes but leave PendingMigrationTenantId set (which would
+        // cause the rebind path to re-trigger on the next login and produce a
+        // duplicate-active-row error).
+        await _userIdentityStore.ExecuteInTransaction(async ct =>
+        {
+            await _userIdentityStore.DeactivateAllActive(candidate.Id, _dateTimeProvider.Now, UserIdentityUnlinkReasons.TenantMigration, ct);
+
+            await _userIdentityStore.Add(new UserIdentity
+            {
+                Id = Guid.NewGuid(),
+                UserId = candidate.Id,
+                Provider = LoginProviders.MicrosoftEntraId,
+                ProviderTenantId = tenantId,
+                ProviderSubject = objectId,
+                IsActive = true,
+                LinkedAt = _dateTimeProvider.Now,
+            }, ct);
+
+            candidate.PendingMigrationTenantId = null;
+            var updateResult = await _userManager.UpdateAsync(candidate);
+            if (!updateResult.Succeeded)
+            {
+                // Throw so ExecuteInTransaction rolls back — the deactivate + insert
+                // above must not commit if we couldn't clear the flag.
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to clear pending migration flag for user {candidate.Id}: {errors}");
+            }
+        });
+
+        _logger.LogInformation(
+            "Tenant migration completed for user {UserId}: rebound to tenant {TenantId} (subject {ObjectId}).",
+            candidate.Id, tenantId, objectId);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(candidate.Id, _dateTimeProvider.Now));
+
+        return candidate;
     }
 
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal, bool isFirstUser)

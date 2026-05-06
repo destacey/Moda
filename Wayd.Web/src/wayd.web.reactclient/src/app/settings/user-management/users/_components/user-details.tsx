@@ -2,9 +2,11 @@
 
 import { UserDetailsDto } from '@/src/services/wayd-api'
 import { InfoCircleOutlined } from '@ant-design/icons'
-import { Card, Descriptions, Flex, List, Tag } from 'antd'
+import { Alert, Card, Descriptions, Flex, List, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+
+const { Text } = Typography
 
 const { Item } = Descriptions
 const { Item: ListItem } = List
@@ -20,6 +22,22 @@ const UserDetails = (props: UserDetailsProps) => {
 
   return (
     <Flex vertical gap="middle">
+      {user.pendingMigrationTenantId && (
+        <Alert
+          type="info"
+          showIcon
+          title="Tenant migration pending"
+          description={
+            <>
+              This user has a staged migration to tenant{' '}
+              <Text code copyable={{ text: user.pendingMigrationTenantId }}>
+                {user.pendingMigrationTenantId}
+              </Text>
+              . The rebind completes on their next sign-in from that tenant.
+            </>
+          }
+        />
+      )}
       <Descriptions column={2} size="small">
         <Item label="User Name">{user.userName}</Item>
         <Item label="Email">{user.email}</Item>

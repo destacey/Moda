@@ -1929,6 +1929,186 @@
         ]
       }
     },
+    "/api/user-management/users/{id}/stage-migration": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Stage a tenant migration for an Entra user. The rebind completes on the user's next sign-in from the target tenant.",
+        "operationId": "Users_StageTenantMigration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StageTenantMigrationRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Cancel a pending tenant migration for a user.",
+        "operationId": "Users_CancelTenantMigration",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/users/{id}/identity-history": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get a user's identity history (active and inactive linked identities).",
+        "operationId": "Users_GetIdentityHistory",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserIdentityDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/strategic-management/strategic-themes": {
       "get": {
         "tags": [
@@ -20693,6 +20873,10 @@
           "loginProvider": {
             "type": "string"
           },
+          "pendingMigrationTenantId": {
+            "type": "string",
+            "nullable": true
+          },
           "lastActivityAt": {
             "type": "string",
             "format": "date-time",
@@ -21134,6 +21318,65 @@
         "properties": {
           "newPassword": {
             "type": "string"
+          }
+        }
+      },
+      "StageTenantMigrationRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "targetTenantId"
+        ],
+        "properties": {
+          "targetTenantId": {
+            "type": "string",
+            "minLength": 1,
+            "nullable": false
+          }
+        }
+      },
+      "UserIdentityDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "provider",
+          "providerSubject",
+          "isActive",
+          "linkedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "providerTenantId": {
+            "type": "string",
+            "nullable": true
+          },
+          "providerSubject": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "linkedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "unlinkedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "unlinkReason": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
