@@ -11,6 +11,7 @@ description: Guides agents working with Wayd Planning Intervals — iterations, 
 - Getting sprint mappings, iteration metrics, or iteration backlogs
 - Listing or analyzing team objectives and their linked work items
 - Generating PI health reports or predictability summaries
+- Reviewing or logging health checks on individual PI objectives (Healthy / AtRisk / Unhealthy)
 - Reviewing PI risks
 
 ---
@@ -88,12 +89,24 @@ Planning Interval (PI)
 - Work items linked to an objective: `PlanningIntervals_GetObjectiveWorkItems`
 - Daily work item metrics for an objective: `PlanningIntervals_GetObjectiveWorkItemMetrics`
 
-### Health report
+### Health report and per-objective health checks
 
-The health report is a dedicated endpoint — do not attempt to derive it from objectives manually.
+The PI-wide health report is a dedicated endpoint — do not attempt to derive it from objectives manually.
 
-- All teams: `PlanningIntervals_GetObjectivesHealthReport` with `idOrKey`
-- Scoped to one team: add `teamId` filter
+| Goal | Tool | Notes |
+|---|---|---|
+| Bulk RAG snapshot (latest check per objective, all teams) | `PlanningIntervals_GetObjectivesHealthReport` | Takes `idOrKey`. Add `teamId` to scope to one team. |
+| Full health check history for one objective | `PlanningIntervals_GetObjectiveHealthChecks` | Takes PI `id` and `objectiveId` (both UUIDs). Newest first. |
+| One specific health check | `PlanningIntervals_GetObjectiveHealthCheck` | Takes PI `id`, `objectiveId`, and `healthCheckId`. |
+| Log a new health check on an objective | `PlanningIntervals_CreateObjectiveHealthCheck` | Takes PI `id` and `objectiveId`; body: `{ planningIntervalObjectiveId, statusId, expiration, note? }`. |
+
+Notes for logging a check:
+
+- `statusId` is a **number**: `1=Healthy, 2=AtRisk, 3=Unhealthy` (asymmetric with the project version, which takes a string `status`).
+- `expiration` is an ISO 8601 UTC datetime and **must be in the future**.
+- `note` is optional, max 1024 characters.
+- The body redundantly requires `planningIntervalObjectiveId` in addition to the path `objectiveId` — they must match.
+- Logging a new check automatically expires the previously active check; only one non-expired check can exist at a time.
 
 ### Predictability
 

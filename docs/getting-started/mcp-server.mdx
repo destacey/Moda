@@ -17,8 +17,8 @@ The MCP server exposes 50+ tools across Wayd's core modules:
 
 | Module | Capabilities |
 |--------|-------------|
-| **[PPM](../user-guide/ppm/index.mdx)** | List/view portfolios, programs, projects, phases, tasks. Create and update tasks. View project plan tree and summary metrics. Get critical path. Manage task dependencies. |
-| **[Planning](../user-guide/planning/index.mdx)** | List/view planning intervals, iterations, objectives, risks. Get PI predictability and health reports. View calendars. |
+| **[PPM](../user-guide/ppm/index.mdx)** | List/view portfolios, programs, projects, phases, tasks. Create and update tasks. View project plan tree and summary metrics. Get critical path. Manage task dependencies. Review and log project health checks. |
+| **[Planning](../user-guide/planning/index.mdx)** | List/view planning intervals, iterations, objectives, risks. Get PI predictability and health reports. Review and log objective health checks. View calendars. |
 | **[Roadmaps](../user-guide/planning/roadmaps.mdx)** | List/view roadmaps and their items (activities, milestones, timeboxes). |
 | **[Organizations](../user-guide/organizations/index.mdx)** | List/view teams and users. |
 
@@ -157,6 +157,9 @@ npx skills add destacey/wayd
 | `Projects_GetProjectPhases` | Get all project phases |
 | `Projects_GetProjectPlanTree` | Get full plan as a hierarchical tree (WBS) |
 | `Projects_GetProjectPlanSummary` | Get plan metrics (overdue, due this week, totals) |
+| `Projects_GetProjectHealthChecks` | Get the health check history for a project |
+| `Projects_GetProjectHealthCheck` | Get a specific project health check by ID |
+| `Projects_CreateProjectHealthCheck` | Log a new health check (Healthy / AtRisk / Unhealthy) on a project |
 | `ProjectLifecycles_GetProjectLifecycles` | List lifecycles with state filter |
 
 ### Tasks
@@ -186,7 +189,8 @@ npx skills add destacey/wayd
 | `PlanningIntervals_GetRisks` | Get risks |
 | `PlanningIntervals_GetObjectivesHealthReport` | Get health report for all objectives in a PI |
 | `PlanningIntervals_GetObjectiveHealthChecks` | Get the health check history for a PI objective |
-| `PlanningIntervals_GetHealthStatuses` | List the available health check status values |
+| `PlanningIntervals_GetObjectiveHealthCheck` | Get a specific PI objective health check by ID |
+| `PlanningIntervals_CreateObjectiveHealthCheck` | Log a new health check (1=Healthy, 2=AtRisk, 3=Unhealthy) on a PI objective |
 | `Roadmaps_GetRoadmaps` | List all roadmaps |
 | `Roadmaps_GetRoadmap` | Get roadmap details |
 | `Roadmaps_GetItems` | Get all roadmap items |
