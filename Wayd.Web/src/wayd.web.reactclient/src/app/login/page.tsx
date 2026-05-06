@@ -489,12 +489,20 @@ export default function LoginPage() {
   const isMsalAuthenticated = useIsAuthenticated()
   const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()
-  const { data: providers } = useGetAuthProvidersQuery()
+  const {
+    data: providers,
+    isError: providersQueryFailed,
+  } = useGetAuthProvidersQuery()
 
   // Entra is considered enabled only when the capabilities query has resolved
   // with entra=true. Defaulting to false while loading keeps a broken button
   // from flashing on local-only deployments.
-  const entraEnabled = providers?.entra === true
+  const hasMicrosoftConfig =
+    !!process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID &&
+    !!process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY
+  const entraEnabled =
+    providers?.entra === true ||
+    (providersQueryFailed && hasMicrosoftConfig)
   const localEnabled = providers?.local !== false
 
   // User's explicit tab selection. Null means "use the default for the current
