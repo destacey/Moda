@@ -162,14 +162,14 @@ Once installed, activate a skill in Claude Code with `/wayd-ppm`, `/wayd-pi`, `/
 | **Portfolios** | List, get details, get programs, get projects |
 | **Programs** | List, get details, get projects |
 | **Project Lifecycles** | List (with state filter), get details |
-| **Projects** | List (with role filter), get details, get team, get phases, get phase details, get plan tree, get plan summary |
+| **Projects** | List (with role filter), get details, get team, get phases, get phase details, get plan tree, get plan summary, list health checks, get health check, create health check |
 | **Tasks** | List, get details, get critical path, get types/statuses/priorities, create, update, delete, add/remove dependencies |
 
 ### Planning
 
 | Category | Operations |
 | --- | --- |
-| **Planning Intervals** | List, get details, calendar, predictability, teams, iterations, objectives, risks |
+| **Planning Intervals** | List, get details, calendar, predictability, teams, iterations, objectives, risks, objective health check history, get/create objective health check |
 | **Roadmaps** | List, get details, get items and activities |
 
 ### Organization

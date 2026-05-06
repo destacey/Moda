@@ -13,8 +13,9 @@ description: Guides agents working with Wayd Portfolio, Program, Project, and Ta
 - Viewing a project's plan tree, phases, team, or plan summary metrics
 - Listing, creating, updating, or deleting tasks within a project
 - Managing task hierarchies, dependencies, or the critical path
+- Reviewing or logging project health checks (Healthy / AtRisk / Unhealthy)
 
-> **Note:** Portfolios, programs, projects, lifecycles, and phases are **read-only** via MCP — only GET and LIST operations are exposed. Task management (create, update, delete) is fully supported.
+> **Note:** Portfolios, programs, lifecycles, and phases are **read-only** via MCP — only GET and LIST operations are exposed. Tasks support full CRUD (create, update, delete). Project **health checks** are read+create (no update or delete from MCP); the rest of the project surface remains read-only.
 
 ---
 
@@ -156,3 +157,22 @@ Required fields: `name`, `typeId`, `statusId`, `priorityId`
 
 - **Add** (finish-to-start): `Tasks_AddTaskDependency` with `{ predecessorId, successorId }` — both UUIDs. Also pass the predecessor task's `id` as the path parameter.
 - **Remove**: `Tasks_RemoveTaskDependency` with path params `id` (predecessor UUID) and `successorId`.
+
+### Project health checks
+
+A health check records a point-in-time RAG assessment of a project (Healthy / AtRisk / Unhealthy) with a reporter, a note, and an expiration. Only one non-expired check is active at a time — logging a new check automatically expires the previous one.
+
+| Goal | Tool | Notes |
+|---|---|---|
+| Full health check history for a project | `Projects_GetProjectHealthChecks` | Takes project `id` (UUID). Newest first. |
+| One specific health check | `Projects_GetProjectHealthCheck` | Takes project `id` and `healthCheckId` (both UUIDs). |
+| Log a new health check | `Projects_CreateProjectHealthCheck` | Takes project `id`; body: `{ status, expiration, note? }`. |
+
+Notes for logging a check:
+
+- `status` is a **string enum**: `"Healthy"`, `"AtRisk"`, or `"Unhealthy"` (asymmetric with the PI objective version, which takes a numeric `statusId`).
+- `expiration` is an ISO 8601 UTC datetime and **must be in the future**.
+- `note` is optional, max 1024 characters.
+- Authorization (server-enforced): the caller must be an Owner or Manager of the project, the parent portfolio, or the parent program. Sponsors are intentionally excluded.
+
+The current active check (if any) is also embedded in `Projects_GetProject` and `Projects_GetProjects` — prefer those when you only need the latest status, and use the dedicated tools when you need history or want to log a new check.
