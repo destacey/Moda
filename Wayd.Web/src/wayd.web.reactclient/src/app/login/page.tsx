@@ -491,18 +491,13 @@ export default function LoginPage() {
   const router = useRouter()
   const {
     data: providers,
-    isError: providersQueryFailed,
   } = useGetAuthProvidersQuery()
 
-  // Entra is considered enabled only when the capabilities query has resolved
-  // with entra=true. Defaulting to false while loading keeps a broken button
-  // from flashing on local-only deployments.
-  const hasMicrosoftConfig =
-    !!process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID &&
-    !!process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY
-  const entraEnabled =
-    providers?.entra === true ||
-    (providersQueryFailed && hasMicrosoftConfig)
+  // Entra is enabled only when the providers capability endpoint says so.
+  // We intentionally do not fall back to frontend env vars when provider
+  // discovery fails, because env vars may be present even when Entra is
+  // disabled server-side.
+  const entraEnabled = providers?.entra === true
   const localEnabled = providers?.local !== false
 
   // User's explicit tab selection. Null means "use the default for the current

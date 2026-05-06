@@ -105,4 +105,33 @@ describe('LoginPage provider gating', () => {
     expect(screen.queryByText('Sign in with Microsoft')).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
   })
+
+  it('keeps Microsoft login hidden when capabilities query fails (local-only fallback safety)', async () => {
+    const originalClientId = process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID
+    const originalAuthority = process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY
+
+    try {
+      process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID = 'test-client-id'
+      process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY = 'https://login.microsoftonline.com/test'
+
+      mockUseGetAuthProvidersQuery.mockReturnValue({
+        data: undefined,
+        isLoading: false,
+        isError: true,
+      })
+
+      render(<LoginPage />)
+
+      await waitFor(() => {
+        expect(screen.queryByText('Sign in with Microsoft')).not.toBeInTheDocument()
+        expect(screen.queryByRole('button', { name: 'Microsoft' })).not.toBeInTheDocument()
+      })
+
+      expect(screen.getByPlaceholderText('Email')).toBeInTheDocument()
+      expect(screen.getByPlaceholderText('Password')).toBeInTheDocument()
+    } finally {
+      process.env.NEXT_PUBLIC_AZURE_AD_CLIENT_ID = originalClientId
+      process.env.NEXT_PUBLIC_MICROSOFT_LOGON_AUTHORITY = originalAuthority
+    }
+  })
 })
