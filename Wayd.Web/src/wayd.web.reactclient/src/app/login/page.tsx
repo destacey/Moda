@@ -489,11 +489,14 @@ export default function LoginPage() {
   const isMsalAuthenticated = useIsAuthenticated()
   const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()
-  const { data: providers } = useGetAuthProvidersQuery()
+  const {
+    data: providers,
+  } = useGetAuthProvidersQuery()
 
-  // Entra is considered enabled only when the capabilities query has resolved
-  // with entra=true. Defaulting to false while loading keeps a broken button
-  // from flashing on local-only deployments.
+  // Entra is enabled only when the providers capability endpoint says so.
+  // We intentionally do not fall back to frontend env vars when provider
+  // discovery fails, because env vars may be present even when Entra is
+  // disabled server-side.
   const entraEnabled = providers?.entra === true
   const localEnabled = providers?.local !== false
 

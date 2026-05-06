@@ -1,5 +1,4 @@
-﻿using Mapster;
-using Wayd.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 using Wayd.Common.Application.Employees.Dtos;
 using Wayd.ProjectPortfolioManagement.Domain.Enums;
 using Wayd.ProjectPortfolioManagement.Domain.Models;
@@ -128,6 +127,7 @@ public sealed record ProjectDetailsDto
     public static TypeAdapterConfig CreateTypeAdapterConfig(Instant now, Guid? employeeId)
     {
         var cfg = new TypeAdapterConfig();
+        ProjectPhaseListDto.RegisterMapping(cfg);
 
         cfg.NewConfig<Project, ProjectDetailsDto>()
             .Map(dest => dest.Key, src => src.Key.Value)
