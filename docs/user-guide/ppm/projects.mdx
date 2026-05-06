@@ -1,6 +1,6 @@
 ---
 title: Projects
-description: Project lifecycle, phases, tasks, dependencies, lifecycles, and the project plan in Wayd.
+description: Project lifecycle, phases, tasks, dependencies, lifecycles, project health checks, and the project plan in Wayd.
 sidebar_position: 2
 audience: [user, agent]
 ---
@@ -17,6 +17,7 @@ Every project has:
 - **[Expenditure Category](../settings/index.mdx#expenditure-categories)** — Budget classification
 - **[Lifecycle](#project-lifecycles)** — Defines the phases the project goes through
 - **Roles** — Sponsor, Owner, Manager, Member
+- **Health Check** — Optional point-in-time project health signal (Healthy, At Risk, Unhealthy) with expiration
 - **[Strategic Theme Tags](../strategic-management/index.mdx#strategic-themes)** — Links to strategic themes
 
 ## Project Status Lifecycle
@@ -51,6 +52,8 @@ The project detail page adapts based on the project's status:
 - **Pre-Execution** (Proposed/Approved): Shows **Project Definition** first (Description, Business Case, Expected Benefits as expandable Markdown sections), then [Phases](#project-phases)/[Tasks](#project-tasks)
 - **Execution** (Active+): Shows **[Phases](#project-phases)** first, then Project Definition
 
+The page header also shows a **Health flag** when the project has an active health check. Hovering the flag shows details (status, reported by, reported on, expiration, and note).
+
 The **Phase Timeline** is a step-based visualization showing each phase's status (completed, in progress, not started, cancelled), date range, and progress percentage. It automatically adjusts between horizontal and vertical layout based on available space.
 
 Warning alerts appear when requirements are missing:
@@ -69,6 +72,40 @@ Warning alerts appear when requirements are missing:
 - **Keyboard shortcuts** for efficient navigation
 
 **Work Items Tab** — Grid of [work items](../work-management/work-items.mdx#work-items) from Work Management that are associated with this project.
+
+## Project Health Checks
+
+Project health checks let teams record a current health signal for a project and track it over time.
+
+### Create a Health Check
+
+1. Open a project detail page.
+2. In **Page Actions**, click **Create Health Check**.
+3. Select a status: **Healthy**, **At Risk**, or **Unhealthy**.
+4. Optionally add a Markdown note.
+5. Set an expiration (must be a future date/time), then click **Create**.
+
+After creation, the current health appears as a flag/tag in project views.
+
+### View the Health Report
+
+From the project detail page, open **Page Actions > Health Report**.
+
+The Health Report opens as a tab and includes:
+- **Health Status History Chart** — Timeline distribution of health checks by status
+- **Health Checks Grid** — Status, Note, Reported By, Reported On, Expiration
+
+Use this view to review trends and reporting history for the project.
+
+### Where Health Appears
+
+- **Projects list/grid** includes a **Health** column.
+- **Project detail header** shows the current health flag/tag.
+- **My Projects dashboard** cards show health beside project status.
+
+### Permissions
+
+To create, edit, or delete project health checks, users need project update rights and management access on the project context (for example, project owner/manager or equivalent portfolio/program management access). Users with project view access can still view health checks and health reports.
 
 ## Project Lifecycles
 
@@ -176,6 +213,14 @@ Tasks support **Finish-to-Start** dependencies — a predecessor task must compl
 5. Drag and drop to reorder tasks within phases
 6. Set [dependencies](#task-dependencies) between tasks
 7. Track progress and update statuses
+
+### Reporting Project Health
+
+1. Open the project detail page.
+2. Use **Page Actions > Create Health Check** to record current health.
+3. Add a concise note explaining risk, impact, and next step.
+4. Set an expiration aligned to your next review cadence (for example, 1-2 weeks).
+5. Review **Page Actions > Health Report** during project reviews to track trend changes.
 
 ### Setting Up a Project Lifecycle
 
