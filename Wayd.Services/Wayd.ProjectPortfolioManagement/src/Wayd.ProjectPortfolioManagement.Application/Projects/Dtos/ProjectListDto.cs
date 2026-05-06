@@ -90,6 +90,8 @@ public sealed record ProjectListDto
     {
         var config = new TypeAdapterConfig();
 
+        ProjectPhaseListDto.RegisterMapping(config);
+
         config.NewConfig<Project, ProjectListDto>()
             .Map(dest => dest.Key, src => src.Key.Value)
             .Map(dest => dest.Status, src => LifecycleNavigationDto.FromEnum(src.Status))

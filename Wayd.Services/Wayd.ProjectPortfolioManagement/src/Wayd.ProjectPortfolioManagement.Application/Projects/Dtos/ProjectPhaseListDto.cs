@@ -13,12 +13,17 @@ public sealed record ProjectPhaseListDto : IMapFrom<ProjectPhase>
     public LocalDate? End { get; set; }
     public decimal Progress { get; set; }
 
-    public void ConfigureMapping(TypeAdapterConfig config)
+    public static void RegisterMapping(TypeAdapterConfig config)
     {
         config.NewConfig<ProjectPhase, ProjectPhaseListDto>()
             .Map(dest => dest.Status, src => SimpleNavigationDto.FromEnum(src.Status))
             .Map(dest => dest.Start, src => src.DateRange != null ? src.DateRange.Start : (LocalDate?)null)
             .Map(dest => dest.End, src => src.DateRange != null ? src.DateRange.End : (LocalDate?)null)
             .Map(dest => dest.Progress, src => src.Progress.Value);
+    }
+
+    public void ConfigureMapping(TypeAdapterConfig config)
+    {
+        RegisterMapping(config);
     }
 }
