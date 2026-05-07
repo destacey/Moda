@@ -69,7 +69,9 @@ function useDebouncedCallback<T extends unknown[]>(
   ms: number,
 ) {
   const ref = useRef(fn)
-  ref.current = fn
+  useEffect(() => {
+    ref.current = fn
+  })
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   return useCallback((...args: T) => {
@@ -130,7 +132,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     : darkTheme
   const currentTheme = useMemo(
     () => mergeThemeConfig(baseTheme, userThemeConfig, currentThemeName),
-    [baseTheme, userThemeConfig],
+    [baseTheme, userThemeConfig, currentThemeName],
   )
 
   useLayoutEffect(() => {
