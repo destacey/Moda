@@ -63,10 +63,11 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
           <Flex wrap gap="small">
             {PRESET_COLORS.map(({ label, value }) => (
               <Tooltip key={value} title={label}>
-                <div
+                <button
+                  aria-label={`${label}${colorPrimary === value ? ' (selected)' : ''}`}
+                  aria-pressed={colorPrimary === value}
                   onClick={() =>
                     setUserThemeConfig({
-                      ...userThemeConfig,
                       colorPrimary: value,
                       useCompactAlgorithm: userThemeConfig?.useCompactAlgorithm ?? false,
                     })
@@ -81,12 +82,14 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     boxShadow: colorPrimary === value ? `0 0 0 2px #fff, 0 0 0 4px ${value}` : undefined,
+                    border: 'none',
+                    padding: 0,
                   }}
                 >
                   {colorPrimary === value && (
                     <CheckOutlined style={{ color: '#fff', fontSize: 12 }} />
                   )}
-                </div>
+                </button>
               </Tooltip>
             ))}
           </Flex>
@@ -102,7 +105,7 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
               { label: 'Compact', value: 'compact' },
             ]}
             onChange={(v) =>
-              setUserThemeConfig({ ...userThemeConfig, colorPrimary: userThemeConfig?.colorPrimary, useCompactAlgorithm: v === 'compact' })
+              setUserThemeConfig({ colorPrimary: userThemeConfig?.colorPrimary, useCompactAlgorithm: v === 'compact' })
             }
           />
         </Flex>

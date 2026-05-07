@@ -1,7 +1,7 @@
 import { ThemeConfig, theme } from 'antd'
 const { darkAlgorithm } = theme
 
-const greyTheme: ThemeConfig = {
+const slateTheme: ThemeConfig = {
   algorithm: darkAlgorithm,
   token: {
     colorPrimary: '#2196f3',
@@ -27,4 +27,4 @@ const greyTheme: ThemeConfig = {
   },
 }
 
-export default greyTheme
+export default slateTheme
