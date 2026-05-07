@@ -82,6 +82,45 @@ The client app is installable as a PWA, providing a native app-like experience w
 
 **Caching strategy:** `defaultCache` from Serwist provides network-first for navigations and API calls, and cache-first for static assets (JS, CSS, images, fonts).
 
+## Theming
+
+Wayd supports three built-in themes — **Light**, **Slate**, and **Dark** — and per-user customization of primary color and density. All theming is built on Ant Design's `ThemeConfig` and `ConfigProvider`.
+
+### Theme files
+
+| File | Purpose |
+|------|---------|
+| `src/config/theme/light-theme.tsx` | Light theme config |
+| `src/config/theme/dark-theme.tsx` | Dark theme config |
+| `src/config/theme/slate-theme.tsx` | Slate (mid-dark) theme config |
+| `src/config/theme/theme-constants.ts` | Brand color (`COLOR_PRIMARY`) — single source of truth |
+| `src/components/contexts/theme/theme-context.tsx` | `ThemeProvider`, `mergeThemeConfig`, ag-Grid theme wiring |
+| `src/components/contexts/theme/types.d.ts` | `ThemeName`, `ThemeContextType` |
+| `src/app/_components/theme-manager-drawer.tsx` | User-facing theme manager UI |
+
+### Adding a new theme
+
+1. Create `src/config/theme/my-theme.tsx` exporting a `ThemeConfig`
+2. Add `'my-theme'` to the `ThemeName` union in `types.d.ts`
+3. Wire it into `theme-context.tsx` — base theme selection, ag-Grid theme, `isLightMode`, and `data-theme` attribute
+4. Add scrollbar CSS rules in `styles/globals.css` for `[data-theme='my-theme']`
+5. Add a `DefaultTimeLineColors` entry in `wayd-timeline.utils.ts`
+6. Add the option to the `Segmented` in `theme-manager-drawer.tsx`
+
+### User theme overrides
+
+Per-user overrides (`colorPrimary`, `useCompactAlgorithm`) are stored as JSON in the `Preferences` column on `Identity.Users` via `UserThemeConfig`. They're loaded from `GET /api/user-management/profiles/theme` on mount and saved debounced (500ms) via `PUT` on change.
+
+`mergeThemeConfig` in `theme-context.tsx` layers these overrides on top of the base theme. The primary color also sets `Layout.headerBg` in light and slate modes (where the header is brand-colored).
+
+### Theme context
+
+Consume the theme context via `useTheme()`:
+
+```typescript
+const { currentThemeName, setCurrentThemeName, token, userThemeConfig, setUserThemeConfig } = useTheme()
+```
+
 ## Key Libraries
 
 | Library | Purpose |
