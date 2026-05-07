@@ -881,6 +881,80 @@
         ]
       }
     },
+    "/api/user-management/profiles/theme": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Get theme configuration of currently logged in user.",
+        "operationId": "Profile_GetThemeConfig",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserThemeConfigDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Update theme configuration of currently logged in user.",
+        "operationId": "Profile_UpdateThemeConfig",
+        "requestBody": {
+          "x-name": "themeConfig",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserThemeConfigDto"
+              }
+            }
+          },
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/user-management/profiles/logs": {
       "get": {
         "tags": [
@@ -21043,6 +21117,30 @@
             "additionalProperties": {
               "type": "boolean"
             }
+          },
+          "themeConfig": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/UserThemeConfigDto"
+              }
+            ]
+          }
+        }
+      },
+      "UserThemeConfigDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "useCompactAlgorithm"
+        ],
+        "properties": {
+          "colorPrimary": {
+            "type": "string",
+            "nullable": true
+          },
+          "useCompactAlgorithm": {
+            "type": "boolean"
           }
         }
       },

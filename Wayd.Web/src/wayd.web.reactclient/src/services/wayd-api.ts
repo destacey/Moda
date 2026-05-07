@@ -1636,6 +1636,123 @@ export class ProfileClient {
     }
 
     /**
+     * Get theme configuration of currently logged in user.
+     */
+    getThemeConfig( cancelToken?: CancelToken): Promise<UserThemeConfigDto> {
+        let url_ = this.baseUrl + "/api/user-management/profiles/theme";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: AxiosRequestConfig = {
+            method: "GET",
+            url: url_,
+            headers: {
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processGetThemeConfig(_response);
+        });
+    }
+
+    protected processGetThemeConfig(response: AxiosResponse): Promise<UserThemeConfigDto> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<UserThemeConfigDto>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<UserThemeConfigDto>(null as any);
+    }
+
+    /**
+     * Update theme configuration of currently logged in user.
+     * @param themeConfig (optional) 
+     */
+    updateThemeConfig(themeConfig?: UserThemeConfigDto | undefined, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/user-management/profiles/theme";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(themeConfig);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "PUT",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processUpdateThemeConfig(_response);
+        });
+    }
+
+    protected processUpdateThemeConfig(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get audit logs of currently logged in user.
      */
     getLogs( cancelToken?: CancelToken): Promise<AuditDto[]> {
@@ -24434,6 +24551,12 @@ export interface UserPermissionsResponse {
 
 export interface UserPreferencesDto {
     tours: { [key: string]: boolean; };
+    themeConfig?: UserThemeConfigDto | undefined;
+}
+
+export interface UserThemeConfigDto {
+    colorPrimary?: string | undefined;
+    useCompactAlgorithm: boolean;
 }
 
 export interface AuditDto {
