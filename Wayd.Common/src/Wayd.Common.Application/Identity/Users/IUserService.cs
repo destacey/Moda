@@ -58,6 +58,10 @@ public interface IUserService : ITransientService
 
     Task<Result> UpdatePreferences(string userId, UserPreferencesDto preferences, CancellationToken cancellationToken);
 
+    Task<UserThemeConfigDto?> GetThemeConfig(string userId, CancellationToken cancellationToken);
+
+    Task<Result> UpdateThemeConfig(string userId, UserThemeConfigDto? themeConfig, CancellationToken cancellationToken);
+
     Task<Result> StageTenantMigration(StageTenantMigrationCommand command, CancellationToken cancellationToken);
 
     Task<Result> CancelTenantMigration(string userId, CancellationToken cancellationToken);

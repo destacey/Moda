@@ -2,13 +2,15 @@
 
 import { Avatar, Dropdown, Grid, MenuProps, Space, Typography } from 'antd'
 import {
+  BgColorsOutlined,
   FileTextOutlined,
   LogoutOutlined,
   UserOutlined,
 } from '@ant-design/icons'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import useAuth from '../../components/contexts/auth'
-import useThemeToggleMenuItem from '../../hooks/theme/use-theme-toggle-menu-item'
+import ThemeManagerDrawer from './theme-manager-drawer'
 
 const { Text } = Typography
 const { useBreakpoint } = Grid
@@ -16,9 +18,9 @@ const { useBreakpoint } = Grid
 const ProfileMenu = () => {
   const { logout, user } = useAuth()
   const router = useRouter()
-  const themeToggleMenuItem = useThemeToggleMenuItem()
   const screens = useBreakpoint()
-  const isXs = !screens.sm // xs screens (< 576px)
+  const isXs = !screens.sm
+  const [themeDrawerOpen, setThemeDrawerOpen] = useState(false)
 
   const handleLogout = async () => {
     try {
@@ -35,7 +37,12 @@ const ProfileMenu = () => {
       icon: <UserOutlined />,
       onClick: () => router.push('/account/profile'),
     },
-    themeToggleMenuItem,
+    {
+      key: 'theme',
+      label: 'Theme',
+      icon: <BgColorsOutlined />,
+      onClick: () => setThemeDrawerOpen(true),
+    },
     {
       key: 'divider',
       type: 'divider',
@@ -71,6 +78,10 @@ const ProfileMenu = () => {
           <Avatar icon={<UserOutlined />} />
         </Dropdown>
       </Space>
+      <ThemeManagerDrawer
+        open={themeDrawerOpen}
+        onClose={() => setThemeDrawerOpen(false)}
+      />
     </>
   )
 }

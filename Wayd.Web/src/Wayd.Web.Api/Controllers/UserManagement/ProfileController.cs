@@ -96,6 +96,33 @@ public class ProfileController(IUserService userService, ISender sender, ICurren
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpGet("theme")]
+    [OpenApiOperation("Get theme configuration of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult<UserThemeConfigDto?>> GetThemeConfig(CancellationToken cancellationToken)
+    {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        return Ok(await _userService.GetThemeConfig(userId, cancellationToken));
+    }
+
+    [HttpPut("theme")]
+    [OpenApiOperation("Update theme configuration of currently logged in user.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateThemeConfig(UserThemeConfigDto? themeConfig, CancellationToken cancellationToken)
+    {
+        if (User.GetUserId() is not { } userId || string.IsNullOrEmpty(userId))
+            return Unauthorized();
+
+        var result = await _userService.UpdateThemeConfig(userId, themeConfig, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("logs")]
     [OpenApiOperation("Get audit logs of currently logged in user.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]

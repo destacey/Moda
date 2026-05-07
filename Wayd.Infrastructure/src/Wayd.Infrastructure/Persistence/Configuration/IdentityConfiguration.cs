@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Domain.Employees;
 
 namespace Wayd.Infrastructure.Persistence.Configuration;
@@ -38,6 +39,11 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
                      v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                      v => JsonSerializer.Deserialize<Dictionary<string, bool>>(v, JsonSerializerOptions.Default)
                            ?? new Dictionary<string, bool>()
+                 );
+            prefs.Property(p => p.ThemeConfig)
+                 .HasConversion(
+                     v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                     v => v == null ? null : JsonSerializer.Deserialize<UserThemeConfig>(v, JsonSerializerOptions.Default)
                  );
         });
 
