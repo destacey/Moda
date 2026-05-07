@@ -33,6 +33,8 @@ const mockThemeContext: ThemeContextType = {
   badgeColor: '#1890ff',
   antDesignChartsTheme: 'classic',
   antvisG6ChartsTheme: 'light',
+  userThemeConfig: null,
+  setUserThemeConfig: jest.fn(),
 }
 
 describe('useThemeToggleMenuItem', () => {
@@ -45,23 +47,35 @@ describe('useThemeToggleMenuItem', () => {
     const themeToggle = useThemeToggleMenuItem()
     expect(themeToggle).toMatchObject({
       key: 'theme',
-      label: 'Theme',
+      label: 'Theme: Light',
       icon: expect.any(Object),
       onClick: expect.any(Function),
     })
   })
 
-  it('toggles from light to dark theme when clicked', () => {
+  it('cycles from light to dark theme when clicked', () => {
     const themeToggle = useThemeToggleMenuItem()
     themeToggle.onClick()
 
     expect(mockThemeContext.setCurrentThemeName).toHaveBeenCalledWith('dark')
   })
 
-  it('toggles from dark to light theme when clicked', () => {
+  it('cycles from dark to slate theme when clicked', () => {
     ;(useTheme as Mock).mockReturnValue({
       ...mockThemeContext,
       currentThemeName: 'dark',
+    })
+
+    const themeToggle = useThemeToggleMenuItem()
+    themeToggle.onClick()
+
+    expect(mockThemeContext.setCurrentThemeName).toHaveBeenCalledWith('slate')
+  })
+
+  it('cycles from slate to light theme when clicked', () => {
+    ;(useTheme as Mock).mockReturnValue({
+      ...mockThemeContext,
+      currentThemeName: 'slate',
     })
 
     const themeToggle = useThemeToggleMenuItem()
@@ -72,7 +86,8 @@ describe('useThemeToggleMenuItem', () => {
 
   it('uses the correct icon for the light theme', () => {
     const themeToggle = useThemeToggleMenuItem()
-    expect(themeToggle.icon.type).toBe(HighlightOutlined)
+    const icon = themeToggle.icon as React.ReactElement
+    expect(icon.type).toBe(HighlightOutlined)
   })
 
   it('uses the correct icon for the dark theme', () => {
@@ -82,6 +97,7 @@ describe('useThemeToggleMenuItem', () => {
     })
 
     const themeToggle = useThemeToggleMenuItem()
-    expect(themeToggle.icon.type).toBe(HighlightFilled)
+    const icon = themeToggle.icon as React.ReactElement
+    expect(icon.type).toBe(HighlightFilled)
   })
 })

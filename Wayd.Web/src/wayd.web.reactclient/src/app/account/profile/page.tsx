@@ -14,7 +14,6 @@ import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { useGetProfileQuery } from '@/src/store/features/user-management/profile-api'
 import { useMessage } from '@/src/components/contexts/messaging'
-
 enum AccountTabs {
   Profile = 'profile',
   Claims = 'claims',
