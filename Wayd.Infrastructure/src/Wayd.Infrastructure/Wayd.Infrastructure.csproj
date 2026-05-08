@@ -41,6 +41,7 @@
         <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
         <PackageReference Include="Microsoft.Identity.Web" />
         <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" />
+        <PackageReference Include="Microsoft.Kiota.Abstractions" />
         <PackageReference Include="NodaTime" />
         <PackageReference Include="NodaTime.Serialization.SystemTextJson" />
         <PackageReference Include="NSwag.AspNetCore" />
