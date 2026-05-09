@@ -178,6 +178,15 @@ function isNetworkError(error: unknown): boolean {
   return e.message === 'Network Error'
 }
 
+function redirectToLoginWithReturnUrl(): void {
+  if (typeof window === 'undefined') return
+  const { pathname } = window.location
+  if (pathname && pathname !== '/' && pathname !== '/login' && pathname !== '/logout') {
+    sessionStorage.setItem('wayd.returnUrl', pathname)
+  }
+  window.location.href = '/login'
+}
+
 // Single-flight guard for refresh. When multiple requests 401 concurrently
 // (typical after an idle period: every in-flight call fails at once), they all
 // share one refresh call instead of each minting a new refresh token and racing
@@ -261,22 +270,17 @@ axiosClient.interceptors.response.use(
 
           console.error('Token refresh on 401 failed:', refreshError)
           clearAuth()
-          if (typeof window !== 'undefined') {
-            const { pathname } = window.location
-            if (pathname && pathname !== '/' && pathname !== '/login' && pathname !== '/logout') {
-              sessionStorage.setItem('wayd.returnUrl', pathname)
-            }
-            window.location.href = '/login'
-          }
+          redirectToLoginWithReturnUrl()
           // Reject early so the generic "API Error" log + downstream error
           // handlers don't run for a 401 we've already handled.
           return Promise.reject(refreshError)
         }
       }
       // No tokens to refresh with: the caller was already unauthenticated.
-      // Fall through to the default reject without touching storage — we
-      // don't want to clobber the remember-me preference on every anonymous
-      // 401 a page might trigger.
+      // Redirect to /login and preserve return URL, but do not clear auth
+      // storage so we don't clobber the remember-me preference.
+      redirectToLoginWithReturnUrl()
+      return Promise.reject(error)
     }
 
     // Quiet log for transient network errors — RTK Query retries plus

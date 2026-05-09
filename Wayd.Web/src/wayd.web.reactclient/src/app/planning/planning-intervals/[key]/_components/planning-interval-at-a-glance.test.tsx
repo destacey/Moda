@@ -155,6 +155,34 @@ describe('PlanningIntervalAtAGlance', () => {
     expect(args[1]).toEqual({ skip: true })
   })
 
+  it('renders an Objectives metric for Future PIs with regular and stretch counts', () => {
+    mockObjectives.mockReturnValue({
+      data: [
+        mkObjective({ isStretch: false }),
+        mkObjective({ isStretch: false }),
+        mkObjective({ isStretch: true }),
+      ],
+    })
+
+    render(
+      <PlanningIntervalAtAGlance
+        planningInterval={mkPi({ stateId: FUTURE }) as any}
+      />,
+    )
+
+    const objectivesCard = screen.getByText('Objectives').closest('.ant-card')!
+    expect(within(objectivesCard as HTMLElement).getByText('3')).toBeInTheDocument()
+    expect(
+      within(objectivesCard as HTMLElement).getByLabelText('Regular')
+        .nextSibling?.textContent,
+    ).toBe('2')
+    expect(
+      within(objectivesCard as HTMLElement).getByLabelText('Stretch')
+        .nextSibling?.textContent,
+    ).toBe('1')
+    expect(screen.queryByText('PI Predictability')).not.toBeInTheDocument()
+  })
+
   it('runs the metrics query for Active PIs', () => {
     render(
       <PlanningIntervalAtAGlance
@@ -264,6 +292,28 @@ describe('PlanningIntervalAtAGlance', () => {
     expect(screen.getByTestId('team-predictability-radar')).toBeInTheDocument()
     expect(screen.getByTestId('objective-status-chart')).toBeInTheDocument()
     expect(screen.getByTestId('objective-health-chart')).toBeInTheDocument()
+  })
+
+  it('does not render chart row for Future PIs even when objectives exist', () => {
+    mockObjectives.mockReturnValue({
+      data: [mkObjective({ status: 'Completed' })],
+    })
+
+    render(
+      <PlanningIntervalAtAGlance
+        planningInterval={mkPi({ stateId: FUTURE }) as any}
+      />,
+    )
+
+    expect(
+      screen.queryByTestId('team-predictability-radar'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('objective-status-chart'),
+    ).not.toBeInTheDocument()
+    expect(
+      screen.queryByTestId('objective-health-chart'),
+    ).not.toBeInTheDocument()
   })
 })
 
