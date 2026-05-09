@@ -30,6 +30,8 @@ interface PlanningIntervalAtAGlanceProps {
 const PlanningIntervalAtAGlance = ({
   planningInterval,
 }: PlanningIntervalAtAGlanceProps) => {
+  const isFuturePlanningInterval = planningInterval.state.id === IterationState.Future
+
   const { data: piPredictabilityData, isLoading: isLoadingPiPredictability } =
     useGetPlanningIntervalPredictabilityQuery(planningInterval.key, {
       skip: !planningInterval.key,
@@ -43,9 +45,7 @@ const PlanningIntervalAtAGlance = ({
   const { data: piMetricsData } = useGetPlanningIntervalMetricsQuery(
     planningInterval.key,
     {
-      skip:
-        !planningInterval.key ||
-        planningInterval.state.id === IterationState.Future,
+      skip: !planningInterval.key || isFuturePlanningInterval,
     },
   )
 
@@ -55,9 +55,7 @@ const PlanningIntervalAtAGlance = ({
       teamId: undefined,
     },
     {
-      skip:
-        !planningInterval.key ||
-        planningInterval.state.id === IterationState.Future,
+      skip: !planningInterval.key,
     },
   )
 
@@ -102,7 +100,32 @@ const PlanningIntervalAtAGlance = ({
               tooltip="Number of teams participating in this planning interval. Excludes teams of teams."
             />
           </Col>
-          {hasObjectives && (
+          {isFuturePlanningInterval && (
+            <Col xs={12} sm={6} md={6} lg={6}>
+              <MetricCard
+                title="Objectives"
+                value={piObjectiveCount}
+                tooltip="Total number of objectives in this planning interval."
+                secondaryValue={
+                  <Flex gap={12} style={{ fontSize: 12 }}>
+                    <WaydTooltip title="Regular (non-stretch)">
+                      <span>
+                        <AimOutlined style={{ marginRight: 4 }} aria-label="Regular" />
+                        {objectiveCounts.regular}
+                      </span>
+                    </WaydTooltip>
+                    <WaydTooltip title="Stretch">
+                      <span>
+                        <PlusCircleOutlined style={{ marginRight: 4 }} aria-label="Stretch" />
+                        {objectiveCounts.stretch}
+                      </span>
+                    </WaydTooltip>
+                  </Flex>
+                }
+              />
+            </Col>
+          )}
+          {!isFuturePlanningInterval && hasObjectives && (
             <Col xs={12} sm={6} md={6} lg={6}>
               <MetricCard
                 title="PI Predictability"
@@ -161,7 +184,7 @@ const PlanningIntervalAtAGlance = ({
               </Col>
             )}
         </Row>
-        {hasObjectives && (
+        {!isFuturePlanningInterval && hasObjectives && (
           <Row gutter={[16, 16]} align="stretch">
             <Col xs={24} md={12} lg={8}>
               <TeamPredictabilityRadarChart
