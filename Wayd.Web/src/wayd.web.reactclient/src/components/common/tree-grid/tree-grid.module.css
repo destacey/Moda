@@ -46,6 +46,7 @@
 }
 
 .tableElement {
+  --tree-grid-header-row-height: 29px;
   width: max-content;
   min-width: 100%;
   border-collapse: separate;
@@ -142,7 +143,7 @@
   overflow: hidden;
   text-align: left;
   position: sticky;
-  top: 29px;
+  top: var(--tree-grid-header-row-height);
   z-index: 19;
 }
 
