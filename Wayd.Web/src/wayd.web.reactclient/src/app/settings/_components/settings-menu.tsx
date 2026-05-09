@@ -31,6 +31,9 @@ enum SettingsTab {
   WorkStatuses = 'work-statuses',
   WorkProcesses = 'work-processes',
 
+  // organization
+  TeamMemberRoles = 'team-member-roles',
+
   // integrations
   Connections = 'connections',
 
@@ -139,6 +142,15 @@ const buildSettingsMenuItems = (featureFlags: {
       'Feature Flags',
       SettingsTab.FeatureFlags,
       '/settings/feature-management/feature-flags',
+    ),
+  ]),
+
+  getSectionMenuItem('Organization', 'organization', [
+    getRestrictedMenuItem(
+      'Permissions.TeamMemberRoles.View',
+      'Team Member Roles',
+      SettingsTab.TeamMemberRoles,
+      '/settings/organization/team-member-roles',
     ),
   ]),
 

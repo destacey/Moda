@@ -46,6 +46,7 @@ import {
   EditTeamForm,
   TeamMembershipsGrid,
 } from '../../_components'
+import TeamMembersGrid from '../_components/team-members-grid'
 
 const CycleTimeReport = dynamic(
   () =>
@@ -67,6 +68,7 @@ enum TeamTabs {
   DependencyManagement = 'dependency-management',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
+  Members = 'members',
   OperatingModelHistory = 'operating-model-history',
   CycleTimeReport = 'cycle-time-report',
 }
@@ -100,6 +102,10 @@ const getStaticTabs = (isScrumTeam: boolean) => {
       tab: 'Risk Management',
     },
     {
+      key: TeamTabs.Members,
+      tab: 'Members',
+    },
+    {
       key: TeamTabs.TeamMemberships,
       tab: 'Team Memberships',
     },
@@ -115,6 +121,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const [activeTab, setActiveTab] = useState<TeamTabs>(TeamTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
+  const [openAddMemberForm, setOpenAddMemberForm] = useState<boolean>(false)
   const [openDeactivateTeamForm, setOpenDeactivateTeamForm] =
     useState<boolean>(false)
   const [openSetOperatingModelForm, setOpenSetOperatingModelForm] =
@@ -230,20 +237,34 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       }
     }
 
-    if (canManageTeamMemberships && team?.isActive === true) {
+    if (team?.isActive === true && (canUpdateTeam || canManageTeamMemberships)) {
+      const teamManagementChildren: ItemType[] = []
+
+      if (canUpdateTeam) {
+        teamManagementChildren.push({
+          key: 'add-member',
+          label: 'Add Member',
+          onClick: () => setOpenAddMemberForm(true),
+        })
+      }
+
+      if (canManageTeamMemberships) {
+        teamManagementChildren.push({
+          key: 'add-team-membership',
+          label: 'Add Team Membership',
+          onClick: () => setOpenCreateTeamMembershipForm(true),
+        })
+      }
+
+      items.push({ type: 'divider', key: 'divider-team-management' })
       items.push({
-        key: 'add-team-membership',
-        label: 'Add Team Membership',
-        onClick: () => setOpenCreateTeamMembershipForm(true),
+        type: 'group',
+        label: 'Team Management',
+        children: teamManagementChildren,
       })
     }
 
     if (canUpdateTeam && team?.isActive === true) {
-      items.push({
-        type: 'divider',
-        key: 'divider-operating-model',
-      })
-
       const operatingModelChildren: ItemType[] = []
 
       if (team?.operatingModel) {
@@ -262,6 +283,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         onClick: () => setOpenSetOperatingModelForm(true),
       })
 
+      items.push({ type: 'divider', key: 'divider-operating-model' })
       items.push({
         type: 'group',
         label: 'Operating Model',
@@ -269,11 +291,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       })
     }
 
-    if (items.length > 0) {
-      items.push({
-        type: 'divider',
-      })
-    }
+    items.push({ type: 'divider', key: 'divider-reports' })
 
     items.push({
       type: 'group',
@@ -327,6 +345,15 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <TeamOperatingModelsGrid
             teamId={team!.id!}
             canUpdate={canUpdateTeam}
+          />
+        )
+      case TeamTabs.Members:
+        return (
+          <TeamMembersGrid
+            teamId={team!.id!}
+            teamIsActive={team!.isActive ?? false}
+            openAddForm={openAddMemberForm}
+            onAddFormClose={() => setOpenAddMemberForm(false)}
           />
         )
       case TeamTabs.CycleTimeReport:

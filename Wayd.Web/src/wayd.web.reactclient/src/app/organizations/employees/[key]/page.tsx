@@ -16,15 +16,21 @@ import { useMessage } from '@/src/components/contexts/messaging'
 import useAuth from '@/src/components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
 import DeleteEmployeeForm from '../_components/delete-employee-form'
+import EmployeeTeamsGrid from './_components/employee-teams-grid'
 
 enum EmployeeTabs {
   Details = 'details',
+  Teams = 'teams',
 }
 
 const tabs = [
   {
     key: EmployeeTabs.Details,
     tab: 'Details',
+  },
+  {
+    key: EmployeeTabs.Teams,
+    tab: 'Teams',
   },
 ]
 
@@ -61,6 +67,8 @@ const EmployeeDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     switch (activeTab) {
       case EmployeeTabs.Details:
         return <EmployeeDetails employee={employeeData!} />
+      case EmployeeTabs.Teams:
+        return <EmployeeTeamsGrid employeeId={employeeData!.id} />
       default:
         return null
     }
