@@ -18,6 +18,7 @@ import CreateProjectTaskForm from './create-project-task-form'
 import DeleteProjectTaskForm from './delete-project-task-form'
 import EditProjectPhaseForm from './edit-project-phase-form'
 import EditProjectTaskForm from './edit-project-task-form'
+import ProjectPlanItemDrawer from './project-plan-item-drawer'
 import {
   buildProjectPhasePatchOperations,
   buildProjectTaskPatchOperations,
@@ -64,8 +65,11 @@ const ProjectPlanTable = ({
   const [openEditTaskForm, setOpenEditTaskForm] = useState(false)
   const [openDeleteTaskForm, setOpenDeleteTaskForm] = useState(false)
   const [openEditPhaseForm, setOpenEditPhaseForm] = useState(false)
+  const [openPlanItemDrawer, setOpenPlanItemDrawer] = useState(false)
   const [selectedTaskId, setSelectedTaskId] = useState<string | undefined>()
+  const [createParentTaskId, setCreateParentTaskId] = useState<string | undefined>()
   const [selectedPhaseId, setSelectedPhaseId] = useState<string | undefined>()
+  const [selectedPlanItemId, setSelectedPlanItemId] = useState<string | null>(null)
 
   // Field errors (owned here for Form.useWatch access)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
@@ -161,13 +165,20 @@ const ProjectPlanTable = ({
   ])
 
   const taskTypeFilterOptions = useMemo(
-    () =>
-      taskTypeOptions
+    () => {
+      const options = taskTypeOptions
         .map((o: any) => {
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter((x): x is FilterOption => x !== null),
+        .filter((x): x is FilterOption => x !== null)
+
+      if (!options.some((o) => o.value === 'Phase')) {
+        options.unshift({ label: 'Phase', value: 'Phase' })
+      }
+
+      return options
+    },
     [taskTypeOptions],
   )
 
@@ -487,6 +498,11 @@ const ProjectPlanTable = ({
     setOpenDeleteTaskForm(true)
   }, [])
 
+  const handleOpenPlanItemDrawer = useCallback((taskId: string) => {
+    setSelectedPlanItemId(taskId)
+    setOpenPlanItemDrawer(true)
+  }, [])
+
   const onEditTaskFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenEditTaskForm(false)
@@ -508,6 +524,7 @@ const ProjectPlanTable = ({
   const onCreateTaskFormClosed = useCallback(
     (wasSaved: boolean) => {
       setOpenCreateTaskForm(false)
+      setCreateParentTaskId(undefined)
       if (wasSaved) refetch()
     },
     [refetch],
@@ -718,6 +735,22 @@ const ProjectPlanTable = ({
     [isSelectedRowMilestone, tasks],
   )
 
+  const selectedPlanItemPhaseName = useMemo(() => {
+    if (!selectedPlanItemId) return undefined
+
+    const selectedNode = findNodeById(
+      tasks,
+      selectedPlanItemId,
+    ) as ProjectPlanNodeDto | null
+    if (!selectedNode) return undefined
+
+    const phaseId = selectedNode.projectPhaseId
+    if (!phaseId) return undefined
+
+    const phaseNode = findNodeById(tasks, phaseId) as ProjectPlanNodeDto | null
+    return phaseNode?.name
+  }, [selectedPlanItemId, tasks])
+
   return (
     <>
       <Form form={form} component={false}>
@@ -750,6 +783,7 @@ const ProjectPlanTable = ({
               taskPriorityFilterOptions,
               isPhaseNode,
               handleEditPhase,
+              openPlanItemDrawer: handleOpenPlanItemDrawer,
             })
           }
           onRefresh={refetch}
@@ -830,6 +864,7 @@ const ProjectPlanTable = ({
       {openCreateTaskForm && (
         <CreateProjectTaskForm
           projectIdOrKey={projectKey}
+          parentTaskId={createParentTaskId}
           onFormComplete={() => onCreateTaskFormClosed(true)}
           onFormCancel={() => onCreateTaskFormClosed(false)}
         />
@@ -865,6 +900,33 @@ const ProjectPlanTable = ({
           }}
         />
       )}
+      <ProjectPlanItemDrawer
+        projectKey={projectKey}
+        taskId={selectedPlanItemId}
+        phaseName={selectedPlanItemPhaseName}
+        drawerOpen={openPlanItemDrawer}
+        onOpenTask={handleOpenPlanItemDrawer}
+        onEditTask={(taskId) => {
+          setOpenPlanItemDrawer(false)
+          setSelectedPlanItemId(null)
+          handleEditTask({ id: taskId } as ProjectPlanNodeDto)
+        }}
+        onDeleteTask={(taskId) => {
+          setOpenPlanItemDrawer(false)
+          setSelectedPlanItemId(null)
+          handleDeleteTask({ id: taskId } as ProjectPlanNodeDto)
+        }}
+        onAddChildTask={(taskId) => {
+          setOpenPlanItemDrawer(false)
+          setSelectedPlanItemId(null)
+          setCreateParentTaskId(taskId)
+          setOpenCreateTaskForm(true)
+        }}
+        onDrawerClose={() => {
+          setOpenPlanItemDrawer(false)
+          setSelectedPlanItemId(null)
+        }}
+      />
     </>
   )
 }

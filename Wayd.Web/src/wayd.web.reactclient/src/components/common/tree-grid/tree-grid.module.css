@@ -46,6 +46,7 @@
 }
 
 .tableElement {
+  --tree-grid-header-row-height: 29px;
   width: max-content;
   min-width: 100%;
   border-collapse: separate;
@@ -55,16 +56,19 @@
   table-layout: fixed;
 }
 
+
 .th {
   padding: 5px var(--ant-padding-sm);
-  background-color: var(--ant-color-fill-alter);
+  background-color: var(--ant-color-bg-container);
   border-bottom: 1px solid var(--ant-color-border);
   color: var(--ant-color-text);
   text-align: left;
   font-size: 12px;
   font-weight: var(--ant-font-weight-strong);
   white-space: nowrap;
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 20;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 0;
@@ -132,12 +136,15 @@
 
 .filterTh {
   padding: 4px 4px;
-  background-color: var(--ant-color-fill-alter);
+  background-color: var(--ant-color-bg-container);
   border-bottom: 1px solid var(--ant-color-border);
   color: var(--ant-color-text);
   font-weight: normal;
   overflow: hidden;
   text-align: left;
+  position: sticky;
+  top: var(--tree-grid-header-row-height);
+  z-index: 19;
 }
 
 .filterControl {

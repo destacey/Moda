@@ -66,12 +66,43 @@ Warning alerts appear when requirements are missing:
 
 - **Tree grid** with hierarchical [tasks](#project-tasks) organized by [phase](#project-phases)
 - **Drag-and-drop** reordering (for users with update permission)
-- **Inline-editable columns**: Name, Phase, Type (Task/Milestone), Status, Priority, Start Date, End Date, Planned Date, Assigned Members, Progress %
+- **Inline-editable columns**: Name, Type (Task/Milestone), Status, Priority, Start Date, End Date, Planned Date, Assigned Members, Progress %, Estimated Effort
 - **Row actions**: Edit task, Delete task, Add child task
-- **Filtering** by task type, status, and priority
+- **Task details drawer**: Click a task **Key** to open a side drawer with task/milestone details
+- **Drawer actions**: Edit, Delete, and Add child task (same actions as row menu)
+- **Drawer links**: Parent Task and Assignees are clickable links
+- **Description rendering**: Task Description supports Markdown
+- **Filtering** by task type, status, and priority (Type filter includes **Phase**)
 - **Keyboard shortcuts** for efficient navigation
 
+Common keyboard shortcuts in Plan:
+- **Enter** or **Down Arrow**: Save and move to next row
+- **Up Arrow**: Save and move to previous row
+- **Tab / Shift+Tab**: Move between editable fields
+- **Esc**: Cancel current edit or drag operation
+
 **Work Items Tab** — Grid of [work items](../work-management/work-items.mdx#work-items) from Work Management that are associated with this project.
+
+## Project Actions Menu
+
+The page-level **Actions** menu changes based on project status and your permissions.
+
+Typical actions include:
+- **Edit**
+- **Change Program**
+- **Change Key**
+- **Assign Lifecycle** (when no lifecycle is assigned)
+- **Change Lifecycle** (when a lifecycle is already assigned)
+- **Delete** (available for Proposed projects)
+- Status transitions such as **Approve**, **Activate**, **Complete**, and **Cancel**
+- **Create Health Check**
+- **Health Report**
+
+## Health Report Tab Behavior
+
+- Opening **Actions > Health Report** adds a **closable** Health Report tab.
+- The Health Report tab can be deep-linked with `#health-report` in the URL.
+- Closing the Health Report tab returns focus to the Details tab.
 
 ## Project Health Checks
 

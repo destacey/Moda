@@ -129,6 +129,8 @@ function TreeGridInner<T extends TreeNode>(
   const [textFilterDraftValues, setTextFilterDraftValues] = useState<
     Record<string, string>
   >({})
+  const draftTasksRef = useRef<DraftItem[]>([])
+  const isAddingDraftRef = useRef(false)
   const draftCounterRef = useRef(0)
   const isResizingRef = useRef(false)
   const filterDebounceTimersRef = useRef<
@@ -139,6 +141,17 @@ function TreeGridInner<T extends TreeNode>(
     selectionStart: number | null
     selectionEnd: number | null
   } | null>(null)
+
+  const updateDraftTasks = useCallback(
+    (updater: (prev: DraftItem[]) => DraftItem[]) => {
+      setDraftTasks((prev) => {
+        const next = updater(prev)
+        draftTasksRef.current = next
+        return next
+      })
+    },
+    [],
+  )
 
   // Field errors: delegate to external state when provided
   const [internalFieldErrors, setInternalFieldErrors] =
@@ -176,7 +189,7 @@ function TreeGridInner<T extends TreeNode>(
           onSave: async (rowId: string, updates: Record<string, any>) => {
             const success = await editingConfig.onSave(rowId, updates)
             if (success && rowId.startsWith(draftPrefix)) {
-              setDraftTasks((prev) => {
+              updateDraftTasks((prev) => {
                 const next = prev.filter((d) => d.id !== rowId)
                 onDraftsChange?.(next)
                 return next
@@ -185,7 +198,7 @@ function TreeGridInner<T extends TreeNode>(
             return success
           },
           onCancelDraft: (draftId) => {
-            setDraftTasks((prev) => {
+            updateDraftTasks((prev) => {
               const next = prev.filter((d) => d.id !== draftId)
               onDraftsChange?.(next)
               return next
@@ -213,6 +226,8 @@ function TreeGridInner<T extends TreeNode>(
     selectedRowId,
     setSelectedRowId,
     setSelectedCellId,
+    isSaving,
+    saveFormChanges,
     getFieldError,
     editableColumns,
     handleKeyDown,
@@ -222,59 +237,87 @@ function TreeGridInner<T extends TreeNode>(
 
   // ─── Draft helpers ───────────────────────────────────────
   const isEditing = selectedRowId !== null
+  const hasDraft = draftTasks.length > 0
+  const canAttemptCreateDraft =
+    canEdit && !!createDraftNode && !isLoading && !isSaving && !isAddingDraftRef.current
   const canCreateDraft =
-    canEdit && !isEditing && draftTasks.length === 0 && !!createDraftNode
+    canAttemptCreateDraft && (!hasDraft || isEditing)
 
   const addDraft = useCallback(
-    (parentId?: string): string | null => {
+    async (parentId?: string): Promise<string | null> => {
       if (!canCreateDraft) return null
+      if (isAddingDraftRef.current) return null
 
-      draftCounterRef.current += 1
-      const newDraft: DraftItem = {
-        id: `${draftPrefix}${Date.now()}-${draftCounterRef.current}`,
-        parentId,
-        order: 0,
-      }
-      setDraftTasks((prev) => {
-        const next = [...prev, newDraft]
-        onDraftsChange?.(next)
-        return next
-      })
-
-      // Ensure parent is expanded when adding a child draft
-      if (parentId && tableRef.current) {
-        const rows = tableRef.current.getRowModel().rows
-        const parentRow = rows.find((r: any) => r.original.id === parentId)
-        if (parentRow && !parentRow.getIsExpanded()) {
-          parentRow.toggleExpanded()
+      isAddingDraftRef.current = true
+      try {
+        if (selectedRowId) {
+          const saved = await saveFormChanges(selectedRowId)
+          if (!saved) return null
         }
+
+        // Prevent multiple simultaneous drafts from being added.
+        if (draftTasksRef.current.length > 0) {
+          return null
+        }
+
+        draftCounterRef.current += 1
+        const newDraft: DraftItem = {
+          id: `${draftPrefix}${Date.now()}-${draftCounterRef.current}`,
+          parentId,
+          order: 0,
+        }
+        updateDraftTasks((prev) => {
+          const next = [...prev, newDraft]
+          onDraftsChange?.(next)
+          return next
+        })
+
+        // Ensure parent is expanded when adding a child draft
+        if (parentId && tableRef.current) {
+          const rows = tableRef.current.getRowModel().rows
+          const parentRow = rows.find((r: any) => r.original.id === parentId)
+          if (parentRow && !parentRow.getIsExpanded()) {
+            parentRow.toggleExpanded()
+          }
+        }
+
+        // Defer selection so the draft row renders first (unselected),
+        // then a second render mounts the editable input for focusing.
+        requestAnimationFrame(() => {
+          setTimeout(() => {
+            setSelectedRowId(newDraft.id)
+            setSelectedCellId(`${newDraft.id}-name`)
+          }, 50)
+        })
+
+        return newDraft.id
+      } finally {
+        isAddingDraftRef.current = false
       }
-
-      // Defer selection so the draft row renders first (unselected),
-      // then a second render mounts the editable input for focusing.
-      requestAnimationFrame(() => {
-        setTimeout(() => {
-          setSelectedRowId(newDraft.id)
-          setSelectedCellId(`${newDraft.id}-name`)
-        }, 50)
-      })
-
-      return newDraft.id
     },
     [
       canCreateDraft,
       draftPrefix,
       onDraftsChange,
+      saveFormChanges,
+      selectedRowId,
       setSelectedRowId,
       setSelectedCellId,
       tableRef,
+      updateDraftTasks,
     ],
   )
 
-  const addDraftAtRoot = useCallback(() => addDraft(), [addDraft])
+  const addDraftAtRoot = useCallback(() => {
+    void addDraft()
+    return null
+  }, [addDraft])
 
   const addDraftAsChild = useCallback(
-    (parentId: string) => addDraft(parentId),
+    (parentId: string) => {
+      void addDraft(parentId)
+      return null
+    },
     [addDraft],
   )
 
