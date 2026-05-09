@@ -11,6 +11,8 @@ import {
 import { Col, Descriptions, Divider, Flex, Row } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useGetTeamMembersQuery } from '@/src/store/features/organization/team-members-api'
+import TeamMemberCard from './team-member-card'
 
 const { Item } = Descriptions
 
@@ -25,6 +27,11 @@ interface TeamDetailsProps {
 }
 
 const TeamDetails = ({ team }: TeamDetailsProps) => {
+  const { data: members } = useGetTeamMembersQuery(
+    { teamId: team?.id ?? '' },
+    { skip: !team?.id },
+  )
+
   if (!team) return null
   return (
     <Flex vertical>
@@ -34,9 +41,7 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
             <Item label="Code">{team.code}</Item>
             <Item label="Type">{team.type}</Item>
             <Item label="Parent Team">
-              <Link
-                href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}
-              >
+              <Link href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}>
                 {team.teamOfTeams?.name}
               </Link>
             </Item>
@@ -73,6 +78,20 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
           </Col>
         )}
       </Row>
+
+      {members && members.length > 0 && (
+        <>
+          <Divider orientation="left">Members</Divider>
+          <Row gutter={[8, 8]}>
+            {members.map((member) => (
+              <Col key={member.employee.id} xs={24} sm={12} md={8} lg={6}>
+                <TeamMemberCard member={member} />
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
+
       <Divider />
       <LinksCard objectId={team.id} />
     </Flex>
