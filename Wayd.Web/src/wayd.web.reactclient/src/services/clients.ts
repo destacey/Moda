@@ -277,9 +277,8 @@ axiosClient.interceptors.response.use(
         }
       }
       // No tokens to refresh with: the caller was already unauthenticated.
-      // Fall through to the default reject without touching storage — we
-      // don't want to clobber the remember-me preference on every anonymous
-      // 401 a page might trigger.
+      // Redirect to /login and preserve return URL, but do not clear auth
+      // storage so we don't clobber the remember-me preference.
       redirectToLoginWithReturnUrl()
       return Promise.reject(error)
     }
