@@ -107,6 +107,22 @@ The operating model affects what the team sees in the UI:
 - **Kanban teams** do not see sprint-related UI
 - The **Sizing Method** determines how work is measured in backlog views and metrics
 
+### Team Members
+
+**Team Members** represent the people assigned to a team and their roles on that team. Each membership records which employee is on the team and in what capacity.
+
+A team member assignment has:
+- **Employee** — The person assigned to the team
+- **Roles** — One or more roles the employee holds on this team (e.g., Tech Lead, Engineer, Scrum Master)
+
+Key rules:
+- An employee can be a member of multiple teams simultaneously
+- An employee can hold multiple roles on the same team
+- An employee cannot hold the same role twice on the same team
+- Members can only be added to active teams; inactive employees cannot be added
+
+**Team Member Roles** are configurable per organisation — see [Team Member Roles](#team-member-roles) in Administration.
+
 ### Team Memberships
 
 **Team Memberships** define the parent-child relationships in the organizational hierarchy. Each membership has a date range, allowing the hierarchy to change over time.
@@ -133,7 +149,21 @@ The **Details** tab shows the team's core properties:
 - Active and Inactive dates
 - Current Methodology and Sizing Method (from the operating model)
 - Description (rendered as Markdown)
-- **Active Team Sprint** — For Scrum teams, shows the current sprint with start/end dates and sizing method
+- **Active Team Sprint** — For Scrum teams, shows the current sprint with timeline progress, completion rate, velocity, in progress count, and average cycle time
+- **Members** — A card for each team member showing their name (links to their employee page) and roles. Cards are clickable and navigate to the employee's detail page.
+
+### Members Tab
+
+The **Members** tab shows all current members of the team in a grid with columns:
+- Name (links to the employee's detail page)
+- Email
+- Title (job title)
+- Roles (the roles the employee holds on this team, shown as tags)
+
+Members are managed from the **Actions menu → Team Management**:
+- **Add Member** — Select an employee and one or more roles. Employees already on the team are excluded from the selection.
+- **Edit** (row menu) — Update the roles assigned to a member.
+- **Remove** (row menu) — Remove the employee from the team entirely (all role assignments).
 
 ### Backlog Tab
 
@@ -182,6 +212,8 @@ Each risk includes summary, status (Open/Closed), category (Resolved, Owned, Acc
 ### Team Memberships Tab
 
 The **Team Memberships** tab shows the team's position in the organizational hierarchy — both the parent Team of Teams it belongs to and any child team relationships.
+
+> The **Add Team Membership** action is available from the **Actions menu → Team Management** section.
 
 Each membership displays:
 - Child Team and Parent Team (with links)
@@ -277,6 +309,27 @@ Wayd renders a **Functional Organization Chart** that visualizes the complete te
 
 ## Common Tasks
 
+### Adding a Member to a Team
+
+1. Navigate to the team's detail page
+2. From the **Actions menu**, click **Team Management > Add Member**
+3. Select an **Employee** (only employees not already on the team are shown)
+4. Select one or more **Roles**
+5. Click **Add**
+
+### Editing a Team Member's Roles
+
+1. Navigate to the team's **Members** tab
+2. Open the row menu for the member and click **Edit**
+3. Add or remove roles as needed
+4. Click **Save**
+
+### Removing a Member from a Team
+
+1. Navigate to the team's **Members** tab
+2. Open the row menu for the member and click **Remove**
+3. Confirm the removal — all role assignments for that employee are removed
+
 ### Creating a Team
 
 1. Navigate to **Organizations > Teams**
@@ -297,7 +350,7 @@ Wayd renders a **Functional Organization Chart** that visualizes the complete te
 To add a team to a Team of Teams:
 1. Navigate to the team's detail page
 2. Go to the **Team Memberships** tab
-3. From the page actions menu, click **Add Team Membership**
+3. From the **Actions menu**, click **Team Management > Add Team Membership**
 4. Select the parent Team of Teams
 5. Set the start date (required) and end date (optional for ongoing membership)
 
@@ -326,6 +379,10 @@ To update the current model without creating a new one:
 2. From the page actions menu, open **Reports > Cycle Time Report**
 3. Configure the date range and filters to analyze delivery performance
 
+## Employee Detail Page
+
+Each employee's detail page includes a **Teams** tab showing all teams the employee is currently a member of, with columns for Team name, Team type, and Roles. Team names link to their respective detail pages.
+
 ## Teams List Page
 
 The **Teams** page (**Organizations > Teams**) shows all teams in a grid with columns:
@@ -349,3 +406,7 @@ Features:
 | Deactivation check | Cannot deactivate a team with active memberships extending past the inactive date |
 | Operating model history | A team must always have at least one operating model |
 | Operating model dates | New operating model start date must be after the current model's start date |
+| Member role uniqueness | An employee cannot hold the same role twice on the same team |
+| Active member required | Only active employees can be added to teams |
+| Active team required | Members can only be added to active teams |
+| Role required | A role must be selected when adding or editing a team member |
