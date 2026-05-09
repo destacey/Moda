@@ -25,7 +25,7 @@ const PiPredictabilityCard: FC<PiPredictabilityCardProps> = ({ pi, teamId }) => 
   const teamMetrics = metrics?.teamMetrics?.find((tm) => tm.team.id === teamId)
   const hasTeamObjectives = (teamMetrics?.regularObjectivesCount ?? 0) + (teamMetrics?.stretchObjectivesCount ?? 0) > 0
 
-  if (!hasTeamObjectives) return null
+  if (!teamMetrics || !hasTeamObjectives) return null
 
   const href = `/planning/planning-intervals/${pi.key}/plan-review#${teamMetrics.teamCode.toLowerCase()}`
 

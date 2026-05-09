@@ -41,7 +41,9 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
             <Item label="Code">{team.code}</Item>
             <Item label="Type">{team.type}</Item>
             <Item label="Parent Team">
-              <Link href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}>
+              <Link
+                href={`/organizations/team-of-teams/${team.teamOfTeams?.key}`}
+              >
                 {team.teamOfTeams?.name}
               </Link>
             </Item>
@@ -81,7 +83,7 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
 
       {members && members.length > 0 && (
         <>
-          <Divider orientation="left">Members</Divider>
+          <Divider titlePlacement="start">Members</Divider>
           <Row gutter={[8, 8]}>
             {members.map((member) => (
               <Col key={member.employee.id} xs={24} sm={12} md={8} lg={6}>
@@ -99,3 +101,4 @@ const TeamDetails = ({ team }: TeamDetailsProps) => {
 }
 
 export default TeamDetails
+
