@@ -457,6 +457,39 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     })
   }, [props.data, colors.item.background, colors.background.background])
 
+  // Fully reinitialize the timeline when the theme changes so group/item templates
+  // re-render with the correct font colors (they use inline styles, not CSS).
+  useEffect(() => {
+    if (!isInitializedRef.current || !timelineInstanceRef.current) return
+
+    // Preserve the current window before destroying
+    const currentWindow = timelineInstanceRef.current.getWindow()
+
+    // Clear the cache immediately so templates don't reuse old containers,
+    // then unmount the React roots async to avoid unmounting during render.
+    const oldElements = elementMapRef.current
+    elementMapRef.current = {}
+    setTimeout(() => {
+      Object.values(oldElements).forEach(({ root }) => {
+        try { root.unmount() } catch { /* ignore */ }
+      })
+    }, 0)
+
+    // Destroy the timeline instance so init effect rebuilds it
+    timelineInstanceRef.current.destroy()
+    timelineInstanceRef.current = null
+    datasetItemsRef.current = null
+    datasetGroupsRef.current = null
+    isInitializedRef.current = false
+
+    // Restore window after reinit
+    if (currentWindow) {
+      initialWindowRef.current = { start: currentWindow.start, end: currentWindow.end }
+    }
+
+    setReinitTrigger((prev) => prev + 1)
+  }, [currentThemeName])
+
   // Update groups when they change (after initialization)
   useEffect(() => {
     if (!isInitializedRef.current || !timelineInstanceRef.current) return

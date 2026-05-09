@@ -30,3 +30,34 @@
 .vis-label.vis-nested-group {
   background: inherit !important;
 }
+
+/* Override inline font colors on group/item labels for dark and slate modes */
+[data-theme='dark'] .vis-label span,
+[data-theme='dark'] .vis-label .ant-typography {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+[data-theme='slate'] .vis-label span,
+[data-theme='slate'] .vis-label .ant-typography {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+/* Collapse/expand icons for dark and slate modes */
+[data-theme='dark'] .vis-label.vis-nesting-group.expanded:before,
+[data-theme='dark'] .vis-label.vis-nesting-group.collapsed:before,
+[data-theme='slate'] .vis-label.vis-nesting-group.expanded:before,
+[data-theme='slate'] .vis-label.vis-nesting-group.collapsed:before {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Timeline header text for dark and slate modes */
+[data-theme='dark'] .vis-time-axis .vis-text,
+[data-theme='slate'] .vis-time-axis .vis-text {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-theme='dark'] .vis-time-axis .vis-text.vis-major,
+[data-theme='slate'] .vis-time-axis .vis-text.vis-major {
+  color: #ffffff;
+  font-weight: 600;
+}
