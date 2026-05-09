@@ -1,5 +1,6 @@
 ﻿using Ardalis.GuardClauses;
 using CSharpFunctionalExtensions;
+using Wayd.Common.Domain.Employees;
 using Wayd.Common.Domain.Enums.Organization;
 using Wayd.Common.Domain.Interfaces.Organization;
 using Wayd.Common.Domain.Models.Organizations;
@@ -11,6 +12,7 @@ namespace Wayd.Organization.Domain.Models;
 public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAndKey
 {
     protected readonly List<TeamMembership> _parentMemberships = [];
+    protected readonly List<TeamMember> _members = [];
 
     /// <summary>Gets the key.</summary>
     /// <value>The key.</value>
@@ -64,6 +66,130 @@ public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAnd
     /// <summary>Gets the parent memberships.</summary>
     /// <value>The parent memberships.</value>
     public IReadOnlyCollection<TeamMembership> ParentMemberships => _parentMemberships.AsReadOnly();
+
+    /// <summary>Gets the members of this team.</summary>
+    public IReadOnlyCollection<TeamMember> Members => _members.AsReadOnly();
+
+    /// <summary>Adds a member to this team with one or more roles.</summary>
+    public Result AddMember(Employee employee, IReadOnlyList<Guid> roleIds)
+    {
+        try
+        {
+            foreach (var roleId in roleIds)
+            {
+                var result = AddMember(employee, roleId);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>Adds a member to this team with a single role.</summary>
+    public Result<TeamMember> AddMember(Employee employee, Guid roleId)
+    {
+        try
+        {
+            Guard.Against.Null(employee);
+
+            if (!IsActive)
+                return Result.Failure<TeamMember>($"Members cannot be added to inactive teams. {Name} is inactive.");
+
+            if (!employee.IsActive)
+                return Result.Failure<TeamMember>($"Inactive employees cannot be added to teams. {employee.Name.FullName} is inactive.");
+
+            if (_members.Any(m => m.EmployeeId == employee.Id && m.RoleId == roleId && !m.IsDeleted))
+                return Result.Failure<TeamMember>($"{employee.Name.FullName} is already a member of this team in the same role.");
+
+            var member = TeamMember.Create(Id, employee.Id, roleId);
+            _members.Add(member);
+
+            return Result.Success(member);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<TeamMember>(ex.ToString());
+        }
+    }
+
+    /// <summary>Updates the roles of an existing team member, adding and removing as needed.</summary>
+    public Result UpdateMemberRoles(Employee employee, IReadOnlyList<Guid> roleIds)
+    {
+        try
+        {
+            Guard.Against.Null(employee);
+
+            var currentRoleIds = _members
+                .Where(m => m.EmployeeId == employee.Id && !m.IsDeleted)
+                .Select(m => m.RoleId)
+                .ToHashSet();
+
+            var requestedRoleIds = roleIds.ToHashSet();
+
+            foreach (var roleId in requestedRoleIds.Except(currentRoleIds))
+            {
+                var result = AddMember(employee, roleId);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+
+            foreach (var roleId in currentRoleIds.Except(requestedRoleIds))
+            {
+                var member = _members.Single(m => m.EmployeeId == employee.Id && m.RoleId == roleId && !m.IsDeleted);
+                var result = RemoveMemberRole(member.Id);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>Removes an employee from this team.</summary>
+    public Result RemoveMember(Guid employeeId)
+    {
+        try
+        {
+            var memberships = _members.Where(m => m.EmployeeId == employeeId && !m.IsDeleted).ToList();
+            if (memberships.Count == 0)
+                return Result.Failure("Employee is not a member of this team.");
+
+            foreach (var membership in memberships)
+                membership.IsDeleted = true;
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    private Result<TeamMember> RemoveMemberRole(Guid teamMemberId)
+    {
+        try
+        {
+            var member = _members.SingleOrDefault(m => m.Id == teamMemberId && !m.IsDeleted);
+            if (member is null)
+                return Result.Failure<TeamMember>($"Team member with Id {teamMemberId} not found.");
+
+            member.IsDeleted = true;
+
+            return Result.Success(member);
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<TeamMember>(ex.ToString());
+        }
+    }
 
     /// <summary>Adds the team membership.</summary>
     /// <param name="parentTeam">The parent team.</param>

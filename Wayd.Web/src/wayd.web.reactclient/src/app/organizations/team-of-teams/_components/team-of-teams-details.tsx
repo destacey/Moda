@@ -1,9 +1,13 @@
+'use client'
+
 import LinksCard from '@/src/components/common/links/links-card'
 import { MarkdownRenderer } from '@/src/components/common/markdown'
 import { TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
-import { Col, Descriptions, Row, Space } from 'antd'
+import { Col, Descriptions, Divider, Flex, Row, Space } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
+import { useGetTeamMembersQuery } from '@/src/store/features/organization/team-members-api'
+import TeamMemberCard from '../../teams/_components/team-member-card'
 
 const { Item } = Descriptions
 
@@ -12,9 +16,14 @@ interface TeamOfTeamsDetailsProps {
 }
 
 const TeamOfTeamsDetails = ({ team }: TeamOfTeamsDetailsProps) => {
+  const { data: members } = useGetTeamMembersQuery(
+    { teamId: team?.id ?? '' },
+    { skip: !team?.id },
+  )
+
   if (!team) return null
   return (
-    <>
+    <Flex vertical>
       <Space vertical>
         <Row>
           <Col xs={24} md={12}>
@@ -46,10 +55,26 @@ const TeamOfTeamsDetails = ({ team }: TeamOfTeamsDetailsProps) => {
             </Descriptions>
           </Col>
         </Row>
-        <LinksCard objectId={team.id} />
       </Space>
-    </>
+
+      {members && members.length > 0 && (
+        <>
+          <Divider titlePlacement="start">Members</Divider>
+          <Row gutter={[8, 8]}>
+            {members.map((member) => (
+              <Col key={member.employee.id} xs={24} sm={12} md={8} lg={6}>
+                <TeamMemberCard member={member} />
+              </Col>
+            ))}
+          </Row>
+        </>
+      )}
+
+      <Divider />
+      <LinksCard objectId={team.id} />
+    </Flex>
   )
 }
 
 export default TeamOfTeamsDetails
+

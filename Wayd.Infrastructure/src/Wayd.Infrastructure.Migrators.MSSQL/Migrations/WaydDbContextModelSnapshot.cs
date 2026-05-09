@@ -1115,6 +1115,112 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.UseTphMappingStrategy();
                 });
 
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("EmployeeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("TeamId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoleId");
+
+                    b.HasIndex("EmployeeId", "IsDeleted")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.HasIndex("TeamId", "EmployeeId", "RoleId", "IsDeleted")
+                        .IsUnique()
+                        .HasDatabaseName("IX_TeamMembers_TeamId_EmployeeId_RoleId")
+                        .HasFilter("[IsDeleted] = 0");
+
+                    b.ToTable("TeamMembers", "Organization");
+                });
+
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMemberRole", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("Deleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeletedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Key")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Key"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("SystemCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemCreatedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("SystemLastModified")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SystemLastModifiedBy")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasAlternateKey("Key");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("TeamMemberRoles", "Organization");
+                });
+
             modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
                 {
                     b.Property<Guid>("Id")
@@ -4697,6 +4803,8 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                         {
                             b1.Property<string>("ApplicationUserId");
 
+                            b1.Property<string>("ThemeConfig");
+
                             b1.Property<string>("Tours")
                                 .IsRequired();
 
@@ -4763,6 +4871,33 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
                     b.Navigation("FromNode");
 
                     b.Navigation("ToNode");
+                });
+
+            modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMember", b =>
+                {
+                    b.HasOne("Wayd.Common.Domain.Employees.Employee", "Employee")
+                        .WithMany()
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Wayd.Organization.Domain.Models.TeamMemberRole", "Role")
+                        .WithMany()
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("Wayd.Organization.Domain.Models.BaseTeam", "Team")
+                        .WithMany("Members")
+                        .HasForeignKey("TeamId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("Team");
                 });
 
             modelBuilder.Entity("Wayd.Organization.Domain.Models.TeamMembership", b =>
@@ -5831,6 +5966,8 @@ namespace Wayd.Infrastructure.Migrators.MSSQL.Migrations
 
             modelBuilder.Entity("Wayd.Organization.Domain.Models.BaseTeam", b =>
                 {
+                    b.Navigation("Members");
+
                     b.Navigation("ParentMemberships");
                 });
 

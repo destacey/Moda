@@ -14,6 +14,7 @@ import RisksGrid, {
 } from '@/src/components/common/planning/risks-grid'
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { EditTeamForm, TeamMembershipsGrid } from '../../_components'
+import TeamMembersGrid from '../../teams/_components/team-members-grid'
 import useAuth from '@/src/components/contexts/auth'
 import {
   useGetTeamOfTeamsMembershipsQuery,
@@ -38,6 +39,7 @@ enum TeamOfTeamsTabs {
   Details = 'details',
   RiskManagement = 'risk-management',
   TeamMemberships = 'team-memberships',
+  Members = 'members',
 }
 
 const tabs = [
@@ -48,6 +50,10 @@ const tabs = [
   {
     key: TeamOfTeamsTabs.RiskManagement,
     tab: 'Risk Management',
+  },
+  {
+    key: TeamOfTeamsTabs.Members,
+    tab: 'Members',
   },
   {
     key: TeamOfTeamsTabs.TeamMemberships,
@@ -66,6 +72,7 @@ const TeamOfTeamsDetailsPage = (props: {
   const [activeTab, setActiveTab] = useState(TeamOfTeamsTabs.Details)
   const [openCreateTeamMembershipForm, setOpenCreateTeamMembershipForm] =
     useState<boolean>(false)
+  const [openAddMemberForm, setOpenAddMemberForm] = useState<boolean>(false)
   const [openDeactivateTeamForm, setOpenDeactivateTeamForm] =
     useState<boolean>(false)
   const [teamMembershipsQueryEnabled, setTeamMembershipsQueryEnabled] =
@@ -126,11 +133,30 @@ const TeamOfTeamsDetailsPage = (props: {
       }
     }
 
-    if (canManageTeamMemberships && team?.isActive === true) {
+    if (team?.isActive === true && (canUpdateTeam || canManageTeamMemberships)) {
+      const teamManagementChildren: ItemType[] = []
+
+      if (canUpdateTeam) {
+        teamManagementChildren.push({
+          key: 'add-member',
+          label: 'Add Member',
+          onClick: () => setOpenAddMemberForm(true),
+        })
+      }
+
+      if (canManageTeamMemberships) {
+        teamManagementChildren.push({
+          key: 'add-team-membership',
+          label: 'Add Team Membership',
+          onClick: () => setOpenCreateTeamMembershipForm(true),
+        })
+      }
+
+      items.push({ type: 'divider', key: 'divider-team-management' })
       items.push({
-        key: 'add-team-membership',
-        label: 'Add Team Membership',
-        onClick: () => setOpenCreateTeamMembershipForm(true),
+        type: 'group',
+        label: 'Team Management',
+        children: teamManagementChildren,
       })
     }
 
@@ -158,6 +184,16 @@ const TeamOfTeamsDetailsPage = (props: {
           refetch: teamMembershipsQuery.refetch,
           teamType: 'Team of Teams',
         })
+      case TeamOfTeamsTabs.Members:
+        return (
+          <TeamMembersGrid
+            teamId={team?.id ?? ''}
+            teamType="TeamOfTeams"
+            teamIsActive={team?.isActive ?? false}
+            openAddForm={openAddMemberForm}
+            onAddFormClose={() => setOpenAddMemberForm(false)}
+          />
+        )
       default:
         return null
     }

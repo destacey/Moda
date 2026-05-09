@@ -75,6 +75,8 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();
     public DbSet<TeamOperatingModel> TeamOperatingModels => Set<TeamOperatingModel>();
+    public DbSet<TeamMemberRole> TeamMemberRoles => Set<TeamMemberRole>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     #endregion IOrganization
 
@@ -83,6 +85,7 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<Iteration> Iterations => Set<Iteration>();
     public DbSet<PlanningIntervalObjective> PlanningIntervalObjectives => Set<PlanningIntervalObjective>();
     public DbSet<PlanningInterval> PlanningIntervals => Set<PlanningInterval>();
+    public DbSet<PlanningIntervalIterationSprint> PlanningIntervalIterationSprints => Set<PlanningIntervalIterationSprint>();
     public DbSet<Risk> Risks => Set<Risk>();
     public DbSet<PlanningTeam> PlanningTeams => Set<PlanningTeam>();
     public DbSet<PlanningIntervalObjectiveHealthCheck> PlanningIntervalObjectiveHealthChecks => Set<PlanningIntervalObjectiveHealthCheck>();

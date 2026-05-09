@@ -11,6 +11,7 @@ import {
   RisksClient,
   RolesClient,
   TeamsClient,
+  TeamMemberRolesClient,
   TeamsOfTeamsClient,
   UsersClient,
   WorkStatusesClient,
@@ -346,6 +347,8 @@ export const getEmployeesClient = () => new EmployeesClient('', axiosClient)
 export const getTeamsClient = () => new TeamsClient('', axiosClient)
 export const getTeamsOfTeamsClient = () =>
   new TeamsOfTeamsClient('', axiosClient)
+export const getTeamMemberRolesClient = () =>
+  new TeamMemberRolesClient('', axiosClient)
 
 // PLANNING
 export const getPlanningIntervalsClient = () =>

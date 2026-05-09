@@ -8,6 +8,7 @@ import {
   RiskListDto,
   SprintListDto,
   SprintDetailsDto,
+  TeamDetailsDto,
   WorkStatusCategory,
   WorkItemListDto,
   SetTeamOperatingModelRequest,
@@ -676,6 +677,19 @@ export const teamApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    getTeamDetails: builder.query<TeamDetailsDto, number>({
+      queryFn: async (key) => {
+        try {
+          const data = await getTeamsClient().getById(key)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, key) => [{ type: QueryTags.Team, id: String(key) }],
+    }),
+
     getTeamOperatingModelsForTeams: builder.query<
       TeamOperatingModelDetailsDto[],
       { teamIds: string[]; asOfDate?: Date | string }
@@ -718,6 +732,7 @@ export const teamApi = apiSlice.injectEndpoints({
 
 export const {
   useGetTeamsQuery,
+  useGetTeamDetailsQuery,
   useDeactivateTeamMutation,
   useDeactivateTeamOfTeamsMutation,
   useGetTeamOptionsQuery,

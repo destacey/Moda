@@ -35,6 +35,7 @@ export enum QueryTags {
   TeamSprint = 'Organizations.TeamSprint',
   TeamSprintOption = 'Organizations.TeamSprintOption',
   TeamMembership = 'Organizations.TeamMembership',
+  TeamMemberRole = 'Organizations.TeamMemberRole',
   TeamRisk = 'Organizations.TeamRisk',
   TeamOperatingModel = 'Organizations.TeamOperatingModel',
   FunctionalOrganizationChart = 'Organizations.FunctionalOrganizationChart',
@@ -74,6 +75,7 @@ export enum QueryTags {
   Sprint = 'Planning.Sprint',
   SprintBacklog = 'Planning.Sprint.Backlog',
   SprintMetrics = 'Planning.Sprint.Metrics',
+  SprintPlanningIntervals = 'Planning.Sprint.PlanningIntervals',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',
