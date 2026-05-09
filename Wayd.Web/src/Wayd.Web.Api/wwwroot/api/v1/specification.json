@@ -18745,25 +18745,15 @@
           "x-position": 2
         },
         "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "guid",
-                  "nullable": false,
-                  "example": "00000000-0000-0000-0000-000000000000"
-                }
-              }
-            }
+          "204": {
+            "description": ""
           },
-          "422": {
+          "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -18776,12 +18766,12 @@
         ]
       }
     },
-    "/api/organization/teams/{id}/members/{memberId}": {
+    "/api/organization/teams/{id}/members/{employeeId}": {
       "put": {
         "tags": [
           "Teams"
         ],
-        "summary": "Update a team member.",
+        "summary": "Update a team member's roles.",
         "operationId": "Teams_UpdateMember",
         "parameters": [
           {
@@ -18797,7 +18787,7 @@
             "x-position": 1
           },
           {
-            "name": "memberId",
+            "name": "employeeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -18862,7 +18852,7 @@
             "x-position": 1
           },
           {
-            "name": "memberId",
+            "name": "employeeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -19791,25 +19781,15 @@
           "x-position": 2
         },
         "responses": {
-          "201": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "string",
-                  "format": "guid",
-                  "nullable": false,
-                  "example": "00000000-0000-0000-0000-000000000000"
-                }
-              }
-            }
+          "204": {
+            "description": ""
           },
-          "422": {
+          "400": {
             "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -19822,12 +19802,12 @@
         ]
       }
     },
-    "/api/organization/teams-of-teams/{id}/members/{memberId}": {
+    "/api/organization/teams-of-teams/{id}/members/{employeeId}": {
       "put": {
         "tags": [
           "TeamsOfTeams"
         ],
-        "summary": "Update a team of teams member.",
+        "summary": "Update a team of teams member's roles.",
         "operationId": "TeamsOfTeams_UpdateMember",
         "parameters": [
           {
@@ -19843,7 +19823,7 @@
             "x-position": 1
           },
           {
-            "name": "memberId",
+            "name": "employeeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -19908,7 +19888,7 @@
             "x-position": 1
           },
           {
-            "name": "memberId",
+            "name": "employeeId",
             "in": "path",
             "required": true,
             "schema": {
@@ -31880,8 +31860,30 @@
         "required": [
           "employee",
           "team",
-          "role",
-          "id"
+          "roles"
+        ],
+        "properties": {
+          "employee": {
+            "$ref": "#/components/schemas/TeamMemberEmployeeDto"
+          },
+          "team": {
+            "$ref": "#/components/schemas/TeamNavigationDto"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NavigationDto"
+            }
+          }
+        }
+      },
+      "TeamMemberEmployeeDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "id",
+          "key"
         ],
         "properties": {
           "id": {
@@ -31890,14 +31892,20 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "employee": {
-            "$ref": "#/components/schemas/EmployeeNavigationDto"
+          "key": {
+            "type": "integer",
+            "format": "int32"
           },
-          "team": {
-            "$ref": "#/components/schemas/TeamNavigationDto"
+          "name": {
+            "type": "string"
           },
-          "role": {
-            "$ref": "#/components/schemas/NavigationDto"
+          "email": {
+            "type": "string",
+            "nullable": true
+          },
+          "jobTitle": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -32698,7 +32706,7 @@
         "additionalProperties": false,
         "required": [
           "employeeId",
-          "roleId"
+          "roleIds"
         ],
         "properties": {
           "employeeId": {
@@ -32707,11 +32715,14 @@
             "nullable": false,
             "example": "00000000-0000-0000-0000-000000000000"
           },
-          "roleId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },
@@ -32719,14 +32730,17 @@
         "type": "object",
         "additionalProperties": false,
         "required": [
-          "roleId"
+          "roleIds"
         ],
         "properties": {
-          "roleId": {
-            "type": "string",
-            "format": "guid",
-            "nullable": false,
-            "example": "00000000-0000-0000-0000-000000000000"
+          "roleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },

@@ -22517,7 +22517,7 @@ export class TeamsClient {
     /**
      * Add a member to a team.
      */
-    addMember(id: string, request: AddTeamMemberRequest, cancelToken?: CancelToken): Promise<string> {
+    addMember(id: string, request: AddTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/organization/teams/{id}/members";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -22532,7 +22532,6 @@ export class TeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
             },
             cancelToken
         };
@@ -22548,7 +22547,7 @@ export class TeamsClient {
         });
     }
 
-    protected processAddMember(response: AxiosResponse): Promise<string> {
+    protected processAddMember(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -22558,38 +22557,35 @@ export class TeamsClient {
                 }
             }
         }
-        if (status === 201) {
+        if (status === 204) {
             const _responseText = response.data;
-            let result201: any = null;
-            let resultData201  = _responseText;
-            result201 = resultData201;
-            return Promise.resolve<string>(result201);
+            return Promise.resolve<void>(null as any);
 
-        } else if (status === 422) {
+        } else if (status === 400) {
             const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = resultData422;
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Update a team member.
+     * Update a team member's roles.
      */
-    updateMember(id: string, memberId: string, request: UpdateTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/organization/teams/{id}/members/{memberId}";
+    updateMember(id: string, employeeId: string, request: UpdateTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/members/{employeeId}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (memberId === undefined || memberId === null)
-            throw new globalThis.Error("The parameter 'memberId' must be defined.");
-        url_ = url_.replace("{memberId}", encodeURIComponent("" + memberId));
+        if (employeeId === undefined || employeeId === null)
+            throw new globalThis.Error("The parameter 'employeeId' must be defined.");
+        url_ = url_.replace("{employeeId}", encodeURIComponent("" + employeeId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -22646,14 +22642,14 @@ export class TeamsClient {
     /**
      * Remove a member from a team.
      */
-    removeMember(id: string, memberId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/organization/teams/{id}/members/{memberId}";
+    removeMember(id: string, employeeId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams/{id}/members/{employeeId}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (memberId === undefined || memberId === null)
-            throw new globalThis.Error("The parameter 'memberId' must be defined.");
-        url_ = url_.replace("{memberId}", encodeURIComponent("" + memberId));
+        if (employeeId === undefined || employeeId === null)
+            throw new globalThis.Error("The parameter 'employeeId' must be defined.");
+        url_ = url_.replace("{employeeId}", encodeURIComponent("" + employeeId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -23650,7 +23646,7 @@ export class TeamsOfTeamsClient {
     /**
      * Add a member to a team of teams.
      */
-    addMember(id: string, request: AddTeamMemberRequest, cancelToken?: CancelToken): Promise<string> {
+    addMember(id: string, request: AddTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
         let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/members";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -23665,7 +23661,6 @@ export class TeamsOfTeamsClient {
             url: url_,
             headers: {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
             },
             cancelToken
         };
@@ -23681,7 +23676,7 @@ export class TeamsOfTeamsClient {
         });
     }
 
-    protected processAddMember(response: AxiosResponse): Promise<string> {
+    protected processAddMember(response: AxiosResponse): Promise<void> {
         const status = response.status;
         let _headers: any = {};
         if (response.headers && typeof response.headers === "object") {
@@ -23691,38 +23686,35 @@ export class TeamsOfTeamsClient {
                 }
             }
         }
-        if (status === 201) {
+        if (status === 204) {
             const _responseText = response.data;
-            let result201: any = null;
-            let resultData201  = _responseText;
-            result201 = resultData201;
-            return Promise.resolve<string>(result201);
+            return Promise.resolve<void>(null as any);
 
-        } else if (status === 422) {
+        } else if (status === 400) {
             const _responseText = response.data;
-            let result422: any = null;
-            let resultData422  = _responseText;
-            result422 = resultData422;
-            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
 
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
         }
-        return Promise.resolve<string>(null as any);
+        return Promise.resolve<void>(null as any);
     }
 
     /**
-     * Update a team of teams member.
+     * Update a team of teams member's roles.
      */
-    updateMember(id: string, memberId: string, request: UpdateTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/members/{memberId}";
+    updateMember(id: string, employeeId: string, request: UpdateTeamMemberRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/members/{employeeId}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (memberId === undefined || memberId === null)
-            throw new globalThis.Error("The parameter 'memberId' must be defined.");
-        url_ = url_.replace("{memberId}", encodeURIComponent("" + memberId));
+        if (employeeId === undefined || employeeId === null)
+            throw new globalThis.Error("The parameter 'employeeId' must be defined.");
+        url_ = url_.replace("{employeeId}", encodeURIComponent("" + employeeId));
         url_ = url_.replace(/[?&]$/, "");
 
         const content_ = JSON.stringify(request);
@@ -23779,14 +23771,14 @@ export class TeamsOfTeamsClient {
     /**
      * Remove a member from a team of teams.
      */
-    removeMember(id: string, memberId: string, cancelToken?: CancelToken): Promise<void> {
-        let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/members/{memberId}";
+    removeMember(id: string, employeeId: string, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/organization/teams-of-teams/{id}/members/{employeeId}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
         url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        if (memberId === undefined || memberId === null)
-            throw new globalThis.Error("The parameter 'memberId' must be defined.");
-        url_ = url_.replace("{memberId}", encodeURIComponent("" + memberId));
+        if (employeeId === undefined || employeeId === null)
+            throw new globalThis.Error("The parameter 'employeeId' must be defined.");
+        url_ = url_.replace("{employeeId}", encodeURIComponent("" + employeeId));
         url_ = url_.replace(/[?&]$/, "");
 
         let options_: AxiosRequestConfig = {
@@ -27944,10 +27936,17 @@ export interface UpdateEmployeeRequest {
 }
 
 export interface TeamMemberDto {
-    id: string;
-    employee: EmployeeNavigationDto;
+    employee: TeamMemberEmployeeDto;
     team: TeamNavigationDto;
-    role: NavigationDto;
+    roles: NavigationDto[];
+}
+
+export interface TeamMemberEmployeeDto {
+    id: string;
+    key: number;
+    name: string;
+    email?: string | undefined;
+    jobTitle?: string | undefined;
 }
 
 export interface TeamMemberRoleDto {
@@ -28142,11 +28141,11 @@ export interface OrganizationalUnitDto {
 
 export interface AddTeamMemberRequest {
     employeeId: string;
-    roleId: string;
+    roleIds: string[];
 }
 
 export interface UpdateTeamMemberRequest {
-    roleId: string;
+    roleIds: string[];
 }
 
 export interface TeamOfTeamsListDto {

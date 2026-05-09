@@ -1,40 +1,20 @@
-﻿using Mapster;
 using Wayd.Common.Application.Dtos;
-using Wayd.Common.Application.Employees.Dtos;
-using Wayd.Common.Domain.Enums.Organization;
 using Wayd.Organization.Application.Models;
 
 namespace Wayd.Organization.Application.Teams.Dtos;
 
-public record TeamMemberDto : IMapFrom<TeamMember>
+public record TeamMemberDto
+{
+    public required TeamMemberEmployeeDto Employee { get; set; }
+    public required TeamNavigationDto Team { get; set; }
+    public required IReadOnlyList<NavigationDto> Roles { get; set; }
+}
+
+public record TeamMemberEmployeeDto
 {
     public Guid Id { get; set; }
-    public required EmployeeNavigationDto Employee { get; set; }
-    public required TeamNavigationDto Team { get; set; }
-    public required NavigationDto Role { get; set; }
-
-    public void ConfigureMapping(TypeAdapterConfig config)
-    {
-        config.NewConfig<TeamMember, TeamMemberDto>()
-            .Map(dest => dest.Id, src => src.Id)
-            .Map(dest => dest.Employee, src => new EmployeeNavigationDto
-            {
-                Id = src.Employee.Id,
-                Key = src.Employee.Key,
-                Name = src.Employee.Name.FirstName + " " + src.Employee.Name.LastName,
-            })
-            .Map(dest => dest.Team, src => new TeamNavigationDto
-            {
-                Id = src.Team.Id,
-                Key = src.Team.Key,
-                Name = src.Team.Name,
-                Type = src.Team.Type == TeamType.TeamOfTeams ? "Team of Teams" : "Team",
-            })
-            .Map(dest => dest.Role, src => new NavigationDto
-            {
-                Id = src.Role.Id,
-                Key = src.Role.Key,
-                Name = src.Role.Name,
-            });
-    }
+    public int Key { get; set; }
+    public required string Name { get; set; }
+    public string? Email { get; set; }
+    public string? JobTitle { get; set; }
 }

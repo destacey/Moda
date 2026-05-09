@@ -26,54 +26,26 @@ public class RemoveTeamMemberCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldRemoveMember_WhenMemberExists()
+    public async Task Handle_ShouldRemoveAllRoles_WhenEmployeeIsAMember()
     {
         // Arrange
         var team = _teamFaker.Generate();
         var employee = _employeeFaker.Generate();
         _dbContext.AddTeam(team);
 
-        var addResult = team.AddMember(employee, Guid.NewGuid());
-        addResult.IsSuccess.Should().BeTrue();
-        var memberId = addResult.Value.Id;
-
-        team.Members.Should().HaveCount(1);
-
-        var command = new RemoveTeamMemberCommand(team.Id, memberId);
-
-        // Act
-        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
-
-        // Assert
-        result.IsSuccess.Should().BeTrue();
-        team.Members.Should().BeEmpty();
-        _dbContext.SaveChangesCallCount.Should().Be(1);
-    }
-
-    [Fact]
-    public async Task Handle_ShouldOnlyRemoveTargetMember_WhenEmployeeHasMultipleRoles()
-    {
-        // Arrange
-        var team = _teamFaker.Generate();
-        var employee = _employeeFaker.Generate();
-        var roleId1 = Guid.NewGuid();
-        var roleId2 = Guid.NewGuid();
-        _dbContext.AddTeam(team);
-
-        var member1 = team.AddMember(employee, roleId1).Value;
-        var member2 = team.AddMember(employee, roleId2).Value;
-
+        team.AddMember(employee, Guid.NewGuid());
+        team.AddMember(employee, Guid.NewGuid());
         team.Members.Should().HaveCount(2);
 
-        var command = new RemoveTeamMemberCommand(team.Id, member1.Id);
+        var command = new RemoveTeamMemberCommand(team.Id, employee.Id);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.Members.Should().HaveCount(1);
-        team.Members.Single().Id.Should().Be(member2.Id);
+        team.Members.Should().HaveCount(2);
+        team.Members.Should().AllSatisfy(m => m.IsDeleted.Should().BeTrue());
         _dbContext.SaveChangesCallCount.Should().Be(1);
     }
 
@@ -93,7 +65,7 @@ public class RemoveTeamMemberCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldFail_WhenMemberNotFound()
+    public async Task Handle_ShouldFail_WhenEmployeeIsNotAMember()
     {
         // Arrange
         var team = _teamFaker.Generate();
@@ -106,7 +78,7 @@ public class RemoveTeamMemberCommandHandlerTests : IDisposable
 
         // Assert
         result.IsFailure.Should().BeTrue();
-        result.Error.Should().Contain("not found");
+        result.Error.Should().Contain("not a member");
         _dbContext.SaveChangesCallCount.Should().Be(0);
     }
 

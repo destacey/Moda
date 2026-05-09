@@ -70,7 +70,26 @@ public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAnd
     /// <summary>Gets the members of this team.</summary>
     public IReadOnlyCollection<TeamMember> Members => _members.AsReadOnly();
 
-    /// <summary>Adds a member to this team.</summary>
+    /// <summary>Adds a member to this team with one or more roles.</summary>
+    public Result AddMember(Employee employee, IReadOnlyList<Guid> roleIds)
+    {
+        try
+        {
+            foreach (var roleId in roleIds)
+            {
+                var result = AddMember(employee, roleId);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    /// <summary>Adds a member to this team with a single role.</summary>
     public Result<TeamMember> AddMember(Employee employee, Guid roleId)
     {
         try
@@ -83,7 +102,7 @@ public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAnd
             if (!employee.IsActive)
                 return Result.Failure<TeamMember>($"Inactive employees cannot be added to teams. {employee.Name.FullName} is inactive.");
 
-            if (_members.Any(m => m.EmployeeId == employee.Id && m.RoleId == roleId))
+            if (_members.Any(m => m.EmployeeId == employee.Id && m.RoleId == roleId && !m.IsDeleted))
                 return Result.Failure<TeamMember>($"{employee.Name.FullName} is already a member of this team in the same role.");
 
             var member = TeamMember.Create(Id, employee.Id, roleId);
@@ -97,35 +116,72 @@ public abstract class BaseTeam : BaseSoftDeletableEntity, ISimpleTeam, IHasIdAnd
         }
     }
 
-    /// <summary>Updates an existing team member's role.</summary>
-    public Result<TeamMember> UpdateMember(Guid teamMemberId, Guid roleId)
+    /// <summary>Updates the roles of an existing team member, adding and removing as needed.</summary>
+    public Result UpdateMemberRoles(Employee employee, IReadOnlyList<Guid> roleIds)
     {
         try
         {
-            var member = _members.SingleOrDefault(m => m.Id == teamMemberId);
-            if (member is null)
-                return Result.Failure<TeamMember>($"Team member with Id {teamMemberId} not found.");
+            Guard.Against.Null(employee);
 
-            member.UpdateRole(roleId);
+            var currentRoleIds = _members
+                .Where(m => m.EmployeeId == employee.Id && !m.IsDeleted)
+                .Select(m => m.RoleId)
+                .ToHashSet();
 
-            return Result.Success(member);
+            var requestedRoleIds = roleIds.ToHashSet();
+
+            foreach (var roleId in requestedRoleIds.Except(currentRoleIds))
+            {
+                var result = AddMember(employee, roleId);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+
+            foreach (var roleId in currentRoleIds.Except(requestedRoleIds))
+            {
+                var member = _members.Single(m => m.EmployeeId == employee.Id && m.RoleId == roleId && !m.IsDeleted);
+                var result = RemoveMemberRole(member.Id);
+                if (result.IsFailure)
+                    return Result.Failure(result.Error);
+            }
+
+            return Result.Success();
         }
         catch (Exception ex)
         {
-            return Result.Failure<TeamMember>(ex.ToString());
+            return Result.Failure(ex.ToString());
         }
     }
 
-    /// <summary>Removes a member from this team.</summary>
-    public Result<TeamMember> RemoveMember(Guid teamMemberId)
+    /// <summary>Removes an employee from this team.</summary>
+    public Result RemoveMember(Guid employeeId)
     {
         try
         {
-            var member = _members.SingleOrDefault(m => m.Id == teamMemberId);
+            var memberships = _members.Where(m => m.EmployeeId == employeeId && !m.IsDeleted).ToList();
+            if (memberships.Count == 0)
+                return Result.Failure("Employee is not a member of this team.");
+
+            foreach (var membership in memberships)
+                membership.IsDeleted = true;
+
+            return Result.Success();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure(ex.ToString());
+        }
+    }
+
+    private Result<TeamMember> RemoveMemberRole(Guid teamMemberId)
+    {
+        try
+        {
+            var member = _members.SingleOrDefault(m => m.Id == teamMemberId && !m.IsDeleted);
             if (member is null)
                 return Result.Failure<TeamMember>($"Team member with Id {teamMemberId} not found.");
 
-            _members.Remove(member);
+            member.IsDeleted = true;
 
             return Result.Success(member);
         }

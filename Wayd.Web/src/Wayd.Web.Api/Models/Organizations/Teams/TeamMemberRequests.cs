@@ -1,5 +1,5 @@
 namespace Wayd.Web.Api.Models.Organizations.Teams;
 
-public sealed record AddTeamMemberRequest(Guid EmployeeId, Guid RoleId);
+public sealed record AddTeamMemberRequest(Guid EmployeeId, IReadOnlyList<Guid> RoleIds);
 
-public sealed record UpdateTeamMemberRequest(Guid RoleId);
+public sealed record UpdateTeamMemberRequest(IReadOnlyList<Guid> RoleIds);

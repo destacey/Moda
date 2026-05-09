@@ -1,13 +1,13 @@
 namespace Wayd.Organization.Application.Teams.Commands;
 
-public sealed record RemoveTeamMemberCommand(Guid TeamId, Guid TeamMemberId) : ICommand;
+public sealed record RemoveTeamMemberCommand(Guid TeamId, Guid EmployeeId) : ICommand;
 
 public sealed class RemoveTeamMemberCommandValidator : CustomValidator<RemoveTeamMemberCommand>
 {
     public RemoveTeamMemberCommandValidator()
     {
         RuleFor(c => c.TeamId).NotEmpty();
-        RuleFor(c => c.TeamMemberId).NotEmpty();
+        RuleFor(c => c.EmployeeId).NotEmpty();
     }
 }
 
@@ -35,16 +35,16 @@ internal sealed class RemoveTeamMemberCommandHandler(
                 return Result.Failure("Team not found.");
             }
 
-            var result = team.RemoveMember(request.TeamMemberId);
+            var result = team.RemoveMember(request.EmployeeId);
             if (result.IsFailure)
             {
-                _logger.LogError("Error removing team member {TeamMemberId} from team {TeamId}. Error message: {Error}", request.TeamMemberId, request.TeamId, result.Error);
+                _logger.LogError("Error removing member {EmployeeId} from team {TeamId}. Error: {Error}", request.EmployeeId, request.TeamId, result.Error);
                 return result;
             }
 
             await _organizationDbContext.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Team member {TeamMemberId} removed from team {TeamId}.", request.TeamMemberId, request.TeamId);
+            _logger.LogInformation("Employee {EmployeeId} removed from team {TeamId}.", request.EmployeeId, request.TeamId);
 
             return Result.Success();
         }

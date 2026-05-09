@@ -27,7 +27,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldAddMember_WhenTeamAndEmployeeExist()
+    public async Task Handle_ShouldAddMember_WithSingleRole()
     {
         // Arrange
         var team = _teamFaker.Generate();
@@ -36,7 +36,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         _dbContext.AddTeam(team);
         _dbContext.AddEmployee(employee);
 
-        var command = new AddTeamMemberCommand(team.Id, employee.Id, roleId);
+        var command = new AddTeamMemberCommand(team.Id, employee.Id, [roleId]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -50,7 +50,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_ShouldAllowSameEmployee_InDifferentRoles()
+    public async Task Handle_ShouldAddMember_WithMultipleRoles()
     {
         // Arrange
         var team = _teamFaker.Generate();
@@ -60,16 +60,16 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         _dbContext.AddTeam(team);
         _dbContext.AddEmployee(employee);
 
-        team.AddMember(employee, roleId1);
-
-        var command = new AddTeamMemberCommand(team.Id, employee.Id, roleId2);
+        var command = new AddTeamMemberCommand(team.Id, employee.Id, [roleId1, roleId2]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
 
         // Assert
         result.IsSuccess.Should().BeTrue();
-        team.Members.Should().HaveCount(2);
+        var activeMembers = team.Members.Where(m => !m.IsDeleted).ToList();
+        activeMembers.Should().HaveCount(2);
+        activeMembers.Select(m => m.RoleId).Should().BeEquivalentTo([roleId1, roleId2]);
         _dbContext.SaveChangesCallCount.Should().Be(1);
     }
 
@@ -85,7 +85,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
 
         team.AddMember(employee, roleId);
 
-        var command = new AddTeamMemberCommand(team.Id, employee.Id, roleId);
+        var command = new AddTeamMemberCommand(team.Id, employee.Id, [roleId]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -103,7 +103,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         var employee = _employeeFaker.Generate();
         _dbContext.AddEmployee(employee);
 
-        var command = new AddTeamMemberCommand(Guid.NewGuid(), employee.Id, Guid.NewGuid());
+        var command = new AddTeamMemberCommand(Guid.NewGuid(), employee.Id, [Guid.NewGuid()]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -121,7 +121,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         var team = _teamFaker.Generate();
         _dbContext.AddTeam(team);
 
-        var command = new AddTeamMemberCommand(team.Id, Guid.NewGuid(), Guid.NewGuid());
+        var command = new AddTeamMemberCommand(team.Id, Guid.NewGuid(), [Guid.NewGuid()]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -141,7 +141,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         _dbContext.AddTeam(team);
         _dbContext.AddEmployee(employee);
 
-        var command = new AddTeamMemberCommand(team.Id, employee.Id, Guid.NewGuid());
+        var command = new AddTeamMemberCommand(team.Id, employee.Id, [Guid.NewGuid()]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -161,7 +161,7 @@ public class AddTeamMemberCommandHandlerTests : IDisposable
         _dbContext.AddTeam(team);
         _dbContext.AddEmployee(employee);
 
-        var command = new AddTeamMemberCommand(team.Id, employee.Id, Guid.NewGuid());
+        var command = new AddTeamMemberCommand(team.Id, employee.Id, [Guid.NewGuid()]);
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);

@@ -277,38 +277,39 @@ public class TeamsOfTeamsController : ControllerBase
     [HttpPost("{id}/members")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
     [OpenApiOperation("Add a member to a team of teams.", "")]
-    [ApiConventionMethod(typeof(WaydApiConventions), nameof(WaydApiConventions.CreateReturn201Guid))]
-    public async Task<ActionResult> AddMember(Guid id, [FromBody] AddTeamMemberRequest request, CancellationToken cancellationToken)
-    {
-        var result = await _sender.Send(new TeamsMemberCommands.AddTeamMemberCommand(id, request.EmployeeId, request.RoleId), cancellationToken);
-
-        return result.IsSuccess
-            ? CreatedAtAction(nameof(GetMembers), new { id }, result.Value)
-            : BadRequest(result.ToBadRequestObject(HttpContext));
-    }
-
-    [HttpPut("{id}/members/{memberId}")]
-    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
-    [OpenApiOperation("Update a team of teams member.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdateMember(Guid id, Guid memberId, [FromBody] UpdateTeamMemberRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult> AddMember(Guid id, [FromBody] AddTeamMemberRequest request, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new TeamsMemberCommands.UpdateTeamMemberCommand(id, memberId, request.RoleId), cancellationToken);
+        var result = await _sender.Send(new TeamsMemberCommands.AddTeamMemberCommand(id, request.EmployeeId, request.RoleIds), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
-    [HttpDelete("{id}/members/{memberId}")]
+    [HttpPut("{id}/members/{employeeId}")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
+    [OpenApiOperation("Update a team of teams member's roles.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<ActionResult> UpdateMember(Guid id, Guid employeeId, [FromBody] UpdateTeamMemberRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(new TeamsMemberCommands.UpdateTeamMemberCommand(id, employeeId, request.RoleIds), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/members/{employeeId}")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Teams)]
     [OpenApiOperation("Remove a member from a team of teams.", "")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> RemoveMember(Guid id, Guid memberId, CancellationToken cancellationToken)
+    public async Task<ActionResult> RemoveMember(Guid id, Guid employeeId, CancellationToken cancellationToken)
     {
-        var result = await _sender.Send(new TeamsMemberCommands.RemoveTeamMemberCommand(id, memberId), cancellationToken);
+        var result = await _sender.Send(new TeamsMemberCommands.RemoveTeamMemberCommand(id, employeeId), cancellationToken);
 
         return result.IsSuccess
             ? NoContent()

@@ -1,4 +1,5 @@
-﻿using Mapster;
+using Mapster;
+using Wayd.Organization.Application.Teams.Dtos;
 
 namespace Wayd.Organization.Application.Teams.Queries;
 
@@ -8,11 +9,20 @@ internal sealed class GetEmployeeTeamMembershipsQueryHandler(IOrganizationDbCont
 {
     public async Task<IReadOnlyList<TeamMemberDto>> Handle(GetEmployeeTeamMembershipsQuery request, CancellationToken cancellationToken)
     {
-        var memberships = await organizationDbContext.TeamMembers
+        var rows = await organizationDbContext.TeamMembers
             .Where(m => m.EmployeeId == request.EmployeeId)
-            .ProjectToType<TeamMemberDto>()
+            .ProjectToType<TeamMemberFlatDto>()
             .ToListAsync(cancellationToken);
 
-        return [.. memberships.OrderBy(m => m.Team.Name).ThenBy(m => m.Role.Name)];
+        return rows
+            .GroupBy(r => r.Team.Id)
+            .Select(g => new TeamMemberDto
+            {
+                Employee = g.First().Employee,
+                Team = g.First().Team,
+                Roles = g.OrderBy(r => r.Role.Name).Select(r => r.Role).ToList(),
+            })
+            .OrderBy(m => m.Team.Name)
+            .ToList();
     }
 }
