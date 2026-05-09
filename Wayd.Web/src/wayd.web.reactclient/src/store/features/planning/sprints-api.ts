@@ -82,7 +82,7 @@ export const sprintsApi = apiSlice.injectEndpoints({
         }
       },
       providesTags: (result, error, sprintKey) => [
-        { type: QueryTags.Sprint, id: `PI-${sprintKey}` },
+        { type: QueryTags.SprintPlanningIntervals, id: sprintKey },
       ],
     }),
   }),

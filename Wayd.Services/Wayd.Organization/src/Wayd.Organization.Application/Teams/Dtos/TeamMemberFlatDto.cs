@@ -27,6 +27,7 @@ internal record TeamMemberFlatDto : IMapFrom<TeamMember>
                 Id = src.Team.Id,
                 Key = src.Team.Key,
                 Name = src.Team.Name,
+                Code = src.Team.Code.Value,
                 Type = src.Team.Type == TeamType.TeamOfTeams ? "Team of Teams" : "Team",
             })
             .Map(dest => dest.Role, src => new NavigationDto

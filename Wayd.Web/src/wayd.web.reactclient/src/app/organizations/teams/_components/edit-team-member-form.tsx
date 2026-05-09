@@ -8,12 +8,14 @@ import { useGetTeamMemberRolesQuery } from '@/src/store/features/organization/te
 import {
   TeamMemberDto,
   useUpdateTeamMemberMutation,
+  useUpdateTeamOfTeamsMemberMutation,
 } from '@/src/store/features/organization/team-members-api'
 
 const { Item: FormItem } = Form
 
 interface Props {
   teamId: string
+  teamType: 'Team' | 'TeamOfTeams'
   member: TeamMemberDto
   onFormComplete: () => void
   onFormCancel: () => void
@@ -23,16 +25,18 @@ interface FormValues {
   roleIds: string[]
 }
 
-const EditTeamMemberForm = ({ teamId, member, onFormComplete, onFormCancel }: Props) => {
+const EditTeamMemberForm = ({ teamId, teamType, member, onFormComplete, onFormCancel }: Props) => {
   const messageApi = useMessage()
   const { data: roleOptions } = useGetTeamMemberRolesQuery(false)
   const [updateTeamMember] = useUpdateTeamMemberMutation()
+  const [updateTeamOfTeamsMember] = useUpdateTeamOfTeamsMemberMutation()
+  const updateMember = teamType === 'Team' ? updateTeamMember : updateTeamOfTeamsMember
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =
     useModalForm<FormValues>({
       onSubmit: async (values) => {
         try {
-          const response = await updateTeamMember({
+          const response = await updateMember({
             teamId,
             employeeId: member.employee.id,
             request: { roleIds: values.roleIds },

@@ -188,6 +188,7 @@ const TeamOfTeamsDetailsPage = (props: {
         return (
           <TeamMembersGrid
             teamId={team?.id ?? ''}
+            teamType="TeamOfTeams"
             teamIsActive={team?.isActive ?? false}
             openAddForm={openAddMemberForm}
             onAddFormClose={() => setOpenAddMemberForm(false)}

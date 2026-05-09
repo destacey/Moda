@@ -75,6 +75,7 @@ export enum QueryTags {
   Sprint = 'Planning.Sprint',
   SprintBacklog = 'Planning.Sprint.Backlog',
   SprintMetrics = 'Planning.Sprint.Metrics',
+  SprintPlanningIntervals = 'Planning.Sprint.PlanningIntervals',
 
   // PPM
   ExpenditureCategory = 'Ppm.ExpenditureCategory',

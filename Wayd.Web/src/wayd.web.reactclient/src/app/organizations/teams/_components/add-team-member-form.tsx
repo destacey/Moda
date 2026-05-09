@@ -6,12 +6,18 @@ import { useModalForm } from '@/src/hooks'
 import { isApiError, type ApiError } from '@/src/utils'
 import { useGetEmployeeOptionsQuery } from '@/src/store/features/organizations/employee-api'
 import { useGetTeamMemberRolesQuery } from '@/src/store/features/organization/team-member-roles-api'
-import { useAddTeamMemberMutation, useGetTeamMembersQuery } from '@/src/store/features/organization/team-members-api'
+import {
+  useAddTeamMemberMutation,
+  useAddTeamOfTeamsMemberMutation,
+  useGetTeamMembersQuery,
+  useGetTeamOfTeamsMembersQuery,
+} from '@/src/store/features/organization/team-members-api'
 
 const { Item: FormItem } = Form
 
 interface Props {
   teamId: string
+  teamType: 'Team' | 'TeamOfTeams'
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -21,12 +27,17 @@ interface FormValues {
   roleIds: string[]
 }
 
-const AddTeamMemberForm = ({ teamId, onFormComplete, onFormCancel }: Props) => {
+const AddTeamMemberForm = ({ teamId, teamType, onFormComplete, onFormCancel }: Props) => {
   const messageApi = useMessage()
   const { data: employeeOptions } = useGetEmployeeOptionsQuery(false)
   const { data: roleOptions } = useGetTeamMemberRolesQuery(false)
-  const { data: currentMembers } = useGetTeamMembersQuery({ teamId })
+  const { data: teamMembers } = useGetTeamMembersQuery({ teamId }, { skip: teamType !== 'Team' })
+  const { data: totMembers } = useGetTeamOfTeamsMembersQuery({ teamId }, { skip: teamType !== 'TeamOfTeams' })
+  const currentMembers = teamType === 'Team' ? teamMembers : totMembers
+
   const [addTeamMember] = useAddTeamMemberMutation()
+  const [addTeamOfTeamsMember] = useAddTeamOfTeamsMemberMutation()
+  const addMember = teamType === 'Team' ? addTeamMember : addTeamOfTeamsMember
 
   const currentMemberIds = new Set(currentMembers?.map((m) => m.employee.id) ?? [])
   const filteredEmployeeOptions = employeeOptions?.filter((e) => !currentMemberIds.has(e.value as string)) ?? []
@@ -35,7 +46,7 @@ const AddTeamMemberForm = ({ teamId, onFormComplete, onFormCancel }: Props) => {
     useModalForm<FormValues>({
       onSubmit: async (values) => {
         try {
-          const response = await addTeamMember({
+          const response = await addMember({
             teamId,
             request: { employeeId: values.employeeId, roleIds: values.roleIds },
           })

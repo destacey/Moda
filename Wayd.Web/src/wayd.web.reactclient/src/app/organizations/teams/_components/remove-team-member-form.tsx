@@ -7,24 +7,28 @@ import { isApiError, type ApiError } from '@/src/utils'
 import {
   TeamMemberDto,
   useRemoveTeamMemberMutation,
+  useRemoveTeamOfTeamsMemberMutation,
 } from '@/src/store/features/organization/team-members-api'
 
 interface Props {
   teamId: string
+  teamType: 'Team' | 'TeamOfTeams'
   member: TeamMemberDto
   onFormComplete: () => void
   onFormCancel: () => void
 }
 
-const RemoveTeamMemberForm = ({ teamId, member, onFormComplete, onFormCancel }: Props) => {
+const RemoveTeamMemberForm = ({ teamId, teamType, member, onFormComplete, onFormCancel }: Props) => {
   const messageApi = useMessage()
   const [removeTeamMember] = useRemoveTeamMemberMutation()
+  const [removeTeamOfTeamsMember] = useRemoveTeamOfTeamsMemberMutation()
+  const removeMember = teamType === 'Team' ? removeTeamMember : removeTeamOfTeamsMember
   const [isRemoving, setIsRemoving] = useState(false)
 
   const handleOk = async () => {
     setIsRemoving(true)
     try {
-      const response = await removeTeamMember({ teamId, employeeId: member.employee.id })
+      const response = await removeMember({ teamId, employeeId: member.employee.id })
       if (response.error) throw response.error
       messageApi.success(`${member.employee.name} removed from team.`)
       onFormComplete()

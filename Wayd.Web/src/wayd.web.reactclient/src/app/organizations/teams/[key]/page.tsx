@@ -351,6 +351,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
         return (
           <TeamMembersGrid
             teamId={team!.id!}
+            teamType="Team"
             teamIsActive={team!.isActive ?? false}
             openAddForm={openAddMemberForm}
             onAddFormClose={() => setOpenAddMemberForm(false)}

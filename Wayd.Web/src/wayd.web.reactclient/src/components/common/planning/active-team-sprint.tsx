@@ -1,6 +1,6 @@
 'use client'
 
-import { useGetActiveSprintQuery } from '@/src/store/features/organizations/team-api'
+import { useGetActiveSprintQuery, useGetTeamDetailsQuery } from '@/src/store/features/organizations/team-api'
 import { useGetSprintMetricsQuery } from '@/src/store/features/planning/sprints-api'
 import { SizingMethod } from '@/src/services/wayd-api'
 import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
@@ -16,7 +16,7 @@ const { Text } = Typography
 
 export interface ActiveTeamSprintProps {
   teamId: string
-  sizingMethod: SizingMethod
+  sizingMethod?: SizingMethod
   showTeamLink?: boolean
 }
 
@@ -26,10 +26,16 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
   showTeamLink = false,
 }) => {
   const { token } = useTheme()
-  const useStoryPoints = sizingMethod === SizingMethod.StoryPoints
 
   const { data: sprintData, isLoading: sprintIsLoading } =
     useGetActiveSprintQuery(teamId)
+
+  const { data: teamDetails } = useGetTeamDetailsQuery(sprintData?.team.key ?? 0, {
+    skip: sizingMethod !== undefined || !sprintData?.team.key,
+  })
+
+  const resolvedSizingMethod = sizingMethod ?? teamDetails?.operatingModel?.sizingMethod ?? SizingMethod.StoryPoints
+  const useStoryPoints = resolvedSizingMethod === SizingMethod.StoryPoints
 
   const sprintKey = sprintData?.key
   const { data: metrics, isLoading: metricsIsLoading } =
@@ -97,14 +103,14 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
             <CompletionRateMetric
               completed={displayValues.completed}
               total={displayValues.total}
-              tooltip={sizingMethod}
+              tooltip={resolvedSizingMethod}
             />
           </Col>
           <Col xs={12}>
             <VelocityMetric
               completed={displayValues.completed}
               total={displayValues.total}
-              tooltip={sizingMethod}
+              tooltip={resolvedSizingMethod}
             />
           </Col>
           <Col xs={12}>

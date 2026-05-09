@@ -23,8 +23,9 @@ public sealed class UpdateTeamMemberRoleCommandValidator : CustomValidator<Updat
 
     private async Task<bool> BeUniqueName(UpdateTeamMemberRoleCommand command, string name, CancellationToken cancellationToken)
     {
+        var normalized = name.Trim();
         return await _organizationDbContext.TeamMemberRoles
-            .AllAsync(r => r.Id == command.Id || r.Name != name, cancellationToken);
+            .AllAsync(r => r.Id == command.Id || r.Name != normalized, cancellationToken);
     }
 }
 

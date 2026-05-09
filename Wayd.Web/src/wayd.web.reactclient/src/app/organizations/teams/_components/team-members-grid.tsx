@@ -11,6 +11,7 @@ import Link from 'next/link'
 import {
   TeamMemberDto,
   useGetTeamMembersQuery,
+  useGetTeamOfTeamsMembersQuery,
 } from '@/src/store/features/organization/team-members-api'
 import AddTeamMemberForm from './add-team-member-form'
 import EditTeamMemberForm from './edit-team-member-form'
@@ -18,6 +19,7 @@ import RemoveTeamMemberForm from './remove-team-member-form'
 
 interface TeamMembersGridProps {
   teamId: string
+  teamType: 'Team' | 'TeamOfTeams'
   teamIsActive: boolean
   openAddForm?: boolean
   onAddFormClose?: () => void
@@ -39,17 +41,25 @@ const RolesCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
   )
 }
 
-const TeamMembersGrid = ({ teamId, teamIsActive, openAddForm, onAddFormClose }: TeamMembersGridProps) => {
+const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFormClose }: TeamMembersGridProps) => {
   const [editingMember, setEditingMember] = useState<TeamMemberDto | null>(null)
   const [removingMember, setRemovingMember] = useState<TeamMemberDto | null>(null)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdate = hasPermissionClaim('Permissions.Teams.Update')
 
-  const { data: members, isLoading, refetch } = useGetTeamMembersQuery(
+  const { data: teamMembers, isLoading: teamLoading, refetch: refetchTeam } = useGetTeamMembersQuery(
     { teamId },
-    { skip: !teamId },
+    { skip: !teamId || teamType !== 'Team' },
   )
+  const { data: totMembers, isLoading: totLoading, refetch: refetchTot } = useGetTeamOfTeamsMembersQuery(
+    { teamId },
+    { skip: !teamId || teamType !== 'TeamOfTeams' },
+  )
+
+  const members = teamType === 'Team' ? teamMembers : totMembers
+  const isLoading = teamType === 'Team' ? teamLoading : totLoading
+  const refetch = teamType === 'Team' ? refetchTeam : refetchTot
 
   const columnDefs = useMemo<ColDef<TeamMemberDto>[]>(() => {
     const getRowMenuItems = (member: TeamMemberDto): ItemType[] => {
@@ -111,6 +121,7 @@ const TeamMembersGrid = ({ teamId, teamIsActive, openAddForm, onAddFormClose }: 
       {openAddForm && teamIsActive && (
         <AddTeamMemberForm
           teamId={teamId}
+          teamType={teamType}
           onFormComplete={() => { onAddFormClose?.(); refetch() }}
           onFormCancel={() => onAddFormClose?.()}
         />
@@ -118,6 +129,7 @@ const TeamMembersGrid = ({ teamId, teamIsActive, openAddForm, onAddFormClose }: 
       {editingMember && (
         <EditTeamMemberForm
           teamId={teamId}
+          teamType={teamType}
           member={editingMember}
           onFormComplete={() => { setEditingMember(null); refetch() }}
           onFormCancel={() => setEditingMember(null)}
@@ -126,6 +138,7 @@ const TeamMembersGrid = ({ teamId, teamIsActive, openAddForm, onAddFormClose }: 
       {removingMember && (
         <RemoveTeamMemberForm
           teamId={teamId}
+          teamType={teamType}
           member={removingMember}
           onFormComplete={() => { setRemovingMember(null); refetch() }}
           onFormCancel={() => setRemovingMember(null)}

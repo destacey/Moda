@@ -24,4 +24,12 @@ describe('getInitials', () => {
   it('handles single character name', () => {
     expect(getInitials('A')).toBe('A')
   })
+
+  it('returns empty string for whitespace-only input', () => {
+    expect(getInitials('   ')).toBe('')
+  })
+
+  it('uses trimmed token for single-word name with surrounding whitespace', () => {
+    expect(getInitials('  Alice  ')).toBe('AL')
+  })
 })

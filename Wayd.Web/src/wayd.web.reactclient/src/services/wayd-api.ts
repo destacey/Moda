@@ -26904,6 +26904,7 @@ export interface PlanningIntervalTeamResponse {
 }
 
 export interface TeamNavigationDto extends NavigationDto {
+    code: string;
     type: string;
 }
 

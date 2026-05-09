@@ -20,8 +20,9 @@ public sealed class CreateTeamMemberRoleCommandValidator : CustomValidator<Creat
 
     private async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
     {
+        var normalized = name.Trim();
         return await _organizationDbContext.TeamMemberRoles
-            .AllAsync(r => r.Name != name, cancellationToken);
+            .AllAsync(r => r.Name != normalized, cancellationToken);
     }
 }
 

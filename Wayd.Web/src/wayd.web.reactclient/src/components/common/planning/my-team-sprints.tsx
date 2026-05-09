@@ -2,11 +2,68 @@
 
 import useAuth from '@/src/components/contexts/auth'
 import { useGetEmployeeTeamMembershipsQuery } from '@/src/store/features/organization/team-members-api'
-import { SizingMethod } from '@/src/services/wayd-api'
+import { useGetActiveSprintQuery } from '@/src/store/features/organizations/team-api'
+import { TeamMemberDto } from '@/src/services/wayd-api'
 import { Flex, Typography } from 'antd'
 import ActiveTeamSprint from './active-team-sprint'
+import { FC, useCallback, useEffect, useState } from 'react'
 
 const { Title } = Typography
+
+interface TeamSprintProbeProps {
+  teamId: string
+  onResult: (teamId: string, hasSprint: boolean) => void
+}
+
+const TeamSprintProbe: FC<TeamSprintProbeProps> = ({ teamId, onResult }) => {
+  const { data: sprintData, isLoading } = useGetActiveSprintQuery(teamId)
+
+  useEffect(() => {
+    if (!isLoading) {
+      onResult(teamId, !!sprintData)
+    }
+  }, [isLoading, sprintData, teamId, onResult])
+
+  return null
+}
+
+interface MyTeamSprintsListProps {
+  teamMemberships: TeamMemberDto[]
+}
+
+const MyTeamSprintsList: FC<MyTeamSprintsListProps> = ({ teamMemberships }) => {
+  const [sprintPresence, setSprintPresence] = useState<Record<string, boolean>>({})
+
+  const handleResult = useCallback((teamId: string, hasSprint: boolean) => {
+    setSprintPresence((prev) => {
+      if (prev[teamId] === hasSprint) return prev
+      return { ...prev, [teamId]: hasSprint }
+    })
+  }, [])
+
+  const allProbed = teamMemberships.every((m) => m.team.id in sprintPresence)
+  const hasAnySprint = Object.values(sprintPresence).some(Boolean)
+
+  return (
+    <>
+      {teamMemberships.map((m) => (
+        <TeamSprintProbe key={m.team.id} teamId={m.team.id} onResult={handleResult} />
+      ))}
+      {allProbed && hasAnySprint && (
+        <Flex vertical gap="middle">
+          <Title level={5} style={{ margin: 0 }}>
+            My Team Sprints
+          </Title>
+          {teamMemberships
+            .filter((m) => sprintPresence[m.team.id])
+            .map((m) => (
+              <ActiveTeamSprint key={m.team.id} teamId={m.team.id} showTeamLink />
+            ))}
+        </Flex>
+      )}
+    </>
+  )
+}
 
 const MyTeamSprints = () => {
   const { user } = useAuth()
@@ -20,26 +77,11 @@ const MyTeamSprints = () => {
   const teamMemberships =
     memberships
       ?.filter((m) => m.team.type === 'Team')
-      .sort((a, b) => a.team.name.localeCompare(b.team.name)) ?? []
+      .sort((a, b) => a.team.code.localeCompare(b.team.code)) ?? []
 
   if (!employeeId || teamMemberships.length === 0) return null
 
-  return (
-    <Flex vertical gap="middle">
-      <Title level={5} style={{ margin: 0 }}>
-        My Team Sprints
-      </Title>
-      {teamMemberships.map((m) => (
-        <ActiveTeamSprint
-          key={m.team.id}
-          teamId={m.team.id}
-          sizingMethod={SizingMethod.StoryPoints}
-          showTeamLink
-        />
-      ))}
-    </Flex>
-  )
+  return <MyTeamSprintsList teamMemberships={teamMemberships} />
 }
 
 export default MyTeamSprints
-

@@ -27376,9 +27376,13 @@
             "type": "object",
             "additionalProperties": false,
             "required": [
+              "code",
               "type"
             ],
             "properties": {
+              "code": {
+                "type": "string"
+              },
               "type": {
                 "type": "string"
               }
