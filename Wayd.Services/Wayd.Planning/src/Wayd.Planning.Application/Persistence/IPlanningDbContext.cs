@@ -9,6 +9,7 @@ public interface IPlanningDbContext : IWaydDbContext
     DbSet<Iteration> Iterations { get; }
     DbSet<PlanningIntervalObjective> PlanningIntervalObjectives { get; }
     DbSet<PlanningInterval> PlanningIntervals { get; }
+    DbSet<PlanningIntervalIterationSprint> PlanningIntervalIterationSprints { get; }
     DbSet<Risk> Risks { get; }
     DbSet<PlanningTeam> PlanningTeams { get; }
     DbSet<PlanningIntervalObjectiveHealthCheck> PlanningIntervalObjectiveHealthChecks { get; }

@@ -22,6 +22,7 @@ export interface MetricCardProps extends Omit<StatisticProps, 'valueStyle'> {
    * would feel doubled-up.
    */
   embedded?: boolean
+  hoverable?: boolean
 }
 
 const MetricCard: FC<MetricCardProps> = ({
@@ -33,6 +34,7 @@ const MetricCard: FC<MetricCardProps> = ({
   valueStyle,
   styles,
   embedded = false,
+  hoverable = false,
   title,
   ...statisticProps
 }) => {
@@ -69,7 +71,7 @@ const MetricCard: FC<MetricCardProps> = ({
       )}
     </Flex>
   ) : (
-    <Card style={defaultCardStyle} size="small">
+    <Card style={defaultCardStyle} size="small" hoverable={hoverable}>
       <Statistic
         {...statisticProps}
         title={titleNode}

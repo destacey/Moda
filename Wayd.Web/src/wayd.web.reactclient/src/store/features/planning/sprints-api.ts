@@ -2,6 +2,7 @@ import { getSprintsClient } from '@/src/services/clients'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import {
+  NavigationDto,
   SprintBacklogItemDto,
   SprintDetailsDto,
   SprintListDto,
@@ -69,6 +70,21 @@ export const sprintsApi = apiSlice.injectEndpoints({
         { type: QueryTags.SprintMetrics, id: sprintKey },
       ],
     }),
+
+    getSprintPlanningIntervals: builder.query<NavigationDto[], number>({
+      queryFn: async (sprintKey: number) => {
+        try {
+          const data = await getSprintsClient().getPlanningIntervals(sprintKey)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, sprintKey) => [
+        { type: QueryTags.Sprint, id: `PI-${sprintKey}` },
+      ],
+    }),
   }),
 })
 
@@ -77,4 +93,5 @@ export const {
   useGetSprintQuery,
   useGetSprintBacklogQuery,
   useGetSprintMetricsQuery,
+  useGetSprintPlanningIntervalsQuery,
 } = sprintsApi

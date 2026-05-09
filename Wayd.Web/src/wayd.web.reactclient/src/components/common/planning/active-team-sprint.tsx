@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { FC } from 'react'
 import { CompletionRateMetric, CycleTimeMetric, StatusMetric, VelocityMetric } from '../metrics'
 import useTheme from '@/src/components/contexts/theme'
+import SprintPiPredictability from './sprint-pi-predictability'
 import TimelineProgress from './timeline-progress'
 import IterationHealthIndicator from './iteration-health-indicator'
 
@@ -121,6 +122,10 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
             />
           </Col>
         </Row>
+        <SprintPiPredictability
+          sprintKey={sprintData.key}
+          teamId={sprintData.team.id}
+        />
       </Flex>
     </Card>
   )

@@ -22,6 +22,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     private readonly List<Iteration> _iterations = [];
     private readonly List<PlanningIntervalObjective> _planningIntervalObjectives = [];
     private readonly List<PlanningInterval> _planningIntervals = [];
+    private readonly List<PlanningIntervalIterationSprint> _planningIntervalIterationSprints = [];
     private readonly List<Risk> _risks = [];
     private readonly List<PlanningTeam> _planningTeams = [];
     private readonly List<PlanningIntervalObjectiveHealthCheck> _planningIntervalObjectiveHealthChecks = [];
@@ -39,6 +40,7 @@ public class FakePlanningDbContext : IPlanningDbContext, IDisposable
     public DbSet<Iteration> Iterations => _iterations.AsDbSet();
     public DbSet<PlanningIntervalObjective> PlanningIntervalObjectives => _planningIntervalObjectives.AsDbSet();
     public DbSet<PlanningInterval> PlanningIntervals => _planningIntervals.AsDbSet();
+    public DbSet<PlanningIntervalIterationSprint> PlanningIntervalIterationSprints => _planningIntervalIterationSprints.AsDbSet();
     public DbSet<Risk> Risks => _risks.AsDbSet();
     public DbSet<PlanningTeam> PlanningTeams => _planningTeams.AsDbSet();
     public DbSet<PlanningIntervalObjectiveHealthCheck> PlanningIntervalObjectiveHealthChecks => _planningIntervalObjectiveHealthChecks.AsDbSet();

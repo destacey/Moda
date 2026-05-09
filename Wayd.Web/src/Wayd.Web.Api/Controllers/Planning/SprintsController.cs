@@ -1,4 +1,5 @@
-﻿using Wayd.Planning.Application.Iterations.Dtos;
+﻿using Wayd.Common.Application.Dtos;
+using Wayd.Planning.Application.Iterations.Dtos;
 using Wayd.Planning.Application.Iterations.Queries;
 using Wayd.Work.Application.WorkItems.Dtos;
 using Wayd.Work.Application.WorkItems.Queries;
@@ -66,5 +67,15 @@ public class SprintsController(ILogger<SprintsController> logger, ISender sender
         return metrics is not null
             ? Ok(metrics)
             : NotFound();
+    }
+
+    [HttpGet("{key:int}/planning-intervals")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Iterations)]
+    [OpenApiOperation("Get planning intervals that this sprint is mapped to.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<NavigationDto>>> GetPlanningIntervals(int key, CancellationToken cancellationToken)
+    {
+        var planningIntervals = await _sender.Send(new GetSprintPlanningIntervalsQuery(key), cancellationToken);
+        return Ok(planningIntervals);
     }
 }
