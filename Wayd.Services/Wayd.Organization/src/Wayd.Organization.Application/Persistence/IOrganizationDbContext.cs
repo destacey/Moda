@@ -8,6 +8,8 @@ public interface IOrganizationDbContext : IWaydDbContext
     DbSet<Team> Teams { get; }
     DbSet<TeamOfTeams> TeamOfTeams { get; }
     DbSet<TeamOperatingModel> TeamOperatingModels { get; }
+    DbSet<TeamMemberRole> TeamMemberRoles { get; }
+    DbSet<TeamMember> TeamMembers { get; }
 
     // Graph Table Syncs
     Task<int> UpsertTeamNode(TeamNode teamNode, CancellationToken cancellationToken);

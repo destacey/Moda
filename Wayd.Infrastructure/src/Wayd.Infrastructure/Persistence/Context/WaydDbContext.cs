@@ -75,6 +75,8 @@ public class WaydDbContext : BaseDbContext, IAppIntegrationDbContext, IFeatureMa
     public DbSet<Team> Teams => Set<Team>();
     public DbSet<TeamOfTeams> TeamOfTeams => Set<TeamOfTeams>();
     public DbSet<TeamOperatingModel> TeamOperatingModels => Set<TeamOperatingModel>();
+    public DbSet<TeamMemberRole> TeamMemberRoles => Set<TeamMemberRole>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
 
     #endregion IOrganization
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Wayd.Common.Domain.Employees;
 using Wayd.Common.Domain.Enums.Organization;
 using Wayd.Common.Domain.Models.Organizations;
 using Wayd.Infrastructure.Persistence.Converters;
@@ -102,6 +103,70 @@ public class TeamMembershipConfig : IEntityTypeConfiguration<TeamMembership>
         builder.Property(o => o.Deleted);
         builder.Property(o => o.DeletedBy);
         builder.Property(o => o.IsDeleted);
+    }
+}
+
+public class TeamMemberRoleConfig : IEntityTypeConfiguration<TeamMemberRole>
+{
+    public void Configure(EntityTypeBuilder<TeamMemberRole> builder)
+    {
+        builder.ToTable("TeamMemberRoles", SchemaNames.Organization);
+
+        builder.HasKey(r => r.Id);
+        builder.HasAlternateKey(r => r.Key);
+
+        builder.Property(r => r.Id).ValueGeneratedNever();
+        builder.Property(r => r.Key).ValueGeneratedOnAdd();
+
+        builder.Property(r => r.Name).IsRequired().HasMaxLength(128);
+        builder.HasIndex(r => r.Name).IsUnique();
+
+        builder.Property(r => r.IsActive);
+
+        // Soft Delete
+        builder.Property(r => r.Deleted);
+        builder.Property(r => r.DeletedBy);
+        builder.Property(r => r.IsDeleted);
+    }
+}
+
+public class TeamMemberConfig : IEntityTypeConfiguration<TeamMember>
+{
+    public void Configure(EntityTypeBuilder<TeamMember> builder)
+    {
+        builder.ToTable("TeamMembers", SchemaNames.Organization);
+
+        builder.HasKey(m => m.Id);
+        builder.Property(m => m.Id).ValueGeneratedNever();
+
+        builder.HasIndex(m => new { m.TeamId, m.EmployeeId, m.RoleId, m.IsDeleted })
+            .IsUnique()
+            .HasFilter("[IsDeleted] = 0")
+            .HasDatabaseName("IX_TeamMembers_TeamId_EmployeeId_RoleId");
+
+        builder.HasIndex(m => new { m.EmployeeId, m.IsDeleted })
+            .HasFilter("[IsDeleted] = 0");
+
+        builder.HasOne(m => m.Employee)
+            .WithMany()
+            .HasForeignKey(m => m.EmployeeId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(m => m.Team)
+            .WithMany(t => t.Members)
+            .HasForeignKey(m => m.TeamId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(m => m.Role)
+            .WithMany()
+            .HasForeignKey(m => m.RoleId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Soft Delete
+        builder.Property(m => m.Deleted);
+        builder.Property(m => m.DeletedBy);
+        builder.Property(m => m.IsDeleted);
     }
 }
 

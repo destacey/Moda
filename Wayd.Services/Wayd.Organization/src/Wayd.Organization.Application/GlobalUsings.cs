@@ -8,6 +8,7 @@ global using Wayd.Common.Application.Persistence;
 global using Wayd.Common.Application.Validation;
 global using Wayd.Common.Extensions;
 global using Wayd.Organization.Application.Persistence;
+global using Wayd.Organization.Application.TeamMemberRoles.Dtos;
 global using Wayd.Organization.Application.Teams.Dtos;
 global using Wayd.Organization.Application.TeamsOfTeams.Dtos;
 global using Wayd.Organization.Application.Validators;

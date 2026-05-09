@@ -38,6 +38,7 @@ public static class ApplicationResource
 
     public const string Employees = nameof(Employees);
     public const string Teams = nameof(Teams);
+    public const string TeamMemberRoles = nameof(TeamMemberRoles);
 
     public const string PlanningIntervals = nameof(PlanningIntervals);
     public const string PlanningIntervalObjectives = nameof(PlanningIntervalObjectives);
@@ -153,6 +154,11 @@ public static class ApplicationPermissions
         new("Update Teams", ApplicationAction.Update, ApplicationResource.Teams, OrganizationCategory),
         new("Manage Team Memberships.  This includes adding, updating, and removing team memberships.", ApplicationAction.ManageTeamMemberships, ApplicationResource.Teams, OrganizationCategory),
         new("Delete Teams", ApplicationAction.Delete, ApplicationResource.Teams, OrganizationCategory),
+
+        new("View Team Member Roles", ApplicationAction.View, ApplicationResource.TeamMemberRoles, OrganizationCategory, IsBasic: true),
+        new("Create Team Member Roles", ApplicationAction.Create, ApplicationResource.TeamMemberRoles, OrganizationCategory),
+        new("Update Team Member Roles", ApplicationAction.Update, ApplicationResource.TeamMemberRoles, OrganizationCategory),
+        new("Delete Team Member Roles", ApplicationAction.Delete, ApplicationResource.TeamMemberRoles, OrganizationCategory),
     ];
 
     private const string PlanningCategory = "Planning";

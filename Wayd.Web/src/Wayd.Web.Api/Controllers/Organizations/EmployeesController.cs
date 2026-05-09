@@ -2,6 +2,8 @@
 using Wayd.Common.Application.Employees.Dtos;
 using Wayd.Common.Application.Employees.Queries;
 using Wayd.Common.Application.Models;
+using Wayd.Organization.Application.Teams.Dtos;
+using Wayd.Organization.Application.Teams.Queries;
 using Wayd.Web.Api.Extensions;
 using Wayd.Web.Api.Models.Organizations.Employees;
 
@@ -109,5 +111,14 @@ public class EmployeesController(ILogger<EmployeesController> logger, ISender se
         return result.IsSuccess
             ? NoContent()
             : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpGet("{id}/team-memberships")]
+    [MustHavePermission(ApplicationAction.View, ApplicationResource.Employees)]
+    [OpenApiOperation("Get team memberships for an employee.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IEnumerable<TeamMemberDto>>> GetTeamMemberships(Guid id, CancellationToken cancellationToken)
+    {
+        return Ok(await _sender.Send(new GetEmployeeTeamMembershipsQuery(id), cancellationToken));
     }
 }
