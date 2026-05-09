@@ -50,6 +50,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   const datasetItemsRef = useRef<DataSet<TItem> | null>(null)
   const datasetGroupsRef = useRef<DataSet<TGroup> | null>(null)
   const initialWindowRef = useRef<{ start: Date; end: Date } | null>(null)
+  const preservedWindowRef = useRef<{ start: Date; end: Date } | null>(null)
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
   const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
@@ -57,6 +58,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   propsDataRef.current = props.data
   const propsGroupsRef = useRef(props.groups)
   propsGroupsRef.current = props.groups
+  const propsRef = useRef(props)
+  propsRef.current = props
 
   const { currentThemeName, token } = useTheme()
 
@@ -64,6 +67,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   const enableSaveAsImage = props.allowSaveAsImage ?? false
 
   const colors = DefaultTimeLineColors[currentThemeName]
+  const colorsRef = useRef(colors)
+  colorsRef.current = colors
 
   const itemTemplateManager: TimelineOptionsTemplateFunction<TItem> =
     useCallback(
@@ -83,15 +88,15 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         //  so we must add the type annotation here to avoid the error
         const Template: TimelineTemplate<WaydDataItem> = getDefaultTemplate(
           item.type,
-          props,
+          propsRef.current,
         )
 
         if (Template)
           root.render(
             <Template
               item={item}
-              fontColor={colors.item.font}
-              foregroundColor={colors.item.foreground}
+              fontColor={colorsRef.current.item.font}
+              foregroundColor={colorsRef.current.item.foreground}
             />,
           )
 
@@ -101,7 +106,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [colors.item.font, colors.item.foreground, props],
+      [],
     )
 
   const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> =
@@ -122,15 +127,15 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         //  so we must add the type annotation here to avoid the error
         const Template: TimelineTemplate<WaydDataGroup> = getDefaultTemplate(
           'group',
-          props,
+          propsRef.current,
         )
 
         if (Template) {
           root.render(
             <Template
               item={item}
-              fontColor={colors.item.font}
-              foregroundColor={colors.item.foreground}
+              fontColor={colorsRef.current.item.font}
+              foregroundColor={colorsRef.current.item.foreground}
               parentElement={element}
             />,
           )
@@ -142,7 +147,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [colors.item.font, colors.item.foreground, props],
+      [],
     )
 
   const onMoveProp = props.onMove
@@ -328,7 +333,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     const datasetItems = new DataSet([] as TItem[])
     data.forEach((item) => {
-      const backgroundColor = item.itemColor ?? colors.item.background
+      const backgroundColor = item.itemColor ?? colorsRef.current.item.background
       const newItem: TItem = {
         ...item,
         itemColor: backgroundColor,
@@ -337,7 +342,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           : item.type === 'range'
             ? `background: ${backgroundColor}; border-color: ${backgroundColor};`
             : item.type === 'background'
-              ? `background: ${colors.background.background}; border-style: inset; border-width: 1px;`
+              ? `background: ${colorsRef.current.background.background}; border-style: inset; border-width: 1px;`
               : undefined,
       }
       datasetItems.add(newItem)
@@ -381,6 +386,16 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     isInitializedRef.current = true
 
+    // Restore window if a theme-change reinit preserved it
+    if (preservedWindowRef.current) {
+      timelineInstanceRef.current.setWindow(
+        preservedWindowRef.current.start,
+        preservedWindowRef.current.end,
+        { animation: false },
+      )
+      preservedWindowRef.current = null
+    }
+
     setTimeout(() => {
       setIsTimelineLoading(false)
     }, 800)
@@ -398,7 +413,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     if (!isInitializedRef.current || !datasetItemsRef.current) return
 
     const processedItems = props.data.map((item) => {
-      const backgroundColor = item.itemColor ?? colors.item.background
+      const backgroundColor = item.itemColor ?? colorsRef.current.item.background
       return {
         ...item,
         itemColor: backgroundColor,
@@ -407,7 +422,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           : item.type === 'range'
             ? `background: ${backgroundColor}; border-color: ${backgroundColor};`
             : item.type === 'background'
-              ? `background: ${colors.background.background}; border-style: inset; border-width: 1px;`
+              ? `background: ${colorsRef.current.background.background}; border-style: inset; border-width: 1px;`
               : undefined,
       } as TItem
     })
@@ -457,6 +472,39 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     })
   }, [props.data, colors.item.background, colors.background.background])
 
+  // Fully reinitialize the timeline when the theme changes so group/item templates
+  // re-render with the correct font colors (they use inline styles, not CSS).
+  useEffect(() => {
+    if (!isInitializedRef.current || !timelineInstanceRef.current) return
+
+    // Preserve the current window before destroying
+    const currentWindow = timelineInstanceRef.current.getWindow()
+
+    // Clear the cache immediately so templates don't reuse old containers,
+    // then unmount the React roots async to avoid unmounting during render.
+    const oldElements = elementMapRef.current
+    elementMapRef.current = {}
+    setTimeout(() => {
+      Object.values(oldElements).forEach(({ root }) => {
+        try { root.unmount() } catch { /* ignore */ }
+      })
+    }, 0)
+
+    // Destroy the timeline instance so init effect rebuilds it
+    timelineInstanceRef.current.destroy()
+    timelineInstanceRef.current = null
+    datasetItemsRef.current = null
+    datasetGroupsRef.current = null
+    isInitializedRef.current = false
+
+    // Stash the current window so it can be restored after reinit
+    if (currentWindow) {
+      preservedWindowRef.current = { start: currentWindow.start, end: currentWindow.end }
+    }
+
+    setReinitTrigger((prev) => prev + 1)
+  }, [currentThemeName])
+
   // Update groups when they change (after initialization)
   useEffect(() => {
     if (!isInitializedRef.current || !timelineInstanceRef.current) return
@@ -501,22 +549,24 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     if (!datasetGroupsRef.current || !props.groups) return
 
-    const currentIds = datasetGroupsRef.current.getIds()
-    const newIds = props.groups.map((g) => g.id)
-
-    const toRemove = currentIds.filter((id) => !newIds.includes(id))
-    if (toRemove.length > 0) {
-      datasetGroupsRef.current.remove(toRemove)
-    }
-
-    props.groups.forEach((group) => {
-      const existing = datasetGroupsRef.current!.get(group.id)
-      if (existing) {
-        datasetGroupsRef.current!.update(group as any)
-      } else {
-        datasetGroupsRef.current!.add(group as any)
+    // Evict cached group template entries so React roots from the old hierarchy
+    // aren't reused after setGroups() rebuilds the DOM and detaches those containers.
+    const prevGroupIds = new Set(datasetGroupsRef.current.getIds())
+    Object.keys(elementMapRef.current).forEach((key) => {
+      const id = (isNaN(Number(key)) ? key : Number(key)) as string | number
+      if (prevGroupIds.has(id)) {
+        const { container, root } = elementMapRef.current[key]
+        container.remove()
+        setTimeout(() => { try { root.unmount() } catch { /* ignore */ } }, 0)
+        delete elementMapRef.current[key]
       }
     })
+
+    // Fully replace the groups DataSet to ensure vis-timeline rebuilds its
+    // internal nestedInGroup hierarchy correctly when the level structure changes.
+    const newDataset = new DataSet(props.groups)
+    datasetGroupsRef.current = newDataset
+    timelineInstanceRef.current.setGroups(newDataset)
   }, [props.groups, props.isLoading])
 
   // Cleanup on unmount
