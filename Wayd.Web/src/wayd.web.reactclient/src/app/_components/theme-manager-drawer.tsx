@@ -28,10 +28,18 @@ interface ThemeManagerDrawerProps {
 }
 
 const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
-  const { currentThemeName, setCurrentThemeName, userThemeConfig, setUserThemeConfig } = useTheme()
+  const {
+    currentThemeName,
+    setCurrentThemeName,
+    userThemeConfig,
+    setUserThemeConfig,
+  } = useTheme()
 
-  const colorPrimary = userThemeConfig?.colorPrimary ?? ThemeConstants.COLOR_PRIMARY
-  const density: 'default' | 'compact' = userThemeConfig?.useCompactAlgorithm ? 'compact' : 'default'
+  const colorPrimary =
+    userThemeConfig?.colorPrimary ?? ThemeConstants.COLOR_PRIMARY
+  const density: 'default' | 'compact' = userThemeConfig?.useCompactAlgorithm
+    ? 'compact'
+    : 'default'
 
   const handleReset = () => setUserThemeConfig(null)
 
@@ -39,7 +47,8 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
     <Drawer
       title="Theme"
       placement="right"
-      width={320}
+      size={320}
+      mask={false}
       open={open}
       onClose={onClose}
     >
@@ -69,7 +78,8 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
                   onClick={() =>
                     setUserThemeConfig({
                       colorPrimary: value,
-                      useCompactAlgorithm: userThemeConfig?.useCompactAlgorithm ?? false,
+                      useCompactAlgorithm:
+                        userThemeConfig?.useCompactAlgorithm ?? false,
                     })
                   }
                   style={{
@@ -81,7 +91,10 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: colorPrimary === value ? `0 0 0 2px #fff, 0 0 0 4px ${value}` : undefined,
+                    boxShadow:
+                      colorPrimary === value
+                        ? `0 0 0 2px #fff, 0 0 0 4px ${value}`
+                        : undefined,
                     border: 'none',
                     padding: 0,
                   }}
@@ -105,13 +118,18 @@ const ThemeManagerDrawer = ({ open, onClose }: ThemeManagerDrawerProps) => {
               { label: 'Compact', value: 'compact' },
             ]}
             onChange={(v) =>
-              setUserThemeConfig({ colorPrimary: userThemeConfig?.colorPrimary, useCompactAlgorithm: v === 'compact' })
+              setUserThemeConfig({
+                colorPrimary: userThemeConfig?.colorPrimary,
+                useCompactAlgorithm: v === 'compact',
+              })
             }
           />
         </Flex>
 
         <Flex vertical gap="small">
-          <Button block onClick={handleReset}>Reset to Defaults</Button>
+          <Button block onClick={handleReset}>
+            Reset to Defaults
+          </Button>
           <Text type="secondary" style={{ fontSize: 12 }}>
             Changes are saved automatically.
           </Text>
