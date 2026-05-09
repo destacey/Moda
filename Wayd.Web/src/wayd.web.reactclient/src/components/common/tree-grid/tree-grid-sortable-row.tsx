@@ -61,8 +61,8 @@ export function TreeGridSortableRow({
     transform: CSS.Transform.toString(transform),
     transition,
     opacity: isDragging || parentIsDragging ? 0.4 : 1,
-    position: 'relative',
-    zIndex: isDragging ? 999 : 'auto',
+    position: isDragging || transform ? 'relative' : undefined,
+    zIndex: isDragging ? 999 : undefined,
   }
 
   const dragHandleContextValue = useMemo(
