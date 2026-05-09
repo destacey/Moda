@@ -536,22 +536,11 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     if (!datasetGroupsRef.current || !props.groups) return
 
-    const currentIds = datasetGroupsRef.current.getIds()
-    const newIds = props.groups.map((g) => g.id)
-
-    const toRemove = currentIds.filter((id) => !newIds.includes(id))
-    if (toRemove.length > 0) {
-      datasetGroupsRef.current.remove(toRemove)
-    }
-
-    props.groups.forEach((group) => {
-      const existing = datasetGroupsRef.current!.get(group.id)
-      if (existing) {
-        datasetGroupsRef.current!.update(group as any)
-      } else {
-        datasetGroupsRef.current!.add(group as any)
-      }
-    })
+    // Fully replace the groups DataSet to ensure vis-timeline rebuilds its
+    // internal nestedInGroup hierarchy correctly when the level structure changes.
+    const newDataset = new DataSet(props.groups)
+    datasetGroupsRef.current = newDataset
+    timelineInstanceRef.current.setGroups(newDataset)
   }, [props.groups, props.isLoading])
 
   // Cleanup on unmount
