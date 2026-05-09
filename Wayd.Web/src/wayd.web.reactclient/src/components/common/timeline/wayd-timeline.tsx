@@ -50,6 +50,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   const datasetItemsRef = useRef<DataSet<TItem> | null>(null)
   const datasetGroupsRef = useRef<DataSet<TGroup> | null>(null)
   const initialWindowRef = useRef<{ start: Date; end: Date } | null>(null)
+  const preservedWindowRef = useRef<{ start: Date; end: Date } | null>(null)
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
   const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
@@ -57,6 +58,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   propsDataRef.current = props.data
   const propsGroupsRef = useRef(props.groups)
   propsGroupsRef.current = props.groups
+  const propsRef = useRef(props)
+  propsRef.current = props
 
   const { currentThemeName, token } = useTheme()
 
@@ -85,7 +88,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         //  so we must add the type annotation here to avoid the error
         const Template: TimelineTemplate<WaydDataItem> = getDefaultTemplate(
           item.type,
-          props,
+          propsRef.current,
         )
 
         if (Template)
@@ -103,7 +106,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [props],
+      [],
     )
 
   const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> =
@@ -124,7 +127,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         //  so we must add the type annotation here to avoid the error
         const Template: TimelineTemplate<WaydDataGroup> = getDefaultTemplate(
           'group',
-          props,
+          propsRef.current,
         )
 
         if (Template) {
@@ -144,7 +147,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [props],
+      [],
     )
 
   const onMoveProp = props.onMove
@@ -383,6 +386,16 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     isInitializedRef.current = true
 
+    // Restore window if a theme-change reinit preserved it
+    if (preservedWindowRef.current) {
+      timelineInstanceRef.current.setWindow(
+        preservedWindowRef.current.start,
+        preservedWindowRef.current.end,
+        { animation: false },
+      )
+      preservedWindowRef.current = null
+    }
+
     setTimeout(() => {
       setIsTimelineLoading(false)
     }, 800)
@@ -484,9 +497,9 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     datasetGroupsRef.current = null
     isInitializedRef.current = false
 
-    // Restore window after reinit
+    // Stash the current window so it can be restored after reinit
     if (currentWindow) {
-      initialWindowRef.current = { start: currentWindow.start, end: currentWindow.end }
+      preservedWindowRef.current = { start: currentWindow.start, end: currentWindow.end }
     }
 
     setReinitTrigger((prev) => prev + 1)
@@ -535,6 +548,19 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     }
 
     if (!datasetGroupsRef.current || !props.groups) return
+
+    // Evict cached group template entries so React roots from the old hierarchy
+    // aren't reused after setGroups() rebuilds the DOM and detaches those containers.
+    const prevGroupIds = new Set(datasetGroupsRef.current.getIds())
+    Object.keys(elementMapRef.current).forEach((key) => {
+      const id = (isNaN(Number(key)) ? key : Number(key)) as string | number
+      if (prevGroupIds.has(id)) {
+        const { container, root } = elementMapRef.current[key]
+        container.remove()
+        setTimeout(() => { try { root.unmount() } catch { /* ignore */ } }, 0)
+        delete elementMapRef.current[key]
+      }
+    })
 
     // Fully replace the groups DataSet to ensure vis-timeline rebuilds its
     // internal nestedInGroup hierarchy correctly when the level structure changes.
