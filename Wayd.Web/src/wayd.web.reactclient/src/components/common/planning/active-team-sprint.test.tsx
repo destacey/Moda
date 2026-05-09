@@ -17,6 +17,7 @@ jest.mock('../../contexts/theme', () => ({
   default: () => ({
     token: {
       colorSuccess: '#52c41a',
+      colorInfo: '#1677ff',
     },
   }),
 }))
@@ -31,6 +32,8 @@ jest.mock('./timeline-progress', () => ({
 jest.mock('../metrics', () => ({
   CompletionRateMetric: () => <div data-testid="completion-rate-metric" />,
   VelocityMetric: () => <div data-testid="velocity-metric" />,
+  StatusMetric: () => <div data-testid="status-metric" />,
+  CycleTimeMetric: () => <div data-testid="cycle-time-metric" />,
 }))
 
 // Mock IterationHealthIndicator
@@ -39,6 +42,12 @@ jest.mock('./iteration-health-indicator', () => ({
   default: () => (
     <div data-testid="iteration-health-indicator">Health Indicator</div>
   ),
+}))
+
+// Mock SprintPiPredictability
+jest.mock('./sprint-pi-predictability', () => ({
+  __esModule: true,
+  default: () => null,
 }))
 
 import { useGetActiveSprintQuery } from '../../../store/features/organizations/team-api'
@@ -50,13 +59,19 @@ describe('ActiveTeamSprint', () => {
     name: 'Sprint 1',
     start: '2023-01-01',
     end: '2023-01-14',
+    team: { id: 'team-1', key: 1, name: 'Team 1', code: 'T1' },
   }
 
   const mockMetrics = {
     totalStoryPoints: 10,
     completedStoryPoints: 5,
+    inProgressStoryPoints: 3,
+    notStartedStoryPoints: 2,
     totalWorkItems: 4,
     completedWorkItems: 2,
+    inProgressWorkItems: 1,
+    notStartedWorkItems: 1,
+    cycleTime: { workItemsCount: 2, totalCycleTimeDays: 10, averageCycleTimeDays: 5 },
   }
 
   beforeEach(() => {
@@ -115,9 +130,6 @@ describe('ActiveTeamSprint', () => {
   })
 
   it('renders loading state when loading metrics', () => {
-    // When metrics are loading, the card should show loading state
-    // but the content might still try to render or be hidden?
-    // In the component: <Card loading={metricsIsLoading} ...>
     ;(useGetSprintMetricsQuery as jest.Mock).mockReturnValue({
       data: undefined,
       isLoading: true,
@@ -129,8 +141,6 @@ describe('ActiveTeamSprint', () => {
         sizingMethod={SizingMethod.StoryPoints}
       />,
     )
-    // Ant Design Card loading state replaces content with skeleton-like structure
-    // We can check if the metrics are NOT present
     expect(
       screen.queryByTestId('completion-rate-metric'),
     ).not.toBeInTheDocument()
@@ -159,7 +169,6 @@ describe('ActiveTeamSprint', () => {
       />,
     )
 
-    // Verify health indicator is rendered
     expect(screen.getByTestId('iteration-health-indicator')).toBeInTheDocument()
   })
 
@@ -176,4 +185,3 @@ describe('ActiveTeamSprint', () => {
     expect(link).toHaveAttribute('href', '/planning/sprints/S1')
   })
 })
-
