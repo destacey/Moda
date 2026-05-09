@@ -222,6 +222,7 @@ export const DrillThroughControl = (props: {
       <Button
         type="text"
         shape="circle"
+        color="default"
         icon={<MinusSquareOutlined />}
         disabled={props.currentLevel === 1}
         onClick={onLevelDown}
@@ -229,6 +230,7 @@ export const DrillThroughControl = (props: {
       <Button
         type="text"
         shape="circle"
+        color="default"
         icon={<PlusSquareOutlined />}
         disabled={props.currentLevel === props.maxLevel || props.maxLevel === 0}
         onClick={onLevelUp}

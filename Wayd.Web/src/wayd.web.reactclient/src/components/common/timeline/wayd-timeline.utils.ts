@@ -46,12 +46,12 @@ export const DefaultTimeLineColors: Record<ThemeName, TimeLineColorData> = {
   },
   slate: {
     item: {
-      background: '#404040',
+      background: '#c0c0c0',
       foreground: '#17354d',
       font: '#f0f0f0',
     },
     background: {
-      background: '#555555',
+      background: '#787878',
     },
   },
 }

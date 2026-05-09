@@ -17,12 +17,14 @@
   color: inherit;
   font-size: 10px;
   padding-left: 5px;
+  font-family: monospace;
 }
 
 .vis-label.vis-nesting-group.collapsed:before {
   color: inherit;
   font-size: 10px;
   padding-left: 5px;
+  font-family: monospace;
 }
 
 /* Override any default group styling */

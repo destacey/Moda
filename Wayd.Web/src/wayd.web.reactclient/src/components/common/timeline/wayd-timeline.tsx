@@ -64,6 +64,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   const enableSaveAsImage = props.allowSaveAsImage ?? false
 
   const colors = DefaultTimeLineColors[currentThemeName]
+  const colorsRef = useRef(colors)
+  colorsRef.current = colors
 
   const itemTemplateManager: TimelineOptionsTemplateFunction<TItem> =
     useCallback(
@@ -90,8 +92,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           root.render(
             <Template
               item={item}
-              fontColor={colors.item.font}
-              foregroundColor={colors.item.foreground}
+              fontColor={colorsRef.current.item.font}
+              foregroundColor={colorsRef.current.item.foreground}
             />,
           )
 
@@ -101,7 +103,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [colors.item.font, colors.item.foreground, props],
+      [props],
     )
 
   const groupTemplateManager: TimelineOptionsTemplateFunction<TGroup> =
@@ -129,8 +131,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           root.render(
             <Template
               item={item}
-              fontColor={colors.item.font}
-              foregroundColor={colors.item.foreground}
+              fontColor={colorsRef.current.item.font}
+              foregroundColor={colorsRef.current.item.foreground}
               parentElement={element}
             />,
           )
@@ -142,7 +144,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         // Return the new container
         return container
       },
-      [colors.item.font, colors.item.foreground, props],
+      [props],
     )
 
   const onMoveProp = props.onMove
@@ -328,7 +330,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     const datasetItems = new DataSet([] as TItem[])
     data.forEach((item) => {
-      const backgroundColor = item.itemColor ?? colors.item.background
+      const backgroundColor = item.itemColor ?? colorsRef.current.item.background
       const newItem: TItem = {
         ...item,
         itemColor: backgroundColor,
@@ -337,7 +339,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           : item.type === 'range'
             ? `background: ${backgroundColor}; border-color: ${backgroundColor};`
             : item.type === 'background'
-              ? `background: ${colors.background.background}; border-style: inset; border-width: 1px;`
+              ? `background: ${colorsRef.current.background.background}; border-style: inset; border-width: 1px;`
               : undefined,
       }
       datasetItems.add(newItem)
@@ -398,7 +400,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     if (!isInitializedRef.current || !datasetItemsRef.current) return
 
     const processedItems = props.data.map((item) => {
-      const backgroundColor = item.itemColor ?? colors.item.background
+      const backgroundColor = item.itemColor ?? colorsRef.current.item.background
       return {
         ...item,
         itemColor: backgroundColor,
@@ -407,7 +409,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           : item.type === 'range'
             ? `background: ${backgroundColor}; border-color: ${backgroundColor};`
             : item.type === 'background'
-              ? `background: ${colors.background.background}; border-style: inset; border-width: 1px;`
+              ? `background: ${colorsRef.current.background.background}; border-style: inset; border-width: 1px;`
               : undefined,
       } as TItem
     })
