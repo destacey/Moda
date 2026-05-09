@@ -5,6 +5,7 @@ import { SizingMethod } from '../../../services/wayd-api'
 // Mock the API hooks
 jest.mock('../../../store/features/organizations/team-api', () => ({
   useGetActiveSprintQuery: jest.fn(),
+  useGetTeamDetailsQuery: jest.fn(() => ({ data: undefined })),
 }))
 
 jest.mock('../../../store/features/planning/sprints-api', () => ({
