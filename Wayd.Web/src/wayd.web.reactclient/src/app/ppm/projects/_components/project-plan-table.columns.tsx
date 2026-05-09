@@ -87,6 +87,7 @@ interface ProjectPlanTableColumnsParams {
   taskPriorityFilterOptions?: FilterOption[]
   isPhaseNode?: (node: ProjectPlanNodeDto | null | undefined) => boolean
   handleEditPhase?: (phase: ProjectPlanNodeDto) => void
+  openPlanItemDrawer?: (taskId: string) => void
 }
 
 export const getProjectPlanTableColumns = ({
@@ -113,6 +114,7 @@ export const getProjectPlanTableColumns = ({
   taskPriorityFilterOptions = [],
   isPhaseNode = () => false,
   handleEditPhase,
+  openPlanItemDrawer,
 }: ProjectPlanTableColumnsParams): ColumnDef<ProjectPlanNodeDto>[] => {
   return [
     ...(canManageTasks
@@ -229,7 +231,29 @@ export const getProjectPlanTableColumns = ({
       enableColumnFilter: true,
       filterFn: 'includesString',
       sortingFn: 'alphanumeric',
-      cell: (info) => info.getValue(),
+      cell: ({ row, getValue }) => {
+        const task = row.original as ProjectPlanNodeDto
+        const isDraft = task.id.startsWith('draft-')
+        const key = (getValue() as string | undefined) ?? ''
+
+        if (!key || isDraft || !openPlanItemDrawer) {
+          return key
+        }
+
+        return (
+          <Button
+            type="link"
+            size="small"
+            style={{ padding: 0, height: 'auto' }}
+            onClick={(e) => {
+              e.stopPropagation()
+              openPlanItemDrawer(task.id)
+            }}
+          >
+            {key}
+          </Button>
+        )
+      },
     },
     {
       accessorKey: 'name',
@@ -278,9 +302,7 @@ export const getProjectPlanTableColumns = ({
                 <span className={styles.indentSpacer} />
               )}
               {isPhase ? (
-                <span className={styles.phaseName}>
-                  {task.name}
-                </span>
+                <span className={styles.phaseName}>{task.name}</span>
               ) : isSelected && handleUpdateTask ? (
                 <FormItem
                   name="name"
@@ -302,7 +324,14 @@ export const getProjectPlanTableColumns = ({
                   />
                 </FormItem>
               ) : (
-                <span style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                <span
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                  }}
+                >
                   {task.name || (isDraft ? '(New Task)' : '')}
                 </span>
               )}
@@ -517,9 +546,7 @@ export const getProjectPlanTableColumns = ({
       } satisfies TreeGridColumnMeta,
       sortingFn: dateSortBy((row: any) => {
         const isMilestone = row.original.type?.name === 'Milestone'
-        return isMilestone
-          ? row.original.plannedDate
-          : row.original.start
+        return isMilestone ? row.original.plannedDate : row.original.start
       }),
       cell: (info) => {
         const task = info.row.original as ProjectPlanNodeDto
@@ -753,7 +780,12 @@ export const getProjectPlanTableColumns = ({
             : task.type?.name === 'Milestone'
           : task.type?.name === 'Milestone'
 
-        if (!isSelected || !handleUpdateTask || isMilestone || task.nodeType === 'Phase') {
+        if (
+          !isSelected ||
+          !handleUpdateTask ||
+          isMilestone ||
+          task.nodeType === 'Phase'
+        ) {
           return value
         }
 
