@@ -161,13 +161,20 @@ const ProjectPlanTable = ({
   ])
 
   const taskTypeFilterOptions = useMemo(
-    () =>
-      taskTypeOptions
+    () => {
+      const options = taskTypeOptions
         .map((o: any) => {
           const label = (o?.label ?? '') as string
           return label ? { label, value: label } : null
         })
-        .filter((x): x is FilterOption => x !== null),
+        .filter((x): x is FilterOption => x !== null)
+
+      if (!options.some((o) => o.value === 'Phase')) {
+        options.unshift({ label: 'Phase', value: 'Phase' })
+      }
+
+      return options
+    },
     [taskTypeOptions],
   )
 
