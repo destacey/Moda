@@ -6,7 +6,8 @@ import { SizingMethod } from '@/src/services/wayd-api'
 import { Card, Col, Flex, Row, Skeleton, Typography } from 'antd'
 import Link from 'next/link'
 import { FC } from 'react'
-import { CompletionRateMetric, VelocityMetric } from '../metrics'
+import { CompletionRateMetric, CycleTimeMetric, StatusMetric, VelocityMetric } from '../metrics'
+import useTheme from '@/src/components/contexts/theme'
 import TimelineProgress from './timeline-progress'
 import IterationHealthIndicator from './iteration-health-indicator'
 
@@ -15,12 +16,15 @@ const { Text } = Typography
 export interface ActiveTeamSprintProps {
   teamId: string
   sizingMethod: SizingMethod
+  showTeamLink?: boolean
 }
 
 const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
   teamId,
   sizingMethod,
+  showTeamLink = false,
 }) => {
+  const { token } = useTheme()
   const useStoryPoints = sizingMethod === SizingMethod.StoryPoints
 
   const { data: sprintData, isLoading: sprintIsLoading } =
@@ -33,23 +37,12 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
     })
 
   const displayValues = (() => {
-    if (!metrics) {
-      return {
-        total: 0,
-        completed: 0,
-      }
-    }
-
-    const displayTotal = useStoryPoints
-      ? metrics.totalStoryPoints
-      : metrics.totalWorkItems
-    const displayCompleted = useStoryPoints
-      ? metrics.completedStoryPoints
-      : metrics.completedWorkItems
-
+    if (!metrics) return { total: 0, completed: 0, inProgress: 0, notStarted: 0 }
     return {
-      total: displayTotal,
-      completed: displayCompleted,
+      total: useStoryPoints ? metrics.totalStoryPoints : metrics.totalWorkItems,
+      completed: useStoryPoints ? metrics.completedStoryPoints : metrics.completedWorkItems,
+      inProgress: useStoryPoints ? metrics.inProgressStoryPoints : metrics.inProgressWorkItems,
+      notStarted: useStoryPoints ? metrics.notStartedStoryPoints : metrics.notStartedWorkItems,
     }
   })()
 
@@ -64,7 +57,16 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
   const title = (
     <Flex justify="space-between">
       <div>
-        <Text>Active Sprint: </Text>
+        {showTeamLink ? (
+          <>
+            <Link href={`/organizations/teams/${sprintData.team.key}`}>
+              {sprintData.team.code}
+            </Link>
+            <Text> · </Text>
+          </>
+        ) : (
+          <Text>Active Sprint: </Text>
+        )}
         <Link href={`/planning/sprints/${sprintData.key}`}>
           {sprintData.name}
         </Link>
@@ -79,32 +81,43 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
   )
 
   return (
-    <Card
-      title={title}
-      size="small"
-      loading={metricsIsLoading}
-      style={{ maxWidth: '450px' }}
-    >
+    <Card title={title} size="small" loading={metricsIsLoading}>
       <Flex vertical gap="small">
         <TimelineProgress
           start={sprintData.start}
           end={sprintData.end}
           dateFormat="MMM D - h:mm A"
+          variant="borderless"
+          size="small"
           style={{ width: '100%' }}
         />
         <Row gutter={[8, 8]}>
-          <Col xs={24} sm={24} md={12} lg={12} xxl={12}>
+          <Col xs={12}>
             <CompletionRateMetric
               completed={displayValues.completed}
               total={displayValues.total}
               tooltip={sizingMethod}
             />
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} xxl={12}>
+          <Col xs={12}>
             <VelocityMetric
               completed={displayValues.completed}
               total={displayValues.total}
               tooltip={sizingMethod}
+            />
+          </Col>
+          <Col xs={12}>
+            <StatusMetric
+              title="In Progress"
+              value={displayValues.inProgress}
+              total={displayValues.total}
+              color={token.colorInfo}
+              tooltip="Total number of story points or items currently in the sprint that are in progress (Status Category: Active). Percentage shown represents the portion of total sprint work that is in progress."
+            />
+          </Col>
+          <Col xs={12}>
+            <CycleTimeMetric
+              value={metrics?.cycleTime?.averageCycleTimeDays ?? 0}
             />
           </Col>
         </Row>
@@ -114,4 +127,3 @@ const ActiveTeamSprint: FC<ActiveTeamSprintProps> = ({
 }
 
 export default ActiveTeamSprint
-
