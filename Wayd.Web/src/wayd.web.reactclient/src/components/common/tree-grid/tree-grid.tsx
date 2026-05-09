@@ -129,6 +129,7 @@ function TreeGridInner<T extends TreeNode>(
   const [textFilterDraftValues, setTextFilterDraftValues] = useState<
     Record<string, string>
   >({})
+  const draftTasksRef = useRef<DraftItem[]>([])
   const draftCounterRef = useRef(0)
   const isResizingRef = useRef(false)
   const filterDebounceTimersRef = useRef<
@@ -139,6 +140,17 @@ function TreeGridInner<T extends TreeNode>(
     selectionStart: number | null
     selectionEnd: number | null
   } | null>(null)
+
+  const updateDraftTasks = useCallback(
+    (updater: (prev: DraftItem[]) => DraftItem[]) => {
+      setDraftTasks((prev) => {
+        const next = updater(prev)
+        draftTasksRef.current = next
+        return next
+      })
+    },
+    [],
+  )
 
   // Field errors: delegate to external state when provided
   const [internalFieldErrors, setInternalFieldErrors] =
@@ -176,7 +188,7 @@ function TreeGridInner<T extends TreeNode>(
           onSave: async (rowId: string, updates: Record<string, any>) => {
             const success = await editingConfig.onSave(rowId, updates)
             if (success && rowId.startsWith(draftPrefix)) {
-              setDraftTasks((prev) => {
+              updateDraftTasks((prev) => {
                 const next = prev.filter((d) => d.id !== rowId)
                 onDraftsChange?.(next)
                 return next
@@ -185,7 +197,7 @@ function TreeGridInner<T extends TreeNode>(
             return success
           },
           onCancelDraft: (draftId) => {
-            setDraftTasks((prev) => {
+            updateDraftTasks((prev) => {
               const next = prev.filter((d) => d.id !== draftId)
               onDraftsChange?.(next)
               return next
@@ -213,6 +225,8 @@ function TreeGridInner<T extends TreeNode>(
     selectedRowId,
     setSelectedRowId,
     setSelectedCellId,
+    isSaving,
+    saveFormChanges,
     getFieldError,
     editableColumns,
     handleKeyDown,
@@ -222,12 +236,21 @@ function TreeGridInner<T extends TreeNode>(
 
   // ─── Draft helpers ───────────────────────────────────────
   const isEditing = selectedRowId !== null
-  const canCreateDraft =
-    canEdit && !isEditing && draftTasks.length === 0 && !!createDraftNode
+  const canCreateDraft = canEdit && !!createDraftNode && !isLoading && !isSaving
 
   const addDraft = useCallback(
-    (parentId?: string): string | null => {
+    async (parentId?: string): Promise<string | null> => {
       if (!canCreateDraft) return null
+
+      if (selectedRowId) {
+        const saved = await saveFormChanges(selectedRowId)
+        if (!saved) return null
+      }
+
+      // Prevent multiple simultaneous drafts from being added.
+      if (draftTasksRef.current.length > 0) {
+        return null
+      }
 
       draftCounterRef.current += 1
       const newDraft: DraftItem = {
@@ -235,7 +258,7 @@ function TreeGridInner<T extends TreeNode>(
         parentId,
         order: 0,
       }
-      setDraftTasks((prev) => {
+      updateDraftTasks((prev) => {
         const next = [...prev, newDraft]
         onDraftsChange?.(next)
         return next
@@ -265,16 +288,25 @@ function TreeGridInner<T extends TreeNode>(
       canCreateDraft,
       draftPrefix,
       onDraftsChange,
+      saveFormChanges,
+      selectedRowId,
       setSelectedRowId,
       setSelectedCellId,
       tableRef,
+      updateDraftTasks,
     ],
   )
 
-  const addDraftAtRoot = useCallback(() => addDraft(), [addDraft])
+  const addDraftAtRoot = useCallback(() => {
+    void addDraft()
+    return null
+  }, [addDraft])
 
   const addDraftAsChild = useCallback(
-    (parentId: string) => addDraft(parentId),
+    (parentId: string) => {
+      void addDraft(parentId)
+      return null
+    },
     [addDraft],
   )
 
