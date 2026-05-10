@@ -9,6 +9,7 @@ const OrganizationalChartTeamNode: React.FC<WaydOrganizationChartNodeProps> = ({
   themeToken,
 }) => {
   const { key, name, type } = data
+  const displayName = name.replace(/\p{Emoji_Presentation}|\p{Extended_Pictographic}/gu, '').trim() || name
 
   const colorMap = {
     'Team of Teams': themeToken.colorPrimary,
@@ -66,7 +67,7 @@ const OrganizationalChartTeamNode: React.FC<WaydOrganizationChartNodeProps> = ({
           }}
           title={name}
         >
-          {name}
+          {displayName}
         </Title>
         <Text
           ellipsis
