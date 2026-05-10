@@ -119,7 +119,9 @@ public class TeamMemberRoleConfig : IEntityTypeConfiguration<TeamMemberRole>
         builder.Property(r => r.Key).ValueGeneratedOnAdd();
 
         builder.Property(r => r.Name).IsRequired().HasMaxLength(128);
-        builder.HasIndex(r => r.Name).IsUnique();
+        builder.HasIndex(r => r.Name).IsUnique().HasFilter("[IsDeleted] = 0");
+
+        builder.Property(r => r.Description).HasMaxLength(1024);
 
         builder.Property(r => r.IsActive);
 

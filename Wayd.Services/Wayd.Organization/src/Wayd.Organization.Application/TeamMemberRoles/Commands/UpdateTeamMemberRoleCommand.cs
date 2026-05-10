@@ -1,6 +1,6 @@
 namespace Wayd.Organization.Application.TeamMemberRoles.Commands;
 
-public sealed record UpdateTeamMemberRoleCommand(Guid Id, string Name) : ICommand;
+public sealed record UpdateTeamMemberRoleCommand(Guid Id, string Name, string? Description) : ICommand;
 
 public sealed class UpdateTeamMemberRoleCommandValidator : CustomValidator<UpdateTeamMemberRoleCommand>
 {
@@ -19,6 +19,10 @@ public sealed class UpdateTeamMemberRoleCommandValidator : CustomValidator<Updat
             .NotEmpty()
             .MaximumLength(128)
             .MustAsync(BeUniqueName).WithMessage("A team member role with this name already exists.");
+
+        RuleFor(c => c.Description)
+            .MaximumLength(1024)
+            .When(c => c.Description is not null);
     }
 
     private async Task<bool> BeUniqueName(UpdateTeamMemberRoleCommand command, string name, CancellationToken cancellationToken)
@@ -52,7 +56,7 @@ internal sealed class UpdateTeamMemberRoleCommandHandler(
                 return Result.Failure("Team member role not found.");
             }
 
-            var result = role.Update(request.Name);
+            var result = role.Update(request.Name, request.Description);
             if (result.IsFailure)
             {
                 _logger.LogError("Error updating team member role {TeamMemberRoleId}. Error message: {Error}", request.Id, result.Error);

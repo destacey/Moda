@@ -1,6 +1,6 @@
 namespace Wayd.Organization.Application.TeamMemberRoles.Commands;
 
-public sealed record CreateTeamMemberRoleCommand(string Name) : ICommand<Guid>;
+public sealed record CreateTeamMemberRoleCommand(string Name, string? Description) : ICommand<Guid>;
 
 public sealed class CreateTeamMemberRoleCommandValidator : CustomValidator<CreateTeamMemberRoleCommand>
 {
@@ -16,6 +16,10 @@ public sealed class CreateTeamMemberRoleCommandValidator : CustomValidator<Creat
             .NotEmpty()
             .MaximumLength(128)
             .MustAsync(BeUniqueName).WithMessage("A team member role with this name already exists.");
+
+        RuleFor(c => c.Description)
+            .MaximumLength(1024)
+            .When(c => c.Description is not null);
     }
 
     private async Task<bool> BeUniqueName(string name, CancellationToken cancellationToken)
@@ -40,7 +44,7 @@ internal sealed class CreateTeamMemberRoleCommandHandler(
     {
         try
         {
-            var result = TeamMemberRole.Create(request.Name);
+            var result = TeamMemberRole.Create(request.Name, request.Description);
             if (result.IsFailure)
             {
                 _logger.LogError("Error creating team member role {Name}. Error message: {Error}", request.Name, result.Error);

@@ -1,4 +1,4 @@
-using Wayd.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
 namespace Wayd.Planning.Application.Iterations.Queries;
 
@@ -15,9 +15,9 @@ internal sealed class GetSprintPlanningIntervalsQueryHandler(IPlanningDbContext 
             .Where(s => s.Sprint.Key == request.SprintKey)
             .Select(s => new NavigationDto
             {
-                Id = s.PlanningIntervalIteration.PlanningInterval.Id,
-                Key = s.PlanningIntervalIteration.PlanningInterval.Key,
-                Name = s.PlanningIntervalIteration.PlanningInterval.Name,
+                Id = s.PlanningIntervalIteration.PlanningInterval!.Id,
+                Key = s.PlanningIntervalIteration.PlanningInterval!.Key,
+                Name = s.PlanningIntervalIteration.PlanningInterval!.Name,
             })
             .Distinct()
             .OrderBy(pi => pi.Name)
