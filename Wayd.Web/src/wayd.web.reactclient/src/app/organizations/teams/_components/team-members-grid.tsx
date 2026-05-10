@@ -5,7 +5,7 @@ import WaydGrid from '@/src/components/common/wayd-grid'
 import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import useAuth from '@/src/components/contexts/auth'
 import { ItemType } from 'antd/es/menu/interface'
-import { Tag } from 'antd'
+import { Flex, Tag, Tooltip } from 'antd'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
 import Link from 'next/link'
 import {
@@ -13,6 +13,7 @@ import {
   useGetTeamMembersQuery,
   useGetTeamOfTeamsMembersQuery,
 } from '@/src/store/features/organization/team-members-api'
+import { useGetTeamMemberRolesQuery } from '@/src/store/features/organization/team-member-roles-api'
 import AddTeamMemberForm from './add-team-member-form'
 import EditTeamMemberForm from './edit-team-member-form'
 import RemoveTeamMemberForm from './remove-team-member-form'
@@ -27,32 +28,48 @@ interface TeamMembersGridProps {
 
 const NameCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
   if (!data) return null
-  return <Link href={`/organizations/employees/${data.employee.key}`}>{data.employee.name}</Link>
-}
-
-const RolesCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
-  if (!data) return null
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', height: '100%' }}>
-      {data.roles.map((role) => (
-        <Tag key={role.id} bordered={false}>{role.name}</Tag>
-      ))}
-    </div>
+    <Link href={`/organizations/employees/${data.employee.key}`}>
+      {data.employee.name}
+    </Link>
   )
 }
 
-const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFormClose }: TeamMembersGridProps) => {
+const TeamMembersGrid = ({
+  teamId,
+  teamType,
+  teamIsActive,
+  openAddForm,
+  onAddFormClose,
+}: TeamMembersGridProps) => {
   const [editingMember, setEditingMember] = useState<TeamMemberDto | null>(null)
-  const [removingMember, setRemovingMember] = useState<TeamMemberDto | null>(null)
+  const [removingMember, setRemovingMember] = useState<TeamMemberDto | null>(
+    null,
+  )
 
   const { hasPermissionClaim } = useAuth()
   const canUpdate = hasPermissionClaim('Permissions.Teams.Update')
 
-  const { data: teamMembers, isLoading: teamLoading, refetch: refetchTeam } = useGetTeamMembersQuery(
+  const { data: allRoles } = useGetTeamMemberRolesQuery(false)
+  const roleDescriptionById = useMemo(() => {
+    const map = new Map<string, string | undefined>()
+    allRoles?.forEach((r) => map.set(r.id, r.description ?? undefined))
+    return map
+  }, [allRoles])
+
+  const {
+    data: teamMembers,
+    isLoading: teamLoading,
+    refetch: refetchTeam,
+  } = useGetTeamMembersQuery(
     { teamId },
     { skip: !teamId || teamType !== 'Team' },
   )
-  const { data: totMembers, isLoading: totLoading, refetch: refetchTot } = useGetTeamOfTeamsMembersQuery(
+  const {
+    data: totMembers,
+    isLoading: totLoading,
+    refetch: refetchTot,
+  } = useGetTeamOfTeamsMembersQuery(
     { teamId },
     { skip: !teamId || teamType !== 'TeamOfTeams' },
   )
@@ -66,7 +83,12 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
       if (!canUpdate) return []
       return [
         { key: 'edit', label: 'Edit', onClick: () => setEditingMember(member) },
-        { key: 'remove', label: 'Remove', danger: true, onClick: () => setRemovingMember(member) },
+        {
+          key: 'remove',
+          label: 'Remove',
+          danger: true,
+          onClick: () => setRemovingMember(member),
+        },
       ]
     }
 
@@ -79,7 +101,10 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
         suppressHeaderMenuButton: true,
         cellRenderer: (params: ICellRendererParams<TeamMemberDto>) => {
           if (!params.data) return null
-          return RowMenuCellRenderer({ ...params, menuItems: getRowMenuItems(params.data) })
+          return RowMenuCellRenderer({
+            ...params,
+            menuItems: getRowMenuItems(params.data),
+          })
         },
       },
       {
@@ -89,25 +114,41 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
         flex: 1,
       },
       {
-        field: 'employee.email',
-        headerName: 'Email',
-        flex: 1,
-      },
-      {
         field: 'employee.jobTitle',
         headerName: 'Title',
         width: 200,
       },
       {
+        field: 'employee.email',
+        headerName: 'Email',
+        flex: 1,
+      },
+      {
         colId: 'roles',
         headerName: 'Roles',
-        cellRenderer: RolesCellRenderer,
-        valueGetter: (params) => params.data?.roles.map((r) => r.name).join(', '),
-        autoHeight: true,
+        cellRenderer: ({ data }: ICellRendererParams<TeamMemberDto>) => {
+          if (!data) return null
+          return (
+            <Flex wrap gap={4}>
+              {data.roles.map((role) => (
+                <Tooltip
+                  key={role.id}
+                  title={roleDescriptionById.get(role.id)}
+                  placement="top"
+                >
+                  <Tag variant="filled">{role.name}</Tag>
+                </Tooltip>
+              ))}
+            </Flex>
+          )
+        },
+        valueGetter: (params) =>
+          params.data?.roles.map((r) => r.name).join(', '),
+        cellStyle: { display: 'flex', alignItems: 'center' },
         flex: 1,
       },
     ]
-  }, [canUpdate])
+  }, [canUpdate, roleDescriptionById])
 
   return (
     <>
@@ -116,13 +157,18 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
         columnDefs={columnDefs}
         rowData={members}
         loading={isLoading}
-        loadData={() => { refetch() }}
+        loadData={() => {
+          refetch()
+        }}
       />
       {openAddForm && teamIsActive && (
         <AddTeamMemberForm
           teamId={teamId}
           teamType={teamType}
-          onFormComplete={() => { onAddFormClose?.(); refetch() }}
+          onFormComplete={() => {
+            onAddFormClose?.()
+            refetch()
+          }}
           onFormCancel={() => onAddFormClose?.()}
         />
       )}
@@ -131,7 +177,10 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
           teamId={teamId}
           teamType={teamType}
           member={editingMember}
-          onFormComplete={() => { setEditingMember(null); refetch() }}
+          onFormComplete={() => {
+            setEditingMember(null)
+            refetch()
+          }}
           onFormCancel={() => setEditingMember(null)}
         />
       )}
@@ -140,7 +189,10 @@ const TeamMembersGrid = ({ teamId, teamType, teamIsActive, openAddForm, onAddFor
           teamId={teamId}
           teamType={teamType}
           member={removingMember}
-          onFormComplete={() => { setRemovingMember(null); refetch() }}
+          onFormComplete={() => {
+            setRemovingMember(null)
+            refetch()
+          }}
           onFormCancel={() => setRemovingMember(null)}
         />
       )}

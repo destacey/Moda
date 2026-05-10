@@ -3,12 +3,13 @@
 import { useMemo } from 'react'
 import WaydGrid from '@/src/components/common/wayd-grid'
 import { ColDef, ICellRendererParams } from 'ag-grid-community'
-import { Tag } from 'antd'
+import { Flex, Tag, Tooltip } from 'antd'
 import Link from 'next/link'
 import {
   TeamMemberDto,
   useGetEmployeeTeamMembershipsQuery,
 } from '@/src/store/features/organization/team-members-api'
+import { useGetTeamMemberRolesQuery } from '@/src/store/features/organization/team-member-roles-api'
 
 interface Props {
   employeeId: string
@@ -16,25 +17,24 @@ interface Props {
 
 const TeamLinkCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
   if (!data) return null
-  return <Link href={`/organizations/teams/${data.team.key}`}>{data.team.name}</Link>
-}
-
-const RolesCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
-  if (!data) return null
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4, alignItems: 'center', height: '100%' }}>
-      {data.roles.map((role) => (
-        <Tag key={role.id} bordered={false}>{role.name}</Tag>
-      ))}
-    </div>
+    <Link href={`/organizations/teams/${data.team.key}`}>{data.team.name}</Link>
   )
 }
 
 const EmployeeTeamsGrid = ({ employeeId }: Props) => {
-  const { data: memberships, isLoading, refetch } = useGetEmployeeTeamMembershipsQuery(
-    { employeeId },
-    { skip: !employeeId },
-  )
+  const {
+    data: memberships,
+    isLoading,
+    refetch,
+  } = useGetEmployeeTeamMembershipsQuery({ employeeId }, { skip: !employeeId })
+
+  const { data: allRoles } = useGetTeamMemberRolesQuery(false)
+  const roleDescriptionById = useMemo(() => {
+    const map = new Map<string, string | undefined>()
+    allRoles?.forEach((r) => map.set(r.id, r.description ?? undefined))
+    return map
+  }, [allRoles])
 
   const columnDefs = useMemo<ColDef<TeamMemberDto>[]>(
     () => [
@@ -48,13 +48,29 @@ const EmployeeTeamsGrid = ({ employeeId }: Props) => {
       {
         colId: 'roles',
         headerName: 'Roles',
-        cellRenderer: RolesCellRenderer,
-        valueGetter: (params) => params.data?.roles.map((r) => r.name).join(', '),
-        autoHeight: true,
+        cellRenderer: ({ data }: ICellRendererParams<TeamMemberDto>) => {
+          if (!data) return null
+          return (
+            <Flex wrap gap={4}>
+              {data.roles.map((role) => (
+                <Tooltip
+                  key={role.id}
+                  title={roleDescriptionById.get(role.id)}
+                  placement="top"
+                >
+                  <Tag variant="filled">{role.name}</Tag>
+                </Tooltip>
+              ))}
+            </Flex>
+          )
+        },
+        valueGetter: (params) =>
+          params.data?.roles.map((r) => r.name).join(', '),
+        cellStyle: { display: 'flex', alignItems: 'center' },
         flex: 1,
       },
     ],
-    [],
+    [roleDescriptionById],
   )
 
   return (
@@ -63,7 +79,9 @@ const EmployeeTeamsGrid = ({ employeeId }: Props) => {
       columnDefs={columnDefs}
       rowData={memberships}
       loading={isLoading}
-      loadData={() => { refetch() }}
+      loadData={() => {
+        refetch()
+      }}
     />
   )
 }
