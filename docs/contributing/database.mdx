@@ -58,6 +58,45 @@ public class WorkItemConfiguration : IEntityTypeConfiguration<WorkItem>
 }
 ```
 
+## Soft Deletes
+
+Wayd uses soft deletes throughout — records are never permanently removed from the database. Instead, they are marked as deleted via the `ISoftDelete` interface.
+
+### BaseSoftDeletableEntity
+
+Entities that support soft delete inherit from `BaseSoftDeletableEntity`, which implements `ISoftDelete`:
+
+```csharp
+public abstract class BaseSoftDeletableEntity<TId> : BaseAuditableEntity<TId>, ISoftDelete
+{
+    public Instant? Deleted { get; set; }
+    public string? DeletedBy { get; set; }
+    public bool IsDeleted { get; set; } = false;
+}
+```
+
+When `SaveChangesAsync` is called, `BaseDbContext` intercepts any `EntityState.Deleted` entry that implements `ISoftDelete`, sets `IsDeleted = true`, and changes the state back to `Modified` — so nothing is ever physically deleted.
+
+### Global Query Filter
+
+`BaseDbContext.OnModelCreating` registers a global EF query filter for all `ISoftDelete` entities:
+
+```csharp
+modelBuilder.AppendGlobalQueryFilter<ISoftDelete>(s => !s.IsDeleted);
+```
+
+This means all LINQ queries automatically exclude soft-deleted rows — no manual `Where(x => !x.IsDeleted)` is needed in handlers or validators. Use `.IgnoreQueryFilters()` only when you explicitly need to include deleted records.
+
+### Unique Indexes on Soft-Deletable Entities
+
+Because soft-deleted rows remain in the table, a plain unique index will block reuse of a deleted value. Always add `HasFilter("[IsDeleted] = 0")` to any unique index on a soft-deletable entity:
+
+```csharp
+builder.HasIndex(r => r.Name).IsUnique().HasFilter("[IsDeleted] = 0");
+```
+
+This keeps the constraint consistent with what the global query filter enforces at the application layer.
+
 ## Migrations
 
 Migrations are managed in `Wayd.Infrastructure.Migrators.MSSQL`.
