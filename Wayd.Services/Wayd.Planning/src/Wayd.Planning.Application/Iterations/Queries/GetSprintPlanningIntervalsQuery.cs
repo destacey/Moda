@@ -1,4 +1,4 @@
-using Wayd.Common.Application.Dtos;
+﻿using Wayd.Common.Application.Dtos;
 
 namespace Wayd.Planning.Application.Iterations.Queries;
 
@@ -12,12 +12,13 @@ internal sealed class GetSprintPlanningIntervalsQueryHandler(IPlanningDbContext 
     public async Task<IReadOnlyList<NavigationDto>> Handle(GetSprintPlanningIntervalsQuery request, CancellationToken cancellationToken)
     {
         return await _planningDbContext.PlanningIntervalIterationSprints
-            .Where(s => s.Sprint.Key == request.SprintKey)
+            .Where(s => s.Sprint.Key == request.SprintKey
+                && s.PlanningIntervalIteration.PlanningInterval != null)
             .Select(s => new NavigationDto
             {
-                Id = s.PlanningIntervalIteration.PlanningInterval.Id,
-                Key = s.PlanningIntervalIteration.PlanningInterval.Key,
-                Name = s.PlanningIntervalIteration.PlanningInterval.Name,
+                Id = s.PlanningIntervalIteration.PlanningInterval!.Id,
+                Key = s.PlanningIntervalIteration.PlanningInterval!.Key,
+                Name = s.PlanningIntervalIteration.PlanningInterval!.Name,
             })
             .Distinct()
             .OrderBy(pi => pi.Name)

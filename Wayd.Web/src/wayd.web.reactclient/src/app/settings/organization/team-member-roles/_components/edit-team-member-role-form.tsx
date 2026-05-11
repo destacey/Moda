@@ -8,6 +8,7 @@ import { Form, Input, Modal } from 'antd'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
+const { TextArea } = Input
 
 export interface EditTeamMemberRoleFormProps {
   role: TeamMemberRoleDto
@@ -17,6 +18,7 @@ export interface EditTeamMemberRoleFormProps {
 
 interface FormValues {
   name: string
+  description?: string
 }
 
 const EditTeamMemberRoleForm = ({
@@ -31,7 +33,11 @@ const EditTeamMemberRoleForm = ({
     useModalForm<FormValues>({
       onSubmit: async (values, form) => {
         try {
-          const response = await updateTeamMemberRole({ id: role.id, name: values.name })
+          const response = await updateTeamMemberRole({
+            id: role.id,
+            name: values.name,
+            description: values.description || undefined,
+          })
           if (response.error) throw response.error
           messageApi.success('Team member role updated successfully.')
           return true
@@ -42,7 +48,8 @@ const EditTeamMemberRoleForm = ({
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              apiError.detail ?? 'An error occurred while updating the team member role.',
+              apiError.detail ??
+                'An error occurred while updating the team member role.',
             )
           }
           return false
@@ -66,7 +73,13 @@ const EditTeamMemberRoleForm = ({
       keyboard={false}
       destroyOnHidden
     >
-      <Form form={form} size="small" layout="vertical" name="edit-team-member-role-form" initialValues={{ name: role.name }}>
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="edit-team-member-role-form"
+        initialValues={{ name: role.name, description: role.description }}
+      >
         <Item
           label="Name"
           name="name"
@@ -76,6 +89,9 @@ const EditTeamMemberRoleForm = ({
           ]}
         >
           <Input showCount maxLength={128} />
+        </Item>
+        <Item label="Description" name="description" rules={[{ max: 1024 }]}>
+          <TextArea showCount maxLength={1024} rows={4} />
         </Item>
       </Form>
     </Modal>

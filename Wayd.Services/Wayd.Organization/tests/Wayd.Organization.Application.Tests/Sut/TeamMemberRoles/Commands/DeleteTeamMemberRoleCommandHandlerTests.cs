@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Wayd.Common.Domain.Tests.Data;
 using Wayd.Organization.Application.TeamMemberRoles.Commands;
@@ -30,7 +30,7 @@ public class DeleteTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldDeleteRole_WhenNotInUse()
     {
         // Arrange
-        var role = TeamMemberRole.Create("Tech Lead").Value;
+        var role = TeamMemberRole.Create("Tech Lead", "Tech Lead role").Value;
         _dbContext.AddTeamMemberRole(role);
 
         var command = new DeleteTeamMemberRoleCommand(role.Id);
@@ -47,7 +47,7 @@ public class DeleteTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldFail_WhenRoleIsInUse()
     {
         // Arrange
-        var role = TeamMemberRole.Create("Tech Lead").Value;
+        var role = TeamMemberRole.Create("Tech Lead", "Tech Lead role").Value;
         var team = _teamFaker.Generate();
         var employee = _employeeFaker.Generate();
         _dbContext.AddTeamMemberRole(role);
@@ -85,5 +85,6 @@ public class DeleteTeamMemberRoleCommandHandlerTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

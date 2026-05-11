@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Wayd.Organization.Application.TeamMemberRoles.Commands;
 using Wayd.Organization.Application.Tests.Infrastructure;
@@ -29,7 +29,7 @@ public class ActivateDeactivateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Deactivate_ShouldDeactivateRole_WhenActive()
     {
         // Arrange
-        var role = TeamMemberRole.Create("Tech Lead").Value;
+        var role = TeamMemberRole.Create("Tech Lead", "Tech Lead role").Value;
         role.IsActive.Should().BeTrue();
         _dbContext.AddTeamMemberRole(role);
 
@@ -48,7 +48,7 @@ public class ActivateDeactivateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Activate_ShouldActivateRole_WhenInactive()
     {
         // Arrange
-        var role = TeamMemberRole.Create("Tech Lead").Value;
+        var role = TeamMemberRole.Create("Tech Lead", "Tech Lead role").Value;
         role.Deactivate();
         role.IsActive.Should().BeFalse();
         _dbContext.AddTeamMemberRole(role);
@@ -97,5 +97,6 @@ public class ActivateDeactivateTeamMemberRoleCommandHandlerTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

@@ -7,6 +7,7 @@ import { Form, Input, Modal } from 'antd'
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
+const { TextArea } = Input
 
 export interface CreateTeamMemberRoleFormProps {
   onFormComplete: () => void
@@ -15,6 +16,7 @@ export interface CreateTeamMemberRoleFormProps {
 
 interface FormValues {
   name: string
+  description?: string
 }
 
 const CreateTeamMemberRoleForm = ({
@@ -28,7 +30,10 @@ const CreateTeamMemberRoleForm = ({
     useModalForm<FormValues>({
       onSubmit: async (values, form) => {
         try {
-          const response = await createTeamMemberRole({ name: values.name })
+          const response = await createTeamMemberRole({
+            name: values.name,
+            description: values.description || undefined,
+          })
           if (response.error) throw response.error
           messageApi.success('Team member role created successfully.')
           return true
@@ -39,7 +44,8 @@ const CreateTeamMemberRoleForm = ({
             messageApi.error('Correct the validation error(s) to continue.')
           } else {
             messageApi.error(
-              apiError.detail ?? 'An error occurred while creating the team member role.',
+              apiError.detail ??
+                'An error occurred while creating the team member role.',
             )
           }
           return false
@@ -63,7 +69,12 @@ const CreateTeamMemberRoleForm = ({
       keyboard={false}
       destroyOnHidden
     >
-      <Form form={form} size="small" layout="vertical" name="create-team-member-role-form">
+      <Form
+        form={form}
+        size="small"
+        layout="vertical"
+        name="create-team-member-role-form"
+      >
         <Item
           label="Name"
           name="name"
@@ -73,6 +84,9 @@ const CreateTeamMemberRoleForm = ({
           ]}
         >
           <Input showCount maxLength={128} />
+        </Item>
+        <Item label="Description" name="description" rules={[{ max: 1024 }]}>
+          <TextArea showCount maxLength={1024} rows={4} />
         </Item>
       </Form>
     </Modal>

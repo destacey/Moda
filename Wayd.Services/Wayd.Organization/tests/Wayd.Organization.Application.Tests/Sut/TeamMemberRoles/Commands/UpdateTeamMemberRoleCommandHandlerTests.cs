@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Wayd.Organization.Application.TeamMemberRoles.Commands;
 using Wayd.Organization.Application.Tests.Infrastructure;
@@ -24,10 +24,10 @@ public class UpdateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldUpdateName_WhenRoleExists()
     {
         // Arrange
-        var role = TeamMemberRole.Create("Tech Lead").Value;
+        var role = TeamMemberRole.Create("Tech Lead", "Tech Lead role").Value;
         _dbContext.AddTeamMemberRole(role);
 
-        var command = new UpdateTeamMemberRoleCommand(role.Id, "Senior Tech Lead");
+        var command = new UpdateTeamMemberRoleCommand(role.Id, "Senior Tech Lead", "Senior Tech Lead role");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -42,7 +42,7 @@ public class UpdateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldFail_WhenRoleNotFound()
     {
         // Arrange
-        var command = new UpdateTeamMemberRoleCommand(Guid.NewGuid(), "Engineer");
+        var command = new UpdateTeamMemberRoleCommand(Guid.NewGuid(), "Engineer", "Engineer role");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -56,5 +56,6 @@ public class UpdateTeamMemberRoleCommandHandlerTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

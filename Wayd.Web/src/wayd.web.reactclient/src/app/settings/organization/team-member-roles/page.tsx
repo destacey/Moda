@@ -110,6 +110,7 @@ const TeamMemberRolesPage = () => {
       },
       { field: 'key', width: 90 },
       { field: 'name', flex: 1 },
+      { field: 'description', flex: 2 },
       { field: 'isActive', headerName: 'Active', width: 90 },
     ]
   }, [canUpdate, canDelete, activateRole, deactivateRole, messageApi])

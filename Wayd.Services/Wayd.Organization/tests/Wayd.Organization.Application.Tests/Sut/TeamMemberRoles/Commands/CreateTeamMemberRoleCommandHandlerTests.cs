@@ -1,4 +1,4 @@
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Moq;
 using Wayd.Organization.Application.TeamMemberRoles.Commands;
 using Wayd.Organization.Application.Tests.Infrastructure;
@@ -23,7 +23,7 @@ public class CreateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldCreateRole_WithValidName()
     {
         // Arrange
-        var command = new CreateTeamMemberRoleCommand("Tech Lead");
+        var command = new CreateTeamMemberRoleCommand("Tech Lead", "Tech Lead role");
 
         // Act
         var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
@@ -38,11 +38,11 @@ public class CreateTeamMemberRoleCommandHandlerTests : IDisposable
     public async Task Handle_ShouldReturnNewId_OnSuccess()
     {
         // Arrange
-        var command = new CreateTeamMemberRoleCommand("Engineer");
+        var command = new CreateTeamMemberRoleCommand("Engineer", "Engineer role");
 
         // Act
         var result1 = await _handler.Handle(command, TestContext.Current.CancellationToken);
-        var result2 = await _handler.Handle(new CreateTeamMemberRoleCommand("Manager"), TestContext.Current.CancellationToken);
+        var result2 = await _handler.Handle(new CreateTeamMemberRoleCommand("Manager", "Manager role"), TestContext.Current.CancellationToken);
 
         // Assert
         result1.IsSuccess.Should().BeTrue();
@@ -53,5 +53,6 @@ public class CreateTeamMemberRoleCommandHandlerTests : IDisposable
     public void Dispose()
     {
         _dbContext.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

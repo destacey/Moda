@@ -28008,16 +28008,19 @@ export interface TeamMemberRoleDto {
     id: string;
     key: number;
     name: string;
+    description?: string | undefined;
     isActive: boolean;
 }
 
 export interface CreateTeamMemberRoleRequest {
     name: string;
+    description?: string | undefined;
 }
 
 export interface UpdateTeamMemberRoleRequest {
     id: string;
     name: string;
+    description?: string | undefined;
 }
 
 export interface TeamListDto {
