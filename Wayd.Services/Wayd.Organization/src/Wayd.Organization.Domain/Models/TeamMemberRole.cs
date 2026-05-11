@@ -92,9 +92,9 @@ public sealed class TeamMemberRole : BaseSoftDeletableEntity, IHasIdAndKey
     /// <summary>
     /// Creates a new instance of <see cref="TeamMemberRole"/> with the specified name and description.
     /// </summary>
-    /// <param name="name"></param>
-    /// <param name="description"></param>
-    /// <returns></returns>
+    /// <param name="name">The name of the role. Cannot be null or whitespace.</param>
+    /// <param name="description">An optional description of the role. Whitespace-only values are treated as null.</param>
+    /// <returns>A successful <see cref="Result{T}"/> containing the new role, or a failure result if validation fails.</returns>
     public static Result<TeamMemberRole> Create(string name, string? description)
     {
         try

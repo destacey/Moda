@@ -5,10 +5,10 @@ import { TeamMemberRoleDto } from '@/src/services/wayd-api'
 import { useUpdateTeamMemberRoleMutation } from '@/src/store/features/organization/team-member-roles-api'
 import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { Form, Input, Modal } from 'antd'
-const { TextArea } = Input
 import { useModalForm } from '@/src/hooks'
 
 const { Item } = Form
+const { TextArea } = Input
 
 export interface EditTeamMemberRoleFormProps {
   role: TeamMemberRoleDto
