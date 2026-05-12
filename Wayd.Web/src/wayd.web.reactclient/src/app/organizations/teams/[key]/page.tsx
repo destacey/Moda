@@ -25,6 +25,7 @@ import { notFound, usePathname } from 'next/navigation'
 import {
   retrieveTeam,
   setEditMode,
+  resetTeamDetail,
   selectEditTeamContext,
 } from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
@@ -47,6 +48,7 @@ import {
   TeamMembershipsGrid,
 } from '../../_components'
 import TeamMembersGrid from '../_components/team-members-grid'
+import AddTeamMemberForm from '../_components/add-team-member-form'
 
 const CycleTimeReport = dynamic(
   () =>
@@ -352,9 +354,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           <TeamMembersGrid
             teamId={team!.id!}
             teamType="Team"
-            teamIsActive={team!.isActive ?? false}
-            openAddForm={openAddMemberForm}
-            onAddFormClose={() => setOpenAddMemberForm(false)}
           />
         )
       case TeamTabs.CycleTimeReport:
@@ -365,6 +364,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }
 
   useEffect(() => {
+    dispatch(resetTeamDetail())
     dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
   }, [teamKey, dispatch])
 
@@ -505,6 +505,14 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
           operatingModelId={team.operatingModel.id}
           onFormComplete={() => onUpdateOperatingModelFormClosed(true)}
           onFormCancel={() => onUpdateOperatingModelFormClosed(false)}
+        />
+      )}
+      {openAddMemberForm && team?.isActive && (
+        <AddTeamMemberForm
+          teamId={team.id!}
+          teamType="Team"
+          onFormComplete={() => setOpenAddMemberForm(false)}
+          onFormCancel={() => setOpenAddMemberForm(false)}
         />
       )}
     </>

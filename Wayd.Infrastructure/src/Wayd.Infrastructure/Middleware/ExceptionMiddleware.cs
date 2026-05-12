@@ -79,7 +79,7 @@ public sealed class ExceptionMiddleware(IProblemDetailsService problemDetailsSer
             ConflictException => StatusCodes.Status409Conflict,
             ValidationException => StatusCodes.Status422UnprocessableEntity,
             ServiceUnavailableException => StatusCodes.Status503ServiceUnavailable,
-            _ => StatusCodes.Status418ImATeapot
+            _ => StatusCodes.Status500InternalServerError
         };
     }
     public static LogEventLevel GetLogLevelFromException(Exception exception)

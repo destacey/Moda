@@ -15,6 +15,7 @@ import RisksGrid, {
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import { EditTeamForm, TeamMembershipsGrid } from '../../_components'
 import TeamMembersGrid from '../../teams/_components/team-members-grid'
+import AddTeamMemberForm from '../../teams/_components/add-team-member-form'
 import useAuth from '@/src/components/contexts/auth'
 import {
   useGetTeamOfTeamsMembershipsQuery,
@@ -25,6 +26,7 @@ import { notFound, usePathname } from 'next/navigation'
 import {
   retrieveTeam,
   setEditMode,
+  resetTeamDetail,
   selectTeamContext,
 } from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
@@ -189,9 +191,6 @@ const TeamOfTeamsDetailsPage = (props: {
           <TeamMembersGrid
             teamId={team?.id ?? ''}
             teamType="TeamOfTeams"
-            teamIsActive={team?.isActive ?? false}
-            openAddForm={openAddMemberForm}
-            onAddFormClose={() => setOpenAddMemberForm(false)}
           />
         )
       default:
@@ -200,6 +199,7 @@ const TeamOfTeamsDetailsPage = (props: {
   }
 
   useEffect(() => {
+    dispatch(resetTeamDetail())
     dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
   }, [teamKey, dispatch])
 
@@ -280,6 +280,14 @@ const TeamOfTeamsDetailsPage = (props: {
           team={team!}
           onFormComplete={() => onDeactivateTeamFormClosed(true)}
           onFormCancel={() => onDeactivateTeamFormClosed(false)}
+        />
+      )}
+      {openAddMemberForm && team?.isActive && (
+        <AddTeamMemberForm
+          teamId={team.id!}
+          teamType="TeamOfTeams"
+          onFormComplete={() => setOpenAddMemberForm(false)}
+          onFormCancel={() => setOpenAddMemberForm(false)}
         />
       )}
     </>

@@ -14,16 +14,12 @@ import {
   useGetTeamOfTeamsMembersQuery,
 } from '@/src/store/features/organization/team-members-api'
 import { useGetTeamMemberRolesQuery } from '@/src/store/features/organization/team-member-roles-api'
-import AddTeamMemberForm from './add-team-member-form'
 import EditTeamMemberForm from './edit-team-member-form'
 import RemoveTeamMemberForm from './remove-team-member-form'
 
 interface TeamMembersGridProps {
   teamId: string
   teamType: 'Team' | 'TeamOfTeams'
-  teamIsActive: boolean
-  openAddForm?: boolean
-  onAddFormClose?: () => void
 }
 
 const NameCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
@@ -38,9 +34,6 @@ const NameCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
 const TeamMembersGrid = ({
   teamId,
   teamType,
-  teamIsActive,
-  openAddForm,
-  onAddFormClose,
 }: TeamMembersGridProps) => {
   const [editingMember, setEditingMember] = useState<TeamMemberDto | null>(null)
   const [removingMember, setRemovingMember] = useState<TeamMemberDto | null>(
@@ -161,17 +154,6 @@ const TeamMembersGrid = ({
           refetch()
         }}
       />
-      {openAddForm && teamIsActive && (
-        <AddTeamMemberForm
-          teamId={teamId}
-          teamType={teamType}
-          onFormComplete={() => {
-            onAddFormClose?.()
-            refetch()
-          }}
-          onFormCancel={() => onAddFormClose?.()}
-        />
-      )}
       {editingMember && (
         <EditTeamMemberForm
           teamId={teamId}

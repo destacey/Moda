@@ -115,6 +115,7 @@ const teamSlice = createCrudSlice({
 export const {
   setIncludeInactive,
   setEditMode,
+  resetDetail: resetTeamDetail,
   getData: retrieveTeams,
   getDetail: retrieveTeam,
   refreshDetail: refreshActiveTeam,
