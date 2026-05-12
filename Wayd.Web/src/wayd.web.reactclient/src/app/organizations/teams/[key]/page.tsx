@@ -25,6 +25,7 @@ import { notFound, usePathname } from 'next/navigation'
 import {
   retrieveTeam,
   setEditMode,
+  resetTeamDetail,
   selectEditTeamContext,
 } from '../../../../store/features/organizations/team-slice'
 import { useAppDispatch, useAppSelector } from '@/src/hooks'
@@ -146,7 +147,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const {
     item,
     error,
-    isLoading: teamIsLoading,
     isInEditMode,
     notFound: teamNotFound,
   } = useAppSelector(selectEditTeamContext)
@@ -364,6 +364,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }
 
   useEffect(() => {
+    dispatch(resetTeamDetail())
     dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
   }, [teamKey, dispatch])
 
@@ -455,7 +456,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }
 
-  if (!teamIsLoading && teamNotFound) {
+  if (teamNotFound) {
     return notFound()
   }
 

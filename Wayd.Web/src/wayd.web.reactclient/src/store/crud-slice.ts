@@ -203,6 +203,15 @@ const createCrudSlice = <
           state.detail.validationErrors = []
         }
       },
+      resetDetail(state) {
+        ;(state.detail.item as TDetail | null) = null
+        state.detail.isLoading = false
+        state.detail.notFound = false
+        state.detail.isSaving = false
+        state.detail.isInEditMode = false
+        state.detail.validationErrors = []
+        state.detail.error = null
+      },
       ...options.reducers,
     },
     extraReducers: (builder) => {
