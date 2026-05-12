@@ -13,7 +13,7 @@ internal sealed class GetSprintsQueryHandler(IPlanningDbContext planningDbContex
     public async Task<List<SprintListDto>> Handle(GetSprintsQuery request, CancellationToken cancellationToken)
     {
         var query = _planningDbContext.Iterations
-            .Where(i => i.Type == IterationType.Sprint)
+            .Where(i => i.Type == IterationType.Sprint && i.TeamId != null)
             .AsQueryable();
 
         if (request.TeamId.HasValue)
