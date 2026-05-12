@@ -17,8 +17,9 @@ interface Props {
 
 const TeamLinkCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
   if (!data) return null
+  const segment = data.team.type === 'Team of Teams' ? 'team-of-teams' : 'teams'
   return (
-    <Link href={`/organizations/teams/${data.team.key}`}>{data.team.name}</Link>
+    <Link href={`/organizations/${segment}/${data.team.key}`}>{data.team.name}</Link>
   )
 }
 

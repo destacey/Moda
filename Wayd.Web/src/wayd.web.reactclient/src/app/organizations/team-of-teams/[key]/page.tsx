@@ -90,6 +90,7 @@ const TeamOfTeamsDetailsPage = (props: {
 
   const {
     item,
+    isLoading: teamIsLoading,
     isInEditMode,
     notFound: teamNotFound,
     error,
@@ -238,7 +239,7 @@ const TeamOfTeamsDetailsPage = (props: {
     }
   }
 
-  if (teamNotFound) {
+  if (!teamIsLoading && teamNotFound) {
     return notFound()
   }
 

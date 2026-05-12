@@ -146,6 +146,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const {
     item,
     error,
+    isLoading: teamIsLoading,
     isInEditMode,
     notFound: teamNotFound,
   } = useAppSelector(selectEditTeamContext)
@@ -454,7 +455,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     }
   }
 
-  if (teamNotFound) {
+  if (!teamIsLoading && teamNotFound) {
     return notFound()
   }
 
