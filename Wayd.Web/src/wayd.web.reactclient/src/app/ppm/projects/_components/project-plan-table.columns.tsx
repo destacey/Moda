@@ -227,7 +227,7 @@ export const getProjectPlanTableColumns = ({
     {
       accessorKey: 'key',
       header: 'Key',
-      size: 120,
+      size: 140,
       enableColumnFilter: true,
       filterFn: 'includesString',
       sortingFn: 'alphanumeric',
