@@ -67,6 +67,7 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     minTime: number | undefined
     maxTime: number | undefined
     editableUpdateTime: boolean
+    template: unknown
   } | null>(null)
   const propsDataRef = useRef(props.data)
   propsDataRef.current = props.data
@@ -320,6 +321,11 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           updatedOptions.editable !== null
             ? !!updatedOptions.editable.updateTime
             : false,
+        // Track the consumer-provided template reference so we re-apply options
+        // when the consumer swaps it out. Consumers are expected to memoize this
+        // reference; if they don't, every render will count as a template change
+        // and re-apply options, which is the correct safe-side behavior.
+        template: propsRef.current.options.template,
       }
       const prev = prevAppliedOptionsRef.current
       const optionsChanged =
@@ -329,7 +335,8 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         prev.groupOrder !== nextSnapshot.groupOrder ||
         prev.minTime !== nextSnapshot.minTime ||
         prev.maxTime !== nextSnapshot.maxTime ||
-        prev.editableUpdateTime !== nextSnapshot.editableUpdateTime
+        prev.editableUpdateTime !== nextSnapshot.editableUpdateTime ||
+        prev.template !== nextSnapshot.template
 
       if (optionsChanged) {
         const { start, end, ...optionsWithoutWindow } = updatedOptions
@@ -625,6 +632,14 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         'group',
         propsRef.current,
       )
+      // vis-timeline orders group rows by the field named by `groupOrder`
+      // (default 'order'). If a consumer mutates that field on an existing
+      // group, the row layout must change — include it in the equality check
+      // so we don't get stuck with stale ordering.
+      const groupOrderField =
+        (typeof propsRef.current.options.groupOrder === 'string'
+          ? propsRef.current.options.groupOrder
+          : undefined) ?? 'order'
       const changedGroups: TGroup[] = []
       props.groups.forEach((next) => {
         if (next.id === undefined) return
@@ -634,7 +649,10 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           prev.content === next.content &&
           prev.className === next.className &&
           prev.style === next.style &&
-          prev.treeLevel === next.treeLevel
+          prev.treeLevel === next.treeLevel &&
+          (prev as Record<string, unknown>)[groupOrderField] ===
+            (next as Record<string, unknown>)[groupOrderField] &&
+          prev.visible === next.visible
         ) {
           return
         }

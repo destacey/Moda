@@ -34,9 +34,12 @@ export const ROADMAP_STATE = {
 } as const
 
 // Walks the roadmap-items tree (children live under activities) and mutates
-// the item whose id matches the date-update request. The cache holds Date
-// objects; the request may carry Dates or YYYY-MM-DD strings (the timeline
-// consumer string-coerces before send), so coerce to Date here.
+// the item whose id matches the date-update request. The NSwag-generated client
+// types these fields as `Date` but does not convert them — `processGetItems`
+// returns raw JSON, so date fields are actually ISO strings at runtime. Write
+// strings here to match the post-refetch shape; downstream consumers parse with
+// dayjs() which accepts both. (Storing Dates would also trip the Redux
+// serializability check on the patch action.)
 function applyOptimisticDates(
   items: RoadmapItemListDto[] | undefined,
   request:
@@ -48,15 +51,15 @@ function applyOptimisticDates(
   for (const item of items) {
     if (item.id === request.itemId) {
       if ('date' in request && request.date !== undefined) {
-        ;(item as RoadmapMilestoneListDto).date = new Date(request.date)
+        ;(item as RoadmapMilestoneListDto).date = toIsoDateString(request.date)
       }
       if ('start' in request && request.start !== undefined) {
         ;(item as RoadmapActivityListDto | RoadmapTimeboxListDto).start =
-          new Date(request.start)
+          toIsoDateString(request.start)
       }
       if ('end' in request && request.end !== undefined) {
         ;(item as RoadmapActivityListDto | RoadmapTimeboxListDto).end =
-          new Date(request.end)
+          toIsoDateString(request.end)
       }
       return true
     }
@@ -66,6 +69,17 @@ function applyOptimisticDates(
     }
   }
   return false
+}
+
+// The DTO fields are typed as `Date` but at runtime hold ISO strings. The
+// request may carry either a real Date (rare) or a YYYY-MM-DD string cast to
+// Date by the timeline consumer. Normalize to a string that vis-timeline /
+// dayjs can parse, and cast back to `Date` to satisfy the DTO type.
+function toIsoDateString(value: Date | string): Date {
+  if (typeof value === 'string') return value as unknown as Date
+  if (value instanceof Date)
+    return value.toISOString() as unknown as Date
+  return value
 }
 
 export const roadmapApi = apiSlice.injectEndpoints({
