@@ -26163,6 +26163,7 @@ export interface ProjectDetailsDto {
     projectManagers: EmployeeNavigationDto[];
     projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
+    strategicInitiatives: NavigationDto[];
     projectLifecycle?: DescriptiveNavigationDto | undefined;
     phases: ProjectPhaseListDto[];
     healthCheck?: ProjectHealthCheckDto | undefined;

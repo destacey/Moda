@@ -24292,6 +24292,7 @@
           "projectManagers",
           "projectMembers",
           "strategicThemes",
+          "strategicInitiatives",
           "id",
           "phases",
           "canManageHealthChecks"
@@ -24372,6 +24373,12 @@
             }
           },
           "strategicThemes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NavigationDto"
+            }
+          },
+          "strategicInitiatives": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NavigationDto"

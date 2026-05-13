@@ -65,6 +65,10 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
 
   const strategicThemes = getSortedNameList(projectData?.strategicThemes ?? [])
 
+  const sortedStrategicInitiatives = [
+    ...(projectData?.strategicInitiatives ?? []),
+  ].sort((a, b) => a.name.localeCompare(b.name))
+
   return (
     <Drawer
       title={projectData?.name ?? 'Project Details'}
@@ -124,6 +128,20 @@ const ProjectDrawer: FC<ProjectDrawerProps> = ({
           {strategicThemes.length > 0 && (
             <LabeledContent label="Strategic Themes">
               {strategicThemes.join(', ')}
+            </LabeledContent>
+          )}
+
+          {sortedStrategicInitiatives.length > 0 && (
+            <LabeledContent label="Strategic Initiatives">
+              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                {sortedStrategicInitiatives.map((si) => (
+                  <li key={si.id}>
+                    <Link href={`/ppm/strategic-initiatives/${si.key}`}>
+                      {si.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </LabeledContent>
           )}
 

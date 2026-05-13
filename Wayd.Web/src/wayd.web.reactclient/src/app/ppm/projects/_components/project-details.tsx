@@ -38,6 +38,10 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((t) => t.name)
 
+  const sortedStrategicInitiatives = [...project.strategicInitiatives].sort(
+    (a, b) => a.name.localeCompare(b.name),
+  )
+
   const hasStarted =
     project.start && dayjs(project.start).isBefore(dayjs(), 'day')
 
@@ -89,6 +93,20 @@ const ProjectDetails: FC<ProjectDetailsProps> = ({ project }) => {
           {strategicThemeNames.length > 0 && (
             <LabeledContent label="Strategic Themes">
               <ContentList items={strategicThemeNames} />
+            </LabeledContent>
+          )}
+
+          {sortedStrategicInitiatives.length > 0 && (
+            <LabeledContent label="Strategic Initiatives">
+              <ul style={{ margin: 0, paddingLeft: 16 }}>
+                {sortedStrategicInitiatives.map((si) => (
+                  <li key={si.id}>
+                    <Link href={`/ppm/strategic-initiatives/${si.key}`}>
+                      {si.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </LabeledContent>
           )}
 
