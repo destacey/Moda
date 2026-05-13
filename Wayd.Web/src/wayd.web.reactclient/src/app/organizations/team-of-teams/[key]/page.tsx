@@ -18,24 +18,18 @@ import TeamMembersGrid from '../../teams/_components/team-members-grid'
 import AddTeamMemberForm from '../../teams/_components/add-team-member-form'
 import useAuth from '@/src/components/contexts/auth'
 import {
+  useGetTeamOfTeamsDetailsQuery,
   useGetTeamOfTeamsMembershipsQuery,
   useGetTeamOfTeamsRisksQuery,
 } from '@/src/store/features/organizations/team-api'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import {
-  retrieveTeam,
-  setEditMode,
-  resetTeamDetail,
-  selectTeamContext,
-} from '../../../../store/features/organizations/team-slice'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import { CreateTeamMembershipForm } from '../../_components'
 import { InactiveTag, PageActions } from '@/src/components/common'
 import { ItemType } from 'antd/es/menu/interface'
 import DeactivateTeamOfTeamsForm from '../../_components/deactivate-team-of-teams-form'
-import { TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 
 enum TeamOfTeamsTabs {
   Details = 'details',
@@ -89,13 +83,13 @@ const TeamOfTeamsDetailsPage = (props: {
     'Permissions.Teams.ManageTeamMemberships',
   )
 
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const {
-    item,
-    isInEditMode,
-    notFound: teamNotFound,
+    data: team,
     error,
-  } = useAppSelector(selectTeamContext)
-  const team = item as TeamOfTeamsDetailsDto | null
+    refetch: refetchTeam,
+  } = useGetTeamOfTeamsDetailsQuery(teamKey)
+  const teamNotFound = (error as any)?.status === 404
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const teamMembershipsQuery = useGetTeamOfTeamsMembershipsQuery(
@@ -123,7 +117,7 @@ const TeamOfTeamsDetailsPage = (props: {
       items.push({
         key: 'edit',
         label: 'Edit',
-        onClick: () => dispatch(setEditMode(true)),
+        onClick: () => setIsEditOpen(true),
       })
 
       if (team?.isActive === true) {
@@ -199,11 +193,6 @@ const TeamOfTeamsDetailsPage = (props: {
   }
 
   useEffect(() => {
-    dispatch(resetTeamDetail())
-    dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
-  }, [teamKey, dispatch])
-
-  useEffect(() => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
   }, [team, dispatch, pathname])
 
@@ -229,14 +218,14 @@ const TeamOfTeamsDetailsPage = (props: {
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
+      refetchTeam()
     }
   }
 
   const onDeactivateTeamFormClosed = (wasSaved: boolean) => {
     setOpenDeactivateTeamForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team of Teams' }))
+      refetchTeam()
     }
   }
 
@@ -266,7 +255,13 @@ const TeamOfTeamsDetailsPage = (props: {
       >
         {renderTabContent()}
       </Card>
-      {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
+      {isEditOpen && team && canUpdateTeam && (
+        <EditTeamForm
+          team={team}
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
           teamId={team!.id!}

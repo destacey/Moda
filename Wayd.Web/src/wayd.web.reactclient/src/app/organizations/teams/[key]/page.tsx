@@ -16,19 +16,14 @@ import RisksGrid, {
 import { useDocumentTitle } from '@/src/hooks/use-document-title'
 import useAuth from '@/src/components/contexts/auth'
 import {
+  useGetTeamDetailsQuery,
   useGetTeamHasEverBeenScrumQuery,
   useGetTeamMembershipsQuery,
   useGetTeamRisksQuery,
 } from '@/src/store/features/organizations/team-api'
 import { authorizePage } from '@/src/components/hoc'
 import { notFound, usePathname } from 'next/navigation'
-import {
-  retrieveTeam,
-  setEditMode,
-  resetTeamDetail,
-  selectEditTeamContext,
-} from '../../../../store/features/organizations/team-slice'
-import { useAppDispatch, useAppSelector } from '@/src/hooks'
+import { useAppDispatch } from '@/src/hooks'
 import { setBreadcrumbTitle } from '@/src/store/breadcrumbs'
 import TeamDependencyManagement from '../_components/team-dependency-management'
 import { ItemType } from 'antd/es/menu/interface'
@@ -41,7 +36,7 @@ import {
   TeamOperatingModelsGrid,
   EditTeamOperatingModelForm,
 } from '../_components'
-import { Methodology, TeamDetailsDto } from '@/src/services/wayd-api'
+import { Methodology } from '@/src/services/wayd-api'
 import {
   CreateTeamMembershipForm,
   EditTeamForm,
@@ -144,13 +139,13 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
     'Permissions.Teams.ManageTeamMemberships',
   )
 
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const {
-    item,
+    data: team,
     error,
-    isInEditMode,
-    notFound: teamNotFound,
-  } = useAppSelector(selectEditTeamContext)
-  const team = item as TeamDetailsDto | null
+    refetch: refetchTeam,
+  } = useGetTeamDetailsQuery(teamKey)
+  const teamNotFound = (error as any)?.status === 404
   const dispatch = useAppDispatch()
   const pathname = usePathname()
   const isScrumTeam = team?.operatingModel?.methodology === Methodology.Scrum
@@ -227,7 +222,7 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       items.push({
         key: 'edit',
         label: 'Edit',
-        onClick: () => dispatch(setEditMode(true)),
+        onClick: () => setIsEditOpen(true),
       })
 
       if (team?.isActive === true) {
@@ -364,11 +359,6 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   }
 
   useEffect(() => {
-    dispatch(resetTeamDetail())
-    dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
-  }, [teamKey, dispatch])
-
-  useEffect(() => {
     team && dispatch(setBreadcrumbTitle({ title: team.name, pathname }))
   }, [team, dispatch, pathname])
 
@@ -431,28 +421,28 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
   const onCreateTeamMembershipFormClosed = (wasSaved: boolean) => {
     setOpenCreateTeamMembershipForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+      refetchTeam()
     }
   }
 
   const onDeactivateTeamFormClosed = (wasSaved: boolean) => {
     setOpenDeactivateTeamForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+      refetchTeam()
     }
   }
 
   const onSetOperatingModelFormClosed = (wasSaved: boolean) => {
     setOpenSetOperatingModelForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+      refetchTeam()
     }
   }
 
   const onUpdateOperatingModelFormClosed = (wasSaved: boolean) => {
     setOpenUpdateOperatingModelForm(false)
     if (wasSaved) {
-      dispatch(retrieveTeam({ key: teamKey, type: 'Team' }))
+      refetchTeam()
     }
   }
 
@@ -476,7 +466,13 @@ const TeamDetailsPage = (props: { params: Promise<{ key: string }> }) => {
       >
         {renderTabContent()}
       </Card>
-      {isInEditMode && team && canUpdateTeam && <EditTeamForm team={team} />}
+      {isEditOpen && team && canUpdateTeam && (
+        <EditTeamForm
+          team={team}
+          open={isEditOpen}
+          onClose={() => setIsEditOpen(false)}
+        />
+      )}
       {openCreateTeamMembershipForm && (
         <CreateTeamMembershipForm
           teamId={team!.id!}

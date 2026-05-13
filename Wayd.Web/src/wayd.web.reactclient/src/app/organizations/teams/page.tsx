@@ -2,17 +2,13 @@
 
 import PageTitle from '@/src/components/common/page-title'
 import WaydGrid from '../../../components/common/wayd-grid'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { ItemType } from 'antd/es/menu/interface'
 import { Button } from 'antd'
 import { useDocumentTitle } from '../../../hooks/use-document-title'
 import useAuth from '../../../components/contexts/auth'
 import { useAppSelector, useAppDispatch } from '../../../hooks'
-import {
-  setIncludeInactive,
-  setEditMode,
-  selectTeamIsInEditMode,
-} from '../../../store/features/organizations/team-slice'
+import { setIncludeInactive } from '../../../store/features/organizations/team-slice'
 import { useGetTeamsQuery } from '../../../store/features/organizations/team-api'
 import { ModalCreateTeamForm } from '../_components/create-team-form'
 import {
@@ -33,7 +29,7 @@ const TeamListPage = () => {
     error,
     refetch,
   } = useGetTeamsQuery(includeInactive)
-  const isInEditMode = useAppSelector(selectTeamIsInEditMode)
+  const [isCreateOpen, setIsCreateOpen] = useState(false)
 
   const columnDefs = useMemo<ColDef<TeamListItem>[]>(
     () => [
@@ -77,7 +73,7 @@ const TeamListPage = () => {
     return (
       <>
         {canCreateTeam && (
-          <Button onClick={() => dispatch(setEditMode(true))}>
+          <Button onClick={() => setIsCreateOpen(true)}>
             Create Team
           </Button>
         )}
@@ -115,7 +111,12 @@ const TeamListPage = () => {
         }}
         loading={isLoading}
       />
-      {isInEditMode && <ModalCreateTeamForm />}
+      {isCreateOpen && (
+        <ModalCreateTeamForm
+          open={isCreateOpen}
+          onClose={() => setIsCreateOpen(false)}
+        />
+      )}
     </>
   )
 }

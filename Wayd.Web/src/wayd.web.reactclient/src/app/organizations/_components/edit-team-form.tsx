@@ -1,45 +1,91 @@
 'use client'
 
-import { Form, Input } from 'antd'
-import { useEffect } from 'react'
+import { Form, Input, Modal } from 'antd'
+import { useEffect, useState } from 'react'
 import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 import { EditTeamFormValues } from '../types'
-import withModalForm, {
-  FormProps,
-} from '../../../components/hoc/with-modal-form'
-import {
-  setEditMode,
-  updateTeam,
-  selectEditTeamContext,
-} from '../../../store/features/organizations/team-slice'
-import { useAppSelector } from '../../../hooks'
+import { useUpdateTeamMutation } from '../../../store/features/organizations/team-api'
+import { useMessage } from '../../../components/contexts/messaging'
 import { MarkdownEditor } from '../../../components/common/markdown'
 
 const { Item } = Form
 
-interface EditTeamFormProps extends FormProps<EditTeamFormValues> {
+interface EditTeamFormProps {
   team: TeamDetailsDto | TeamOfTeamsDetailsDto
+  open: boolean
+  onClose: (success: boolean) => void
 }
 
-const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
+const EditTeamForm = ({ team, open, onClose }: EditTeamFormProps) => {
+  const [form] = Form.useForm<EditTeamFormValues>()
+  const formValues = Form.useWatch([], form)
+  const [isValid, setIsValid] = useState(false)
+  const [updateTeam, { isLoading, error, reset }] = useUpdateTeamMutation()
+  const messageApi = useMessage()
+
   useEffect(() => {
-    if (!team) return
-    const mapTeamToFormValues = (team: EditTeamFormValues) => {
-      form.setFieldsValue({
-        id: team.id,
-        name: team.name,
-        code: team.code,
-        description: team.description || '',
-        type: team.type,
-      })
+    if (!team || !open) return
+    form.setFieldsValue({
+      id: team.id,
+      key: team.key,
+      name: team.name,
+      code: team.code,
+      description: team.description || '',
+      type: team.type,
+    } as EditTeamFormValues)
+  }, [form, team, open])
+
+  useEffect(() => {
+    form.validateFields({ validateOnly: true }).then(
+      () => setIsValid(form.isFieldsTouched()),
+      () => setIsValid(false),
+    )
+  }, [form, formValues])
+
+  useEffect(() => {
+    if (error) {
+      console.error(error)
+      messageApi.error('An unexpected error occurred while saving.')
     }
-    mapTeamToFormValues(team as EditTeamFormValues)
-  }, [form, team])
+  }, [error, messageApi])
+
+  const handleOk = async () => {
+    try {
+      const values = await form.validateFields()
+      const result = await updateTeam(values)
+      if (!('error' in result)) {
+        form.resetFields()
+        reset()
+        onClose(true)
+      }
+    } catch (errorInfo) {
+      console.error(errorInfo)
+    }
+  }
+
+  const handleCancel = () => {
+    form.resetFields()
+    reset()
+    onClose(false)
+  }
 
   return (
-    <>
+    <Modal
+      title="Edit Team"
+      open={open}
+      onOk={handleOk}
+      okButtonProps={{ disabled: !isValid }}
+      okText="Save"
+      confirmLoading={isLoading}
+      onCancel={handleCancel}
+      keyboard={false}
+      destroyOnHidden={true}
+    >
       <Form form={form} size="small" layout="vertical" name="update-team-form">
         <Item name="id" hidden={true}>
+          <Input />
+        </Item>
+        <Item name="key" hidden={true}>
           <Input />
         </Item>
         <Item name="type" hidden={true}>
@@ -76,16 +122,8 @@ const EditTeamForm = ({ form, team }: EditTeamFormProps) => {
           />
         </Item>
       </Form>
-    </>
+    </Modal>
   )
 }
 
-const ModalEditTeamForm = withModalForm(EditTeamForm, {
-  title: 'Edit Team',
-  okText: 'Save',
-  useFormState: () => useAppSelector(selectEditTeamContext),
-  onOk: (values: EditTeamFormValues) => updateTeam!(values),
-  onCancel: () => setEditMode(false),
-})
-
-export default ModalEditTeamForm
+export default EditTeamForm

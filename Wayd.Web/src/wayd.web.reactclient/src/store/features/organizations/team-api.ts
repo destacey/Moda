@@ -9,13 +9,19 @@ import {
   SprintListDto,
   SprintDetailsDto,
   TeamDetailsDto,
+  TeamOfTeamsDetailsDto,
   WorkStatusCategory,
   WorkItemListDto,
   SetTeamOperatingModelRequest,
   UpdateTeamOperatingModelRequest,
   TeamOperatingModelDetailsDto,
 } from './../../../services/wayd-api'
-import { TeamListItem, TeamTypeName } from '@/src/app/organizations/types'
+import {
+  CreateTeamFormValues,
+  EditTeamFormValues,
+  TeamListItem,
+  TeamTypeName,
+} from '@/src/app/organizations/types'
 import { apiSlice } from '../apiSlice'
 import { QueryTags } from '../query-tags'
 import { getTeamsClient, getTeamsOfTeamsClient } from '@/src/services/clients'
@@ -690,6 +696,60 @@ export const teamApi = apiSlice.injectEndpoints({
       providesTags: (result, error, key) => [{ type: QueryTags.Team, id: String(key) }],
     }),
 
+    getTeamOfTeamsDetails: builder.query<TeamOfTeamsDetailsDto, number>({
+      queryFn: async (key) => {
+        try {
+          const data = await getTeamsOfTeamsClient().getById(key)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      providesTags: (result, error, key) => [{ type: QueryTags.Team, id: String(key) }],
+    }),
+
+    createTeam: builder.mutation<TeamDetailsDto | TeamOfTeamsDetailsDto, CreateTeamFormValues>({
+      queryFn: async (newTeam) => {
+        try {
+          const teamClient = newTeam.type === 'Team' ? getTeamsClient() : getTeamsOfTeamsClient()
+          const request = {
+            ...newTeam,
+            activeDate: (newTeam.activeDate as any)?.format('YYYY-MM-DD'),
+          }
+          const id = await teamClient.create(request)
+          const data = await teamClient.getById(id)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: [
+        { type: QueryTags.Team, id: 'LIST-true' },
+        { type: QueryTags.Team, id: 'LIST-false' },
+      ],
+    }),
+
+    updateTeam: builder.mutation<TeamDetailsDto | TeamOfTeamsDetailsDto, EditTeamFormValues>({
+      queryFn: async (team) => {
+        try {
+          const teamClient = team.type === 'Team' ? getTeamsClient() : getTeamsOfTeamsClient()
+          await teamClient.update(team.id, team)
+          const data = await teamClient.getById(team.key)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, team) => [
+        { type: QueryTags.Team, id: String(team.key) },
+        { type: QueryTags.Team, id: 'LIST-true' },
+        { type: QueryTags.Team, id: 'LIST-false' },
+      ],
+    }),
+
     getTeamOperatingModelsForTeams: builder.query<
       TeamOperatingModelDetailsDto[],
       { teamIds: string[]; asOfDate?: Date | string }
@@ -760,4 +820,7 @@ export const {
   useUpdateTeamOperatingModelMutation,
   useDeleteTeamOperatingModelMutation,
   useGetTeamOperatingModelsForTeamsQuery,
+  useGetTeamOfTeamsDetailsQuery,
+  useCreateTeamMutation,
+  useUpdateTeamMutation,
 } = teamApi

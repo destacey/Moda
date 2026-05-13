@@ -16,6 +16,7 @@ export interface CreateTeamFormValues {
 
 export interface EditTeamFormValues {
   id: string
+  key: number
   name: string
   code: string
   description: string
