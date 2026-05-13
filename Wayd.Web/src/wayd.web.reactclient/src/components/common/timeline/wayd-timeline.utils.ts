@@ -92,3 +92,36 @@ export function getDefaultTemplate<
       return undefined
   }
 }
+
+// Structural comparison of two group arrays — checks the id set and each
+// group's `nestedGroups` membership, which together define the hierarchy
+// that vis-timeline tracks internally. Returns true when setGroups() would
+// produce no meaningful change. Ordering is irrelevant: vis-timeline uses
+// `groupOrder`, not array index, to lay out rows. Label/style-only changes
+// should also return true — those are patched in place via DataSet.update().
+export function groupsStructurallyEqual<TGroup extends WaydDataGroup>(
+  a: TGroup[],
+  b: TGroup[],
+): boolean {
+  if (a.length !== b.length) return false
+
+  const byId = new Map<string | number, TGroup>()
+  a.forEach((g) => {
+    if (g.id !== undefined) byId.set(g.id, g)
+  })
+
+  for (const next of b) {
+    if (next.id === undefined) return false
+    const prev = byId.get(next.id)
+    if (!prev) return false
+
+    const prevNested = prev.nestedGroups ?? []
+    const nextNested = next.nestedGroups ?? []
+    if (prevNested.length !== nextNested.length) return false
+    for (let i = 0; i < prevNested.length; i++) {
+      if (prevNested[i] !== nextNested[i]) return false
+    }
+  }
+
+  return true
+}
