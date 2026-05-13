@@ -93,6 +93,53 @@ export function getDefaultTemplate<
   }
 }
 
+// Compares the fields of two data items that affect visible output — the
+// fields the item template reads (`content`, `itemColor`) plus the fields
+// vis-timeline itself uses to lay out and style the item (`start`, `end`,
+// `type`, `group`, `style`, `className`, `title`, `order`). Returns true
+// when an update would produce no visible change, so the caller can skip
+// the destructive evict + DataSet.update() round-trip (which causes the
+// whole timeline to flicker on every refetch).
+//
+// `start` and `end` are compared by epoch time because the same instant can
+// arrive as `Date`, number, or string depending on the source (RTK Query
+// payload vs. vis-data's internal representation after a previous update).
+export function itemsVisuallyEqual<TItem extends WaydDataItem>(
+  a: TItem,
+  b: TItem,
+): boolean {
+  if (toTime(a.start) !== toTime(b.start)) return false
+  if (toTime(a.end) !== toTime(b.end)) return false
+  if (a.content !== b.content) return false
+  if (a.itemColor !== b.itemColor) return false
+  if (a.style !== b.style) return false
+  if (a.className !== b.className) return false
+  if (a.title !== b.title) return false
+  if (a.type !== b.type) return false
+  if (a.group !== b.group) return false
+  if ((a as { order?: unknown }).order !== (b as { order?: unknown }).order)
+    return false
+  return true
+}
+
+function toTime(value: unknown): number | undefined {
+  if (value === undefined || value === null) return undefined
+  if (value instanceof Date) return value.getTime()
+  if (typeof value === 'number') return value
+  if (typeof value === 'string') {
+    const t = new Date(value).getTime()
+    return Number.isNaN(t) ? undefined : t
+  }
+  // vis-data may store Moment-like objects; fall back to toDate()/valueOf()
+  const v = value as { toDate?: () => Date; valueOf?: () => number }
+  if (typeof v.toDate === 'function') return v.toDate().getTime()
+  if (typeof v.valueOf === 'function') {
+    const n = v.valueOf()
+    return typeof n === 'number' ? n : undefined
+  }
+  return undefined
+}
+
 // Structural comparison of two group arrays — checks the id set and each
 // group's `nestedGroups` membership, which together define the hierarchy
 // that vis-timeline tracks internally. Returns true when setGroups() would
