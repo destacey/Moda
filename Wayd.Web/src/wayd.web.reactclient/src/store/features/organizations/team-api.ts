@@ -728,6 +728,10 @@ export const teamApi = apiSlice.injectEndpoints({
       invalidatesTags: [
         { type: QueryTags.Team, id: 'LIST-true' },
         { type: QueryTags.Team, id: 'LIST-false' },
+        { type: QueryTags.TeamOptions, id: 'OPTIONS-true' },
+        { type: QueryTags.TeamOptions, id: 'OPTIONS-false' },
+        { type: QueryTags.TeamOptions, id: 'TEAM_OF_TEAMS-true' },
+        { type: QueryTags.TeamOptions, id: 'TEAM_OF_TEAMS-false' },
       ],
     }),
 
@@ -747,6 +751,10 @@ export const teamApi = apiSlice.injectEndpoints({
         { type: QueryTags.Team, id: String(team.key) },
         { type: QueryTags.Team, id: 'LIST-true' },
         { type: QueryTags.Team, id: 'LIST-false' },
+        { type: QueryTags.TeamOptions, id: 'OPTIONS-true' },
+        { type: QueryTags.TeamOptions, id: 'OPTIONS-false' },
+        { type: QueryTags.TeamOptions, id: 'TEAM_OF_TEAMS-true' },
+        { type: QueryTags.TeamOptions, id: 'TEAM_OF_TEAMS-false' },
       ],
     }),
 

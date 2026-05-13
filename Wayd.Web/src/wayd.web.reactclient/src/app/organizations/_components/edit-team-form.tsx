@@ -6,6 +6,7 @@ import { TeamDetailsDto, TeamOfTeamsDetailsDto } from '@/src/services/wayd-api'
 import { EditTeamFormValues } from '../types'
 import { useUpdateTeamMutation } from '../../../store/features/organizations/team-api'
 import { useMessage } from '../../../components/contexts/messaging'
+import { toFormErrors, isApiError, type ApiError } from '@/src/utils'
 import { MarkdownEditor } from '../../../components/common/markdown'
 
 const { Item } = Form
@@ -45,9 +46,15 @@ const EditTeamForm = ({ team, open, onClose }: EditTeamFormProps) => {
   useEffect(() => {
     if (error) {
       console.error(error)
-      messageApi.error('An unexpected error occurred while saving.')
+      const apiError: ApiError = isApiError(error) ? error : {}
+      if (apiError.status === 422 && apiError.errors) {
+        form.setFields(toFormErrors(apiError.errors))
+        messageApi.error('Correct the validation error(s) to continue.')
+      } else {
+        messageApi.error(apiError.detail ?? 'An unexpected error occurred while saving.')
+      }
     }
-  }, [error, messageApi])
+  }, [error, form, messageApi])
 
   const handleOk = async () => {
     try {
