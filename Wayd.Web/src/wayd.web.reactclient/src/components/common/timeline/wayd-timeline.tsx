@@ -30,6 +30,37 @@ import { saveElementAsImage } from '@/src/utils'
 import { TimelineOptionsItemCallbackFunction } from 'vis-timeline'
 import dayjs from 'dayjs'
 
+// Structural comparison of two group arrays — checks the id set and each
+// group's `nestedGroups` membership, which together define the hierarchy
+// that vis-timeline tracks internally. Returns true when setGroups() would
+// produce no meaningful change.
+function groupsStructurallyEqual<TGroup extends WaydDataGroup>(
+  a: TGroup[],
+  b: TGroup[],
+): boolean {
+  if (a.length !== b.length) return false
+
+  const byId = new Map<string | number, TGroup>()
+  a.forEach((g) => {
+    if (g.id !== undefined) byId.set(g.id, g)
+  })
+
+  for (const next of b) {
+    if (next.id === undefined) return false
+    const prev = byId.get(next.id)
+    if (!prev) return false
+
+    const prevNested = prev.nestedGroups ?? []
+    const nextNested = next.nestedGroups ?? []
+    if (prevNested.length !== nextNested.length) return false
+    for (let i = 0; i < prevNested.length; i++) {
+      if (prevNested[i] !== nextNested[i]) return false
+    }
+  }
+
+  return true
+}
+
 const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   props: WaydTimelineProps<TItem, TGroup>,
 ) => {
@@ -548,6 +579,12 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     }
 
     if (!datasetGroupsRef.current || !props.groups) return
+
+    // Skip the destructive setGroups() when the group hierarchy is structurally
+    // unchanged — otherwise every refetch (e.g. after a drag-edit) rebuilds the
+    // group DOM and leaves orphaned item containers from the template cache.
+    const prevGroups = datasetGroupsRef.current.get() as TGroup[]
+    if (groupsStructurallyEqual(prevGroups, props.groups)) return
 
     // Evict cached group template entries so React roots from the old hierarchy
     // aren't reused after setGroups() rebuilds the DOM and detaches those containers.
