@@ -31,10 +31,7 @@ const NameCellRenderer = ({ data }: ICellRendererParams<TeamMemberDto>) => {
   )
 }
 
-const TeamMembersGrid = ({
-  teamId,
-  teamType,
-}: TeamMembersGridProps) => {
+const TeamMembersGrid = ({ teamId, teamType }: TeamMembersGridProps) => {
   const [editingMember, setEditingMember] = useState<TeamMemberDto | null>(null)
   const [removingMember, setRemovingMember] = useState<TeamMemberDto | null>(
     null,
@@ -104,17 +101,17 @@ const TeamMembersGrid = ({
         field: 'employee.name',
         headerName: 'Name',
         cellRenderer: NameCellRenderer,
-        flex: 1,
+        width: 250,
       },
       {
         field: 'employee.jobTitle',
         headerName: 'Title',
-        width: 200,
+        width: 300,
       },
       {
         field: 'employee.email',
         headerName: 'Email',
-        flex: 1,
+        width: 300,
       },
       {
         colId: 'roles',
@@ -138,7 +135,7 @@ const TeamMembersGrid = ({
         valueGetter: (params) =>
           params.data?.roles.map((r) => r.name).join(', '),
         cellStyle: { display: 'flex', alignItems: 'center' },
-        flex: 1,
+        width: 400,
       },
     ]
   }, [canUpdate, roleDescriptionById])
