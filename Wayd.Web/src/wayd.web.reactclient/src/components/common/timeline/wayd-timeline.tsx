@@ -13,6 +13,7 @@ import {
   DefaultTimeLineColors,
   getDefaultTemplate,
   groupsStructurallyEqual,
+  itemsVisuallyEqual,
 } from './wayd-timeline.utils'
 import {
   WaydDataGroup,
@@ -55,6 +56,19 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
   const isInitializedRef = useRef(false)
   const dynamicOptionsRef = useRef<TimelineOptions>({})
   const prevWindowBoundsRef = useRef<{ start: Date; end: Date } | null>(null)
+  // Snapshot of the option values last applied via setOptions(), so we can skip
+  // calling it again when only object/function identity changed (e.g. a refetch
+  // produced a fresh Date with the same instant). setOptions() triggers a redraw
+  // even for a no-op change, which the user perceives as a section-wide flicker.
+  const prevAppliedOptionsRef = useRef<{
+    maxHeight: number | undefined
+    showCurrentTime: boolean | undefined
+    groupOrder: string | undefined
+    minTime: number | undefined
+    maxTime: number | undefined
+    editableUpdateTime: boolean
+    template: unknown
+  } | null>(null)
   const propsDataRef = useRef(props.data)
   propsDataRef.current = props.data
   const propsGroupsRef = useRef(props.groups)
@@ -286,9 +300,49 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         }
       }
 
-      // Always update other options, excluding start/end to avoid implicit resets
-      const { start, end, ...optionsWithoutWindow } = updatedOptions
-      timelineInstanceRef.current.setOptions(optionsWithoutWindow)
+      // Only call setOptions when an option value actually changed. baseOptions
+      // is re-created on every render because consumers pass fresh Date instances
+      // (e.g. dayjs().toDate() in roadmap timeline) — without this short-circuit,
+      // setOptions() fires every refetch and the user sees a section-wide flicker.
+      const nextSnapshot = {
+        maxHeight:
+          typeof updatedOptions.maxHeight === 'number'
+            ? updatedOptions.maxHeight
+            : undefined,
+        showCurrentTime: updatedOptions.showCurrentTime,
+        groupOrder:
+          typeof updatedOptions.groupOrder === 'string'
+            ? updatedOptions.groupOrder
+            : undefined,
+        minTime: updatedOptions.min ? new Date(updatedOptions.min).getTime() : undefined,
+        maxTime: updatedOptions.max ? new Date(updatedOptions.max).getTime() : undefined,
+        editableUpdateTime:
+          typeof updatedOptions.editable === 'object' &&
+          updatedOptions.editable !== null
+            ? !!updatedOptions.editable.updateTime
+            : false,
+        // Track the consumer-provided template reference so we re-apply options
+        // when the consumer swaps it out. Consumers are expected to memoize this
+        // reference; if they don't, every render will count as a template change
+        // and re-apply options, which is the correct safe-side behavior.
+        template: propsRef.current.options.template,
+      }
+      const prev = prevAppliedOptionsRef.current
+      const optionsChanged =
+        !prev ||
+        prev.maxHeight !== nextSnapshot.maxHeight ||
+        prev.showCurrentTime !== nextSnapshot.showCurrentTime ||
+        prev.groupOrder !== nextSnapshot.groupOrder ||
+        prev.minTime !== nextSnapshot.minTime ||
+        prev.maxTime !== nextSnapshot.maxTime ||
+        prev.editableUpdateTime !== nextSnapshot.editableUpdateTime ||
+        prev.template !== nextSnapshot.template
+
+      if (optionsChanged) {
+        const { start, end, ...optionsWithoutWindow } = updatedOptions
+        timelineInstanceRef.current.setOptions(optionsWithoutWindow)
+        prevAppliedOptionsRef.current = nextSnapshot
+      }
     }
 
     // Add resize listener when in fullscreen
@@ -451,25 +505,32 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
 
     processedItems.forEach((item) => {
       const existing = item.id !== undefined ? datasetItemsRef.current!.get(item.id) : undefined
-      if (existing) {
-        // Clear cached template so it re-renders with updated data
-        const mapId = item.id ?? 0
-        if (elementMapRef.current[mapId]) {
-          const { container, root } = elementMapRef.current[mapId]
-          container.remove()
-          setTimeout(() => {
-            try {
-              root.unmount()
-            } catch (error) {
-              console.error('Error unmounting root:', error)
-            }
-          }, 0)
-          delete elementMapRef.current[mapId]
-        }
-        datasetItemsRef.current!.update(item as any)
-      } else {
+      if (!existing) {
         datasetItemsRef.current!.add(item as any)
+        return
       }
+
+      // Skip when nothing the template or vis-timeline cares about has changed.
+      // RTK Query returns a fresh array on every refetch, so without this check
+      // every item would re-mount on every refetch and the whole timeline would
+      // flicker after editing a single activity.
+      if (itemsVisuallyEqual(existing as TItem, item)) return
+
+      // Clear cached template so it re-renders with updated data
+      const mapId = item.id ?? 0
+      if (elementMapRef.current[mapId]) {
+        const { container, root } = elementMapRef.current[mapId]
+        container.remove()
+        setTimeout(() => {
+          try {
+            root.unmount()
+          } catch (error) {
+            console.error('Error unmounting root:', error)
+          }
+        }, 0)
+        delete elementMapRef.current[mapId]
+      }
+      datasetItemsRef.current!.update(item as any)
     })
   }, [props.data, colors.item.background, colors.background.background])
 
@@ -497,6 +558,9 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
     datasetItemsRef.current = null
     datasetGroupsRef.current = null
     isInitializedRef.current = false
+    // Force the options-effect to apply on the next render after reinit,
+    // since the new Timeline instance starts with no options applied.
+    prevAppliedOptionsRef.current = null
 
     // Stash the current window so it can be restored after reinit
     if (currentWindow) {
@@ -568,6 +632,15 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
         'group',
         propsRef.current,
       )
+      // vis-timeline orders group rows by the field named by `groupOrder`
+      // (default 'order'). If a consumer mutates that field on an existing
+      // group, the row layout must change — include it in the equality check
+      // so we don't get stuck with stale ordering.
+      const groupOrderField =
+        (typeof propsRef.current.options.groupOrder === 'string'
+          ? propsRef.current.options.groupOrder
+          : undefined) ?? 'order'
+      const changedGroups: TGroup[] = []
       props.groups.forEach((next) => {
         if (next.id === undefined) return
         const prev = prevById.get(next.id)
@@ -576,10 +649,14 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           prev.content === next.content &&
           prev.className === next.className &&
           prev.style === next.style &&
-          prev.treeLevel === next.treeLevel
+          prev.treeLevel === next.treeLevel &&
+          (prev as Record<string, unknown>)[groupOrderField] ===
+            (next as Record<string, unknown>)[groupOrderField] &&
+          prev.visible === next.visible
         ) {
           return
         }
+        changedGroups.push(next)
         const cached = elementMapRef.current[next.id]
         if (cached && Template) {
           cached.root.render(
@@ -592,7 +669,12 @@ const WaydTimeline = <TItem extends WaydDataItem, TGroup extends WaydDataGroup>(
           )
         }
       })
-      datasetGroupsRef.current.update(props.groups as any)
+      // Skip the DataSet.update() entirely when no visible field changed —
+      // calling update() on every refetch fires change events that cause
+      // vis-timeline to re-lay out group rows, producing visible flicker.
+      if (changedGroups.length > 0) {
+        datasetGroupsRef.current.update(changedGroups as any)
+      }
       return
     }
 

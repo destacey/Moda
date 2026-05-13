@@ -7,6 +7,8 @@ import {
   RoadmapActivityListDto,
   RoadmapItemDetailsDto,
   RoadmapItemListDto,
+  RoadmapMilestoneListDto,
+  RoadmapTimeboxListDto,
   UpdateRoadmapActivityDatesRequest,
   UpdateRoadmapActivityRequest,
   UpdateRoadmapMilestoneDatesRequest,
@@ -30,6 +32,55 @@ export const ROADMAP_STATE = {
   Active: 1,
   Archived: 2,
 } as const
+
+// Walks the roadmap-items tree (children live under activities) and mutates
+// the item whose id matches the date-update request. The NSwag-generated client
+// types these fields as `Date` but does not convert them — `processGetItems`
+// returns raw JSON, so date fields are actually ISO strings at runtime. Write
+// strings here to match the post-refetch shape; downstream consumers parse with
+// dayjs() which accepts both. (Storing Dates would also trip the Redux
+// serializability check on the patch action.)
+function applyOptimisticDates(
+  items: RoadmapItemListDto[] | undefined,
+  request:
+    | UpdateRoadmapActivityDatesRequest
+    | UpdateRoadmapMilestoneDatesRequest
+    | UpdateRoadmapTimeboxDatesRequest,
+): boolean {
+  if (!items) return false
+  for (const item of items) {
+    if (item.id === request.itemId) {
+      if ('date' in request && request.date !== undefined) {
+        ;(item as RoadmapMilestoneListDto).date = toIsoDateString(request.date)
+      }
+      if ('start' in request && request.start !== undefined) {
+        ;(item as RoadmapActivityListDto | RoadmapTimeboxListDto).start =
+          toIsoDateString(request.start)
+      }
+      if ('end' in request && request.end !== undefined) {
+        ;(item as RoadmapActivityListDto | RoadmapTimeboxListDto).end =
+          toIsoDateString(request.end)
+      }
+      return true
+    }
+    const activity = item as RoadmapActivityListDto
+    if (activity.children && applyOptimisticDates(activity.children, request)) {
+      return true
+    }
+  }
+  return false
+}
+
+// The DTO fields are typed as `Date` but at runtime hold ISO strings. The
+// request may carry either a real Date (rare) or a YYYY-MM-DD string cast to
+// Date by the timeline consumer. Normalize to a string that vis-timeline /
+// dayjs can parse, and cast back to `Date` to satisfy the DTO type.
+function toIsoDateString(value: Date | string): Date {
+  if (typeof value === 'string') return value as unknown as Date
+  if (value instanceof Date)
+    return value.toISOString() as unknown as Date
+  return value
+}
 
 export const roadmapApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -308,6 +359,26 @@ export const roadmapApi = apiSlice.injectEndpoints({
         } catch (error) {
           console.error('API Error:', error)
           return { error }
+        }
+      },
+      // Patch the getRoadmapItems cache up front so consumers (e.g. the timeline)
+      // see the new dates immediately, before the refetch lands. Otherwise the
+      // dragged item visibly snaps back to its original position and then to the
+      // new one once the refetch returns. Roll back on failure.
+      onQueryStarted: async (arg, { dispatch, queryFulfilled }) => {
+        const patchResult = dispatch(
+          roadmapApi.util.updateQueryData(
+            'getRoadmapItems',
+            arg.roadmapId,
+            (draft) => {
+              applyOptimisticDates(draft, arg)
+            },
+          ),
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
         }
       },
       invalidatesTags: (result, error, arg) => {
