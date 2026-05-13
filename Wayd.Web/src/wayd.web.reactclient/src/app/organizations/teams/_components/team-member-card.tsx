@@ -33,10 +33,13 @@ const TeamMemberCard = ({ member }: Props) => {
         >
           {getInitials(member.employee.name)}
         </Avatar>
-        <Flex vertical gap={4}>
-          <Text strong style={{ fontSize: 13 }}>
-            {member.employee.name}
-          </Text>
+        <Flex vertical>
+          <Text strong>{member.employee.name}</Text>
+          {member.employee.jobTitle && (
+            <Text type="secondary" style={{ fontSize: 11 }}>
+              {member.employee.jobTitle}
+            </Text>
+          )}
           <Flex wrap gap={4}>
             {member.roles.map((role) => (
               <Tag
@@ -55,4 +58,3 @@ const TeamMemberCard = ({ member }: Props) => {
 }
 
 export default TeamMemberCard
-
