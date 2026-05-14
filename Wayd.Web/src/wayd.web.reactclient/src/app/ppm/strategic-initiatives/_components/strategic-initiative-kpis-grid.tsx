@@ -1,13 +1,23 @@
 'use client'
 
 import { WaydGrid } from '@/src/components/common'
+import { useMessage } from '@/src/components/contexts/messaging'
 import { WaydStatisticNumber } from '@/src/components/common/metrics'
-import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import { StrategicInitiativeKpiListDto } from '@/src/services/wayd-api'
-import { ColDef, GetRowIdParams, ICellRendererParams } from 'ag-grid-community'
-import { Button, MenuProps } from 'antd'
+import { useReorderStrategicInitiativeKpisMutation } from '@/src/store/features/ppm/strategic-initiatives-api'
+import { isApiError } from '@/src/utils'
+import { HolderOutlined, MoreOutlined } from '@ant-design/icons'
+import styles from './strategic-initiative-kpis-grid.module.css'
+import {
+  ColDef,
+  GetRowIdParams,
+  ICellRendererParams,
+  RowDragEndEvent,
+} from 'ag-grid-community'
+import { AgGridReact } from 'ag-grid-react'
+import { Button, Dropdown, Flex, MenuProps } from 'antd'
 import { ItemType } from 'antd/es/menu/interface'
-import { FC, useState, useMemo } from 'react'
+import { FC, useState, useMemo, useRef, useCallback } from 'react'
 import {
   AddStrategicInitiativeKpiMeasurementForm,
   DeleteStrategicInitiativeKpiForm,
@@ -79,6 +89,46 @@ const getRowMenuItems = (props: RowMenuProps): ItemType[] => {
   ]
 }
 
+interface DragAndMenuCellRendererProps
+  extends ICellRendererParams<StrategicInitiativeKpiListDto> {
+  menuItems: ItemType[]
+  canDrag: boolean
+}
+
+const DragAndMenuCellRenderer = (props: DragAndMenuCellRendererProps) => {
+  const dragHandleRef = useCallback(
+    (node: HTMLSpanElement | null) => {
+      if (node && props.canDrag) {
+        props.registerRowDragger(node)
+      }
+    },
+    [props],
+  )
+
+  const showMenu = props.menuItems.length > 0
+
+  if (!props.canDrag && !showMenu) return null
+
+  return (
+    <Flex align="center" gap={2} style={{ height: '100%' }}>
+      {props.canDrag && (
+        <span
+          ref={dragHandleRef}
+          style={{ cursor: 'grab', display: 'inline-flex', padding: '0 4px' }}
+          aria-label="Drag to reorder"
+        >
+          <HolderOutlined />
+        </span>
+      )}
+      {showMenu && (
+        <Dropdown menu={{ items: props.menuItems }} trigger={['click']}>
+          <Button type="text" size="small" icon={<MoreOutlined />} />
+        </Dropdown>
+      )}
+    </Flex>
+  )
+}
+
 const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
   props,
 ) => {
@@ -102,6 +152,12 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     useState<boolean>(false)
   const [openManageCheckpointPlanForm, setOpenManageCheckpointPlanForm] =
     useState<boolean>(false)
+
+  const gridRef = useRef<AgGridReact<StrategicInitiativeKpiListDto>>(null)
+  const messageApi = useMessage()
+  const [reorderKpis] = useReorderStrategicInitiativeKpisMutation()
+
+  const canReorder = canManageKpis && !isReadOnly
 
   const onEditKpiFormClosed = (wasSaved: boolean) => {
     setOpenEditKpiForm(false)
@@ -164,11 +220,13 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
 
       return [
       {
-        width: 50,
+        width: 70,
         filter: false,
         sortable: false,
         resizable: false,
+        suppressHeaderMenuButton: true,
         hide: !canManageKpis || isReadOnly,
+        cellClass: styles.rowActionsCell,
         cellRenderer: (params: ICellRendererParams<StrategicInitiativeKpiListDto>) => {
           const menuItems = getRowMenuItems({
             kpiId: params.data!.id,
@@ -180,7 +238,13 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
             onManageCheckpointPlanMenuClicked,
           })
 
-          return RowMenuCellRenderer({ ...params, menuItems })
+          return (
+            <DragAndMenuCellRenderer
+              {...params}
+              menuItems={menuItems}
+              canDrag={canReorder}
+            />
+          )
         },
       },
       { field: 'key', width: 90 },
@@ -228,6 +292,7 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     ]},
     [
       canManageKpis,
+      canReorder,
       isReadOnly,
       strategicInitiativeId,
     ],
@@ -239,9 +304,46 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
     refetch()
   }
 
+  const hasActiveSort = () => {
+    const columnState = gridRef.current?.api?.getColumnState() ?? []
+    return columnState.some((c) => c.sort)
+  }
+
+  const onRowDragEnd = async (event: RowDragEndEvent<StrategicInitiativeKpiListDto>) => {
+    if (!canReorder) return
+
+    if (hasActiveSort()) {
+      messageApi.warning(
+        'Clear column sorting to reorder KPIs.',
+      )
+      refetch()
+      return
+    }
+
+    const orderedIds: string[] = []
+    event.api.forEachNodeAfterFilterAndSort((node) => {
+      if (node.data?.id) orderedIds.push(node.data.id)
+    })
+
+    try {
+      await reorderKpis({
+        strategicInitiativeId,
+        request: { orderedKpiIds: orderedIds },
+      }).unwrap()
+    } catch (error) {
+      messageApi.error(
+        (isApiError(error) ? error.detail : undefined) ??
+          'Failed to reorder KPIs. Please try again.',
+      )
+      refetch()
+    }
+  }
+
+
   return (
     <>
       <WaydGrid
+        ref={gridRef}
         columnDefs={columnDefs}
         rowData={kpis}
         loadData={refresh}
@@ -250,6 +352,8 @@ const StrategicInitiativeKpisGrid: FC<StrategicInitiativeKpisGridProps> = (
         emptyMessage="No KPIs found."
         getRowId={getRowId}
         toolbarActions={viewSelector}
+        rowDragManaged={true}
+        onRowDragEnd={onRowDragEnd}
       />
       {selectedKpiId && (
         <StrategicInitiativeKpiDetailsDrawer

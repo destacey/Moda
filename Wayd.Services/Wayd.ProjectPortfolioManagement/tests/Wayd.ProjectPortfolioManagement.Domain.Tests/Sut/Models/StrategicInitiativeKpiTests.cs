@@ -33,7 +33,7 @@ public sealed class StrategicInitiativeKpiTests
         var kpiParameters = expectedKpi.ToUpsertParameters();
 
         // Act
-        var kpi = StrategicInitiativeKpi.Create(expectedKpi.StrategicInitiativeId, kpiParameters);
+        var kpi = StrategicInitiativeKpi.Create(expectedKpi.StrategicInitiativeId, kpiParameters, order: 1);
 
         // Assert
         kpi.Should().NotBeNull();
@@ -45,6 +45,7 @@ public sealed class StrategicInitiativeKpiTests
         kpi.Suffix.Should().Be(expectedKpi.Suffix);
         kpi.TargetDirection.Should().Be(expectedKpi.TargetDirection);
         kpi.StrategicInitiativeId.Should().Be(expectedKpi.StrategicInitiativeId);
+        kpi.Order.Should().Be(1);
     }
 
     [Fact]

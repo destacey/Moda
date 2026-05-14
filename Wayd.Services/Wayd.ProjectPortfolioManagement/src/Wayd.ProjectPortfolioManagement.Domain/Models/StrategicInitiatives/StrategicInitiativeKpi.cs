@@ -12,16 +12,22 @@ public sealed class StrategicInitiativeKpi : Kpi
 
     private StrategicInitiativeKpi() : base() { }
 
-    private StrategicInitiativeKpi(string name, string? description, double? startingValue, double targetValue, string? prefix, string? suffix, KpiTargetDirection direction, Guid strategicInitiativeId)
+    private StrategicInitiativeKpi(string name, string? description, double? startingValue, double targetValue, string? prefix, string? suffix, KpiTargetDirection direction, Guid strategicInitiativeId, int order)
         : base(name, description, startingValue, targetValue, prefix, suffix, direction)
     {
         StrategicInitiativeId = strategicInitiativeId;
+        Order = order;
     }
 
     /// <summary>
     /// The unique identifier of the associated Strategic Initiative.
     /// </summary>
     public Guid StrategicInitiativeId { get; private set; }
+
+    /// <summary>
+    /// The display order of the KPI within its strategic initiative. Lower values appear first.
+    /// </summary>
+    public int Order { get; internal set; }
 
     /// <summary>
     /// The collection of KPI checkpoints.
@@ -189,9 +195,10 @@ public sealed class StrategicInitiativeKpi : Kpi
     /// </summary>
     /// <param name="strategicInitiativeId">The unique identifier of the associated Strategic Initiative.</param>
     /// <param name="parameters">The KPI upsert parameters.</param>
+    /// <param name="order">The display order of the KPI within the strategic initiative.</param>
     /// <returns></returns>
-    internal static StrategicInitiativeKpi Create(Guid strategicInitiativeId, StrategicInitiativeKpiUpsertParameters parameters)
+    internal static StrategicInitiativeKpi Create(Guid strategicInitiativeId, StrategicInitiativeKpiUpsertParameters parameters, int order)
     {
-        return new StrategicInitiativeKpi(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Prefix, parameters.Suffix, parameters.TargetDirection, strategicInitiativeId);
+        return new StrategicInitiativeKpi(parameters.Name, parameters.Description, parameters.StartingValue, parameters.TargetValue, parameters.Prefix, parameters.Suffix, parameters.TargetDirection, strategicInitiativeId, order);
     }
 }

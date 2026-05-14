@@ -247,6 +247,21 @@ public class StrategicInitiativesController(ILogger<StrategicInitiativesControll
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/kpis/reorder")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.StrategicInitiatives)]
+    [OpenApiOperation("Reorder KPIs for a strategic initiative.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    public async Task<ActionResult> ReorderKpis(Guid id, [FromBody] ReorderStrategicInitiativeKpisRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _sender.Send(request.ToReorderStrategicInitiativeKpisCommand(id), cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("{id}/kpis/{kpiId}/checkpoints")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.StrategicInitiatives)]
     [OpenApiOperation("Get the checkpoints for a strategic initiative KPI.", "")]

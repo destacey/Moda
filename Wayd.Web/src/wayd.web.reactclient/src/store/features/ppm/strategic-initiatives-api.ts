@@ -4,6 +4,7 @@ import {
   ManageStrategicInitiativeKpiCheckpointPlanRequest,
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
+  ReorderStrategicInitiativeKpisRequest,
   StrategicInitiativeKpiCheckpointDetailsDto,
   StrategicInitiativeKpiCheckpointDto,
   StrategicInitiativeKpiDetailsDto,
@@ -350,6 +351,32 @@ export const strategicInitiativesApi = apiSlice.injectEndpoints({
         ]
       },
     }),
+    reorderStrategicInitiativeKpis: builder.mutation<
+      void,
+      {
+        strategicInitiativeId: string
+        request: ReorderStrategicInitiativeKpisRequest
+      }
+    >({
+      queryFn: async ({ strategicInitiativeId, request }) => {
+        try {
+          const data = await getStrategicInitiativesClient().reorderKpis(
+            strategicInitiativeId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        {
+          type: QueryTags.StrategicInitiativeKpi,
+          id: arg.strategicInitiativeId,
+        },
+      ],
+    }),
     addStrategicInitiativeKpiMeasurement: builder.mutation<
       void,
       AddStrategicInitiativeKpiMeasurementRequest
@@ -567,6 +594,7 @@ export const {
   useCreateStrategicInitiativeKpiMutation,
   useUpdateStrategicInitiativeKpiMutation,
   useDeleteStrategicInitiativeKpiMutation,
+  useReorderStrategicInitiativeKpisMutation,
   useAddStrategicInitiativeKpiMeasurementMutation,
   useGetStrategicInitiativeKpiMeasurementsQuery,
   useGetStrategicInitiativeProjectsQuery,

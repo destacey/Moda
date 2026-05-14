@@ -334,6 +334,7 @@ public class StrategicInitiativeKpiConfiguration : IEntityTypeConfiguration<Stra
         builder.Property(k => k.StartingValue);
         builder.Property(k => k.TargetValue).IsRequired();
         builder.Property(k => k.ActualValue);
+        builder.Property(k => k.Order).IsRequired();
 
         builder.Property(k => k.Prefix)
             .HasMaxLength(8);

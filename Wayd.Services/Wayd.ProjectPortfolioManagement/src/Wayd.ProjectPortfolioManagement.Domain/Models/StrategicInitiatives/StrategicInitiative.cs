@@ -222,7 +222,9 @@ public sealed class StrategicInitiative : BaseAuditableEntity, IHasIdAndKey
             return Result.Failure<StrategicInitiativeKpi>("KPIs cannot be created for closed strategic initiatives.");
         }
 
-        var kpi = StrategicInitiativeKpi.Create(Id, parameters);
+        var nextOrder = _kpis.Count == 0 ? 1 : _kpis.Max(k => k.Order) + 1;
+
+        var kpi = StrategicInitiativeKpi.Create(Id, parameters, nextOrder);
 
         _kpis.Add(kpi);
 
@@ -276,7 +278,59 @@ public sealed class StrategicInitiative : BaseAuditableEntity, IHasIdAndKey
 
         _kpis.Remove(kpi);
 
+        ResequenceKpiOrder();
+
         return Result.Success();
+    }
+
+    /// <summary>
+    /// Reorders the KPIs based on the provided ordered list of KPI IDs.
+    /// </summary>
+    /// <param name="orderedKpiIds">The KPI IDs in the desired order.</param>
+    public Result ReorderKpis(List<Guid> orderedKpiIds)
+    {
+        Guard.Against.Null(orderedKpiIds, nameof(orderedKpiIds));
+
+        if (IsClosed)
+        {
+            return Result.Failure("KPIs cannot be reordered for closed strategic initiatives.");
+        }
+
+        if (orderedKpiIds.Count != _kpis.Count)
+        {
+            return Result.Failure("The number of KPI IDs must match the number of existing KPIs.");
+        }
+
+        if (orderedKpiIds.Distinct().Count() != orderedKpiIds.Count)
+        {
+            return Result.Failure("Duplicate KPI IDs are not allowed.");
+        }
+
+        for (int i = 0; i < orderedKpiIds.Count; i++)
+        {
+            var kpi = _kpis.FirstOrDefault(k => k.Id == orderedKpiIds[i]);
+            if (kpi is null)
+            {
+                return Result.Failure($"KPI with ID '{orderedKpiIds[i]}' not found.");
+            }
+
+            kpi.Order = i + 1;
+        }
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Resets KPI ordering to eliminate gaps after removal.
+    /// </summary>
+    private void ResequenceKpiOrder()
+    {
+        int order = 1;
+        foreach (var kpi in _kpis.OrderBy(k => k.Order))
+        {
+            kpi.Order = order;
+            order++;
+        }
     }
 
     #endregion KPIs

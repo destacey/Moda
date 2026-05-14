@@ -30,9 +30,11 @@ internal sealed class GetStrategicInitiativeKpisQueryHandler(IProjectPortfolioMa
             return null;
         }
 
-        return await query
+        var kpis = await query
             .SelectMany(i => i.Kpis)
             .ProjectToType<StrategicInitiativeKpiListDto>()
             .ToListAsync(cancellationToken);
+
+        return [.. kpis.OrderBy(k => k.Order)];
     }
 }

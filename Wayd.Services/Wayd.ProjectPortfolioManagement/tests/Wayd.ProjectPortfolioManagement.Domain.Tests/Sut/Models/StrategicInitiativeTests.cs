@@ -477,6 +477,134 @@ public sealed class StrategicInitiativeTests
         initiative.Kpis.Should().NotBeEmpty();
     }
 
+    [Fact]
+    public void CreateKpi_ShouldAssignNextOrder_WhenInitiativeHasNoKpis()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate();
+        var parameters = _kpiFaker.Generate().ToUpsertParameters();
+
+        // Act
+        var result = initiative.CreateKpi(parameters);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Order.Should().Be(1);
+    }
+
+    [Fact]
+    public void CreateKpi_ShouldAssignMaxOrderPlusOne_WhenInitiativeHasExistingKpis()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(3);
+        var maxOrder = initiative.Kpis.Max(k => k.Order);
+        var parameters = _kpiFaker.Generate().ToUpsertParameters();
+
+        // Act
+        var result = initiative.CreateKpi(parameters);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Order.Should().Be(maxOrder + 1);
+    }
+
+    [Fact]
+    public void DeleteKpi_ShouldResequenceRemainingKpisToEliminateGaps()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(3);
+        var middleKpi = initiative.Kpis.Single(k => k.Order == 2);
+
+        // Act
+        var result = initiative.DeleteKpi(middleKpi.Id);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        initiative.Kpis.Should().HaveCount(2);
+        initiative.Kpis.Select(k => k.Order).OrderBy(o => o).Should().Equal(1, 2);
+    }
+
+    [Fact]
+    public void ReorderKpis_ShouldUpdateOrderToMatchProvidedSequence()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(3);
+        var originalOrder = initiative.Kpis.OrderBy(k => k.Order).Select(k => k.Id).ToList();
+        var reversed = originalOrder.AsEnumerable().Reverse().ToList();
+
+        // Act
+        var result = initiative.ReorderKpis(reversed);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        for (int i = 0; i < reversed.Count; i++)
+        {
+            initiative.Kpis.Single(k => k.Id == reversed[i]).Order.Should().Be(i + 1);
+        }
+    }
+
+    [Fact]
+    public void ReorderKpis_ShouldFail_WhenCountDoesNotMatch()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(3);
+        var partial = initiative.Kpis.Take(2).Select(k => k.Id).ToList();
+
+        // Act
+        var result = initiative.ReorderKpis(partial);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("The number of KPI IDs must match the number of existing KPIs.");
+    }
+
+    [Fact]
+    public void ReorderKpis_ShouldFail_WhenDuplicateIdsProvided()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(3);
+        var ids = initiative.Kpis.Select(k => k.Id).ToList();
+        ids[1] = ids[0]; // duplicate
+
+        // Act
+        var result = initiative.ReorderKpis(ids);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("Duplicate KPI IDs are not allowed.");
+    }
+
+    [Fact]
+    public void ReorderKpis_ShouldFail_WhenInitiativeIsClosed()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.AsCompleted(_dateTimeProvider).AddKpis(2);
+        var ids = initiative.Kpis.Select(k => k.Id).ToList();
+
+        // Act
+        var result = initiative.ReorderKpis(ids);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Be("KPIs cannot be reordered for closed strategic initiatives.");
+    }
+
+    [Fact]
+    public void ReorderKpis_ShouldFail_WhenKpiIdNotFound()
+    {
+        // Arrange
+        var initiative = _strategicInitiativeFaker.Generate().AddKpis(2);
+        var ids = initiative.Kpis.Select(k => k.Id).ToList();
+        ids[0] = Guid.NewGuid(); // unknown id
+
+        // Act
+        var result = initiative.ReorderKpis(ids);
+
+        // Assert
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("not found");
+    }
+
 
     #endregion KPI Tests
 

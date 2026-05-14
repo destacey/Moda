@@ -92,6 +92,11 @@ public sealed record ProjectDetailsDto
     public required List<NavigationDto> StrategicThemes { get; set; } = [];
 
     /// <summary>
+    /// The strategic initiatives this project is supporting.
+    /// </summary>
+    public required List<NavigationDto> StrategicInitiatives { get; set; } = [];
+
+    /// <summary>
     /// The project lifecycle assigned to this project.
     /// </summary>
     public DescriptiveNavigationDto? ProjectLifecycle { get; set; }
@@ -142,6 +147,7 @@ public sealed record ProjectDetailsDto
             .Map(dest => dest.ProjectManagers, src => src.Roles.Where(r => r.Role == ProjectRole.Manager).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.ProjectMembers, src => src.Roles.Where(r => r.Role == ProjectRole.Member).Select(x => EmployeeNavigationDto.From(x.Employee!)).ToList())
             .Map(dest => dest.StrategicThemes, src => src.StrategicThemeTags.Select(x => NavigationDto.Create(x.StrategicTheme!.Id, x.StrategicTheme.Key, x.StrategicTheme.Name)).ToList())
+            .Map(dest => dest.StrategicInitiatives, src => src.StrategicInitiativeProjects.Select(x => NavigationDto.Create(x.StrategicInitiative!.Id, x.StrategicInitiative.Key, x.StrategicInitiative.Name)).ToList())
             .Map(dest => dest.ProjectLifecycle, src => src.ProjectLifecycle != null ? DescriptiveNavigationDto.Create(src.ProjectLifecycle.Id, src.ProjectLifecycle.Key, src.ProjectLifecycle.Name, src.ProjectLifecycle.Description) : null)
             .Map(dest => dest.Phases, src => src.Phases.OrderBy(p => p.Order))
             .Map(dest => dest.HealthCheck, src => src.HealthChecks

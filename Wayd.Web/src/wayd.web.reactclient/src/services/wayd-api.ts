@@ -11253,6 +11253,74 @@ export class StrategicInitiativesClient {
     }
 
     /**
+     * Reorder KPIs for a strategic initiative.
+     */
+    reorderKpis(id: string, request: ReorderStrategicInitiativeKpisRequest, cancelToken?: CancelToken): Promise<void> {
+        let url_ = this.baseUrl + "/api/ppm/strategic-initiatives/{id}/kpis/reorder";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processReorderKpis(_response);
+        });
+    }
+
+    protected processReorderKpis(response: AxiosResponse): Promise<void> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 204) {
+            const _responseText = response.data;
+            return Promise.resolve<void>(null as any);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 422) {
+            const _responseText = response.data;
+            let result422: any = null;
+            let resultData422  = _responseText;
+            result422 = resultData422;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result422);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<void>(null as any);
+    }
+
+    /**
      * Get the checkpoints for a strategic initiative KPI.
      */
     getKpiCheckpoints(id: string, kpiId: string, cancelToken?: CancelToken): Promise<StrategicInitiativeKpiCheckpointDto[]> {
@@ -26163,6 +26231,7 @@ export interface ProjectDetailsDto {
     projectManagers: EmployeeNavigationDto[];
     projectMembers: EmployeeNavigationDto[];
     strategicThemes: NavigationDto[];
+    strategicInitiatives: NavigationDto[];
     projectLifecycle?: DescriptiveNavigationDto | undefined;
     phases: ProjectPhaseListDto[];
     healthCheck?: ProjectHealthCheckDto | undefined;
@@ -26636,6 +26705,7 @@ export interface StrategicInitiativeKpiListDto {
     prefix?: string | undefined;
     suffix?: string | undefined;
     targetDirection: KpiTargetDirection;
+    order: number;
 }
 
 export enum KpiTargetDirection {
@@ -26655,6 +26725,7 @@ export interface StrategicInitiativeKpiDetailsDto {
     prefix?: string | undefined;
     suffix?: string | undefined;
     targetDirection: KpiTargetDirection;
+    order: number;
 }
 
 export interface CreateStrategicInitiativeKpiRequest {
@@ -26695,6 +26766,11 @@ export interface UpdateStrategicInitiativeKpiRequest {
     suffix?: string | undefined;
     /** The target direction for the KPI. */
     targetDirection: KpiTargetDirection;
+}
+
+export interface ReorderStrategicInitiativeKpisRequest {
+    /** The ordered list of KPI IDs representing the desired display order. */
+    orderedKpiIds: string[];
 }
 
 export interface StrategicInitiativeKpiCheckpointDto {
