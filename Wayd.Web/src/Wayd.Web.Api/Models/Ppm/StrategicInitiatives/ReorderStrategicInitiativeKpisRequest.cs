@@ -20,6 +20,8 @@ public sealed class ReorderStrategicInitiativeKpisRequestValidator : AbstractVal
     public ReorderStrategicInitiativeKpisRequestValidator()
     {
         RuleFor(x => x.OrderedKpiIds)
-            .NotEmpty();
+            .NotEmpty()
+            .Must(ids => ids.All(id => id != Guid.Empty))
+            .WithMessage("OrderedKpiIds cannot contain empty GUIDs.");
     }
 }
