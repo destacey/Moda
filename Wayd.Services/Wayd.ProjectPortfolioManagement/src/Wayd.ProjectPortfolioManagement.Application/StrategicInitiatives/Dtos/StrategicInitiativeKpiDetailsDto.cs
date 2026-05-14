@@ -56,4 +56,9 @@ public sealed record StrategicInitiativeKpiDetailsDto : IMapFrom<StrategicInitia
     /// Gets the target direction for the KPI. This indicates whether the KPI is expected to increase or decrease.
     /// </summary>
     public KpiTargetDirection TargetDirection { get; set; }
+
+    /// <summary>
+    /// The display order of the KPI within its strategic initiative. Lower values appear first.
+    /// </summary>
+    public int Order { get; set; }
 }

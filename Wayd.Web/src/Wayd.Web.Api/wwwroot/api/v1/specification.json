@@ -8961,6 +8961,71 @@
         ]
       }
     },
+    "/api/ppm/strategic-initiatives/{id}/kpis/reorder": {
+      "post": {
+        "tags": [
+          "StrategicInitiatives"
+        ],
+        "summary": "Reorder KPIs for a strategic initiative.",
+        "operationId": "StrategicInitiatives_ReorderKpis",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReorderStrategicInitiativeKpisRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
     "/api/ppm/strategic-initiatives/{id}/kpis/{kpiId}/checkpoints": {
       "get": {
         "tags": [
@@ -26299,7 +26364,8 @@
           "id",
           "key",
           "targetValue",
-          "targetDirection"
+          "targetDirection",
+          "order"
         ],
         "properties": {
           "id": {
@@ -26344,6 +26410,10 @@
           },
           "targetDirection": {
             "$ref": "#/components/schemas/KpiTargetDirection"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -26367,7 +26437,8 @@
           "id",
           "key",
           "targetValue",
-          "targetDirection"
+          "targetDirection",
+          "order"
         ],
         "properties": {
           "id": {
@@ -26416,6 +26487,10 @@
           },
           "targetDirection": {
             "$ref": "#/components/schemas/KpiTargetDirection"
+          },
+          "order": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -26563,6 +26638,27 @@
                 "$ref": "#/components/schemas/KpiTargetDirection"
               }
             ]
+          }
+        }
+      },
+      "ReorderStrategicInitiativeKpisRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "orderedKpiIds"
+        ],
+        "properties": {
+          "orderedKpiIds": {
+            "type": "array",
+            "description": "The ordered list of KPI IDs representing the desired display order.",
+            "minLength": 1,
+            "nullable": false,
+            "items": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            }
           }
         }
       },
