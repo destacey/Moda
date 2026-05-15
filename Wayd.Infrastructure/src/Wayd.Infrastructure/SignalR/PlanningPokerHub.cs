@@ -22,7 +22,13 @@ public class PlanningPokerHub : Hub
         await Groups.AddToGroupAsync(connectionId, sessionKey);
 
         var userId = Context.User?.GetUserId();
+        // Display name: prefer the OIDC standard "name" claim (Entra tokens),
+        // fall back to ClaimTypes.Name (Wayd-issued JWTs use the schemas.xmlsoap.org
+        // URI form for first name), and finally to email. Without the URI fallback,
+        // Wayd-JWT-authenticated users would always be displayed as their email
+        // address in the presence list.
         var name = Context.User?.FindFirst("name")?.Value
+            ?? Context.User?.FindFirst(ClaimTypes.Name)?.Value
             ?? Context.User?.GetEmail();
 
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(name))
