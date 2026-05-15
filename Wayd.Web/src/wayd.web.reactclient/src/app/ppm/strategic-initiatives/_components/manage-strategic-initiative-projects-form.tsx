@@ -11,6 +11,7 @@ import {
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
 } from '@/src/services/wayd-api'
+import { useGetPortfolioProjectsQuery } from '@/src/store/features/ppm/portfolios-api'
 import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import {
   useGetStrategicInitiativeProjectsQuery,
@@ -75,10 +76,29 @@ const ManageStrategicInitiativeProjectsForm = ({
   } = useGetStrategicInitiativeProjectsQuery(strategicInitiativeId)
 
   const {
-    data: projectData,
-    isLoading: projectsIsLoading,
-    error: projectsError,
-  } = useGetProjectsQuery(undefined)
+    data: portfolioProjectsData,
+    isLoading: portfolioProjectsIsLoading,
+    error: portfolioProjectsError,
+  } = useGetPortfolioProjectsQuery(
+    { portfolioIdOrKey: portfolioId },
+    { skip: includeOtherPortfolios },
+  )
+
+  const {
+    data: allProjectsData,
+    isLoading: allProjectsIsLoading,
+    error: allProjectsError,
+  } = useGetProjectsQuery(undefined, { skip: !includeOtherPortfolios })
+
+  const projectData = includeOtherPortfolios
+    ? allProjectsData
+    : portfolioProjectsData
+  const projectsIsLoading = includeOtherPortfolios
+    ? allProjectsIsLoading
+    : portfolioProjectsIsLoading
+  const projectsError = includeOtherPortfolios
+    ? allProjectsError
+    : portfolioProjectsError
 
   const [manageProjects] = useManageStrategicInitiativeProjectsMutation()
 
@@ -122,9 +142,8 @@ const ManageStrategicInitiativeProjectsForm = ({
     const targetIds = new Set(targetProjects.map((p) => p.id))
     return projectData
       .filter((p) => !targetIds.has(p.id))
-      .filter((p) => includeOtherPortfolios || p.portfolio.id === portfolioId)
       .sort(defaultSort)
-  }, [projectData, targetProjects, includeOtherPortfolios, portfolioId])
+  }, [projectData, targetProjects])
 
   const onDragStop = (items: ProjectListDto[]) => {
     if (items.length === 0) return
