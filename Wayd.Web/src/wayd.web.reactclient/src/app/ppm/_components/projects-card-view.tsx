@@ -16,9 +16,10 @@ const { Text } = Typography
 interface ProjectCardProps {
   project: ProjectListDto
   onCardClick: (key: string) => void
+  hidePortfolio?: boolean
 }
 
-const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
+const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick, hidePortfolio }) => {
   const managerNames = getSortedNames(project.projectManagers)
 
   const timelineFormat =
@@ -62,6 +63,19 @@ const ProjectCard: FC<ProjectCardProps> = ({ project, onCardClick }) => {
 
         {/* Meta rows */}
         <Flex vertical gap={3}>
+          {!hidePortfolio && (
+            <Flex gap={6} align="center">
+              <Text type="secondary" style={{ fontSize: 11, minWidth: 60 }}>
+                Portfolio
+              </Text>
+              <Text
+                style={{ fontSize: 12 }}
+                ellipsis={{ tooltip: project.portfolio.name }}
+              >
+                {project.portfolio.name}
+              </Text>
+            </Flex>
+          )}
           <Flex gap={6} align="center">
             <Text type="secondary" style={{ fontSize: 11, minWidth: 60 }}>
               Managers
@@ -102,6 +116,7 @@ export interface ProjectsCardViewProps {
   isLoading: boolean
   viewSelector?: ReactNode
   onCardClick: (key: string) => void
+  hidePortfolio?: boolean
 }
 
 const ProjectsCardView: FC<ProjectsCardViewProps> = ({
@@ -109,6 +124,7 @@ const ProjectsCardView: FC<ProjectsCardViewProps> = ({
   isLoading,
   viewSelector,
   onCardClick,
+  hidePortfolio,
 }) => {
   if (isLoading) {
     return (
@@ -137,6 +153,7 @@ const ProjectsCardView: FC<ProjectsCardViewProps> = ({
             key={project.key}
             project={project}
             onCardClick={onCardClick}
+            hidePortfolio={hidePortfolio}
           />
         ))}
       </div>

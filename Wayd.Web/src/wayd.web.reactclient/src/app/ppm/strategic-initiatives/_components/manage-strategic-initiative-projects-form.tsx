@@ -11,19 +11,19 @@ import {
   ManageStrategicInitiativeProjectsRequest,
   ProjectListDto,
 } from '@/src/services/wayd-api'
-import { useGetPortfolioProjectsQuery } from '@/src/store/features/ppm/portfolios-api'
+import { useGetProjectsQuery } from '@/src/store/features/ppm/projects-api'
 import {
   useGetStrategicInitiativeProjectsQuery,
   useManageStrategicInitiativeProjectsMutation,
 } from '@/src/store/features/ppm/strategic-initiatives-api'
 import { ColDef } from 'ag-grid-community'
-import { Modal } from 'antd'
-import { useEffect, useState } from 'react'
+import { Checkbox, Flex, Modal } from 'antd'
+import { useEffect, useMemo, useState } from 'react'
 import { isApiError, type ApiError } from '@/src/utils'
 
 export interface ManageStrategicInitiativeProjectsFormProps {
   strategicInitiativeId: string
-  portfolioKey: number
+  portfolioId: string
   onFormComplete: () => void
   onFormCancel: () => void
 }
@@ -32,12 +32,17 @@ const projectColDefs: ColDef<ProjectListDto>[] = [
   {
     field: 'key',
     headerName: 'Key',
-    width: 75,
+    width: 120,
   },
   {
     field: 'name',
     headerName: 'Name',
-    flex: 1,
+    width: 250,
+  },
+  {
+    field: 'portfolio.name',
+    headerName: 'Portfolio',
+    width: 180,
   },
   {
     field: 'status.name',
@@ -54,12 +59,12 @@ const defaultSort = (a: ProjectListDto, b: ProjectListDto) => {
 
 const ManageStrategicInitiativeProjectsForm = ({
   strategicInitiativeId,
-  portfolioKey,
+  portfolioId,
   onFormComplete,
   onFormCancel,
 }: ManageStrategicInitiativeProjectsFormProps) => {
-  const [sourceProjects, setSourceProjects] = useState<ProjectListDto[]>([])
   const [targetProjects, setTargetProjects] = useState<ProjectListDto[]>([])
+  const [includeOtherPortfolios, setIncludeOtherPortfolios] = useState(false)
 
   const messageApi = useMessage()
 
@@ -73,10 +78,9 @@ const ManageStrategicInitiativeProjectsForm = ({
     data: projectData,
     isLoading: projectsIsLoading,
     error: projectsError,
-  } = useGetPortfolioProjectsQuery({ portfolioIdOrKey: portfolioKey.toString() })
+  } = useGetProjectsQuery(undefined)
 
-  const [manageProjects] =
-    useManageStrategicInitiativeProjectsMutation()
+  const [manageProjects] = useManageStrategicInitiativeProjectsMutation()
 
   const { isOpen, isSaving, handleOk, handleCancel } = useConfirmModal({
     onSubmit: async () => {
@@ -113,23 +117,17 @@ const ManageStrategicInitiativeProjectsForm = ({
     setTargetProjects(existingProjectsData?.slice().sort(defaultSort) ?? [])
   }, [existingProjectsData])
 
-  useEffect(() => {
-    if (!projectData) return
-
-    const selectedIds = existingProjectsData?.map((item) => item.id) ?? []
-    const filteredProjects = projectData
-      .filter((item) => !selectedIds.includes(item.id))
+  const sourceProjects = useMemo(() => {
+    if (!projectData) return []
+    const targetIds = new Set(targetProjects.map((p) => p.id))
+    return projectData
+      .filter((p) => !targetIds.has(p.id))
+      .filter((p) => includeOtherPortfolios || p.portfolio.id === portfolioId)
       .sort(defaultSort)
-
-    setSourceProjects(filteredProjects)
-  }, [projectData, existingProjectsData])
+  }, [projectData, targetProjects, includeOtherPortfolios, portfolioId])
 
   const onDragStop = (items: ProjectListDto[]) => {
     if (items.length === 0) return
-
-    setSourceProjects((prevSource) =>
-      prevSource.filter((p) => !items.some((i) => i.id === p.id)),
-    )
 
     setTargetProjects((prevTarget) =>
       [...prevTarget, ...items].sort(defaultSort),
@@ -142,8 +140,6 @@ const ManageStrategicInitiativeProjectsForm = ({
     setTargetProjects((prevTarget) =>
       prevTarget.filter((p) => p.id !== item.id),
     )
-
-    setSourceProjects((prevSource) => [...prevSource, item].sort(defaultSort))
   }
 
   const rightColDefs = asDeletableColDefs(projectColDefs, handleDelete)
@@ -160,7 +156,13 @@ const ManageStrategicInitiativeProjectsForm = ({
       keyboard={false} // disable esc key to close modal
       destroyOnHidden
     >
-      {
+      <Flex vertical gap="small">
+        <Checkbox
+          checked={includeOtherPortfolios}
+          onChange={(e) => setIncludeOtherPortfolios(e.target.checked)}
+        >
+          Include projects from other portfolios
+        </Checkbox>
         <AgGridTransfer
           leftGridData={sourceProjects}
           rightGridData={targetProjects}
@@ -168,8 +170,9 @@ const ManageStrategicInitiativeProjectsForm = ({
           rightColumnDef={rightColDefs}
           onDragStop={onDragStop}
           getRowId={(param) => param.data.id}
+          GridProps={{ defaultColDef: { filter: true } }}
         />
-      }
+      </Flex>
     </Modal>
   )
 }
