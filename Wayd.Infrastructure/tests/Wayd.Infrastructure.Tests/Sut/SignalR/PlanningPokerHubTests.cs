@@ -126,6 +126,26 @@ public class PlanningPokerHubTests
         AssertParticipantBroadcastWithName(callerProxy, WaydFirstName);
     }
 
+    [Theory]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task JoinSession_WithBlankClaimTypesName_FallsBackToEmail(string blankFirstName)
+    {
+        // TokenService emits ClaimTypes.Name as (user.FirstName ?? string.Empty). For a
+        // Wayd user with no first name set, that claim is present but blank. A plain
+        // null-coalescing fallback would latch onto the empty string and skip email,
+        // making the user undisplayable. The hub must treat blank as "absent".
+        var user = Principal(
+            (ClaimTypes.NameIdentifier, TestUserId),
+            (ClaimTypes.Name, blankFirstName),
+            (ClaimTypes.Email, TestEmail));
+        var (hub, callerProxy) = BuildHub(user);
+
+        await hub.JoinSession(Guid.NewGuid());
+
+        AssertParticipantBroadcastWithName(callerProxy, TestEmail);
+    }
+
     [Fact]
     public async Task JoinSession_WithOnlyEmailClaim_FallsBackToEmail()
     {
