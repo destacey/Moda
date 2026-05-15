@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Domain.Employees;
+using Wayd.Common.Domain.Identity;
 
 namespace Wayd.Infrastructure.Persistence.Configuration;
 
@@ -163,6 +164,79 @@ public class WaydUserConfig : IEntityTypeConfiguration<User>
         builder.Property(u => u.DisplayName).HasMaxLength(200);
         builder.Property(u => u.Email).HasMaxLength(256);
         builder.Property(u => u.IsActive);
+    }
+}
+
+public class OidcProviderConfig : IEntityTypeConfiguration<OidcProvider>
+{
+    public void Configure(EntityTypeBuilder<OidcProvider> builder)
+    {
+        builder.ToTable("OidcProviders", SchemaNames.Identity);
+
+        builder.HasKey(p => p.Id);
+        builder.Property(p => p.Id).ValueGeneratedNever();
+
+        builder.Property(p => p.Name)
+            .HasMaxLength(50)
+            .IsRequired();
+
+        // Stable provider key — must match the Provider column on UserIdentity. A
+        // duplicate would let two configurations claim the same identity rows.
+        builder.HasIndex(p => p.Name)
+            .IsUnique()
+            .HasDatabaseName("UX_OidcProviders_Name");
+
+        builder.Property(p => p.DisplayName)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(p => p.ProviderType)
+            .HasConversion<string>()
+            .HasMaxLength(40)
+            .IsRequired();
+
+        builder.Property(p => p.Authority)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        builder.Property(p => p.ClientId)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(p => p.Audience)
+            .HasMaxLength(500)
+            .IsRequired();
+
+        // Scopes and AllowedTenantIds are small string lists. JSON columns keep the
+        // schema flat (no child tables), match the round-trip shape the domain expects,
+        // and are queryable via OPENJSON when needed.
+        builder.Property(p => p.Scopes)
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default) ?? new List<string>())
+            .Metadata.SetValueComparer(new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<IReadOnlyList<string>>(
+                (a, b) => (a ?? new List<string>()).SequenceEqual(b ?? new List<string>()),
+                v => v == null ? 0 : v.Aggregate(0, (acc, s) => HashCode.Combine(acc, s)),
+                v => v.ToList()));
+        builder.Property(p => p.Scopes).HasMaxLength(2000);
+
+        builder.Property(p => p.AllowedTenantIds)
+            .HasConversion(
+                v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => string.IsNullOrEmpty(v) ? null : JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default))
+            .Metadata.SetValueComparer(new Microsoft.EntityFrameworkCore.ChangeTracking.ValueComparer<IReadOnlyList<string>?>(
+                (a, b) => (a == null && b == null) || (a != null && b != null && a.SequenceEqual(b)),
+                v => v == null ? 0 : v.Aggregate(0, (acc, s) => HashCode.Combine(acc, s)),
+                v => v == null ? null : v.ToList()));
+        builder.Property(p => p.AllowedTenantIds).HasMaxLength(4000);
+
+        builder.Property(p => p.ClockSkewSeconds)
+            .IsRequired()
+            .HasDefaultValue(60);
+
+        builder.Property(p => p.IsEnabled)
+            .IsRequired()
+            .HasDefaultValue(false);
     }
 }
 
