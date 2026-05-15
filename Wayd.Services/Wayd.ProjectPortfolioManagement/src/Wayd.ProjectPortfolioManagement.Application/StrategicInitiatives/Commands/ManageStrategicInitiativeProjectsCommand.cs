@@ -37,11 +37,10 @@ internal sealed class ManageStrategicInitiativeProjectsCommandHandler(IProjectPo
             var projectIds = request.ProjectIds.ToList();
 
             var existingProjectCount = await _ppmDbContext.Projects
-                .Where(p => p.PortfolioId == strategicInitiative.PortfolioId)
                 .CountAsync(p => projectIds.Contains(p.Id), cancellationToken);
             if (existingProjectCount != projectIds.Count)
             {
-                _logger.LogError("Unable to update projects for Strategic Initiative {StrategicInitiativeId} because one or more projects do not exist within the portfolio.", request.Id);
+                _logger.LogError("Unable to update projects for Strategic Initiative {StrategicInitiativeId} because one or more projects do not exist.", request.Id);
                 return Result.Failure("One or more projects do not exist.");
             }
 

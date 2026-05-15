@@ -76,6 +76,7 @@ const ProjectViewManager = (props: ProjectViewManagerProps) => {
           isLoading={props.isLoading}
           viewSelector={viewSelector}
           onCardClick={onCardClick}
+          hidePortfolio={props.hidePortfolio}
         />
       )}
       {currentView === 'List' && (

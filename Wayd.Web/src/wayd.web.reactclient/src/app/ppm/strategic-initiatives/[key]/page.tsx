@@ -376,7 +376,7 @@ const StrategicInitiativeDetailsPage = (props: {
                 projects={projectData ?? []}
                 isLoading={isLoadingProjects}
                 refetch={refetchProjects}
-                hidePortfolio={true}
+                hidePortfolio={false}
                 groupByProgram={true}
                 defaultView="Card"
               />
@@ -441,7 +441,7 @@ const StrategicInitiativeDetailsPage = (props: {
       {openManageProjectsForm && (
         <ManageStrategicInitiativeProjectsForm
           strategicInitiativeId={strategicInitiativeData?.id}
-          portfolioKey={strategicInitiativeData?.portfolio.key}
+          portfolioId={strategicInitiativeData?.portfolio.id}
           onFormComplete={() => setOpenManageProjectsForm(false)}
           onFormCancel={() => setOpenManageProjectsForm(false)}
         />
