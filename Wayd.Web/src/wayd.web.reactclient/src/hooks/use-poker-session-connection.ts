@@ -4,8 +4,7 @@ import {
   HubConnection,
   LogLevel,
 } from '@microsoft/signalr'
-import { tokenRequest } from '@/auth-config'
-import { msalInstance } from '@/src/components/contexts/auth/msal-instance'
+import { getFreshAuthToken } from '@/src/services/clients'
 import { store } from '@/src/store/store'
 import { pokerSessionsApi } from '@/src/store/features/planning/poker-sessions-api'
 import { QueryTags } from '@/src/store/features/query-tags'
@@ -63,16 +62,15 @@ export function usePokerSessionConnection(
       try {
         const connection = new HubConnectionBuilder()
           .withUrl(`${API_BASE_URL}/hubs/planning-poker`, {
-            accessTokenFactory: async () => {
-              if (!msalInstance) return ''
-              const accounts = msalInstance.getAllAccounts()
-              if (accounts.length === 0) return ''
-              const tokenResponse = await msalInstance.acquireTokenSilent({
-                ...tokenRequest,
-                account: accounts[0],
-              })
-              return tokenResponse?.accessToken ?? ''
-            },
+            // SignalR authenticates via the Wayd JWT, same as REST. The hub's
+            // [Authorize] resolves the LocalJwt scheme off ?access_token=
+            // (see Local/ConfigureServices.cs OnMessageReceived).
+            //
+            // SignalR calls this factory on every connect and reconnect, so we
+            // must refresh-before-read to survive token expiry across long-
+            // running sessions. getFreshAuthToken shares the single-flight
+            // refresh with the axios interceptor — no duplicate refresh calls.
+            accessTokenFactory: async () => (await getFreshAuthToken()) ?? '',
           })
           .withAutomaticReconnect()
           .configureLogging(LogLevel.Warning)

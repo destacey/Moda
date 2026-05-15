@@ -220,6 +220,35 @@ function refreshOnce(): Promise<TokenResponse> | null {
   return inFlightRefresh
 }
 
+/**
+ * Returns the current Wayd JWT, proactively refreshing first if it's expired or
+ * within the refresh skew window. Shared by the axios request interceptor and
+ * the SignalR accessTokenFactory so both paths use the same single-flight
+ * refresh (inFlightRefresh) — important because a hub start/reconnect happens
+ * outside the axios pipeline and would otherwise hand SignalR a stale token,
+ * causing it to fall back to polling until the hook remounts.
+ *
+ * Refresh failure is non-fatal here: we still return whatever token is in
+ * storage so the caller can attempt the request. The 401-recovery path in the
+ * response interceptor handles cleanup if the stale token is rejected; for
+ * SignalR, the hub's automatic-reconnect will try again once a fresh token
+ * lands. Network failures inside refreshOnce() also fall through to send-as-is
+ * — better to let the actual call decide than to fail eagerly here.
+ */
+export async function getFreshAuthToken(): Promise<string | null> {
+  if (isAuthTokenExpiringSoon()) {
+    const refresh = refreshOnce()
+    if (refresh) {
+      try {
+        await refresh
+      } catch {
+        // Swallowed deliberately — see comment above.
+      }
+    }
+  }
+  return getAuthToken()
+}
+
 // Response interceptor: automatic Wayd refresh-token retry on 401.
 // One path for every provider because every provider ends up with the same
 // Wayd JWT shape in storage after login/exchange. No MSAL involvement — the
@@ -313,17 +342,7 @@ axiosClient.interceptors.response.use(
 // — better to let the actual call decide than to fail eagerly here.
 axiosClient.interceptors.request.use(
   async (config) => {
-    if (isAuthTokenExpiringSoon()) {
-      const refresh = refreshOnce()
-      if (refresh) {
-        try {
-          await refresh
-        } catch {
-          // Swallowed deliberately — see comment above.
-        }
-      }
-    }
-    const token = getAuthToken()
+    const token = await getFreshAuthToken()
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }

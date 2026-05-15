@@ -22,8 +22,16 @@ public class PlanningPokerHub : Hub
         await Groups.AddToGroupAsync(connectionId, sessionKey);
 
         var userId = Context.User?.GetUserId();
-        var name = Context.User?.FindFirst("name")?.Value
-            ?? Context.User?.GetEmail();
+        // Display name: prefer the OIDC standard "name" claim (Entra tokens), fall back
+        // to ClaimTypes.Name (Wayd-issued JWTs use the schemas.xmlsoap.org URI form for
+        // first name), and finally to email. Use whitespace-aware fallback because the
+        // Wayd JWT always emits ClaimTypes.Name (as user.FirstName ?? "") — a plain
+        // ?? would latch onto the empty string and skip the email fallback for users
+        // whose FirstName is unset.
+        var name = FirstNonBlank(
+            Context.User?.FindFirst("name")?.Value,
+            Context.User?.FindFirst(ClaimTypes.Name)?.Value,
+            Context.User?.GetEmail());
 
         if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(name))
             return;
@@ -123,6 +131,15 @@ public class PlanningPokerHub : Hub
             await Clients.Group(sessionKey)
                 .SendAsync("ParticipantLeft", new { Id = removedUserId });
         }
+    }
+
+    private static string? FirstNonBlank(params string?[] values)
+    {
+        foreach (var v in values)
+        {
+            if (!string.IsNullOrWhiteSpace(v)) return v;
+        }
+        return null;
     }
 
     private record PresenceEntry(string UserId, string Name)
