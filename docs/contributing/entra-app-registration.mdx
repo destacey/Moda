@@ -244,9 +244,9 @@ Sign in to the frontend. Then:
 
 If `aud` has `api://` in it but your config expects a bare GUID, the API registration is still issuing v1 tokens. Redo Step 1's v2 switch. **Users will need to get a fresh token** — cached v1 tokens in MSAL's localStorage stay v1 until they expire or the user signs out and back in.
 
-**`503 Service Unavailable` on `/api/auth/exchange`.** `Enabled: false` on the backend. Either flip it to `true` or remove the Entra login button from the frontend.
+**`401 Invalid token` on `/api/auth/exchange` with no matching `OidcProvider` row.** The provider name the frontend sent doesn't match any enabled row in `Identity.OidcProviders`. Either no provider was seeded (the legacy `SecuritySettings:Providers:Entra:Enabled` was `false`, or `SecuritySettings:AzureAd:ClientId` was empty when the seeder ran) or an admin disabled the row via the Settings UI. Check the application logs around startup — the seeder logs a warning when it skips, and `OidcTokenValidator` logs the unknown-provider rejection.
 
-**Startup fails with `AllowedTenantIds must be non-empty`.** Exactly what it says. Fail-safe default — add at least one tenant ID.
+**Microsoft Entra ID row missing `AllowedTenantIds`.** The `OidcProvider.Create` entity invariant requires at least one tenant ID for `MicrosoftEntraId` rows; the validator and admin form both enforce it. If the seed found no `AllowedTenantIds` in legacy config, the seed is skipped with a logged warning and the row needs to be created through the Settings UI with a tenant list.
 
 **User signs in, immediately redirects back to `/login`.** Usually means the exchange succeeded but the login page's storage write raced a redirect. Check browser console for the precise error; most commonly it's a CORS failure or a mismatched `API_BASE_URL`.
 
