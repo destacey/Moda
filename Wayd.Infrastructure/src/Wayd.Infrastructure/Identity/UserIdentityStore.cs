@@ -51,6 +51,14 @@ internal sealed class UserIdentityStore(WaydDbContext db, ILogger<UserIdentitySt
             cancellationToken);
     }
 
+    public Task<int> CountActiveByProvider(string provider, CancellationToken cancellationToken = default)
+    {
+        return _db.UserIdentities.CountAsync(ui =>
+            ui.IsActive &&
+            ui.Provider == provider,
+            cancellationToken);
+    }
+
     public async Task<IReadOnlyDictionary<string, string>> GetActiveSubjectsByProvider(string provider, CancellationToken cancellationToken = default)
     {
         // The "at most one active identity per user+provider" invariant is

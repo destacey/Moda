@@ -1,4 +1,6 @@
-﻿namespace Wayd.Infrastructure.Auth.Oidc;
+﻿using Wayd.Common.Domain.Identity;
+
+namespace Wayd.Common.Application.Identity.OidcProviders;
 
 /// <summary>
 /// Resolves <see cref="OidcProvider"/> rows from the database for use by the

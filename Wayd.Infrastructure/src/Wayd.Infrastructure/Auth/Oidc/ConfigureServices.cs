@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Wayd.Common.Application.Identity.OidcProviders;
 using Wayd.Infrastructure.Auth.Entra;
 
 namespace Wayd.Infrastructure.Auth.Oidc;

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Wayd.Common.Application.Identity.OidcProviders;
 
 namespace Wayd.Infrastructure.Auth.Oidc;
 

@@ -32,6 +32,7 @@ public static class ApplicationResource
     public const string Roles = nameof(Roles);
     public const string RoleClaims = nameof(RoleClaims);
     public const string Permissions = nameof(Permissions);
+    public const string OidcProviders = nameof(OidcProviders);
 
     public const string Connections = nameof(Connections);
     public const string Connectors = nameof(Connectors);
@@ -110,7 +111,12 @@ public static class ApplicationPermissions
         new("View RoleClaims", ApplicationAction.View, ApplicationResource.RoleClaims, IdentityCategory),
         new("Update RoleClaims", ApplicationAction.Update, ApplicationResource.RoleClaims, IdentityCategory),
 
-        new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions, IdentityCategory)
+        new("View Permissions", ApplicationAction.View, ApplicationResource.Permissions, IdentityCategory),
+
+        new("View OIDC Providers", ApplicationAction.View, ApplicationResource.OidcProviders, IdentityCategory),
+        new("Create OIDC Providers", ApplicationAction.Create, ApplicationResource.OidcProviders, IdentityCategory),
+        new("Update OIDC Providers", ApplicationAction.Update, ApplicationResource.OidcProviders, IdentityCategory),
+        new("Delete OIDC Providers", ApplicationAction.Delete, ApplicationResource.OidcProviders, IdentityCategory)
     ];
 
     private const string IntegrationsCategory = "Integrations";

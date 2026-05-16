@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Wayd.Common.Application.Exceptions;
 using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.OidcProviders;
 using Wayd.Common.Application.Identity.Tokens;
 using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Domain.Identity;

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
+using Wayd.Common.Application.Identity.OidcProviders;
 using Wayd.Common.Domain.Identity;
 
 namespace Wayd.Infrastructure.Auth.Oidc;

@@ -17,6 +17,7 @@ public interface IWaydDbContext
     // Common DbSets
     DbSet<Employee> Employees { get; }
     DbSet<ExternalEmployeeBlacklistItem> ExternalEmployeeBlacklistItems { get; }
+    DbSet<OidcProvider> OidcProviders { get; }
     DbSet<PersonalAccessToken> PersonalAccessTokens { get; }
     DbSet<User> WaydUsers { get; }
 }
