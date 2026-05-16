@@ -35,7 +35,6 @@ public class AuthController(ITokenService tokenService) : ControllerBase
     [OpenApiOperation("Exchange an external identity-provider token (e.g., Microsoft Entra ID) for a Wayd JWT.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status503ServiceUnavailable)]
     public async Task<ActionResult<TokenResponse>> Exchange(ExchangeTokenCommand command, CancellationToken cancellationToken)
     {
         var response = await _tokenService.ExchangeTokenAsync(command, cancellationToken);
@@ -45,11 +44,13 @@ public class AuthController(ITokenService tokenService) : ControllerBase
     [HttpGet("providers")]
     [OpenApiOperation("List the authentication providers enabled on this deployment.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public ActionResult<AuthProvidersResponse> GetProviders()
+    public async Task<ActionResult<AuthProvidersResponse>> GetProviders(CancellationToken cancellationToken)
     {
-        // Anonymous and cheap — the frontend calls this before rendering the
-        // login page to decide which provider buttons to show. No auth data
-        // leaked: knowing "this deployment accepts Entra tokens" is not sensitive.
-        return Ok(_tokenService.GetAuthProviders());
+        // Anonymous and cheap — the frontend calls this before constructing any
+        // OIDC client. The response contains only public OIDC client metadata
+        // (Authority, ClientId, Scopes) per provider; AllowedTenantIds and any
+        // future secrets are deliberately not exposed here.
+        var response = await _tokenService.GetAuthProviders(cancellationToken);
+        return Ok(response);
     }
 }

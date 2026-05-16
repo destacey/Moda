@@ -235,16 +235,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
@@ -21610,14 +21600,52 @@
         "additionalProperties": false,
         "required": [
           "local",
-          "entra"
+          "oidc"
         ],
         "properties": {
           "local": {
             "type": "boolean"
           },
-          "entra": {
-            "type": "boolean"
+          "oidc": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OidcProviderInfo"
+            }
+          }
+        }
+      },
+      "OidcProviderInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "displayName",
+          "providerType",
+          "authority",
+          "clientId",
+          "scopes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

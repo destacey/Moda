@@ -717,13 +717,6 @@ export class AuthClient {
             result401 = resultData401;
             return throwException("A server side error occurred.", status, _responseText, _headers, result401);
 
-        } else if (status === 503) {
-            const _responseText = response.data;
-            let result503: any = null;
-            let resultData503  = _responseText;
-            result503 = resultData503;
-            return throwException("A server side error occurred.", status, _responseText, _headers, result503);
-
         } else if (status !== 200 && status !== 204) {
             const _responseText = response.data;
             return throwException("An unexpected server error occurred.", status, _responseText, _headers);
@@ -25527,7 +25520,16 @@ export interface ExchangeTokenCommand {
 
 export interface AuthProvidersResponse {
     local: boolean;
-    entra: boolean;
+    oidc: OidcProviderInfo[];
+}
+
+export interface OidcProviderInfo {
+    name: string;
+    displayName: string;
+    providerType: string;
+    authority: string;
+    clientId: string;
+    scopes: string[];
 }
 
 export interface ApplicationPermission {

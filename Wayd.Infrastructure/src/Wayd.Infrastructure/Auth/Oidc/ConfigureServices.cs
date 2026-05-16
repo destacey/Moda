@@ -1,25 +1,37 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Wayd.Infrastructure.Auth.Entra;
 
 namespace Wayd.Infrastructure.Auth.Oidc;
 
 internal static class ConfigureServices
 {
     /// <summary>
-    /// Registers the database-backed OIDC provider registry and the per-authority
-    /// <c>ConfigurationManager</c> cache. These run alongside the existing
-    /// Entra-only token exchange path until <c>TokenService.ExchangeTokenAsync</c>
-    /// is migrated to use the registry (Phase 1e).
+    /// Registers the database-backed OIDC provider registry, the per-authority
+    /// JWKS <c>ConfigurationManager</c> cache, the token validator, and binds
+    /// <c>EntraSettings</c> — the latter so <see cref="OidcProviderSeeder"/> can
+    /// translate the legacy <c>SecuritySettings:Providers:Entra</c> config into
+    /// an <c>OidcProvider</c> row on first boot.
     /// </summary>
-    internal static IServiceCollection AddOidcProviderRegistry(this IServiceCollection services)
+    internal static IServiceCollection AddOidcProviderRegistry(this IServiceCollection services, IConfiguration config)
     {
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IOidcProviderRegistry, OidcProviderRegistry>();
         services.AddSingleton<IOidcConfigurationManagerFactory, OidcConfigurationManagerFactory>();
 
-        // Validator is scoped to match the existing IEntraIdTokenValidator
-        // lifetime — its only meaningful state is the logger, but scoped keeps
-        // it consistent with the rest of the request-bound auth surface.
+        // Scoped to match the rest of the request-bound auth surface. Its only
+        // meaningful state is the logger, but lifetime parity matters because the
+        // validator depends on the singleton registry/factory and not the other
+        // way around — keeping it scoped avoids accidental upgrade to singleton.
         services.AddScoped<IOidcTokenValidator, OidcTokenValidator>();
+
+        // Legacy Entra config schema. Read at startup by the OidcProvider seeder
+        // to bootstrap a Microsoft Entra ID row for deployments that already had
+        // SecuritySettings:Providers:Entra configured before the DB-managed
+        // provider model existed. Removable in a future cleanup once all
+        // deployments have rolled forward.
+        services.Configure<EntraSettings>(config.GetSection(EntraSettings.SectionName));
+
         return services;
     }
 }

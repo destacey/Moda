@@ -4,11 +4,9 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
-using Wayd.Infrastructure.Auth.Entra;
 using Wayd.Infrastructure.Auth.Oidc;
 
 namespace Wayd.Infrastructure.Auth.Local;
@@ -21,7 +19,7 @@ internal class TokenService(
     IUserIdentityStore userIdentityStore,
     IUserService userService,
     IOidcTokenValidator oidcTokenValidator,
-    IOptions<EntraSettings> entraSettings,
+    IOidcProviderRegistry oidcProviderRegistry,
     ILogger<TokenService> logger) : ITokenService
 {
     private readonly UserManager<ApplicationUser> _userManager = userManager;
@@ -31,10 +29,7 @@ internal class TokenService(
     private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
     private readonly IUserService _userService = userService;
     private readonly IOidcTokenValidator _oidcTokenValidator = oidcTokenValidator;
-    // EntraSettings is retained only for GetAuthProviders() — the legacy bool flag
-    // that Phase 1f replaces with the dynamic provider list. Exchange flow no
-    // longer reads it.
-    private readonly EntraSettings _entraSettings = entraSettings.Value;
+    private readonly IOidcProviderRegistry _oidcProviderRegistry = oidcProviderRegistry;
     private readonly ILogger<TokenService> _logger = logger;
 
     public async Task<TokenResponse> GetTokenAsync(LoginCommand command, CancellationToken cancellationToken)
@@ -286,6 +281,24 @@ internal class TokenService(
         return settings;
     }
 
-    public AuthProvidersResponse GetAuthProviders() =>
-        new(Local: true, Entra: _entraSettings.Enabled);
+    public async Task<AuthProvidersResponse> GetAuthProviders(CancellationToken cancellationToken)
+    {
+        // Local username/password is always available. Wayd doesn't currently
+        // support disabling it — every deployment can mint Wayd-local accounts
+        // even when SSO is the primary path. If that changes, this is the spot
+        // to gate it on a configuration flag.
+        var oidcProviders = await _oidcProviderRegistry.GetEnabled(cancellationToken);
+
+        var infos = oidcProviders
+            .Select(p => new OidcProviderInfo(
+                Name: p.Name,
+                DisplayName: p.DisplayName,
+                ProviderType: p.ProviderType.ToString(),
+                Authority: p.Authority,
+                ClientId: p.ClientId,
+                Scopes: p.Scopes))
+            .ToList();
+
+        return new AuthProvidersResponse(Local: true, Oidc: infos);
+    }
 }
