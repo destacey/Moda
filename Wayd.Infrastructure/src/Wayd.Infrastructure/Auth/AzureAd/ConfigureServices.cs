@@ -14,6 +14,12 @@ internal static class ConfigureServices
     {
         var logger = Log.ForContext(typeof(AzureAdJwtBearerEvents));
 
+        // Bind AzureAdSettings so other components (e.g. the OidcProvider seeder)
+        // can resolve ClientId via IOptions<AzureAdSettings> instead of parsing
+        // IConfiguration directly. The existing GetConfig(IConfiguration) static
+        // continues to work because both paths read the same section.
+        services.Configure<AzureAdSettings>(config.GetSection(AzureAdSettings.SectionName));
+
         services
             .AddAuthentication(authentication =>
             {
