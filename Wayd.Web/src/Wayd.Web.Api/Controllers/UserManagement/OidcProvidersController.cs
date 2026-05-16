@@ -1,6 +1,8 @@
+using Microsoft.FeatureManagement.Mvc;
 using Wayd.Common.Application.Identity.OidcProviders.Commands;
 using Wayd.Common.Application.Identity.OidcProviders.Dtos;
 using Wayd.Common.Application.Identity.OidcProviders.Queries;
+using Wayd.Common.Domain.FeatureManagement;
 using Wayd.Web.Api.Extensions;
 using Wayd.Web.Api.Models.UserManagement.OidcProviders;
 
@@ -13,18 +15,27 @@ namespace Wayd.Web.Api.Controllers.UserManagement;
 /// configuration (incl. AllowedTenantIds) and requires the OidcProviders
 /// permission set.
 /// </summary>
+/// <remarks>
+/// Gated by the <c>IdentityProviders</c> feature flag. The OIDC token-exchange
+/// runtime is always on (every deployment uses it through the seeded Entra
+/// provider), but this admin surface stays dark until an admin enables the
+/// flag via the Settings UI — see the flag definition in <see cref="FeatureFlags"/>.
+/// </remarks>
 [Route("api/user-management/oidc-providers")]
 [ApiVersionNeutral]
 [ApiController]
+[FeatureGate(FeatureFlags.Names.IdentityProviders)]
 public class OidcProvidersController(ISender sender) : ControllerBase
 {
+    private readonly ISender _sender = sender;
+
     [HttpGet]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.OidcProviders)]
     [OpenApiOperation("List all configured OIDC providers.", "")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<OidcProviderListItemDto>>> GetList(CancellationToken cancellationToken)
     {
-        var providers = await sender.Send(new GetOidcProvidersQuery(), cancellationToken);
+        var providers = await _sender.Send(new GetOidcProvidersQuery(), cancellationToken);
         return Ok(providers);
     }
 
@@ -35,7 +46,7 @@ public class OidcProvidersController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<OidcProviderDto>> GetById(Guid id, CancellationToken cancellationToken)
     {
-        var provider = await sender.Send(new GetOidcProviderQuery(id), cancellationToken);
+        var provider = await _sender.Send(new GetOidcProviderQuery(id), cancellationToken);
         return provider is not null ? Ok(provider) : NotFound();
     }
 
@@ -58,7 +69,7 @@ public class OidcProvidersController(ISender sender) : ControllerBase
             request.ClockSkewSeconds,
             request.IsEnabled);
 
-        var result = await sender.Send(command, cancellationToken);
+        var result = await _sender.Send(command, cancellationToken);
 
         return result.IsSuccess
             ? CreatedAtAction(nameof(GetById), new { id = result.Value.Id }, result.Value)
@@ -86,7 +97,7 @@ public class OidcProvidersController(ISender sender) : ControllerBase
             request.ClockSkewSeconds,
             request.IsEnabled);
 
-        var result = await sender.Send(command, cancellationToken);
+        var result = await _sender.Send(command, cancellationToken);
 
         return result.IsSuccess
             ? NoContent()
@@ -101,7 +112,7 @@ public class OidcProvidersController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult> Delete(Guid id, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new DeleteOidcProviderCommand(id), cancellationToken);
+        var result = await _sender.Send(new DeleteOidcProviderCommand(id), cancellationToken);
 
         if (result.IsFailure)
         {
@@ -124,7 +135,7 @@ public class OidcProvidersController(ISender sender) : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<TestOidcProviderDiscoveryResult>> TestDiscovery(Guid id, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new TestOidcProviderDiscoveryCommand(id), cancellationToken);
+        var result = await _sender.Send(new TestOidcProviderDiscoveryCommand(id), cancellationToken);
 
         // Note: a discovery failure (timeout, 404, bad JSON) returns 200 OK
         // with Success=false. The 400 path is reserved for the request being
