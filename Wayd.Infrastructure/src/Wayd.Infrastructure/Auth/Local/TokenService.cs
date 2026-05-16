@@ -8,10 +8,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Wayd.Common.Application.Identity;
 using Wayd.Common.Application.Identity.Tokens;
-using Wayd.Common.Application.Identity.Users;
-using Wayd.Common.Domain.Authorization;
 using Wayd.Infrastructure.Auth.Entra;
-using Wayd.Infrastructure.Identity;
+using Wayd.Infrastructure.Auth.Oidc;
 
 namespace Wayd.Infrastructure.Auth.Local;
 
@@ -22,7 +20,7 @@ internal class TokenService(
     IDateTimeProvider dateTimeProvider,
     IUserIdentityStore userIdentityStore,
     IUserService userService,
-    IEntraIdTokenValidator entraIdTokenValidator,
+    IOidcTokenValidator oidcTokenValidator,
     IOptions<EntraSettings> entraSettings,
     ILogger<TokenService> logger) : ITokenService
 {
@@ -32,7 +30,10 @@ internal class TokenService(
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
     private readonly IUserService _userService = userService;
-    private readonly IEntraIdTokenValidator _entraIdTokenValidator = entraIdTokenValidator;
+    private readonly IOidcTokenValidator _oidcTokenValidator = oidcTokenValidator;
+    // EntraSettings is retained only for GetAuthProviders() — the legacy bool flag
+    // that Phase 1f replaces with the dynamic provider list. Exchange flow no
+    // longer reads it.
     private readonly EntraSettings _entraSettings = entraSettings.Value;
     private readonly ILogger<TokenService> _logger = logger;
 
@@ -114,29 +115,33 @@ internal class TokenService(
 
     public async Task<TokenResponse> ExchangeTokenAsync(ExchangeTokenCommand command, CancellationToken cancellationToken)
     {
-        if (command.Provider != LoginProviders.MicrosoftEntraId)
+        if (string.IsNullOrWhiteSpace(command.Provider))
         {
-            // Auth0 and other providers are out of scope for PR 3.1 — the shape
-            // generalizes cleanly when they're added, but we reject unknown
-            // providers explicitly rather than silently falling through.
-            _logger.LogWarning("Token exchange rejected: unsupported provider {Provider}.", command.Provider);
             throw new UnauthorizedException("Invalid token.");
         }
 
-        if (!_entraSettings.Enabled)
-        {
-            // Local-only deployment — the feature exists but isn't configured here.
-            // 503 distinguishes this from 401 (bad token) and 404 (no route): the
-            // endpoint is discoverable, just turned off for this tenant.
-            throw new ServiceUnavailableException("Entra token exchange is not enabled on this deployment.");
-        }
+        // The validator owns provider lookup, enabled-checks, and signature
+        // validation. Unknown or disabled providers throw UnauthorizedException
+        // there — no special-case for Entra config here anymore.
+        var principal = await _oidcTokenValidator.Validate(command.Provider, command.SubjectToken, cancellationToken);
 
-        var principal = await _entraIdTokenValidator.Validate(command.SubjectToken, cancellationToken);
+        // User provisioning for non-Entra providers needs claim mappings that
+        // Entra's GetOrCreateFromPrincipalAsync doesn't have (sub-claim subject,
+        // no tid, different display-name claims, no Microsoft Graph). That work
+        // is tracked as a follow-up; until then, reject GenericOidc exchanges at
+        // this boundary so we fail explicitly instead of silently mis-provisioning.
+        if (!string.Equals(command.Provider, LoginProviders.MicrosoftEntraId, StringComparison.Ordinal))
+        {
+            _logger.LogWarning(
+                "Token exchange rejected: provider {Provider} validated but user provisioning for non-Entra providers is not yet implemented.",
+                command.Provider);
+            throw new UnauthorizedException("Invalid token.");
+        }
 
         // Reuse the existing principal-based user resolution. That path handles
         // UserIdentity lookup, the null-tid upgrade, new-user creation, and the
-        // first-user-is-admin case — all unchanged from the MSAL middleware flow
-        // this endpoint is replacing.
+        // first-user-is-admin case — unchanged from the MSAL middleware flow
+        // this endpoint replaced.
         var (userId, _) = await _userService.GetOrCreateFromPrincipalAsync(principal);
 
         var user = await _userManager.FindByIdAsync(userId)
@@ -148,7 +153,10 @@ internal class TokenService(
             throw new UnauthorizedException("Your account has been deactivated. Please contact an administrator.");
         }
 
-        await EnsureActiveIdentityAsync(user, LoginProviders.MicrosoftEntraId, user.UserName ?? user.Id, cancellationToken);
+        // Identity check is keyed by the actual provider from the request — same
+        // value the validator just confirmed and the same value already written
+        // into UserIdentity.Provider for this user.
+        await EnsureActiveIdentityAsync(user, command.Provider, user.UserName ?? user.Id, cancellationToken);
 
         return await GenerateTokensAndUpdateUser(user, cancellationToken);
     }
