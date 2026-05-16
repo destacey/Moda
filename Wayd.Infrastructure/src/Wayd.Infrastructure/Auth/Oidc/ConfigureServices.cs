@@ -15,6 +15,11 @@ internal static class ConfigureServices
         services.AddSingleton(TimeProvider.System);
         services.AddSingleton<IOidcProviderRegistry, OidcProviderRegistry>();
         services.AddSingleton<IOidcConfigurationManagerFactory, OidcConfigurationManagerFactory>();
+
+        // Validator is scoped to match the existing IEntraIdTokenValidator
+        // lifetime — its only meaningful state is the logger, but scoped keeps
+        // it consistent with the rest of the request-bound auth surface.
+        services.AddScoped<IOidcTokenValidator, OidcTokenValidator>();
         return services;
     }
 }
