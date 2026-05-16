@@ -114,6 +114,7 @@ export enum QueryTags {
   StrategicThemState = 'StrategicManagement.StrategicThemeState',
 
   // USER MANAGEMENT
+  OidcProvider = 'UserManagement.OidcProvider',
   User = 'UserManagement.User',
   UserIdentityHistory = 'UserManagement.UserIdentityHistory',
   UserPermission = 'UserManagement.UserPermission',

@@ -5,6 +5,7 @@ import {
   EmployeesClient,
   HealthChecksClient,
   LinksClient,
+  OidcProvidersClient,
   PermissionsClient,
   ProfileClient,
   PlanningIntervalsClient,
@@ -423,6 +424,7 @@ export const getFeatureFlagsClient = () =>
   new FeatureFlagsClient('', axiosClient)
 
 // USER MANAGEMENT
+export const getOidcProvidersClient = () => new OidcProvidersClient('', axiosClient)
 export const getPermissionsClient = () => new PermissionsClient('', axiosClient)
 export const getProfileClient = () => new ProfileClient('', axiosClient)
 export const getRolesClient = () => new RolesClient('', axiosClient)
