@@ -132,12 +132,12 @@ Architecture tests in `Wayd.ArchitectureTests` enforce these dependency rules.
 
 ### Authentication
 
-Two methods, configured per user via `LoginProvider`:
+Two methods, configured per deployment:
 
-1. **Microsoft Entra ID** — SSO via Azure AD. Requires `.env` with `AAD_CLIENT_ID`, `AAD_TENANT_ID`, etc.
+1. **Identity providers (OIDC)** — Database-managed, stored in `Identity.OidcProviders`. Supports Microsoft Entra ID and any standards-compliant OIDC provider (Google, Okta, Auth0, Keycloak). Bootstrapped on first boot from `SecuritySettings:Providers:Entra:*` config, then managed by admins via **Settings → Identity Providers**. Frontend uses `oidc-client-ts` (PKCE redirect flow).
 2. **Wayd (Local)** — JWT auth. Requires `SecuritySettings:LocalJwt:Secret` in API config.
 
-Key files: `Wayd.Infrastructure/Auth/Local/TokenService.cs`, `wayd.web.reactclient/src/components/contexts/auth/auth-context.tsx`
+Key files: `Wayd.Infrastructure/Auth/Local/TokenService.cs`, `Wayd.Infrastructure/Auth/Oidc/OidcTokenValidator.cs`, `Wayd.Infrastructure/Persistence/Initialization/OidcProviderSeeder.cs`, `wayd.web.reactclient/src/components/contexts/auth/auth-context.tsx`, `wayd.web.reactclient/src/components/contexts/auth/oidc-client-registry.ts`
 
 User → login-provider linkage lives in a `UserIdentity` table — one active row per user, keyed by `(Provider, ProviderTenantId, ProviderSubject)`. Every authentication path resolves through the same lookup. Admins can stage tenant migrations per user; the rebind happens transactionally on the user's next sign-in from the new tenant. See [docs/contributing/configuration.mdx](docs/contributing/configuration.mdx) (Identity model + Tenant migration sections) for schema, invariants, and admin workflow.
 
