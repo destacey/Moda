@@ -316,6 +316,15 @@ internal partial class UserService
             }
         });
 
+        // If the user was previously a local account, clear the password hash now
+        // that the Wayd identity is deactivated. The hash is unreachable at login
+        // (TokenService gates on an active Wayd identity), but removing it makes
+        // the intent explicit and prevents a future bug if that gate ever moves.
+        if (candidate.PasswordHash is not null)
+        {
+            await _userManager.RemovePasswordAsync(candidate);
+        }
+
         _logger.LogInformation(
             "Provider migration completed for user {UserId}: rebound to provider {Provider} (subject {Subject}).",
             candidate.Id, providerName, subject);

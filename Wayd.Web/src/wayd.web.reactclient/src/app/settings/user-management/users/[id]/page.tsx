@@ -64,11 +64,11 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const isOidcUser = !isLocalUser
   const hasPendingMigration = !!userData?.pendingMigrationTenantId
   const hasPendingProviderMigration = !!userData?.pendingMigrationProviderId
-  // Only show "Change Identity Provider" when more than one OIDC provider is configured
+  // Only show "Change Identity Provider" when at least one enabled OIDC provider
+  // exists that is different from the user's current provider.
   const enabledOidcProviders = oidcProviders.filter((p) => p.isEnabled)
   const canChangeProvider =
-    isOidcUser &&
-    enabledOidcProviders.length > 1 &&
+    enabledOidcProviders.length > 0 &&
     enabledOidcProviders.some((p) => p.name !== userData?.loginProvider)
 
   const tabs = [

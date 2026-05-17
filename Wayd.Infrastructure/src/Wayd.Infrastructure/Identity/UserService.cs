@@ -211,10 +211,6 @@ internal partial class UserService(
         if (user is null)
             throw new NotFoundException("User Not Found.");
 
-        // Local users switching to OIDC is a separate feature (out of scope)
-        if (user.LoginProvider == LoginProviders.Wayd)
-            return Result.Failure("Provider migration is not available for local accounts.");
-
         // Can't migrate to the same provider — that's a tenant migration (or a no-op)
         if (string.Equals(user.LoginProvider, command.TargetProviderId, StringComparison.OrdinalIgnoreCase))
             return Result.Failure("Target provider is the same as the user's current provider.");
