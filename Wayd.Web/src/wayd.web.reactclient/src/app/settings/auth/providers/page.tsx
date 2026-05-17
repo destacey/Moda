@@ -4,7 +4,7 @@ import { WaydGrid, PageTitle } from '@/src/components/common'
 import { RowMenuCellRenderer } from '@/src/components/common/wayd-grid-cell-renderers'
 import useAuth from '@/src/components/contexts/auth'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { authorizePage, requireFeatureFlag } from '@/src/components/hoc'
+import { authorizePage } from '@/src/components/hoc'
 import { useDocumentTitle } from '@/src/hooks'
 import { OidcProviderListItemDto, OidcProviderType } from '@/src/services/wayd-api'
 import {
@@ -307,13 +307,10 @@ const OidcProvidersPage = () => {
   )
 }
 
-const OidcProvidersPageWithAuthorization = requireFeatureFlag(
-  authorizePage(
-    OidcProvidersPage,
-    'Permission',
-    'Permissions.OidcProviders.View',
-  ),
-  'identity-providers',
+const OidcProvidersPageWithAuthorization = authorizePage(
+  OidcProvidersPage,
+  'Permission',
+  'Permissions.OidcProviders.View',
 )
 
 export default OidcProvidersPageWithAuthorization

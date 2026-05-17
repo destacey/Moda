@@ -121,7 +121,6 @@ const getRegularMenuItem = (
 
 const buildSettingsMenuItems = (featureFlags: {
   planningPoker: boolean
-  identityProviders: boolean
 }): ItemType[] => [
   getSectionMenuItem('User Management', 'user-management', [
     getRestrictedMenuItem(
@@ -136,16 +135,12 @@ const buildSettingsMenuItems = (featureFlags: {
       SettingsTab.Roles,
       '/settings/user-management/roles',
     ),
-    ...(featureFlags.identityProviders
-      ? [
-          getRestrictedMenuItem(
-            'Permissions.OidcProviders.View',
-            'Identity Providers',
-            SettingsTab.IdentityProviders,
-            '/settings/auth/providers',
-          ),
-        ]
-      : []),
+    getRestrictedMenuItem(
+      'Permissions.OidcProviders.View',
+      'Identity Providers',
+      SettingsTab.IdentityProviders,
+      '/settings/auth/providers',
+    ),
   ]),
 
   getSectionMenuItem('Feature Management', 'feature-management', [
@@ -235,10 +230,9 @@ const buildSettingsMenuItems = (featureFlags: {
 export default function SettingsMenu() {
   const { hasPermissionClaim } = useAuth()
   const { isEnabled: planningPoker } = useFeatureFlag('planning-poker')
-  const { isEnabled: identityProviders } = useFeatureFlag('identity-providers')
 
   // Derive menu items based on user's permissions and feature flags
-  const menuItems = (buildSettingsMenuItems({ planningPoker, identityProviders }) as SectionMenuItem[]).reduce(
+  const menuItems = (buildSettingsMenuItems({ planningPoker }) as SectionMenuItem[]).reduce(
       (acc: ItemType<MenuItemType>[], item: SectionMenuItem) =>
         authorizeMenuItems(acc, item, hasPermissionClaim),
       [] as ItemType<MenuItemType>[],

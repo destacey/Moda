@@ -4,7 +4,6 @@ import '@testing-library/jest-dom'
 // window.location.replace is non-configurable in jsdom; mock the module-level
 // side-effect rather than the browser API.
 jest.mock('@/src/app/logout/page', () => {
-  const React = require('react')
   // Re-implement without the useEffect redirect so rendering tests work cleanly.
   return {
     __esModule: true,

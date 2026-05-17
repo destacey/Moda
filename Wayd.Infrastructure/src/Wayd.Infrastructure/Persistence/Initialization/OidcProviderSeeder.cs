@@ -1,9 +1,7 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Wayd.Common.Application.Identity;
-using Wayd.Common.Domain.FeatureManagement;
-using Wayd.Common.Domain.Identity;
 using Wayd.Infrastructure.Auth.Entra;
 
 namespace Wayd.Infrastructure.Persistence.Initialization;
@@ -96,20 +94,10 @@ public class OidcProviderSeeder : ICustomSeeder
         }
 
         dbContext.OidcProviders.Add(result.Value);
-
-        // Enable the IdentityProviders feature flag so the admin Settings UI is
-        // immediately visible after migration — no manual flag toggle needed.
-        var flag = await dbContext.FeatureFlags
-            .SingleOrDefaultAsync(f => f.Name == FeatureFlags.Names.IdentityProviders, cancellationToken);
-        if (flag is not null && !flag.IsEnabled)
-        {
-            flag.Toggle(true);
-        }
-
         await dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
-            "Seeded Microsoft Entra ID OidcProvider from existing SecuritySettings config and " +
-            "enabled the IdentityProviders feature flag. Manage providers via the Settings UI from now on.");
+            "Seeded Microsoft Entra ID OidcProvider from existing SecuritySettings config. " +
+            "Manage providers via the Settings UI from now on.");
     }
 }

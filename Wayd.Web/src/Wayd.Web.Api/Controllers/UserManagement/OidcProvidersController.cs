@@ -1,8 +1,6 @@
-using Microsoft.FeatureManagement.Mvc;
 using Wayd.Common.Application.Identity.OidcProviders.Commands;
 using Wayd.Common.Application.Identity.OidcProviders.Dtos;
 using Wayd.Common.Application.Identity.OidcProviders.Queries;
-using Wayd.Common.Domain.FeatureManagement;
 using Wayd.Web.Api.Extensions;
 using Wayd.Web.Api.Models.UserManagement.OidcProviders;
 
@@ -15,16 +13,9 @@ namespace Wayd.Web.Api.Controllers.UserManagement;
 /// configuration (incl. AllowedTenantIds) and requires the OidcProviders
 /// permission set.
 /// </summary>
-/// <remarks>
-/// Gated by the <c>IdentityProviders</c> feature flag. The OIDC token-exchange
-/// runtime is always on (every deployment uses it through the seeded Entra
-/// provider), but this admin surface stays dark until an admin enables the
-/// flag via the Settings UI — see the flag definition in <see cref="FeatureFlags"/>.
-/// </remarks>
 [Route("api/user-management/oidc-providers")]
 [ApiVersionNeutral]
 [ApiController]
-[FeatureGate(FeatureFlags.Names.IdentityProviders)]
 public class OidcProvidersController(ISender sender) : ControllerBase
 {
     private readonly ISender _sender = sender;
