@@ -54,6 +54,10 @@ const TagInput = ({ value = [], onChange, placeholder }: TagInputProps) => {
       ) : (
         <Tag
           onClick={showInput}
+          onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && showInput()}
+          role="button"
+          tabIndex={0}
+          aria-label={placeholder ?? 'Add'}
           style={{ cursor: 'pointer', borderStyle: 'dashed' }}
           icon={<PlusOutlined />}
         >

@@ -118,11 +118,11 @@ const CreateOidcProviderForm = ({
               pattern: /^[a-z0-9-]+$/,
               message: 'Only lowercase letters, digits, and hyphens',
             },
-            { max: 64 },
+            { max: 50 },
           ]}
           tooltip="Immutable identifier used in URLs and configuration. Only lowercase letters, digits, and hyphens."
         >
-          <Input maxLength={64} />
+          <Input maxLength={50} />
         </Item>
 
         <Item
@@ -130,11 +130,11 @@ const CreateOidcProviderForm = ({
           name="displayName"
           rules={[
             { required: true, message: 'Display name is required' },
-            { max: 128 },
+            { max: 100 },
           ]}
           tooltip="Label shown on the login page button."
         >
-          <Input maxLength={128} />
+          <Input maxLength={100} />
         </Item>
 
         <Item
@@ -161,11 +161,11 @@ const CreateOidcProviderForm = ({
           rules={[
             { required: true, message: 'Authority URL is required' },
             { type: 'url', message: 'Must be a valid URL' },
-            { max: 256 },
+            { max: 500 },
           ]}
           tooltip="The base URL of the OIDC issuer, e.g. https://login.microsoftonline.com/{tenant}/v2.0"
         >
-          <Input maxLength={256} placeholder="https://..." />
+          <Input maxLength={500} placeholder="https://..." />
         </Item>
 
         <Item
@@ -173,11 +173,11 @@ const CreateOidcProviderForm = ({
           name="clientId"
           rules={[
             { required: true, message: 'Client ID is required' },
-            { max: 256 },
+            { max: 200 },
           ]}
           tooltip="The public OAuth client ID used by the browser when initiating sign-in. For Entra ID this is the SPA (client) app registration's client ID."
         >
-          <Input maxLength={256} />
+          <Input maxLength={200} />
         </Item>
 
         <Item
@@ -185,11 +185,11 @@ const CreateOidcProviderForm = ({
           name="audience"
           rules={[
             { required: true, message: 'Audience is required' },
-            { max: 256 },
+            { max: 500 },
           ]}
           tooltip="Expected audience (aud) claim in the token. For Entra ID this is the bare API client ID GUID."
         >
-          <Input maxLength={256} />
+          <Input maxLength={500} />
         </Item>
 
         <Item
@@ -221,10 +221,10 @@ const CreateOidcProviderForm = ({
         <Item
           label="Clock Skew (seconds)"
           name="clockSkewSeconds"
-          rules={[{ type: 'number', min: 0, max: 300 }]}
+          rules={[{ type: 'number', min: 0, max: 600 }]}
           tooltip="Tolerance for token expiry/not-before checks to account for clock drift between servers. 60 seconds is the standard default."
         >
-          <InputNumber min={0} max={300} style={{ width: '100%' }} />
+          <InputNumber min={0} max={600} style={{ width: '100%' }} />
         </Item>
 
         <Item

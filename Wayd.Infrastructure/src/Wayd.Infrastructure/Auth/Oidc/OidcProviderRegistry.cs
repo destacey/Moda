@@ -23,7 +23,6 @@ namespace Wayd.Infrastructure.Auth.Oidc;
 internal sealed class OidcProviderRegistry : IOidcProviderRegistry
 {
     private static readonly TimeSpan CacheTtl = TimeSpan.FromSeconds(60);
-    private const string AllEnabledKey = "__all_enabled__";
 
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly TimeProvider _timeProvider;
@@ -64,10 +63,10 @@ internal sealed class OidcProviderRegistry : IOidcProviderRegistry
 
     public async Task<IReadOnlyList<OidcProvider>> GetEnabled(CancellationToken cancellationToken)
     {
-        // Double-checked read: the unsynchronized fast path covers the common
-        // case (cache warm), and the lock-protected slow path prevents two
-        // concurrent misses from both running the query. The "all enabled" entry
-        // is mutated as a unit (whole list replaced), not per-element.
+        // Fast path: unsynchronized read covers the common case (cache warm).
+        // On a miss, multiple concurrent callers may each run the DB query — the
+        // lock only protects the write so the last writer wins cleanly. Redundant
+        // queries on concurrent cold-start are acceptable; the TTL keeps them rare.
         if (_allEnabled is { } current && !IsExpired(current))
         {
             return current.Value;

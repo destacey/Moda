@@ -139,11 +139,11 @@ const EditOidcProviderForm = ({
           name="displayName"
           rules={[
             { required: true, message: 'Display name is required' },
-            { max: 128 },
+            { max: 100 },
           ]}
           tooltip="Label shown on the login page button."
         >
-          <Input maxLength={128} />
+          <Input maxLength={100} />
         </Item>
 
         <Item
@@ -152,11 +152,11 @@ const EditOidcProviderForm = ({
           rules={[
             { required: true, message: 'Authority URL is required' },
             { type: 'url', message: 'Must be a valid URL' },
-            { max: 256 },
+            { max: 500 },
           ]}
           tooltip="The base URL of the OIDC issuer. For Entra ID use the tenant-specific URL: https://login.microsoftonline.com/{tenant-id}/v2.0"
         >
-          <Input maxLength={256} placeholder="https://..." />
+          <Input maxLength={500} placeholder="https://..." />
         </Item>
 
         <Item
@@ -164,11 +164,11 @@ const EditOidcProviderForm = ({
           name="clientId"
           rules={[
             { required: true, message: 'Client ID is required' },
-            { max: 256 },
+            { max: 200 },
           ]}
           tooltip="The public OAuth client ID used by the browser when initiating sign-in. For Entra ID this is the SPA (client) app registration's client ID."
         >
-          <Input maxLength={256} />
+          <Input maxLength={200} />
         </Item>
 
         <Item
@@ -176,11 +176,11 @@ const EditOidcProviderForm = ({
           name="audience"
           rules={[
             { required: true, message: 'Audience is required' },
-            { max: 256 },
+            { max: 500 },
           ]}
           tooltip="Expected audience (aud) claim in the token. For Entra ID this is the bare API app registration client ID GUID."
         >
-          <Input maxLength={256} />
+          <Input maxLength={500} />
         </Item>
 
         <Item
@@ -212,10 +212,10 @@ const EditOidcProviderForm = ({
         <Item
           label="Clock Skew (seconds)"
           name="clockSkewSeconds"
-          rules={[{ type: 'number', min: 0, max: 300 }]}
+          rules={[{ type: 'number', min: 0, max: 600 }]}
           tooltip="Tolerance for token expiry/not-before checks to account for clock drift between servers. 60 seconds is the standard default."
         >
-          <InputNumber min={0} max={300} style={{ width: '100%' }} />
+          <InputNumber min={0} max={600} style={{ width: '100%' }} />
         </Item>
 
         <Item
