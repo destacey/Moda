@@ -132,6 +132,7 @@ const CreateOidcProviderForm = ({
             { required: true, message: 'Display name is required' },
             { max: 128 },
           ]}
+          tooltip="Label shown on the login page button."
         >
           <Input maxLength={128} />
         </Item>
@@ -140,6 +141,7 @@ const CreateOidcProviderForm = ({
           label="Provider Type"
           name="providerType"
           rules={[{ required: true, message: 'Provider type is required' }]}
+          tooltip="Microsoft Entra ID enforces a tenant allowlist. Generic OIDC accepts any token from the configured issuer. Immutable after creation."
         >
           <Select
             options={[
@@ -173,6 +175,7 @@ const CreateOidcProviderForm = ({
             { required: true, message: 'Client ID is required' },
             { max: 256 },
           ]}
+          tooltip="The public OAuth client ID used by the browser when initiating sign-in. For Entra ID this is the SPA (client) app registration's client ID."
         >
           <Input maxLength={256} />
         </Item>
@@ -189,7 +192,11 @@ const CreateOidcProviderForm = ({
           <Input maxLength={256} />
         </Item>
 
-        <Item label="Scopes" name="scopes">
+        <Item
+          label="Scopes"
+          name="scopes"
+          tooltip="OAuth scopes the browser requests when initiating sign-in. For Entra ID include the API scope (e.g. api://{api-client-id}/access_as_user) so Entra issues an access token with the correct audience."
+        >
           <TagInput placeholder="Add scope and press Enter" />
         </Item>
 
@@ -215,11 +222,17 @@ const CreateOidcProviderForm = ({
           label="Clock Skew (seconds)"
           name="clockSkewSeconds"
           rules={[{ type: 'number', min: 0, max: 300 }]}
+          tooltip="Tolerance for token expiry/not-before checks to account for clock drift between servers. 60 seconds is the standard default."
         >
           <InputNumber min={0} max={300} style={{ width: '100%' }} />
         </Item>
 
-        <Item label="Enabled" name="isEnabled" valuePropName="checked">
+        <Item
+          label="Enabled"
+          name="isEnabled"
+          valuePropName="checked"
+          tooltip="Disabled providers are hidden from the login page and reject token exchange attempts."
+        >
           <Switch />
         </Item>
       </Form>

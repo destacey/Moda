@@ -141,6 +141,7 @@ const EditOidcProviderForm = ({
             { required: true, message: 'Display name is required' },
             { max: 128 },
           ]}
+          tooltip="Label shown on the login page button."
         >
           <Input maxLength={128} />
         </Item>
@@ -153,6 +154,7 @@ const EditOidcProviderForm = ({
             { type: 'url', message: 'Must be a valid URL' },
             { max: 256 },
           ]}
+          tooltip="The base URL of the OIDC issuer. For Entra ID use the tenant-specific URL: https://login.microsoftonline.com/{tenant-id}/v2.0"
         >
           <Input maxLength={256} placeholder="https://..." />
         </Item>
@@ -164,6 +166,7 @@ const EditOidcProviderForm = ({
             { required: true, message: 'Client ID is required' },
             { max: 256 },
           ]}
+          tooltip="The public OAuth client ID used by the browser when initiating sign-in. For Entra ID this is the SPA (client) app registration's client ID."
         >
           <Input maxLength={256} />
         </Item>
@@ -175,11 +178,16 @@ const EditOidcProviderForm = ({
             { required: true, message: 'Audience is required' },
             { max: 256 },
           ]}
+          tooltip="Expected audience (aud) claim in the token. For Entra ID this is the bare API app registration client ID GUID."
         >
           <Input maxLength={256} />
         </Item>
 
-        <Item label="Scopes" name="scopes">
+        <Item
+          label="Scopes"
+          name="scopes"
+          tooltip="OAuth scopes the browser requests when initiating sign-in. For Entra ID include the API scope (e.g. api://{api-client-id}/access_as_user) so Entra issues an access token with the correct audience."
+        >
           <TagInput placeholder="Add scope and press Enter" />
         </Item>
 
@@ -195,6 +203,7 @@ const EditOidcProviderForm = ({
                     : Promise.resolve(),
               },
             ]}
+            tooltip="GUID tenant IDs that are permitted to authenticate. Add at least one."
           >
             <TagInput placeholder="Add tenant ID and press Enter" />
           </Item>
@@ -204,11 +213,17 @@ const EditOidcProviderForm = ({
           label="Clock Skew (seconds)"
           name="clockSkewSeconds"
           rules={[{ type: 'number', min: 0, max: 300 }]}
+          tooltip="Tolerance for token expiry/not-before checks to account for clock drift between servers. 60 seconds is the standard default."
         >
           <InputNumber min={0} max={300} style={{ width: '100%' }} />
         </Item>
 
-        <Item label="Enabled" name="isEnabled" valuePropName="checked">
+        <Item
+          label="Enabled"
+          name="isEnabled"
+          valuePropName="checked"
+          tooltip="Disabled providers are hidden from the login page and reject token exchange attempts."
+        >
           <Switch />
         </Item>
       </Form>
