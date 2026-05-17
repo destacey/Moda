@@ -3,7 +3,6 @@
 import React, { createContext, useCallback, useMemo, useState } from 'react'
 import { AuthContextType, AuthMethod, Claim, User } from './types'
 import ChangePasswordForm from '@/src/app/account/profile/change-password-form'
-import useTheme from '@/src/components/contexts/theme/use-theme'
 import styles from './auth-provider.module.css'
 import {
   AUTH_MUST_CHANGE_PASSWORD_KEY,
@@ -231,7 +230,6 @@ function deriveSessionFromStorage(): SessionSnapshot {
  * we hit during PR 3.2 testing.
  */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const { token } = useTheme()
   const { data: providers } = useGetAuthProvidersQuery()
 
   const [session, setSession] = useState<SessionSnapshot>(

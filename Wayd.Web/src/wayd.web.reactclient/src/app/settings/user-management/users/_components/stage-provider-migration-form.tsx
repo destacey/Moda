@@ -3,7 +3,7 @@
 import { Alert, Form, Modal, Select, Typography } from 'antd'
 import { toFormErrors } from '@/src/utils'
 import { useStageProviderMigrationMutation } from '@/src/store/features/user-management/users-api'
-import { useGetOidcProvidersQuery } from '@/src/store/features/user-management/oidc-providers-api'
+import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import { useModalForm } from '@/src/hooks'
 
@@ -33,14 +33,13 @@ const StageProviderMigrationForm = ({
 }: StageProviderMigrationFormProps) => {
   const messageApi = useMessage()
   const [stageProviderMigration] = useStageProviderMigrationMutation()
-  const { data: providers = [], isLoading: providersLoading } =
-    useGetOidcProvidersQuery()
+  const { data: authProviders, isLoading: providersLoading } =
+    useGetAuthProvidersQuery()
 
-  const eligibleProviders = providers.filter(
-    (p) =>
-      p.isEnabled &&
-      p.name !== currentLoginProvider &&
-      p.name !== 'Wayd',
+  // Public endpoint returns only enabled providers; filter to those that differ
+  // from the user's current provider. 'Wayd' is never in the OIDC list.
+  const eligibleProviders = (authProviders?.oidc ?? []).filter(
+    (p) => p.name !== currentLoginProvider,
   )
 
   const { form, isOpen, isValid, isSaving, handleOk, handleCancel } =

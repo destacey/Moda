@@ -14,7 +14,7 @@ import {
   useCancelTenantMigrationMutation,
   useGetUserQuery,
 } from '@/src/store/features/user-management/users-api'
-import { useGetOidcProvidersQuery } from '@/src/store/features/user-management/oidc-providers-api'
+import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   ConvertToLocalAccountForm,
@@ -55,7 +55,8 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { data: userData, isLoading, error } = useGetUserQuery(id)
   const [cancelTenantMigration] = useCancelTenantMigrationMutation()
   const [cancelProviderMigration] = useCancelProviderMigrationMutation()
-  const { data: oidcProviders = [] } = useGetOidcProvidersQuery()
+  const { data: authProviders } = useGetAuthProvidersQuery()
+  const oidcProviders = authProviders?.oidc ?? []
   const { modal } = App.useApp()
   const messageApi = useMessage()
 
@@ -65,11 +66,11 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const hasPendingMigration = !!userData?.pendingMigrationTenantId
   const hasPendingProviderMigration = !!userData?.pendingMigrationProviderId
   // Only show "Change Identity Provider" when at least one enabled OIDC provider
-  // exists that is different from the user's current provider.
-  const enabledOidcProviders = oidcProviders.filter((p) => p.isEnabled)
+  // exists that is different from the user's current provider. The public
+  // auth/providers endpoint only returns enabled providers, so no extra filter needed.
   const canChangeProvider =
-    enabledOidcProviders.length > 0 &&
-    enabledOidcProviders.some((p) => p.name !== userData?.loginProvider)
+    oidcProviders.length > 0 &&
+    oidcProviders.some((p) => p.name !== userData?.loginProvider)
 
   const tabs = [
     { key: UserDetailsTabs.Details, tab: 'Details' },

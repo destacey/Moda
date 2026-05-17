@@ -67,7 +67,7 @@ This action is available for any user (including local accounts) when at least o
 
 **Things to know:**
 
-- **Stage before the user signs in via the new provider.** If the user signs in via the target provider before staging, Wayd creates a new account — there's no in-app merge path.
+- **Stage before the user signs in via the new provider (Entra targets only).** If the target provider is Microsoft Entra ID and the user signs in there before staging, Wayd creates a new account — there's no in-app merge path. For GenericOidc targets (Google, Okta, Auth0, Keycloak, etc.) this is not a risk: unknown users are rejected at the token-exchange boundary until a migration is staged for them.
 - For users migrating **from a local account**: their password hash is cleared when the rebind completes, since the Wayd identity is deactivated. If the migration needs to be reversed, use **Convert to Local Account**.
 - The action is hidden when only one OIDC provider is configured, or when the user is already on the only available provider.
 - Re-staging with a different target provider silently replaces the previous one. Cancellation is available and idempotent.

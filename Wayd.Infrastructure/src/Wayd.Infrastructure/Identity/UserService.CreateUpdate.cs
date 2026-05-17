@@ -225,6 +225,22 @@ internal partial class UserService
         var email = principal.FindFirstValue(ClaimTypes.Email)
             ?? principal.FindFirstValue("email");
 
+        // Reject an explicitly unverified email — some providers issue tokens
+        // with email_verified=false for addresses the user hasn't confirmed.
+        // Treating such a claim as a trusted account binding would let an attacker
+        // register with someone else's email and take over any pending migration
+        // staged for that address. Absent email_verified is accepted (well-behaved
+        // providers that always verify simply omit the claim).
+        var emailVerifiedClaim = principal.FindFirstValue("email_verified");
+        if (emailVerifiedClaim is not null &&
+            emailVerifiedClaim.Equals("false", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning(
+                "Provider migration skipped for provider {Provider}: email_verified=false on token.",
+                providerName);
+            email = null; // treat as no email — rebind won't fire
+        }
+
         // GenericOidc providers are single-tenant per row — no tid claim; tenant
         // is implicit from the provider configuration itself. Store null to keep
         // the schema consistent with how single-tenant rows are represented.

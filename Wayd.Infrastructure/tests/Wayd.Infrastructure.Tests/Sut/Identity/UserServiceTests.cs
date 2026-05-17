@@ -84,6 +84,7 @@ public class UserServiceTests
             _mockOidcProviderRegistry.Object);
     }
 
+
     private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true, string loginProvider = LoginProviders.MicrosoftEntraId)
     {
         return new ApplicationUser
@@ -1236,6 +1237,455 @@ public class UserServiceTests
     }
 
     #endregion
+
+    #region StageProviderMigration
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldSetPendingProvider_WhenOidcUserHasActiveIdentity()
+    {
+        const string targetProvider = "Acme-Okta";
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserIdentityStore.Setup(s => s.ExistsActive(user.Id, LoginProviders.MicrosoftEntraId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _mockOidcProviderRegistry.Setup(r => r.GetByName(targetProvider, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(BuildOidcProvider(targetProvider));
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, targetProvider),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().Be(targetProvider);
+        _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserUpdatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldSucceed_ForLocalUser()
+    {
+        // Local (Wayd) users can now be staged to migrate to an OIDC provider.
+        const string targetProvider = "Acme-Okta";
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserIdentityStore.Setup(s => s.ExistsActive(user.Id, LoginProviders.Wayd, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _mockOidcProviderRegistry.Setup(r => r.GetByName(targetProvider, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(BuildOidcProvider(targetProvider));
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, targetProvider),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().Be(targetProvider);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldOverwritePreviousTarget_WhenAlreadyStaged()
+    {
+        const string firstProvider = "Acme-Okta";
+        const string secondProvider = "Acme-Google";
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        user.PendingMigrationProviderId = firstProvider;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserIdentityStore.Setup(s => s.ExistsActive(user.Id, LoginProviders.MicrosoftEntraId, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(true);
+        _mockOidcProviderRegistry.Setup(r => r.GetByName(secondProvider, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(BuildOidcProvider(secondProvider));
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, secondProvider),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().Be(secondProvider);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldFail_WhenTargetIsSameAsCurrentProvider()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, LoginProviders.MicrosoftEntraId),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("same as the user's current provider");
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldFail_WhenTargetProviderDoesNotExist()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockOidcProviderRegistry.Setup(r => r.GetByName("unknown", It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Wayd.Common.Domain.Identity.OidcProvider?)null);
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, "unknown"),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("does not exist");
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldFail_WhenTargetProviderIsDisabled()
+    {
+        const string targetProvider = "Acme-Okta";
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockOidcProviderRegistry.Setup(r => r.GetByName(targetProvider, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(BuildOidcProvider(targetProvider, isEnabled: false));
+
+        var sut = CreateSut();
+
+        var result = await sut.StageProviderMigration(
+            new StageProviderMigrationCommand(user.Id, targetProvider),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("disabled");
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task StageProviderMigration_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        _mockUserManager.Setup(x => x.Users).Returns(Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var act = () => sut.StageProviderMigration(
+            new StageProviderMigrationCommand("missing", "Acme-Okta"),
+            TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region CancelProviderMigration
+
+    [Fact]
+    public async Task CancelProviderMigration_ShouldClearPendingProvider_WhenStaged()
+    {
+        var user = CreateUser();
+        user.PendingMigrationProviderId = "Acme-Okta";
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.CancelProviderMigration(user.Id, TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().BeNull();
+        _mockUserManager.Verify(x => x.UpdateAsync(user), Times.Once);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserUpdatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task CancelProviderMigration_ShouldBeIdempotent_WhenNothingStaged()
+    {
+        var user = CreateUser();
+        user.PendingMigrationProviderId = null;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.CancelProviderMigration(user.Id, TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserUpdatedEvent>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task CancelProviderMigration_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        _mockUserManager.Setup(x => x.Users).Returns(Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var act = () => sut.CancelProviderMigration("missing", TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    #region TryApplyPendingProviderMigration
+
+    [Fact]
+    public async Task TryApplyPendingProviderMigration_ShouldRebindIdentity_WhenMigrationStagedAndEmailMatches()
+    {
+        const string targetProvider = "Acme-Okta";
+        const string subject = "okta-sub-abc123";
+        const string email = "alice@example.com";
+
+        var user = CreateUser(id: "user-rebind", loginProvider: LoginProviders.MicrosoftEntraId);
+        user.NormalizedEmail = email.ToUpperInvariant();
+        user.PendingMigrationProviderId = targetProvider;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.TryApplyPendingProviderMigration(targetProvider, null, subject, email);
+
+        result.Should().NotBeNull();
+        result!.Id.Should().Be(user.Id);
+        user.LoginProvider.Should().Be(targetProvider);
+        user.PendingMigrationProviderId.Should().BeNull();
+
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            user.Id, It.IsAny<NodaTime.Instant>(), UserIdentityUnlinkReasons.ProviderRelinked,
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockUserIdentityStore.Verify(s => s.Add(
+            It.Is<UserIdentity>(ui =>
+                ui.UserId == user.Id &&
+                ui.Provider == targetProvider &&
+                ui.ProviderTenantId == null &&
+                ui.ProviderSubject == subject &&
+                ui.IsActive),
+            It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task TryApplyPendingProviderMigration_ShouldReturnNull_WhenEmailIsNull()
+    {
+        var sut = CreateSut();
+
+        var result = await sut.TryApplyPendingProviderMigration("Acme-Okta", null, "sub-123", email: null);
+
+        result.Should().BeNull();
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task TryApplyPendingProviderMigration_ShouldReturnNull_WhenNoPendingMigrationForProvider()
+    {
+        const string targetProvider = "Acme-Okta";
+        const string email = "alice@example.com";
+
+        // User has no pending migration (PendingMigrationProviderId is null)
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        user.NormalizedEmail = email.ToUpperInvariant();
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.TryApplyPendingProviderMigration(targetProvider, null, "sub-123", email);
+
+        result.Should().BeNull();
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task TryApplyPendingProviderMigration_ShouldThrowAndSignalRollback_WhenUpdateFails()
+    {
+        const string targetProvider = "Acme-Okta";
+        const string email = "alice@example.com";
+
+        var user = CreateUser(id: "user-rebind-fail", loginProvider: LoginProviders.MicrosoftEntraId);
+        user.NormalizedEmail = email.ToUpperInvariant();
+        user.PendingMigrationProviderId = targetProvider;
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.UpdateAsync(user))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Concurrency failure." }));
+
+        Exception? captured = null;
+        _mockUserIdentityStore
+            .Setup(s => s.ExecuteInTransaction(It.IsAny<Func<CancellationToken, Task>>(), It.IsAny<CancellationToken>()))
+            .Returns<Func<CancellationToken, Task>, CancellationToken>(async (action, ct) =>
+            {
+                try { await action(ct); }
+                catch (Exception ex) { captured = ex; throw; }
+            });
+
+        var sut = CreateSut();
+
+        var act = () => sut.TryApplyPendingProviderMigration(targetProvider, null, "sub-123", email);
+
+        await act.Should().ThrowAsync<InternalServerException>()
+            .WithMessage("*Failed to apply pending provider migration*Concurrency failure*");
+
+        captured.Should().NotBeNull("the transaction lambda must throw to trigger rollback");
+        _mockUserIdentityStore.Verify(s => s.Add(It.IsAny<UserIdentity>(), It.IsAny<CancellationToken>()), Times.Once);
+    }
+
+    #endregion
+
+    #region ConvertToLocalAccount
+
+    [Fact]
+    public async Task ConvertToLocalAccount_ShouldSucceed_WhenOidcUserConverts()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass123!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand(user.Id, "NewPass123!"),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.LoginProvider.Should().Be(LoginProviders.Wayd);
+        user.MustChangePassword.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().BeNull();
+
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            user.Id, It.IsAny<NodaTime.Instant>(), UserIdentityUnlinkReasons.ProviderRelinked,
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockUserIdentityStore.Verify(s => s.Add(
+            It.Is<UserIdentity>(ui =>
+                ui.UserId == user.Id &&
+                ui.Provider == LoginProviders.Wayd &&
+                ui.ProviderTenantId == null &&
+                ui.ProviderSubject == user.Id &&
+                ui.IsActive),
+            It.IsAny<CancellationToken>()), Times.Once);
+
+        _mockEvents.Verify(x => x.PublishAsync(It.IsAny<ApplicationUserUpdatedEvent>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task ConvertToLocalAccount_ShouldClearPendingProviderMigration_WhenFlagIsSet()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        user.PendingMigrationProviderId = "Acme-Okta";
+
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+        _mockUserManager.Setup(x => x.GeneratePasswordResetTokenAsync(user)).ReturnsAsync("reset-token");
+        _mockUserManager.Setup(x => x.ResetPasswordAsync(user, "reset-token", "NewPass123!"))
+            .ReturnsAsync(IdentityResult.Success);
+        _mockUserManager.Setup(x => x.UpdateAsync(user)).ReturnsAsync(IdentityResult.Success);
+
+        var sut = CreateSut();
+
+        var result = await sut.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand(user.Id, "NewPass123!"),
+            TestContext.Current.CancellationToken);
+
+        result.IsSuccess.Should().BeTrue();
+        user.PendingMigrationProviderId.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task ConvertToLocalAccount_ShouldFail_WhenUserIsAlreadyLocal()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.Wayd);
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand(user.Id, "NewPass123!"),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("already a local account");
+        _mockUserManager.Verify(x => x.UpdateAsync(It.IsAny<ApplicationUser>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ConvertToLocalAccount_ShouldReturnFailure_WhenPasswordValidationFails()
+    {
+        var user = CreateUser(loginProvider: LoginProviders.MicrosoftEntraId);
+        _mockUserManager.Setup(x => x.Users).Returns(new[] { user }.AsQueryable().BuildMockDbSet().Object);
+
+        // PasswordValidators is a non-virtual IList<> populated by ASP.NET Identity
+        // from the UserManager ctor arg. We can't Moq.Setup it, but we can add to
+        // the list that was already created — UserManager<T> exposes it as IList.
+        var mockValidator = new Mock<IPasswordValidator<ApplicationUser>>();
+        mockValidator.Setup(v => v.ValidateAsync(It.IsAny<UserManager<ApplicationUser>>(), user, "weak"))
+            .ReturnsAsync(IdentityResult.Failed(new IdentityError { Description = "Password too short." }));
+        _mockUserManager.Object.PasswordValidators.Add(mockValidator.Object);
+
+        var sut = CreateSut();
+
+        var result = await sut.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand(user.Id, "weak"),
+            TestContext.Current.CancellationToken);
+
+        result.IsFailure.Should().BeTrue();
+        result.Error.Should().Contain("Password too short.");
+        // Transaction must not have opened — no identity writes
+        _mockUserIdentityStore.Verify(s => s.DeactivateAllActive(
+            It.IsAny<string>(), It.IsAny<NodaTime.Instant>(), It.IsAny<string>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task ConvertToLocalAccount_ShouldThrowNotFound_WhenUserDoesNotExist()
+    {
+        _mockUserManager.Setup(x => x.Users).Returns(Array.Empty<ApplicationUser>().AsQueryable().BuildMockDbSet().Object);
+
+        var sut = CreateSut();
+
+        var act = () => sut.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand("missing", "NewPass123!"),
+            TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<NotFoundException>();
+    }
+
+    #endregion
+
+    // Builds a minimal OidcProvider via reflection so tests don't need a Create factory.
+    private static Wayd.Common.Domain.Identity.OidcProvider BuildOidcProvider(string name, bool isEnabled = true)
+    {
+        var provider = (Wayd.Common.Domain.Identity.OidcProvider)System.Runtime.CompilerServices.RuntimeHelpers
+            .GetUninitializedObject(typeof(Wayd.Common.Domain.Identity.OidcProvider));
+
+        typeof(Wayd.Common.Domain.Identity.OidcProvider)
+            .GetProperty(nameof(Wayd.Common.Domain.Identity.OidcProvider.Name))!
+            .SetValue(provider, name);
+        typeof(Wayd.Common.Domain.Identity.OidcProvider)
+            .GetProperty(nameof(Wayd.Common.Domain.Identity.OidcProvider.IsEnabled))!
+            .SetValue(provider, isEnabled);
+
+        return provider;
+    }
 
     #region UnlockUserAsync
 
