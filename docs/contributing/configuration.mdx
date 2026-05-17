@@ -26,7 +26,7 @@ Wayd supports two authentication paths:
 
 Each row in the `Identity.OidcProviders` table is one configured provider — its discovery `Authority`, public `ClientId`, expected token `Audience`, scopes, and (for Entra) the allowed-tenant list. The token-exchange endpoint resolves provider metadata from this table on every request, with a short cache TTL and explicit invalidation on admin writes.
 
-**Bootstrap (existing deployments).** On first start after upgrading, if `SecuritySettings:Providers:Entra:Enabled = true` and no `OidcProvider` row exists for Microsoft Entra ID yet, the application seeds one from the legacy `SecuritySettings:Providers:Entra` config plus `SecuritySettings:AzureAd:ClientId`. After that seed, the database is the source of truth — config-file edits no longer flow through, so admins should make subsequent changes via the Settings UI.
+**Bootstrap (existing deployments).** On first start after upgrading, if `SecuritySettings:Providers:Entra:Enabled = true` and no `OidcProvider` row exists for Microsoft Entra ID yet, the application seeds one from `SecuritySettings:Providers:Entra`. After that seed, the database is the source of truth — config-file edits no longer flow through, so admins should make subsequent changes via the Settings UI.
 
 **Managing providers.** Once the `IdentityProviders` feature flag is enabled, admins with the `Permissions.OidcProviders.{View|Create|Update|Delete}` permissions can manage providers from **Settings → Identity Providers**. The "Test connection" button fetches the provider's `.well-known/openid-configuration` document so typos in `Authority` are caught at configuration time, not at the user's next login.
 
@@ -43,7 +43,7 @@ Each row in the `Identity.OidcProviders` table is one configured provider — it
 | `ClockSkewSeconds` | Tolerance for expiry/not-before checks. Defaults to 60; range `[0, 600]`. |
 | `IsEnabled` | Disabled providers are hidden from the login page; exchange attempts against them return 401. |
 
-**Legacy env config (still used for the first-boot seed).** Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Secrets only on deployments that don't yet have an `OidcProviders` row. Once seeded, this config block is no longer consulted at runtime.
+**First-boot seed config.** Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Secrets on any deployment that doesn't yet have an `OidcProviders` row. Once seeded, this config block is no longer consulted at runtime.
 
 ```json
 {
@@ -51,20 +51,28 @@ Each row in the `Identity.OidcProviders` table is one configured provider — it
         "Providers": {
             "Entra": {
                 "Enabled": true,
-                "Authority": "https://login.microsoftonline.com/common/v2.0",
-                "Audience": "{exact token aud claim — see note below}",
-                "AllowedTenantIds": [ "{your AAD tenant ID}" ],
+                "Authority": "https://login.microsoftonline.com/{your-tenant-id}/v2.0",
+                "SpaClientId": "{client app registration client ID}",
+                "ApiScope": "api://{api-client-id}/access_as_user",
+                "Audience": "{API app registration client ID — bare GUID for v2 tokens}",
+                "AllowedTenantIds": [ "{your Entra tenant ID}" ],
                 "ClockSkewSeconds": 60
             }
-        },
-        "AzureAd": {
-            "ClientId": "{your AAD client ID}"
         }
     }
 }
 ```
 
-The seeder reads `Audience`, `Authority`, `AllowedTenantIds`, and `ClockSkewSeconds` from `Providers:Entra`, and `ClientId` from `AzureAd:ClientId` (which the Microsoft Graph integration already requires). If `AzureAd:ClientId` is empty when the seed runs, the seed is skipped with a logged warning and the operator can create the row manually via the Settings UI once it's available.
+The seeder reads all fields from `Providers:Entra`:
+
+- `SpaClientId` — the **client (SPA) app registration's** client ID, presented to Entra when initiating sign-in
+- `ApiScope` — the API scope (e.g. `api://{api-client-id}/access_as_user`) appended to the standard OIDC scopes so Entra issues an access token with `aud = {api-client-id}`
+- `Audience` — the **API app registration's** client ID, pinned as the expected `aud` claim on incoming tokens
+- `Authority` — use the tenant-specific URL (`/v2.0` suffix required) for single-tenant deployments; use `https://login.microsoftonline.com/common/v2.0` only for true multi-tenant deployments where users from multiple Entra tenants sign in
+
+These are different values because Wayd follows Entra's standard two-registration pattern (see [Entra App Registration Setup](./entra-app-registration.mdx)).
+
+If `SpaClientId` is not set the seed is skipped with a logged warning; the operator can create the row manually via the Settings UI instead.
 
 :::tip Setting up a new environment
 If you don't yet have an Entra app registration for this deployment, follow [Entra App Registration Setup](./entra-app-registration.mdx) first. That walks through creating the two app registrations (API + client), choosing the right token version, and collecting the GUIDs referenced above.
@@ -82,9 +90,11 @@ Setting the seed config via User Secrets (preferred for local dev — `security.
 ```bash
 cd Wayd.Web/src/Wayd.Web.Api
 dotnet user-secrets set "SecuritySettings:Providers:Entra:Enabled" "true"
-dotnet user-secrets set "SecuritySettings:Providers:Entra:Audience" "{exact aud claim from a real token}"
-dotnet user-secrets set "SecuritySettings:Providers:Entra:AllowedTenantIds:0" "{your AAD tenant ID}"
-dotnet user-secrets set "SecuritySettings:AzureAd:ClientId" "{your AAD client ID}"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:Authority" "https://login.microsoftonline.com/{your-tenant-id}/v2.0"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:SpaClientId" "{client app registration client ID}"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:ApiScope" "api://{api-client-id}/access_as_user"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:Audience" "{API app registration client ID}"
+dotnet user-secrets set "SecuritySettings:Providers:Entra:AllowedTenantIds:0" "{your Entra tenant ID}"
 ```
 
 Array elements bind by index (`:0`, `:1`, ...). The seeder picks these up on the next application start. Subsequent changes go through the Settings UI.
@@ -111,14 +121,14 @@ Only `Secret` needs to be set per deploy — the rest have sensible defaults and
 
 ### Auth flow (high level)
 
-Every login path produces a **Wayd JWT + Wayd refresh token** stored in `localStorage`/`sessionStorage`. The API only ever validates Wayd JWTs — OIDC tokens from upstream providers are exchanged for a Wayd JWT at login and never presented to the API directly. The diagram below uses MSAL because Microsoft Entra is the only provider supported on the frontend today; the generic OIDC client path follows the same shape with `oidc-client-ts` replacing MSAL.
+Every login path produces a **Wayd JWT + Wayd refresh token** stored in `localStorage`/`sessionStorage`. The API only ever validates Wayd JWTs — OIDC tokens from upstream providers are exchanged for a Wayd JWT at login and never presented to the API directly.
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant F as Frontend
-    participant M as MSAL
-    participant E as Microsoft Entra
+    participant O as oidc-client-ts
+    participant P as OIDC Provider (Entra / Google / etc.)
     participant W as Wayd API
     participant A as Any API endpoint
 
@@ -128,15 +138,16 @@ sequenceDiagram
     W-->>F: { token, refreshToken }
     F->>F: storeWaydAuth(...)
 
-    Note over U,A: Entra (SSO) login
-    U->>F: Click "Sign in with Microsoft"
-    F->>M: loginRedirect
-    M->>E: OIDC auth flow
-    E-->>M: ID token + access token
-    F->>M: acquireTokenSilent(apiScope)
-    M-->>F: Entra access token
-    F->>W: POST /api/auth/exchange<br/>{ provider, subjectToken }
-    W->>W: Validate signature via JWKS<br/>Check tenant allowlist
+    Note over U,A: OIDC login (any configured provider)
+    U->>F: Click provider button
+    F->>O: signinRedirect(provider)
+    O->>P: PKCE authorization redirect
+    P-->>F: Redirect back with ?code=...
+    F->>O: signinRedirectCallback()
+    O->>P: Exchange code for tokens
+    P-->>O: access_token
+    F->>W: POST /api/auth/exchange<br/>{ provider, subjectToken: access_token }
+    W->>W: Validate signature via JWKS<br/>Check tenant allowlist (Entra)
     W->>W: Resolve UserIdentity<br/>Load permissions
     W-->>F: { token (Wayd JWT), refreshToken }
     F->>F: storeWaydAuth(...)
