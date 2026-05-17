@@ -35,19 +35,19 @@ internal sealed class GetPlanningIntervalObjectiveQueryHandler(IPlanningDbContex
         if (objectiveId is null)
         {
             objectiveId = await GetObjectiveId(request, cancellationToken);
-            if (objectiveId == Guid.Empty)
+            if (objectiveId == Guid.Empty || objectiveId is null)
                 return null;
         }
 
         var planningInterval = await _planningDbContext.PlanningIntervals
-        .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
-            .ThenInclude(o => o.Team)
-        .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
-            .ThenInclude(o => o.HealthChecks)
-                .ThenInclude(h => h.ReportedBy)
-        .Where(request.PlanningIntervalIdOrKeyFilter)
-        .AsNoTrackingWithIdentityResolution()
-        .FirstOrDefaultAsync(cancellationToken);
+            .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
+                .ThenInclude(o => o.Team)
+            .Include(p => p.Objectives.Where(o => o.Id == objectiveId.Value))
+                .ThenInclude(o => o.HealthChecks)
+                    .ThenInclude(h => h.ReportedBy)
+            .Where(request.PlanningIntervalIdOrKeyFilter)
+            .AsNoTrackingWithIdentityResolution()
+            .FirstOrDefaultAsync(cancellationToken);
         if (planningInterval is null || planningInterval.Objectives.Count != 1
             || planningInterval.Objectives.First().Id != objectiveId.Value)
             return null;
