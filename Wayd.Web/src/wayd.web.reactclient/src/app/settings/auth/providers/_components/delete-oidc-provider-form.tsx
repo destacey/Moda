@@ -3,7 +3,7 @@
 import { useMessage } from '@/src/components/contexts/messaging'
 import { DeleteOidcProviderResult, OidcProviderListItemDto } from '@/src/services/wayd-api'
 import { useDeleteOidcProviderMutation } from '@/src/store/features/user-management/oidc-providers-api'
-import { Modal, Typography } from 'antd'
+import { Alert, Flex, Modal, Typography } from 'antd'
 import { useState } from 'react'
 import { useConfirmModal } from '@/src/hooks'
 
@@ -97,9 +97,16 @@ const DeleteOidcProviderForm = ({
       keyboard={false}
       destroyOnHidden
     >
-      <Text>
-        <strong>{provider.displayName}</strong> ({provider.name})
-      </Text>
+      <Flex vertical gap={12}>
+        <Text>
+          <strong>{provider.displayName}</strong> ({provider.name})
+        </Text>
+        <Alert
+          type="warning"
+          showIcon
+          message="This cannot be completed if any users have an active identity bound to this provider. Rebind those users first."
+        />
+      </Flex>
     </Modal>
   )
 }
