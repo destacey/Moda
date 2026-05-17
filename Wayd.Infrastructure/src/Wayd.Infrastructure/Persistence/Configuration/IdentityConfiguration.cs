@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Domain.Employees;
-using Wayd.Common.Domain.Identity;
 
 namespace Wayd.Infrastructure.Persistence.Configuration;
 

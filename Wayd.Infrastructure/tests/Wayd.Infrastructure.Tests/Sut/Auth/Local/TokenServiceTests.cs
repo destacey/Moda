@@ -671,22 +671,26 @@ public class TokenServiceTests
     }
 
     [Fact]
-    public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenGenericOidcValidatesButProvisioningNotImplemented()
+    public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenGenericOidcValidatesButNoMatchingUser()
     {
-        // Defense-in-depth boundary: even if a future deployment seeds a
-        // GenericOidc row and the validator accepts the token, TokenService
-        // still rejects because UserService.GetOrCreateFromPrincipalAsync is
-        // Entra-only today. Removing this branch is the followup task.
-        var principal = CreateEntraPrincipal(); // shape doesn't matter; we don't reach the user service
+        // GenericOidc tokens are now fully validated and routed to
+        // ResolveFromGenericOidcPrincipalAsync. When that method returns null
+        // (no existing identity, no pending migration), TokenService rejects
+        // with a user-facing message rather than a generic "Invalid token."
+        var principal = CreateEntraPrincipal(); // claim shape doesn't matter for this path
         _mockOidcTokenValidator
             .Setup(v => v.Validate("Acme-Google", It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
+        _mockUserService
+            .Setup(s => s.ResolveFromGenericOidcPrincipalAsync("Acme-Google", principal, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(((string Id, string? EmployeeId)?)null);
 
         var act = () => _sut.ExchangeTokenAsync(
             new ExchangeTokenCommand("Acme-Google", "valid-google-token"),
             TestContext.Current.CancellationToken);
 
-        await act.Should().ThrowAsync<UnauthorizedException>().WithMessage("Invalid token.");
+        await act.Should().ThrowAsync<UnauthorizedException>()
+            .WithMessage("No account found for this identity. Contact an administrator.");
         _mockUserService.Verify(s => s.GetOrCreateFromPrincipalAsync(It.IsAny<ClaimsPrincipal>()), Times.Never);
     }
 
