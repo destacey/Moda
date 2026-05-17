@@ -17,8 +17,7 @@ import AppBreadcrumb from './_components/app-breadcrumb'
 import { ThemeProvider } from '../components/contexts/theme'
 import { MenuToggleProvider } from '../components/contexts/menu-toggle'
 import { AntdRegistry } from '@ant-design/nextjs-registry'
-import { AuthProvider, msalInstance } from '../components/contexts/auth'
-import { MsalProvider } from '@azure/msal-react'
+import { AuthProvider } from '../components/contexts/auth'
 import { MessageProvider } from '../components/contexts/messaging'
 import LoginPage from './login/page'
 import LogoutPage from './logout/page'
@@ -64,8 +63,6 @@ const AppContent = memo(({ children }: PropsWithChildren) => {
 
 AppContent.displayName = 'AppContent'
 
-const SsrFallback = () => null
-
 const AppProviders = ({ children }: PropsWithChildren) => (
   <ThemeProvider>
     <MenuToggleProvider>
@@ -87,14 +84,24 @@ const AppProviders = ({ children }: PropsWithChildren) => (
  * in to Wayd" — the source of the logout re-login race that PR 3.2's earlier
  * revisions hit.
  */
-const subscribeNoop = () => () => {}
+// Re-check auth state whenever another tab writes or clears the Wayd JWT.
+// Without this, a login in Tab A leaves Tab B stuck on /login until refresh.
+const subscribeAuthStorage = (callback: () => void) => {
+  const handler = (event: StorageEvent) => {
+    if (event.key === null || event.key.startsWith('wayd.local.')) {
+      callback()
+    }
+  }
+  window.addEventListener('storage', handler, { passive: true })
+  return () => window.removeEventListener('storage', handler)
+}
 const getAuthSnapshot = () => isAuthActive()
 const getAuthServerSnapshot = () => false
 
 const AuthGate = ({ children }: PropsWithChildren) => {
   const pathname = usePathname()
   const auth = useSyncExternalStore(
-    subscribeNoop,
+    subscribeAuthStorage,
     getAuthSnapshot,
     getAuthServerSnapshot,
   )
@@ -127,15 +134,16 @@ const AuthGate = ({ children }: PropsWithChildren) => {
   return <LoginPage />
 }
 
+const SsrFallback = () => null
+
 const RootLayout = ({ children }: React.PropsWithChildren) => {
-  // MSAL can't run during SSR (no window). Render the same shell on the server
-  // AND on the first client render, then swap to the MsalProvider tree after
-  // the mount effect fires. This keeps server HTML and first-paint client HTML
-  // identical — required for hydration — while still booting MSAL on the client.
+  // Suppress the server/client hydration mismatch that arises because
+  // AuthGate reads localStorage (client-only) to decide what to render.
+  // The server always produces a blank shell; we swap in the real tree
+  // after the first client render, keeping server and first-paint HTML
+  // identical.
   const [mounted, setMounted] = React.useState(false)
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
+  React.useEffect(() => { setMounted(true) }, [])
 
   return (
     <html lang="en">
@@ -150,12 +158,10 @@ const RootLayout = ({ children }: React.PropsWithChildren) => {
       </head>
       <body className={inter.className}>
         <ReleaseCleanup />
-        {mounted && msalInstance ? (
+        {mounted ? (
           <AntdRegistry>
             <Provider store={store}>
-              <MsalProvider instance={msalInstance}>
-                <AuthGate>{children}</AuthGate>
-              </MsalProvider>
+              <AuthGate>{children}</AuthGate>
             </Provider>
             {process.env.NODE_ENV !== 'production' && <BreakpointIndicator />}
           </AntdRegistry>

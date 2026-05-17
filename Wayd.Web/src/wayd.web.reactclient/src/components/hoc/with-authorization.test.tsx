@@ -2,12 +2,6 @@ import React from 'react'
 import { render } from '@testing-library/react'
 import '@testing-library/jest-dom'
 
-// Mock the MsalProvider
-jest.mock('@azure/msal-react', () => ({
-  MsalProvider: ({ children }: { children: React.ReactNode }) => children,
-  useMsal: jest.fn(),
-}))
-
 import { AuthContext, AuthContextType } from '../contexts/auth'
 import withAuthorization, { WithAuthorizationProps } from './with-authorization'
 

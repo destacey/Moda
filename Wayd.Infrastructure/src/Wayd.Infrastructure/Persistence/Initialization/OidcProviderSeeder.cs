@@ -2,44 +2,35 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Wayd.Common.Application.Identity;
+using Wayd.Common.Domain.FeatureManagement;
 using Wayd.Common.Domain.Identity;
-using Wayd.Infrastructure.Auth.AzureAd;
 using Wayd.Infrastructure.Auth.Entra;
 
 namespace Wayd.Infrastructure.Persistence.Initialization;
 
 /// <summary>
-/// One-time bridge: if this deployment is configured for Entra via the legacy
-/// env/config settings and there isn't yet an <see cref="OidcProvider"/> row for
-/// Microsoft Entra ID, seed one. Existing deployments roll forward into the new
-/// database-managed provider model without operator action.
+/// One-time bridge: if this deployment is configured for Entra via
+/// <c>SecuritySettings:Providers:Entra</c> and there isn't yet an
+/// <see cref="OidcProvider"/> row for Microsoft Entra ID, seed one.
+/// Existing deployments roll forward into the database-managed provider
+/// model without further operator action beyond adding
+/// <c>SecuritySettings:Providers:Entra:SpaClientId</c>.
 /// </summary>
 /// <remarks>
-/// The seeder only inserts. It deliberately does NOT update an existing row from
-/// config: once the row exists, the database is the source of truth. Sync-from-
-/// config-every-startup would silently undo admin edits made through the
-/// Settings UI and create a confusing config/DB race.
-///
-/// The <c>ClientId</c> is sourced from <c>SecuritySettings:AzureAd:ClientId</c>,
-/// which is currently used by the Graph integration and almost always matches
-/// the frontend MSAL client. If it's not set, the seeder logs a warning and
-/// skips — the admin can create the provider explicitly via the Settings UI
-/// once Phase 2 ships. We don't fabricate a placeholder ClientId because that
-/// would create a provider row that doesn't actually work.
+/// The seeder only inserts. It deliberately does NOT update an existing row:
+/// once the row exists the database is the source of truth. Sync-from-config
+/// on every startup would silently undo admin edits made through the Settings UI.
 /// </remarks>
 public class OidcProviderSeeder : ICustomSeeder
 {
     private readonly EntraSettings _entraSettings;
-    private readonly AzureAdSettings _azureAdSettings;
     private readonly ILogger<OidcProviderSeeder> _logger;
 
     public OidcProviderSeeder(
         IOptions<EntraSettings> entraSettings,
-        IOptions<AzureAdSettings> azureAdSettings,
         ILogger<OidcProviderSeeder> logger)
     {
         _entraSettings = entraSettings.Value;
-        _azureAdSettings = azureAdSettings.Value;
         _logger = logger;
     }
 
@@ -59,30 +50,32 @@ public class OidcProviderSeeder : ICustomSeeder
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(_azureAdSettings.ClientId))
+        // SpaClientId is the SPA (frontend) app registration client ID — the value
+        // the OIDC client sends as client_id when initiating the authorization flow.
+        // Audience is the API app registration client ID — the expected aud claim.
+        // Standard Entra two-registration setup: both values are required.
+        if (string.IsNullOrWhiteSpace(_entraSettings.SpaClientId))
         {
             _logger.LogWarning(
-                "Entra is enabled but SecuritySettings:AzureAd:ClientId is empty. " +
-                "Skipping OidcProvider seed — an admin can create the Microsoft Entra ID provider " +
-                "through the Settings UI once configured. Frontend Entra login will continue using " +
-                "the existing NEXT_PUBLIC_AZURE_AD_CLIENT_ID env var until then.");
+                "Entra is enabled but SecuritySettings:Providers:Entra:SpaClientId is not set. " +
+                "Skipping OidcProvider seed — add SpaClientId (the SPA/client app registration's " +
+                "client ID) to SecuritySettings:Providers:Entra, then restart to seed automatically, " +
+                "or create the provider manually via the Settings UI.");
             return;
         }
 
         var displayName = "Microsoft Entra ID";
-        // Default scopes for the SPA flow. The frontend OIDC client uses these to
-        // request the access token it then exchanges at /api/auth/exchange. The
-        // backend only validates the resulting token's `aud` claim — it doesn't
-        // enforce scopes — so getting these slightly wrong here is recoverable.
-        // The admin can refine the list via the Settings UI.
-        var scopes = new[] { "openid", "profile", "email" };
+        var baseScopes = new[] { "openid", "profile", "email" };
+        var scopes = string.IsNullOrWhiteSpace(_entraSettings.ApiScope)
+            ? baseScopes
+            : [.. baseScopes, _entraSettings.ApiScope];
 
         var result = OidcProvider.Create(
             name: LoginProviders.MicrosoftEntraId,
             displayName: displayName,
             providerType: OidcProviderType.MicrosoftEntraId,
             authority: _entraSettings.Authority,
-            clientId: _azureAdSettings.ClientId!,
+            clientId: _entraSettings.SpaClientId!,
             audience: _entraSettings.Audience,
             scopes: scopes,
             allowedTenantIds: _entraSettings.AllowedTenantIds,
@@ -103,10 +96,20 @@ public class OidcProviderSeeder : ICustomSeeder
         }
 
         dbContext.OidcProviders.Add(result.Value);
+
+        // Enable the IdentityProviders feature flag so the admin Settings UI is
+        // immediately visible after migration — no manual flag toggle needed.
+        var flag = await dbContext.FeatureFlags
+            .SingleOrDefaultAsync(f => f.Name == FeatureFlags.Names.IdentityProviders, cancellationToken);
+        if (flag is not null && !flag.IsEnabled)
+        {
+            flag.Toggle(true);
+        }
+
         await dbContext.SaveChangesAsync(cancellationToken);
 
         _logger.LogInformation(
-            "Seeded Microsoft Entra ID OidcProvider from existing SecuritySettings config. " +
-            "Manage providers via the Settings UI from now on.");
+            "Seeded Microsoft Entra ID OidcProvider from existing SecuritySettings config and " +
+            "enabled the IdentityProviders feature flag. Manage providers via the Settings UI from now on.");
     }
 }

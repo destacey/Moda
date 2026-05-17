@@ -1,13 +1,7 @@
 'use client'
 
-import { useMsal, useIsAuthenticated } from '@azure/msal-react'
-import {
-  InteractionRequiredAuthError,
-  InteractionStatus,
-} from '@azure/msal-browser'
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { tokenRequest } from '@/auth-config'
 import styles from './page.module.css'
 import {
   getAuthClient,
@@ -18,6 +12,15 @@ import {
 import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 import { LoadingAccount } from '@/src/components/common'
 import { useDocumentTitle } from '@/src/hooks'
+import { OidcProviderInfo, OidcProviderType } from '@/src/services/wayd-api'
+import {
+  clearChosenProvider,
+  completeSignin,
+  getChosenProviderName,
+  getLastProviderName,
+  signinRedirect,
+  signinSilent,
+} from '@/src/components/contexts/auth/oidc-client-registry'
 
 const pulseAnimation = `
 @keyframes pulse {
@@ -353,42 +356,37 @@ function LoadingSpinner() {
   )
 }
 
-function MicrosoftLoginTab() {
-  const { instance, inProgress } = useMsal()
-
-  const isInitializing = inProgress === InteractionStatus.Startup
-  const isLoggingIn = inProgress === InteractionStatus.HandleRedirect
-
-  const handleLogin = async () => {
-    await instance.loginRedirect()
-  }
+function OidcLoginButton({
+  provider,
+  onLogin,
+  isLoading,
+}: {
+  provider: OidcProviderInfo
+  onLogin: (provider: OidcProviderInfo) => void
+  isLoading: boolean
+}) {
+  const isMicrosoft =
+    provider.providerType === OidcProviderType.MicrosoftEntraId
 
   return (
-    <>
-      <p className={styles.subtitle}>
-        Sign in with your organizational account to access your delivery
-        platform.
-      </p>
-
-      <button
-        type="button"
-        onClick={handleLogin}
-        disabled={isInitializing || isLoggingIn}
-        className={styles.loginButton}
-      >
-        {isInitializing || isLoggingIn ? (
-          <>
-            <LoadingSpinner />
-            {isLoggingIn ? 'Signing in...' : 'Loading...'}
-          </>
-        ) : (
-          <>
-            <MicrosoftLogo />
-            Sign in with Microsoft
-          </>
-        )}
-      </button>
-    </>
+    <button
+      type="button"
+      onClick={() => onLogin(provider)}
+      disabled={isLoading}
+      className={styles.loginButton}
+    >
+      {isLoading ? (
+        <>
+          <LoadingSpinner />
+          Signing in...
+        </>
+      ) : (
+        <>
+          {isMicrosoft && <MicrosoftLogo />}
+          {provider.displayName}
+        </>
+      )}
+    </button>
   )
 }
 
@@ -486,141 +484,150 @@ function LocalLoginTab() {
 
 export default function LoginPage() {
   useDocumentTitle('Wayd Login')
-  const isMsalAuthenticated = useIsAuthenticated()
-  const { instance, accounts, inProgress } = useMsal()
   const router = useRouter()
-  const {
-    data: providers,
-  } = useGetAuthProvidersQuery()
+  const { data: providers } = useGetAuthProvidersQuery()
 
-  // Entra is enabled only when the providers capability endpoint says so.
-  // We intentionally do not fall back to frontend env vars when provider
-  // discovery fails, because env vars may be present even when Entra is
-  // disabled server-side.
-  const entraEnabled = providers?.entra === true
+  const oidcProviders = providers?.oidc ?? []
   const localEnabled = providers?.local !== false
+  const hasOidcProviders = oidcProviders.length > 0
 
-  // User's explicit tab selection. Null means "use the default for the current
-  // provider set" — derived below. Tracking overrides separately avoids the
-  // setState-in-effect anti-pattern; the default is computed, not stored.
-  const [tabOverride, setTabOverride] = useState<'microsoft' | 'local' | null>(
-    null,
-  )
-  const activeTab = tabOverride ?? (entraEnabled ? 'microsoft' : 'local')
+  // Tracks which OIDC provider button the user clicked so we can show a
+  // spinner on the right button while the redirect is initiating.
+  const [signingInProvider, setSigningInProvider] = useState<string | null>(null)
 
-  // Exchange flow state. The login page owns the MSAL-redirect handling:
-  // when we land here with an active MSAL session but no Wayd JWT, we grab
-  // the access token and POST it to /api/auth/exchange. This is the standard
-  // OIDC callback-route pattern (we just fold it into /login rather than
-  // splitting into /auth/callback).
+  // Exchange flow state. When we return from an OIDC redirect, the URL will
+  // contain the `code` and `state` params. We detect this, complete the
+  // callback, and exchange the access token for a Wayd JWT.
   const [exchangeState, setExchangeState] = useState<
     'idle' | 'running' | 'failed'
   >('idle')
   const [exchangeError, setExchangeError] = useState<string | null>(null)
   const exchangeStartedRef = useRef(false)
+  const silentStartedRef = useRef(false)
 
-  // Already authenticated — bail back to the app. Runs whenever a Wayd JWT
-  // appears in storage (after exchange succeeds, after local login succeeds,
-  // or on fresh page load when a stored token already exists).
+  // Tab selection: only relevant when both OIDC and local are enabled.
+  const [tabOverride, setTabOverride] = useState<'oidc' | 'local' | null>(null)
+  const activeTab = tabOverride ?? (hasOidcProviders ? 'oidc' : 'local')
+  const showTabs = hasOidcProviders && localEnabled
+
+  // Already authenticated — bail back to the app.
   useEffect(() => {
     if (isAuthActive()) {
       router.replace('/')
     }
   }, [router])
 
-  // Exchange-on-MSAL-redirect. When MSAL has an account and we don't have a
-  // Wayd JWT, silently acquire the access token and exchange it. Succeeds →
-  // stores Wayd JWT → effect above navigates away. Fails → shows retry UI.
+  // Silent sign-in: if the user has visited before, try to re-authenticate
+  // automatically using their IdP's existing SSO session. Runs once after
+  // providers load, skipped when we're already handling a redirect callback.
+  useEffect(() => {
+    if (silentStartedRef.current) return
+    if (isAuthActive()) return
+    if (!providers) return
+
+    // Skip if we're handling a redirect callback — that flow takes over.
+    const url = new URL(window.location.href)
+    if (url.searchParams.has('code') || url.searchParams.has('error')) return
+
+    const lastProviderName = getLastProviderName()
+    if (!lastProviderName) return
+
+    const provider = providers.oidc.find((p) => p.name === lastProviderName)
+    if (!provider) return
+
+    silentStartedRef.current = true
+    setExchangeState('running')
+
+    const run = async () => {
+      const oidcUser = await signinSilent(provider)
+      if (!oidcUser) {
+        // No active SSO session — show the login page normally.
+        setExchangeState('idle')
+        return
+      }
+      try {
+        const tokenResponse = await getAuthClient().exchange({
+          provider: provider.name,
+          subjectToken: oidcUser.access_token,
+        })
+        storeAuth(tokenResponse)
+        window.location.href = '/'
+      } catch (error) {
+        console.error('[Login] Silent exchange failed:', error)
+        setExchangeState('idle')
+      }
+    }
+    run()
+  }, [providers])
+
+  // OIDC redirect callback handler. Fires when we return from the IdP with a
+  // `code` param in the URL. We stored the chosen provider name in
+  // sessionStorage before the redirect; use it to match the right UserManager.
   useEffect(() => {
     if (exchangeStartedRef.current) return
-    if (inProgress !== InteractionStatus.None) return
     if (isAuthActive()) return
-    if (!isMsalAuthenticated || accounts.length === 0) return
+
+    const url = new URL(window.location.href)
+    const hasCode = url.searchParams.has('code')
+    const hasError = url.searchParams.has('error')
+    if (!hasCode && !hasError) return
+
+    const chosenProviderName = getChosenProviderName()
+    if (!chosenProviderName) return
+
+    // Providers may not be loaded yet — wait for them before completing signin.
+    // This effect re-runs when `providers` changes, so it will retry.
+    if (!providers) return
+
+    const provider = providers.oidc.find((p) => p.name === chosenProviderName)
+    if (!provider) return
 
     exchangeStartedRef.current = true
-    // Legitimate side-effect: kicking off the exchange in response to MSAL
-    // returning a usable session. The state updates mark "we're actively
-    // exchanging" for the UI, not an auto-memoizable derivation.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExchangeState('running')
     setExchangeError(null)
 
     const run = async () => {
-      // Step 1: silent MSAL token acquisition. Failures here mean MSAL's
-      // cached state is unusable — typical after a long idle (timed_out) or
-      // when Entra needs re-consent (InteractionRequiredAuthError). We clear
-      // MSAL's cache so the next button click runs a fresh loginRedirect
-      // rather than another doomed silent acquire.
-      let accessToken: string
       try {
-        const account = instance.getActiveAccount() ?? accounts[0]
-        instance.setActiveAccount(account)
-        const msalResponse = await instance.acquireTokenSilent({
-          ...tokenRequest,
-          account,
-        })
-        accessToken = msalResponse.accessToken
-      } catch (error) {
-        console.error('[Login] MSAL silent token acquisition failed:', error)
-
-        try {
-          instance.setActiveAccount(null)
-          await instance.clearCache()
-        } catch (cacheError) {
-          console.warn(
-            '[Login] MSAL clearCache failed; continuing.',
-            cacheError,
-          )
+        if (hasError) {
+          const errorDesc = url.searchParams.get('error_description') ?? 'Sign-in was cancelled or failed.'
+          throw new Error(errorDesc)
         }
 
-        const message =
-          error instanceof InteractionRequiredAuthError
-            ? 'Sign-in needs to be completed interactively. Please click Sign in with Microsoft.'
-            : 'Sign-in session expired. Please click Sign in with Microsoft to continue.'
-        setExchangeError(message)
-        setExchangeState('failed')
-        return
-      }
+        const oidcUser = await completeSignin(provider)
+        clearChosenProvider()
 
-      // Step 2: trade the MSAL access token for a Wayd JWT. Failures here are
-      // backend/network issues — the user's Entra session is fine, so we
-      // deliberately leave MSAL's cache intact. Forcing them to redo Entra
-      // auth for a transient API failure would be a regression; on retry the
-      // existing MSAL account can still produce a token silently.
-      try {
         const tokenResponse = await getAuthClient().exchange({
-          provider: 'MicrosoftEntraId',
-          subjectToken: accessToken,
+          provider: provider.name,
+          subjectToken: oidcUser.access_token,
         })
         storeAuth(tokenResponse)
-        // Full reload so the layout gate re-reads storage and mounts the app.
         window.location.href = '/'
       } catch (error) {
-        console.error('[Login] Wayd token exchange failed:', error)
+        console.error('[Login] OIDC sign-in failed:', error)
+        clearChosenProvider()
         setExchangeError(
-          'Unable to complete sign-in. Please try again in a moment.',
+          'Unable to complete sign-in. Please try again.',
         )
         setExchangeState('failed')
       }
     }
     run()
-  }, [accounts, inProgress, instance, isMsalAuthenticated])
+  }, [providers])
 
-  const showTabs = entraEnabled && localEnabled
-
-  // During exchange, show the shared LoadingAccount screen (spinner + logo +
-  // message) so the transition from Entra redirect → Wayd app matches the
-  // visual language of other loading states in the app.
-  if (exchangeState === 'running') {
-    return <LoadingAccount message="Completing sign-in…" />
+  const handleOidcLogin = async (provider: OidcProviderInfo) => {
+    setSigningInProvider(provider.name)
+    try {
+      await signinRedirect(provider)
+      // signinRedirect navigates away; code after this won't run.
+    } catch (error) {
+      console.error('[Login] OIDC redirect failed:', error)
+      setSigningInProvider(null)
+      setExchangeError('Unable to start sign-in. Please try again.')
+    }
   }
 
-  if (exchangeState === 'failed') {
-    // Show the login UI with an error banner. User can click the Microsoft
-    // button (which triggers loginRedirect) or use email/password.
-    // Note: we deliberately clear MSAL's cached account via a reset so a
-    // subsequent click runs a fresh loginRedirect rather than silent-acquire.
-    // (Left to Microsoft button's natural flow for now — not critical.)
+  if (exchangeState === 'running') {
+    return <LoadingAccount message="Completing sign-in…" />
   }
 
   return (
@@ -677,16 +684,15 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Auth method tabs. Hidden when only one provider is enabled —
-                there's no choice to offer. */}
+            {/* Auth method tabs. Hidden when only one provider type is available. */}
             {showTabs && (
               <div className={styles.tabs}>
                 <button
                   type="button"
-                  className={`${styles.tab} ${activeTab === 'microsoft' ? styles.tabActive : ''}`}
-                  onClick={() => setTabOverride('microsoft')}
+                  className={`${styles.tab} ${activeTab === 'oidc' ? styles.tabActive : ''}`}
+                  onClick={() => setTabOverride('oidc')}
                 >
-                  Microsoft
+                  Sign in
                 </button>
                 <button
                   type="button"
@@ -698,8 +704,20 @@ export default function LoginPage() {
               </div>
             )}
 
-            {entraEnabled && activeTab === 'microsoft' ? (
-              <MicrosoftLoginTab />
+            {activeTab === 'oidc' && hasOidcProviders ? (
+              <>
+                <p className={styles.subtitle}>
+                  Sign in with your organizational account.
+                </p>
+                {oidcProviders.map((provider) => (
+                  <OidcLoginButton
+                    key={provider.name}
+                    provider={provider}
+                    onLogin={handleOidcLogin}
+                    isLoading={signingInProvider === provider.name}
+                  />
+                ))}
+              </>
             ) : (
               <LocalLoginTab />
             )}

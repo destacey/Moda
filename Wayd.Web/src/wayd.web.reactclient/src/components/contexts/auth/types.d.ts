@@ -11,7 +11,7 @@ export interface User {
   claims: Claim[]
 }
 
-export type AuthMethod = 'msal' | 'local' | null
+export type AuthMethod = 'oidc' | 'local' | null
 
 export interface AuthContextType {
   user: User | null

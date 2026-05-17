@@ -1,22 +1,13 @@
 'use client'
 
 import { Button, Result, Typography } from 'antd'
-import { useMsal } from '@azure/msal-react'
+import useAuth from '@/src/components/contexts/auth'
 
 const { Paragraph, Text } = Typography
 
 export default function UnauthorizedPage() {
-  const { instance } = useMsal()
-
-  const handleLogout = async () => {
-    instance.setActiveAccount(null)
-    await instance.logoutRedirect({
-      postLogoutRedirectUri: `${window.location.origin}/login`,
-    })
-  }
-
-  const activeAccount = instance.getActiveAccount()
-  const username = activeAccount?.username ?? 'Unknown user'
+  const { user, logout } = useAuth()
+  const username = user?.username || user?.name || 'Unknown user'
 
   return (
     <Result
@@ -24,7 +15,7 @@ export default function UnauthorizedPage() {
       title="Access Denied"
       subTitle="You are not authorized to access Wayd."
       extra={[
-        <Button type="primary" key="logout" onClick={handleLogout}>
+        <Button type="primary" key="logout" onClick={logout}>
           Sign Out
         </Button>,
       ]}

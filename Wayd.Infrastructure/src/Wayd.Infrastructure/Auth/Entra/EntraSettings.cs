@@ -30,8 +30,26 @@ public sealed class EntraSettings
     public string Authority { get; set; } = "https://login.microsoftonline.com/common/v2.0";
 
     /// <summary>
-    /// Expected <c>aud</c> claim on incoming id tokens. Pins tokens to this app
-    /// registration — tokens issued for a different Microsoft app are rejected.
+    /// Client ID of the SPA (frontend) app registration. Used by the OIDC client
+    /// when initiating the authorization flow. Distinct from <see cref="Audience"/>
+    /// because Entra's standard two-registration pattern has a separate app
+    /// registration for the SPA and the API.
+    /// </summary>
+    public string? SpaClientId { get; set; }
+
+    /// <summary>
+    /// The API scope to request alongside the standard OIDC scopes. This causes
+    /// Entra to issue an access token with <c>aud</c> set to the API app
+    /// registration's client ID, which is what <see cref="Audience"/> pins.
+    /// Typically <c>api://{api-client-id}/access_as_user</c>.
+    /// If omitted, only <c>openid profile email</c> are requested and the
+    /// resulting token will have the SPA client ID as audience — validation fails.
+    /// </summary>
+    public string? ApiScope { get; set; }
+
+    /// <summary>
+    /// Expected <c>aud</c> claim on incoming id tokens. This is the API app
+    /// registration's client ID — tokens issued for a different app are rejected.
     /// </summary>
     public string Audience { get; set; } = null!;
 
