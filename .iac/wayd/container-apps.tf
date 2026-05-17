@@ -239,10 +239,10 @@ resource "azurerm_container_app" "wayd_backend" {
         value = tostring(var.local_jwt_refresh_token_expiration_days)
       }
 
-      # Entra token-exchange config (PR 3.1). /common/v2.0 is the multi-tenant
-      # authority; the AllowedTenantIds list below is the actual gatekeeper for
-      # which orgs we accept tokens from. Startup validation in the API fails
-      # fast if Enabled=true and any of the required fields are missing.
+      # Entra token-exchange config. The OidcProviderSeeder uses these values to
+      # create the first Identity.OidcProviders row on startup if none exists.
+      # Once seeded, the database row is the source of truth — subsequent changes
+      # go through Settings → Identity Providers in the admin UI.
       # Local-only deployments leave Enabled=false and can omit the other keys.
       env {
         name  = "SecuritySettings__Providers__Entra__Enabled"
@@ -251,13 +251,26 @@ resource "azurerm_container_app" "wayd_backend" {
 
       env {
         name  = "SecuritySettings__Providers__Entra__Authority"
-        value = "https://login.microsoftonline.com/common/v2.0"
+        value = "https://login.microsoftonline.com/${var.aad_tenant_id}/v2.0"
       }
 
-      # For v2.0 Entra tokens, `aud` is the bare client ID (not the App ID URI
-      # or scope). v1.0 registrations put `api://<clientId>` in `aud` instead.
-      # The value here must match whatever the access token actually carries —
-      # decode a real token at jwt.ms if in doubt.
+      # SpaClientId: the client (SPA/frontend) app registration's client ID.
+      # Used by the browser OIDC client when initiating sign-in.
+      env {
+        name  = "SecuritySettings__Providers__Entra__SpaClientId"
+        value = var.app_reg_client_id
+      }
+
+      # ApiScope: the full API scope URI. Included in scopes so Entra issues an
+      # access token with aud = api_app_reg_client_id (the Audience below).
+      env {
+        name  = "SecuritySettings__Providers__Entra__ApiScope"
+        value = var.app_reg_api_scope
+      }
+
+      # Audience: for v2.0 Entra tokens, `aud` is the bare API client ID GUID
+      # (not the App ID URI or scope). v1.0 registrations put `api://<clientId>`
+      # in `aud` instead — decode a real token at jwt.ms if in doubt.
       env {
         name  = "SecuritySettings__Providers__Entra__Audience"
         value = var.api_app_reg_client_id
