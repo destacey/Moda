@@ -26,7 +26,9 @@ User accounts control access to Wayd. Each user has:
 - **Deactivate** — Disable a user account
 - **Unlock** — Unlock an account locked due to failed login attempts
 - **Reset Password** — Admin-initiated password reset (local auth only, forces change on next login)
-- **Migrate to New Tenant** — Stage a Microsoft Entra ID tenant migration for the user (see below)
+- **Migrate to New Tenant** — Stage a Microsoft Entra ID tenant migration (see below)
+- **Change Identity Provider** — Stage a move to a different OIDC provider, or from a local account to an OIDC provider (see below)
+- **Convert to Local Account** — Immediately switch an OIDC user to password-based login (see below)
 
 Local users created by an administrator have a **Must Change Password** flag that requires them to set a new password on first login.
 
@@ -36,18 +38,55 @@ When your organization moves users from one Microsoft Entra ID tenant to another
 
 **Workflow:**
 
-1. On the user detail page (**Settings → User Management → Users → \[user]**), open the **Actions** menu and pick **Migrate to New Tenant**. Enter the target tenant id (a GUID — the new Entra directory id) and confirm.
-2. The user's details now show a **Tenant migration pending** banner with the target tenant id, and the Actions menu offers **Cancel Pending Migration** alongside **Replace Pending Migration**.
-3. Nothing else changes until the user signs in. Sign-ins from the *old* tenant continue to work normally with the flag still pending.
+1. On the user detail page (**Settings → User Management → Users → \[user]**), open the **Actions** menu and pick **Migrate to New Tenant**. Enter the target tenant ID (a GUID — the new Entra directory ID) and confirm.
+2. The Actions menu now offers **Cancel Pending Migration** and **Replace Pending Migration**.
+3. Nothing else changes until the user signs in. Sign-ins from the *old* tenant continue to work normally.
 4. When the user next signs in from the new tenant, Wayd detects the staged migration and atomically swaps their identity binding. The user notices nothing.
-5. After the rebind, the **Identity History** tab on the user detail page shows the old binding (Inactive, reason: Tenant Migration) alongside the new active one — a permanent audit trail of which tenant the user used to belong to.
+5. After the rebind, the **Identity History** tab shows the old binding (Inactive, reason: Tenant Migration) alongside the new active one.
 
 **Things to know:**
 
-- **Stage before the user signs in from the new tenant.** If you skip staging and the user signs in from the new tenant first, Wayd creates a brand-new account with a separate user id, and there's no in-app way to merge it back with the original — it requires manual database work to recover.
-- Tenant migration is **Microsoft Entra ID only**. Local (Wayd) users have no tenant to migrate. Cross-provider migration (e.g., moving from Entra to a different identity provider) is not supported.
+- **Stage before the user signs in from the new tenant.** If you skip staging and the user signs in from the new tenant first, Wayd creates a brand-new account with a separate user ID — there's no in-app way to merge it back with the original; it requires manual database work to recover.
+- Tenant migration is **Microsoft Entra ID only**. For moving a user between different OIDC providers, use **Change Identity Provider** instead.
 - Re-staging a migration with a different target tenant silently replaces the previous one — the most recent stage wins.
-- Bulk migration (CSV/API import) and self-service migration (with email verification) are not currently supported. Migrations are staged one user at a time by an administrator.
+- Bulk and self-service migration are not currently supported. Migrations are staged one user at a time by an administrator.
+
+#### Change Identity Provider
+
+Moves a user from one OIDC provider to another, or from a local (Wayd) account to an OIDC provider. Like tenant migration, the change is **deferred** — the user's current login continues to work until they sign in via the target provider for the first time, at which point the rebind happens automatically.
+
+This action is available for any user (including local accounts) when at least one enabled OIDC provider is configured that differs from their current one.
+
+**Workflow:**
+
+1. On the user detail page, open the **Actions** menu and pick **Change Identity Provider** (or **Replace Pending Provider Migration** if one is already staged).
+2. Select the target provider from the dropdown of enabled OIDC providers and confirm.
+3. The user's current login continues to work as normal.
+4. When the user next signs in via the target provider, Wayd matches them by email, atomically deactivates their old identity, inserts the new one, and updates their login provider. The user notices nothing.
+5. The **Identity History** tab records the old binding as Inactive (reason: Provider Relinked).
+
+**Things to know:**
+
+- **Stage before the user signs in via the new provider.** If the user signs in via the target provider before staging, Wayd creates a new account — there's no in-app merge path.
+- For users migrating **from a local account**: their password hash is cleared when the rebind completes, since the Wayd identity is deactivated. If the migration needs to be reversed, use **Convert to Local Account**.
+- The action is hidden when only one OIDC provider is configured, or when the user is already on the only available provider.
+- Re-staging with a different target provider silently replaces the previous one. Cancellation is available and idempotent.
+
+#### Convert to Local Account
+
+Converts an OIDC user to a local (password-based) account **immediately** — no deferred rebind. The admin sets a temporary password; the user is required to change it on their next login.
+
+**Workflow:**
+
+1. On the user detail page, open the **Actions** menu and pick **Convert to Local Account**.
+2. Enter and confirm a temporary password, then confirm the action.
+3. The user's OIDC identity is immediately deactivated and replaced with a local Wayd identity. Their next login must use the temporary password and they will be prompted to set a new one.
+
+**Things to know:**
+
+- This action is immediate and cannot be undone via the UI. To move the user back to OIDC, use **Change Identity Provider** to stage a new deferred migration.
+- The user's `UserId`, permissions, and all other records are preserved — only the authentication method changes.
+- The temporary password must meet the deployment's password policy (minimum 8 characters).
 
 ### Roles
 
