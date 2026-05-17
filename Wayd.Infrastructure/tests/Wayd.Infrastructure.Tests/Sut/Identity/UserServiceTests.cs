@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Wayd.Common.Application.Events;
 using Wayd.Common.Application.Exceptions;
 using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.OidcProviders;
 using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Application.Interfaces;
 using Wayd.Common.Domain.Authorization;
@@ -28,6 +29,7 @@ public class UserServiceTests
     private readonly Mock<ISender> _mockSender;
     private readonly Mock<ICurrentUser> _mockCurrentUser;
     private readonly Mock<IUserIdentityStore> _mockUserIdentityStore;
+    private readonly Mock<IOidcProviderRegistry> _mockOidcProviderRegistry;
 
     // UserService depends on WaydDbContext and GraphServiceClient which are hard to
     // mock. We test methods that don't require them. UserIdentity writes go through
@@ -56,6 +58,7 @@ public class UserServiceTests
         _mockCurrentUser = new Mock<ICurrentUser>();
         _mockCurrentUser.Setup(x => x.GetUserId()).Returns("current-user-id");
         _mockUserIdentityStore = new Mock<IUserIdentityStore>();
+        _mockOidcProviderRegistry = new Mock<IOidcProviderRegistry>();
 
         // Pass-through: tests don't exercise transaction semantics. Invoke the
         // action directly so CreateAsync behaves as if the transaction succeeded.
@@ -77,7 +80,8 @@ public class UserServiceTests
             _mockSender.Object,
             _dateTimeProvider,
             _mockCurrentUser.Object,
-            _mockUserIdentityStore.Object);
+            _mockUserIdentityStore.Object,
+            _mockOidcProviderRegistry.Object);
     }
 
     private static ApplicationUser CreateUser(string id = "user-1", string userName = "testuser", bool isActive = true, string loginProvider = LoginProviders.MicrosoftEntraId)

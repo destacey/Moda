@@ -25,6 +25,8 @@ public sealed record UserDetailsDto
 
     public string? PendingMigrationTenantId { get; set; }
 
+    public string? PendingMigrationProviderId { get; set; }
+
     public Instant? LastActivityAt { get; set; }
 
     public NavigationDto? Employee { get; set; }

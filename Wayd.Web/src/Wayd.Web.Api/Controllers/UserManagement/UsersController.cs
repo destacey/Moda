@@ -198,6 +198,38 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPut("{id}/stage-provider-migration")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Stage a cross-provider identity migration for a user. The rebind completes on the user's next sign-in via the target provider.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> StageProviderMigration(string id, StageProviderMigrationRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.StageProviderMigration(
+            new StageProviderMigrationCommand(id, request.TargetProviderId),
+            cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
+    [HttpDelete("{id}/stage-provider-migration")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Cancel a pending cross-provider migration for a user.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> CancelProviderMigration(string id, CancellationToken cancellationToken)
+    {
+        var result = await _userService.CancelProviderMigration(id, cancellationToken);
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpGet("{id}/identity-history")]
     [MustHavePermission(ApplicationAction.View, ApplicationResource.Users)]
     [OpenApiOperation("Get a user's identity history (active and inactive linked identities).", "")]
