@@ -235,16 +235,6 @@
                 }
               }
             }
-          },
-          "503": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
@@ -268,6 +258,285 @@
             }
           }
         }
+      }
+    },
+    "/api/user-management/oidc-providers": {
+      "get": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "List all configured OIDC providers.",
+        "operationId": "OidcProviders_GetList",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OidcProviderListItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "Create a new OIDC provider.",
+        "operationId": "OidcProviders_Create",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOidcProviderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OidcProviderDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/oidc-providers/{id}": {
+      "get": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "Get OIDC provider detail by id.",
+        "operationId": "OidcProviders_GetById",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OidcProviderDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "Update an OIDC provider.",
+        "operationId": "OidcProviders_Update",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOidcProviderRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 2
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "Delete an OIDC provider.",
+        "operationId": "OidcProviders_Delete",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteOidcProviderResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
+      }
+    },
+    "/api/user-management/oidc-providers/{id}/test-discovery": {
+      "post": {
+        "tags": [
+          "OidcProviders"
+        ],
+        "summary": "Fetch the provider's OIDC discovery document and report success/failure.",
+        "operationId": "OidcProviders_TestDiscovery",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "guid",
+              "nullable": false,
+              "example": "00000000-0000-0000-0000-000000000000"
+            },
+            "x-position": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestOidcProviderDiscoveryResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKey": []
+          }
+        ]
       }
     },
     "/api/user-management/permissions": {
@@ -21610,14 +21879,312 @@
         "additionalProperties": false,
         "required": [
           "local",
-          "entra"
+          "oidc"
         ],
         "properties": {
           "local": {
             "type": "boolean"
           },
-          "entra": {
+          "oidc": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OidcProviderInfo"
+            }
+          }
+        }
+      },
+      "OidcProviderInfo": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "displayName",
+          "providerType",
+          "authority",
+          "clientId",
+          "scopes"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "OidcProviderListItemDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "providerType",
+          "authority",
+          "isEnabled"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "isEnabled": {
             "type": "boolean"
+          }
+        }
+      },
+      "OidcProviderDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "name",
+          "displayName",
+          "providerType",
+          "authority",
+          "clientId",
+          "audience",
+          "scopes",
+          "clockSkewSeconds",
+          "isEnabled"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "providerType": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedTenantIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "clockSkewSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateOidcProviderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "displayName",
+          "providerType",
+          "authority",
+          "clientId",
+          "audience",
+          "scopes",
+          "clockSkewSeconds",
+          "isEnabled"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "providerType": {
+            "$ref": "#/components/schemas/OidcProviderType"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedTenantIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "clockSkewSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OidcProviderType": {
+        "type": "string",
+        "description": "",
+        "x-enumNames": [
+          "MicrosoftEntraId",
+          "GenericOidc"
+        ],
+        "enum": [
+          "MicrosoftEntraId",
+          "GenericOidc"
+        ]
+      },
+      "UpdateOidcProviderRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "displayName",
+          "authority",
+          "clientId",
+          "audience",
+          "scopes",
+          "clockSkewSeconds",
+          "isEnabled"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "guid",
+            "nullable": false,
+            "example": "00000000-0000-0000-0000-000000000000"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "authority": {
+            "type": "string"
+          },
+          "clientId": {
+            "type": "string"
+          },
+          "audience": {
+            "type": "string"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "allowedTenantIds": {
+            "type": "array",
+            "nullable": true,
+            "items": {
+              "type": "string"
+            }
+          },
+          "clockSkewSeconds": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "isEnabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "DeleteOidcProviderResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "deleted",
+          "activeIdentityCount"
+        ],
+        "properties": {
+          "deleted": {
+            "type": "boolean"
+          },
+          "activeIdentityCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "TestOidcProviderDiscoveryResult": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "success",
+          "jwksKeyCount"
+        ],
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "issuer": {
+            "type": "string",
+            "nullable": true
+          },
+          "jwksKeyCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": "string",
+            "nullable": true
           }
         }
       },

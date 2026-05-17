@@ -4,7 +4,7 @@
             "Instance": "https://login.microsoftonline.com/",
             "Domain": "<Your Domain>.onmicrosoft.com",
             "TenantId": "<Your TenantId of the AzureAd Server App Registration>",
-            "ClientId": "<Your ClientId of the AzureAd Server App Registration>",
+            "ClientId": "<Your ClientId of the AzureAd API App Registration>",
             "ClientSecret": "<Your ClientSecret of the AzureAd Server App Registration>",
             "Scopes": "access_as_user",
             "RootIssuer": "https://sts.windows.net/<Your AzureAd TenantId>/"
@@ -24,12 +24,16 @@
         },
         "Providers": {
             "Entra": {
-                "//Enabled": "Set to true to enable the /api/auth/exchange endpoint. Local-only deployments leave this false.",
+                "//Enabled": "Set to true to enable Entra ID login. Local-only deployments leave this false.",
                 "Enabled": false,
                 "Authority": "https://login.microsoftonline.com/common/v2.0",
-                "//Audience": "Required when Enabled=true. Must match the token's 'aud' claim exactly. For v1.0 tokens typically 'api://<ClientId>'; for v2.0 tokens typically just '<ClientId>'. Decode a real token at jwt.ms to confirm before setting.",
+                "//SpaClientId": "Required when Enabled=true. Client ID of the SPA (frontend/client) app registration — used by the browser OIDC client to initiate sign-in.",
+                "SpaClientId": "",
+                "//ApiScope": "Required when Enabled=true. The API scope to request so Entra issues an access token for the API, e.g. api://{api-client-id}/access_as_user.",
+                "ApiScope": "",
+                "//Audience": "Required when Enabled=true. Client ID of the API app registration — must match the token's 'aud' claim. For v2.0 tokens this is the bare GUID (not api://...).",
                 "Audience": "",
-                "//AllowedTenantIds": "Required when Enabled=true. Array of allowed tenant IDs.",
+                "//AllowedTenantIds": "Required when Enabled=true. Array of Entra tenant IDs permitted to authenticate.",
                 "AllowedTenantIds": [],
                 "ClockSkewSeconds": 60
             }

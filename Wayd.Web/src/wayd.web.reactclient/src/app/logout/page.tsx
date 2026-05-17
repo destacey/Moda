@@ -1,7 +1,6 @@
 'use client'
 
-import { useMsal } from '@azure/msal-react'
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import styles from './page.module.css'
 
 function LoadingSpinner() {
@@ -27,35 +26,22 @@ function LoadingSpinner() {
 }
 
 export default function LogoutPage() {
-  const { instance } = useMsal()
-  const hasInitiatedLogout = useRef(false)
-
+  // AuthGate renders this page when the path is /logout and no Wayd JWT is
+  // in storage — meaning logout has already completed (clearAuth ran in
+  // auth-context's logout action, and any OIDC signoutRedirect navigated here
+  // as the post-logout destination). Just redirect to /login.
   useEffect(() => {
-    // Prevent double-execution in React strict mode
-    if (hasInitiatedLogout.current) return
-    hasInitiatedLogout.current = true
-
-    const performLogout = async () => {
-      instance.setActiveAccount(null)
-      await instance.logoutRedirect({
-        postLogoutRedirectUri: `${window.location.origin}/login`,
-      })
-    }
-
-    performLogout()
-  }, [instance])
+    window.location.replace('/login')
+  }, [])
 
   return (
     <div className={styles.pageBackground}>
-      {/* Background decoration circles */}
       <div className={`${styles.bgCircle} ${styles.bgCircle1}`} />
       <div className={`${styles.bgCircle} ${styles.bgCircle2}`} />
       <div className={`${styles.bgCircle} ${styles.bgCircle3}`} />
 
-      {/* Main card */}
       <div className={styles.card}>
         <div className={styles.content}>
-          {/* Logo */}
           <div className={styles.logo}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
@@ -67,7 +53,6 @@ export default function LogoutPage() {
             <span className={styles.logoText}>wayd</span>
           </div>
 
-          {/* Loading state */}
           <div className={styles.spinnerWrapper}>
             <LoadingSpinner />
           </div>

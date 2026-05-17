@@ -15,6 +15,7 @@ enum SettingsTab {
   // user-management
   Users = 'users',
   Roles = 'roles',
+  IdentityProviders = 'identity-providers',
 
   // feature management
   FeatureFlags = 'feature-flags',
@@ -133,6 +134,12 @@ const buildSettingsMenuItems = (featureFlags: {
       'Roles',
       SettingsTab.Roles,
       '/settings/user-management/roles',
+    ),
+    getRestrictedMenuItem(
+      'Permissions.OidcProviders.View',
+      'Identity Providers',
+      SettingsTab.IdentityProviders,
+      '/settings/auth/providers',
     ),
   ]),
 

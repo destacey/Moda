@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useCallback, useMemo, useState } from 'react'
-import { useMsal } from '@azure/msal-react'
 import { AuthContextType, AuthMethod, Claim, User } from './types'
 import ChangePasswordForm from '@/src/app/account/profile/change-password-form'
 import useTheme from '@/src/components/contexts/theme/use-theme'
@@ -15,6 +14,8 @@ import {
   isAuthActive,
   storeAuth,
 } from '@/src/services/clients'
+import { signoutRedirect } from './oidc-client-registry'
+import { useGetAuthProvidersQuery } from '@/src/store/features/common/auth-providers-api'
 
 export const AuthContext = createContext<AuthContextType | null>(null)
 
@@ -137,8 +138,8 @@ function decodeWaydJwt(token: string): DecodedClaims | null {
 function authMethodFromLoginProvider(
   loginProvider: string | null,
 ): AuthMethod {
-  if (loginProvider === 'MicrosoftEntraId') return 'msal'
   if (loginProvider === 'Wayd') return 'local'
+  if (loginProvider) return 'oidc'
   return null
 }
 
@@ -156,6 +157,7 @@ type SessionSnapshot = {
   user: User
   permissionsSet: Set<string>
   authMethod: AuthMethod
+  loginProvider: string | null
   mustChangePassword: boolean
 }
 
@@ -163,6 +165,7 @@ const EMPTY_SESSION: SessionSnapshot = {
   user: UNAUTHENTICATED_USER,
   permissionsSet: new Set(),
   authMethod: null,
+  loginProvider: null,
   mustChangePassword: false,
 }
 
@@ -202,6 +205,7 @@ function deriveSessionFromStorage(): SessionSnapshot {
     },
     permissionsSet: new Set(decoded.permissions),
     authMethod: authMethodFromLoginProvider(decoded.loginProvider),
+    loginProvider: decoded.loginProvider,
     mustChangePassword:
       getAuthStorage().getItem(AUTH_MUST_CHANGE_PASSWORD_KEY) === 'true',
   }
@@ -228,7 +232,7 @@ function deriveSessionFromStorage(): SessionSnapshot {
  */
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { token } = useTheme()
-  const { instance } = useMsal()
+  const { data: providers } = useGetAuthProvidersQuery()
 
   const [session, setSession] = useState<SessionSnapshot>(
     deriveSessionFromStorage,
@@ -283,25 +287,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   )
 
   const logout = useCallback(async () => {
-    // Drop the Wayd session AND MSAL's local cache. Without clearing MSAL,
-    // the login page's exchange-on-mount effect sees an authenticated MSAL
-    // account, silently acquires a new access token, and exchanges it for a
-    // fresh Wayd JWT — putting the user right back in the app.
-    //
-    // This only clears MSAL's cache in the browser; the user's Entra SSO
-    // cookie on login.microsoftonline.com stays intact. Their next "Sign in
-    // with Microsoft" click silently re-auths without a password prompt —
-    // the standard "sign out of this app, stay signed in to Microsoft"
-    // behavior used by most B2B SaaS.
     clearAuth()
-    instance.setActiveAccount(null)
-    try {
-      await instance.clearCache()
-    } catch (e) {
-      console.warn('[Auth] MSAL clearCache failed; continuing logout.', e)
+    const loginProvider = session.loginProvider
+    if (loginProvider && session.authMethod === 'oidc') {
+      // Find the matching provider config so signoutRedirect can call the
+      // correct end_session_endpoint. Falls back to /login if not found.
+      const providerInfo = providers?.oidc.find((p) => p.name === loginProvider)
+      if (providerInfo) {
+        await signoutRedirect(providerInfo)
+        return
+      }
     }
     window.location.href = '/login'
-  }, [instance])
+  }, [session.loginProvider, session.authMethod, providers])
 
   // --- Context value ---
 

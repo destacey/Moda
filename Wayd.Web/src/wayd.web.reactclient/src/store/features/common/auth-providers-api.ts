@@ -5,11 +5,10 @@ import { isAxiosError } from 'axios'
 
 /**
  * Advertises which authentication providers are enabled on this deployment.
- * Used by the login page to render the right set of login options — e.g., a
- * local-only deployment hides the Microsoft login tab.
+ * Used by the login page to render the right set of login options.
  *
- * Cheap + anonymous on the backend. Cached indefinitely here because provider
- * availability doesn't change without a redeploy.
+ * Cheap + anonymous on the backend. Not cached aggressively — admins can
+ * add/remove/disable providers at runtime via the Settings UI.
  */
 export const authProvidersApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({

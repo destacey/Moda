@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Wayd.Common.Application.Exceptions;
 using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.OidcProviders;
 using Wayd.Common.Application.Identity.Tokens;
 using Wayd.Common.Application.Identity.Users;
-using Wayd.Infrastructure.Auth.Entra;
+using Wayd.Common.Domain.Identity;
 using Wayd.Infrastructure.Auth.Local;
+using Wayd.Infrastructure.Auth.Oidc;
 using Wayd.Infrastructure.Identity;
 using Wayd.Tests.Shared;
 
@@ -29,8 +30,8 @@ public class TokenServiceTests
     private readonly Mock<ILogger<TokenService>> _mockLogger;
     private readonly Mock<IUserIdentityStore> _mockUserIdentityStore;
     private readonly Mock<IUserService> _mockUserService;
-    private readonly Mock<IEntraIdTokenValidator> _mockEntraIdTokenValidator;
-    private readonly EntraSettings _entraSettings;
+    private readonly Mock<IOidcTokenValidator> _mockOidcTokenValidator;
+    private readonly Mock<IOidcProviderRegistry> _mockOidcProviderRegistry;
     private readonly TokenService _sut;
 
     public TokenServiceTests()
@@ -60,16 +61,20 @@ public class TokenServiceTests
         _mockLogger = new Mock<ILogger<TokenService>>();
         _mockUserIdentityStore = new Mock<IUserIdentityStore>();
         _mockUserService = new Mock<IUserService>();
-        _mockEntraIdTokenValidator = new Mock<IEntraIdTokenValidator>();
+        _mockOidcTokenValidator = new Mock<IOidcTokenValidator>();
+        _mockOidcProviderRegistry = new Mock<IOidcProviderRegistry>();
 
         // Default: user has no permissions. Individual tests can override.
         _mockUserService
             .Setup(s => s.GetPermissionsAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<string>());
 
-        // Default: Entra is enabled so the majority of exchange tests exercise the
-        // full flow. Tests that care about the disabled path mutate this directly.
-        _entraSettings = new EntraSettings { Enabled = true };
+        // Default: registry returns no enabled OIDC providers so the local-only
+        // shape is the baseline. Tests that care about the OIDC list shape mutate
+        // this directly.
+        _mockOidcProviderRegistry
+            .Setup(r => r.GetEnabled(It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IReadOnlyList<OidcProvider>)Array.Empty<OidcProvider>());
 
         _sut = new TokenService(
             _mockUserManager.Object,
@@ -78,8 +83,8 @@ public class TokenServiceTests
             _dateTimeProvider,
             _mockUserIdentityStore.Object,
             _mockUserService.Object,
-            _mockEntraIdTokenValidator.Object,
-            Options.Create(_entraSettings),
+            _mockOidcTokenValidator.Object,
+            _mockOidcProviderRegistry.Object,
             _mockLogger.Object);
     }
 
@@ -567,8 +572,8 @@ public class TokenServiceTests
         var user = CreateEntraUser();
         var principal = CreateEntraPrincipal();
 
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate("entra-id-token", It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(LoginProviders.MicrosoftEntraId, "entra-id-token", It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
         _mockUserService
             .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
@@ -596,8 +601,8 @@ public class TokenServiceTests
         var user = CreateEntraUser();
         var principal = CreateEntraPrincipal();
 
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
         _mockUserService
             .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
@@ -626,8 +631,8 @@ public class TokenServiceTests
         var user = CreateEntraUser();
         var principal = CreateEntraPrincipal();
 
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
         _mockUserService
             .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
@@ -646,21 +651,50 @@ public class TokenServiceTests
     }
 
     [Fact]
-    public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenProviderIsUnsupported()
+    public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenProviderRejectedByValidator()
     {
+        // Unknown provider: the validator (backed by the registry) throws
+        // UnauthorizedException for any name that doesn't map to an enabled row.
+        // TokenService surfaces that as-is — the previous behavior of
+        // short-circuiting before calling the validator is gone now that the
+        // registry is the single source of truth for which providers exist.
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate("Auth0", It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ThrowsAsync(new UnauthorizedException("Invalid token."));
+
         var act = () => _sut.ExchangeTokenAsync(
             new ExchangeTokenCommand("Auth0", "some-token"),
             TestContext.Current.CancellationToken);
 
         await act.Should().ThrowAsync<UnauthorizedException>().WithMessage("Invalid token.");
-        _mockEntraIdTokenValidator.Verify(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        _mockUserService.Verify(s => s.GetOrCreateFromPrincipalAsync(It.IsAny<ClaimsPrincipal>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenGenericOidcValidatesButProvisioningNotImplemented()
+    {
+        // Defense-in-depth boundary: even if a future deployment seeds a
+        // GenericOidc row and the validator accepts the token, TokenService
+        // still rejects because UserService.GetOrCreateFromPrincipalAsync is
+        // Entra-only today. Removing this branch is the followup task.
+        var principal = CreateEntraPrincipal(); // shape doesn't matter; we don't reach the user service
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate("Acme-Google", It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(principal);
+
+        var act = () => _sut.ExchangeTokenAsync(
+            new ExchangeTokenCommand("Acme-Google", "valid-google-token"),
+            TestContext.Current.CancellationToken);
+
+        await act.Should().ThrowAsync<UnauthorizedException>().WithMessage("Invalid token.");
+        _mockUserService.Verify(s => s.GetOrCreateFromPrincipalAsync(It.IsAny<ClaimsPrincipal>()), Times.Never);
     }
 
     [Fact]
     public async Task ExchangeTokenAsync_ShouldThrowUnauthorized_WhenValidatorRejectsToken()
     {
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate("bad-token", It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(LoginProviders.MicrosoftEntraId, "bad-token", It.IsAny<CancellationToken>()))
             .ThrowsAsync(new UnauthorizedException("Invalid token."));
 
         var act = () => _sut.ExchangeTokenAsync(
@@ -678,8 +712,8 @@ public class TokenServiceTests
         user.IsActive = false;
         var principal = CreateEntraPrincipal();
 
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
         _mockUserService
             .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
@@ -699,8 +733,8 @@ public class TokenServiceTests
         var user = CreateEntraUser();
         var principal = CreateEntraPrincipal();
 
-        _mockEntraIdTokenValidator
-            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+        _mockOidcTokenValidator
+            .Setup(v => v.Validate(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(principal);
         _mockUserService
             .Setup(s => s.GetOrCreateFromPrincipalAsync(principal))
@@ -717,44 +751,56 @@ public class TokenServiceTests
 
     #endregion
 
-    #region AuthProviders + disabled Entra
+    #region AuthProviders
 
     [Fact]
-    public async Task ExchangeTokenAsync_ShouldThrow503_WhenEntraIsDisabled()
+    public async Task GetAuthProviders_ShouldReportLocalTrueAndEmptyOidcList_WhenNoProvidersRegistered()
     {
-        // Local-only deployment — Enabled=false means the endpoint returns 503
-        // rather than 401. Distinguishes "feature off" from "bad token".
-        _entraSettings.Enabled = false;
+        // Default registry mock returns empty list — local-only deployment.
+        var result = await _sut.GetAuthProviders(TestContext.Current.CancellationToken);
 
-        var act = () => _sut.ExchangeTokenAsync(
-            new ExchangeTokenCommand(LoginProviders.MicrosoftEntraId, "any-token"),
-            TestContext.Current.CancellationToken);
-
-        await act.Should().ThrowAsync<ServiceUnavailableException>()
-            .WithMessage("*not enabled*");
-        _mockEntraIdTokenValidator.Verify(v => v.Validate(It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Never);
+        result.Local.Should().BeTrue();
+        result.Oidc.Should().BeEmpty();
     }
 
     [Fact]
-    public void GetAuthProviders_ShouldReportLocalTrueAndEntraFalse_WhenEntraDisabled()
+    public async Task GetAuthProviders_ShouldExposePublicProviderFields()
     {
-        _entraSettings.Enabled = false;
+        // Pin the shape contract: response includes Name/DisplayName/ProviderType/
+        // Authority/ClientId/Scopes per enabled provider. AllowedTenantIds is NOT
+        // exposed — it's a security gate and the frontend never needs it. If a
+        // future regression adds it to the response, this assertion catches it
+        // via the explicit field list (BeEquivalentTo treats extras as a failure
+        // when the expected shape doesn't include them — but here we just check
+        // each known field is right).
+        var entra = OidcProvider.Create(
+            name: LoginProviders.MicrosoftEntraId,
+            displayName: "Microsoft Entra ID",
+            providerType: OidcProviderType.MicrosoftEntraId,
+            authority: "https://login.microsoftonline.com/common/v2.0",
+            clientId: "test-client-id",
+            audience: "api://test",
+            scopes: new[] { "openid", "profile" },
+            allowedTenantIds: new[] { "11111111-1111-1111-1111-111111111111" },
+            clockSkewSeconds: 60,
+            isEnabled: true,
+            timestamp: NodaTime.SystemClock.Instance.GetCurrentInstant()).Value;
 
-        var result = _sut.GetAuthProviders();
+        _mockOidcProviderRegistry
+            .Setup(r => r.GetEnabled(It.IsAny<CancellationToken>()))
+            .ReturnsAsync((IReadOnlyList<OidcProvider>)new[] { entra });
+
+        var result = await _sut.GetAuthProviders(TestContext.Current.CancellationToken);
 
         result.Local.Should().BeTrue();
-        result.Entra.Should().BeFalse();
-    }
-
-    [Fact]
-    public void GetAuthProviders_ShouldReportBothTrue_WhenEntraEnabled()
-    {
-        _entraSettings.Enabled = true;
-
-        var result = _sut.GetAuthProviders();
-
-        result.Local.Should().BeTrue();
-        result.Entra.Should().BeTrue();
+        result.Oidc.Should().HaveCount(1);
+        var info = result.Oidc[0];
+        info.Name.Should().Be("MicrosoftEntraId");
+        info.DisplayName.Should().Be("Microsoft Entra ID");
+        info.ProviderType.Should().Be(nameof(OidcProviderType.MicrosoftEntraId));
+        info.Authority.Should().Be("https://login.microsoftonline.com/common/v2.0");
+        info.ClientId.Should().Be("test-client-id");
+        info.Scopes.Should().BeEquivalentTo(new[] { "openid", "profile" });
     }
 
     #endregion
@@ -773,8 +819,8 @@ public class TokenServiceTests
             _dateTimeProvider,
             _mockUserIdentityStore.Object,
             _mockUserService.Object,
-            _mockEntraIdTokenValidator.Object,
-            Options.Create(_entraSettings),
+            _mockOidcTokenValidator.Object,
+            _mockOidcProviderRegistry.Object,
             _mockLogger.Object);
 
         var user = CreateLocalUser();

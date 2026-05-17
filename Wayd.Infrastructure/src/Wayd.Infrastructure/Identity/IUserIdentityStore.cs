@@ -20,6 +20,13 @@ internal interface IUserIdentityStore : IScopedService
     Task<bool> ExistsActive(string userId, string provider, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Counts active identities for a given provider. Used when validating whether
+    /// an <see cref="OidcProvider"/> row can be deleted — deletion is blocked while
+    /// any user is still actively bound to the provider.
+    /// </summary>
+    Task<int> CountActiveByProvider(string provider, CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Returns a dictionary mapping <c>UserId</c> to the <c>ProviderSubject</c> of
     /// their active identity row for the given provider. Used by batch processes
     /// that need to correlate users to an external identifier (e.g., employee

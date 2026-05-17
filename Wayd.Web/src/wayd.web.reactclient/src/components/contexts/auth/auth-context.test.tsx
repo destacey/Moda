@@ -18,15 +18,16 @@ jest.mock('../../../app/account/profile/change-password-form', () => ({
   ),
 }))
 
-// MSAL mock — AuthProvider uses useMsal() to clear the cache on logout. The
-// session-reading behavior we're actually testing doesn't touch MSAL.
-jest.mock('@azure/msal-react', () => ({
-  useMsal: () => ({
-    instance: {
-      setActiveAccount: jest.fn(),
-      clearCache: jest.fn().mockResolvedValue(undefined),
-    },
-  }),
+// oidc-client-registry mock — logout path may call signoutRedirect; the
+// session-reading behavior we're actually testing doesn't touch it.
+jest.mock('./oidc-client-registry', () => ({
+  signoutRedirect: jest.fn().mockResolvedValue(undefined),
+}))
+
+// auth-providers-api mock — AuthProvider queries this to resolve the OIDC
+// provider for logout. Not relevant to the session-reading tests.
+jest.mock('../../../store/features/common/auth-providers-api', () => ({
+  useGetAuthProvidersQuery: () => ({ data: undefined }),
 }))
 
 jest.mock('./../../contexts/theme/use-theme', () => ({
@@ -181,7 +182,7 @@ describe('AuthProvider hydration from stored Wayd JWT', () => {
     expect(screen.getByTestId('has-projects-view')).toHaveTextContent('yes')
   })
 
-  it('hydrates an Entra-issued JWT with authMethod = msal', async () => {
+  it('hydrates an OIDC-issued JWT with authMethod = oidc', async () => {
     storeAuth({
       token: makeWaydJwt({
         given_name: 'Bob',
@@ -202,7 +203,7 @@ describe('AuthProvider hydration from stored Wayd JWT', () => {
     )
 
     expect(screen.getByTestId('authenticated')).toHaveTextContent('yes')
-    expect(screen.getByTestId('auth-method')).toHaveTextContent('msal')
+    expect(screen.getByTestId('auth-method')).toHaveTextContent('oidc')
   })
 
   it('supports permission claim as a single string (not just array)', () => {

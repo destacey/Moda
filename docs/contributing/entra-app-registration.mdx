@@ -128,14 +128,14 @@ Token exchange validates public JWKS → no secret. Graph client-credentials flo
 
 ## Step 2 — Create the client (SPA) app registration
 
-This is the frontend. It's what MSAL identifies as when acquiring tokens.
+This is the frontend. It's what the browser OIDC client (`oidc-client-ts`) identifies as when initiating the authorization flow.
 
 1. Azure Portal → **App registrations** → **New registration**.
 2. Name: `Wayd Client ({env})` — e.g., `Wayd Client (prod)`.
 3. **Supported account types**: pick the same option as the API registration — **Single tenant only** or **Multiple Entra ID tenants**. Never the personal-accounts variants (see Step 1).
 4. **Redirect URI**:
    - Platform: **Single-page application (SPA)**
-   - URL: your frontend's origin, with no path — e.g., `https://wayd.ahstech.com` for prod, `http://localhost:3000` for dev
+   - URL: your frontend's origin + `/login` — e.g., `https://wayd.ahstech.com/login` for prod, `http://localhost:3000/login` for dev
 5. **Register**.
 
 Copy the **Application (client) ID** from the Overview page — we'll call it `{client-id}`.
@@ -164,31 +164,13 @@ Skip this if everything stays in one Entra tenant; it's only relevant if clients
 
 ## Step 3 — Wire the values into Wayd
 
-You now have two GUIDs and one scope string. Here's where each goes.
+You now have two GUIDs. Here's where each goes.
 
-### Frontend
-
-Create a `.env` file at the repo root (or set the equivalents in your container app / hosting platform):
-
-```env
-AAD_CLIENT_ID='{client-id}'
-AAD_TENANT_ID='{your tenant ID}'
-AAD_LOGON_AUTHORITY='https://login.microsoftonline.com/{your tenant ID}'
-API_SCOPE='api://{api-client-id}/access_as_user'
-API_BASE_URL='https://localhost:5001'
-```
-
-#### Authority values by account type
-
-Pick the authority that matches the **Supported account types** you chose in Step 1/Step 2:
-
-| Authority | Who can sign in | Use when |
+| Value | Config key | Purpose |
 |---|---|---|
-| `https://login.microsoftonline.com/{your tenant ID}` | Users in this one Entra tenant | Single-tenant deployment (common case) |
-| `https://login.microsoftonline.com/organizations` | Any Entra ID (work/school) tenant | Multi-tenant deployment — **recommended** |
-| `https://login.microsoftonline.com/common` | Any Entra tenant **+ personal Microsoft accounts** | Avoid — Wayd rejects personal accounts, so those sign-ins fail at token validation |
-
-For a multi-tenant deployment, use `/organizations`. MSAL picks the user's home tenant automatically, and Wayd's `AllowedTenantIds` allowlist still controls which specific Entra tenants are accepted. Do not use `/common` unless you have a reason to let MSAL issue personal-account tokens that Wayd will then reject.
+| `{client-id}` (SPA registration) | `SecuritySettings:Providers:Entra:SpaClientId` | Browser OIDC client uses this as `client_id` when redirecting to Entra |
+| `api://{api-client-id}/access_as_user` | `SecuritySettings:Providers:Entra:ApiScope` | Requested scope so Entra issues an access token with `aud = {api-client-id}` |
+| `{api-client-id}` (API registration) | `SecuritySettings:Providers:Entra:Audience` | Backend pins the token's `aud` claim to this value |
 
 ### Backend
 
@@ -200,7 +182,9 @@ Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Se
         "Providers": {
             "Entra": {
                 "Enabled": true,
-                "Authority": "https://login.microsoftonline.com/common/v2.0",
+                "Authority": "https://login.microsoftonline.com/{your-tenant-id}/v2.0",
+                "SpaClientId": "{client-id}",
+                "ApiScope": "api://{api-client-id}/access_as_user",
                 "Audience": "{api-client-id}",
                 "AllowedTenantIds": [ "{your tenant ID}" ],
                 "ClockSkewSeconds": 60
@@ -210,11 +194,15 @@ Configure in `Wayd.Web/src/Wayd.Web.Api/Configurations/security.json` or User Se
 }
 ```
 
-Three things to note:
+Five things to note:
 
-- **`Authority`**: use `/common/v2.0` even when only one Entra tenant is in play. The `v2.0` suffix is what matches v2 tokens; the `AllowedTenantIds` allowlist is what restricts which Entra tenants are accepted.
+- **`SpaClientId`**: the **client (SPA)** app registration's client ID — the value the browser presents to Entra at sign-in. Previously only in the frontend env var `NEXT_PUBLIC_AZURE_AD_CLIENT_ID`.
+- **`ApiScope`**: the API scope string from Step 1's "Expose an API" section. Requesting this scope causes Entra to issue an access token with `aud = {api-client-id}`, which is what Wayd's token validator expects. Without it, Entra issues a token with `aud = {client-id}` and every exchange fails with 401.
 - **`Audience`**: bare GUID of the **API** registration (not the client, not `api://...`). This is why Step 1's v2 switch matters — with v1 tokens this value would need to be `api://{api-client-id}` instead.
+- **`Authority`**: use the tenant-specific URL (`https://login.microsoftonline.com/{your-tenant-id}/v2.0`) for single-tenant deployments. Use `/common/v2.0` only for true multi-tenant deployments; the `AllowedTenantIds` allowlist still controls which tenants are accepted at runtime.
 - **`AllowedTenantIds`**: must be non-empty. Startup fails if `Enabled: true` and this list is empty — that's a deliberate fail-safe default.
+
+On first application start after these settings are in place, the seeder creates a row in `Identity.OidcProviders` and from that point the database is the source of truth. Subsequent changes (authority, scopes, allowed tenants) are made through **Settings → Identity Providers** in the admin UI.
 
 For Terraform-driven deploys, see [the IaC README](https://github.com/destacey/Wayd/tree/main/.iac/wayd) for the `allowed_entra_tenant_ids` variable and how the `dynamic "env"` block emits `AllowedTenantIds__0`, `__1`, etc.
 
@@ -242,11 +230,11 @@ Sign in to the frontend. Then:
 | `ver` | `"2.0"` |
 | `exp` | In the future |
 
-If `aud` has `api://` in it but your config expects a bare GUID, the API registration is still issuing v1 tokens. Redo Step 1's v2 switch. **Users will need to get a fresh token** — cached v1 tokens in MSAL's localStorage stay v1 until they expire or the user signs out and back in.
+If `aud` has `api://` in it but your config expects a bare GUID, the API registration is still issuing v1 tokens. Redo Step 1's v2 switch. **Users will need to get a fresh token** — have them clear site data (DevTools → Application → Storage → Clear site data) and sign in again.
 
-**`503 Service Unavailable` on `/api/auth/exchange`.** `Enabled: false` on the backend. Either flip it to `true` or remove the Entra login button from the frontend.
+**`401 Invalid token` on `/api/auth/exchange` with no matching `OidcProvider` row.** The provider name the frontend sent doesn't match any enabled row in `Identity.OidcProviders`. Either no provider was seeded (`SecuritySettings:Providers:Entra:Enabled` was `false`, or `SpaClientId` was empty when the seeder ran) or an admin disabled the row via the Settings UI. Check the application logs around startup — the seeder logs a warning when it skips, and `OidcTokenValidator` logs the unknown-provider rejection.
 
-**Startup fails with `AllowedTenantIds must be non-empty`.** Exactly what it says. Fail-safe default — add at least one tenant ID.
+**Microsoft Entra ID row missing `AllowedTenantIds`.** The `OidcProvider.Create` entity invariant requires at least one tenant ID for `MicrosoftEntraId` rows; the validator and admin form both enforce it. If the seed found no `AllowedTenantIds` in legacy config, the seed is skipped with a logged warning and the row needs to be created through the Settings UI with a tenant list.
 
 **User signs in, immediately redirects back to `/login`.** Usually means the exchange succeeded but the login page's storage write raced a redirect. Check browser console for the precise error; most commonly it's a CORS failure or a mismatched `API_BASE_URL`.
 

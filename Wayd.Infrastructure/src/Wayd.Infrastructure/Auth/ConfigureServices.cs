@@ -3,8 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Wayd.Infrastructure.Auth.AzureAd;
-using Wayd.Infrastructure.Auth.Entra;
 using Wayd.Infrastructure.Auth.Local;
+using Wayd.Infrastructure.Auth.Oidc;
 using Wayd.Infrastructure.Auth.Permissions;
 using Wayd.Infrastructure.Auth.PersonalAccessToken;
 
@@ -22,7 +22,7 @@ internal static class ConfigureServices
             .AddIdentity()
             .AddAzureAdAuth(config)
             .AddLocalJwtAuth(config, environment)
-            .AddEntraTokenExchange(config)
+            .AddOidcProviderRegistry(config)
             .AddPersonalAccessTokenAuth()
             .AddAuthorizationPolicies();
     }
