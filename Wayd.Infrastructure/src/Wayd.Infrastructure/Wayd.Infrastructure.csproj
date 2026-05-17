@@ -14,6 +14,7 @@
     <ItemGroup>
         <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
         <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+        <PackageReference Include="Azure.Identity" />
         <PackageReference Include="Hangfire" />
         <PackageReference Include="Hangfire.Console.Extensions" />
         <PackageReference Include="Hangfire.Dashboard.BasicAuthorization" />
@@ -41,7 +42,6 @@
         <PackageReference Include="Microsoft.Extensions.ServiceDiscovery" />
         <PackageReference Include="Microsoft.Identity.Web" />
         <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" />
-        <PackageReference Include="Microsoft.Kiota.Abstractions" />
         <PackageReference Include="NodaTime" />
         <PackageReference Include="NodaTime.Serialization.SystemTextJson" />
         <PackageReference Include="NSwag.AspNetCore" />

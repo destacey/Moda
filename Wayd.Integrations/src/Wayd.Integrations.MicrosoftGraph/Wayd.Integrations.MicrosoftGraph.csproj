@@ -5,7 +5,6 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" />
     <PackageReference Include="Microsoft.Graph" />
     <PackageReference Include="Microsoft.Identity.Web.MicrosoftGraph" />
-    <PackageReference Include="Microsoft.Kiota.Abstractions" />
     <PackageReference Include="NodaTime" />
   </ItemGroup>
 
