@@ -274,6 +274,79 @@ internal partial class UserService(
         return Result.Success();
     }
 
+    public async Task<Result> ConvertToLocalAccount(ConvertToLocalAccountCommand command, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (user.LoginProvider == LoginProviders.Wayd)
+            return Result.Failure("User is already a local account.");
+
+        // Validate the password before entering the transaction so a bad password
+        // returns a clean Result.Failure without touching the database.
+        foreach (var validator in _userManager.PasswordValidators)
+        {
+            var validationResult = await validator.ValidateAsync(_userManager, user, command.NewPassword);
+            if (!validationResult.Succeeded)
+            {
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.Description));
+                return Result.Failure(errors);
+            }
+        }
+
+        // Run deactivate + add local identity + set password + update user in one
+        // transaction. Any failure rolls back all steps — without this we could
+        // deactivate the OIDC identity then fail to set the password, locking the
+        // user out of both paths.
+        await _userIdentityStore.ExecuteInTransaction(async ct =>
+        {
+            await _userIdentityStore.DeactivateAllActive(
+                user.Id, _dateTimeProvider.Now, UserIdentityUnlinkReasons.ProviderRelinked, ct);
+
+            await _userIdentityStore.Add(new UserIdentity
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Provider = LoginProviders.Wayd,
+                ProviderTenantId = null,
+                ProviderSubject = user.Id,
+                IsActive = true,
+                LinkedAt = _dateTimeProvider.Now,
+            }, ct);
+
+            // Reset any existing password hash before setting the new one so
+            // this works regardless of whether the user previously had a password
+            // (e.g. was on Wayd, migrated to OIDC, now converting back).
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await _userManager.ResetPasswordAsync(user, token, command.NewPassword);
+            if (!passwordResult.Succeeded)
+            {
+                var errors = string.Join(", ", passwordResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to set password for user {user.Id} during local conversion: {errors}");
+            }
+
+            user.LoginProvider = LoginProviders.Wayd;
+            user.MustChangePassword = true;
+            user.PendingMigrationProviderId = null;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to update user {user.Id} during local conversion: {errors}");
+            }
+        }, cancellationToken);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation(
+            "User {UserId} converted from {Provider} to a local account.",
+            user.Id, user.LoginProvider);
+        return Result.Success();
+    }
+
     public async Task<List<UserIdentityDto>> GetIdentityHistory(string userId, CancellationToken cancellationToken)
     {
         var userExists = await _userManager.Users.AnyAsync(u => u.Id == userId, cancellationToken);

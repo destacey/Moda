@@ -198,6 +198,24 @@ public class UsersController(IUserService userService) : ControllerBase
             : BadRequest(result.ToBadRequestObject(HttpContext));
     }
 
+    [HttpPost("{id}/convert-to-local")]
+    [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
+    [OpenApiOperation("Convert an OIDC user to a local account with a password. The change is immediate and irreversible without admin intervention.", "")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(HttpValidationProblemDetails), StatusCodes.Status422UnprocessableEntity)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ConvertToLocalAccount(string id, ConvertToLocalAccountRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _userService.ConvertToLocalAccount(
+            new ConvertToLocalAccountCommand(id, request.NewPassword),
+            cancellationToken);
+
+        return result.IsSuccess
+            ? NoContent()
+            : BadRequest(result.ToBadRequestObject(HttpContext));
+    }
+
     [HttpPut("{id}/stage-provider-migration")]
     [MustHavePermission(ApplicationAction.Update, ApplicationResource.Users)]
     [OpenApiOperation("Stage a cross-provider identity migration for a user. The rebind completes on the user's next sign-in via the target provider.", "")]

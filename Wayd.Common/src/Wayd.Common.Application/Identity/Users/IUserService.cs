@@ -81,5 +81,7 @@ public interface IUserService : ITransientService
 
     Task<Result> CancelProviderMigration(string userId, CancellationToken cancellationToken);
 
+    Task<Result> ConvertToLocalAccount(ConvertToLocalAccountCommand command, CancellationToken cancellationToken);
+
     Task<List<UserIdentityDto>> GetIdentityHistory(string userId, CancellationToken cancellationToken);
 }

@@ -17,6 +17,7 @@ import {
 import { useGetOidcProvidersQuery } from '@/src/store/features/user-management/oidc-providers-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
+  ConvertToLocalAccountForm,
   EditUserForm,
   ManageUserRolesForm,
   ResetPasswordForm,
@@ -44,6 +45,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const [openStageMigrationForm, setOpenStageMigrationForm] = useState(false)
   const [openStageProviderMigrationForm, setOpenStageProviderMigrationForm] =
     useState(false)
+  const [openConvertToLocalForm, setOpenConvertToLocalForm] = useState(false)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
@@ -193,6 +195,13 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
         })
       }
     }
+    if (canUpdateUser && isOidcUser) {
+      secondaryItems.push({
+        key: 'convert-to-local',
+        label: 'Convert to Local Account',
+        onClick: () => setOpenConvertToLocalForm(true),
+      })
+    }
     if (canUpdateUserRoles) {
       secondaryItems.push({
         key: 'manage-roles',
@@ -296,6 +305,14 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           currentPendingProviderId={userData.pendingMigrationProviderId}
           onFormComplete={() => setOpenStageProviderMigrationForm(false)}
           onFormCancel={() => setOpenStageProviderMigrationForm(false)}
+        />
+      )}
+      {openConvertToLocalForm && (
+        <ConvertToLocalAccountForm
+          userId={userData.id}
+          userName={fullName}
+          onFormComplete={() => setOpenConvertToLocalForm(false)}
+          onFormCancel={() => setOpenConvertToLocalForm(false)}
         />
       )}
     </>

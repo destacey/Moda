@@ -1,6 +1,7 @@
 import { apiSlice } from '../apiSlice'
 import {
   AssignUserRolesRequest,
+  ConvertToLocalAccountRequest,
   CreateUserRequest,
   ManageRoleUsersRequest,
   StageProviderMigrationRequest,
@@ -387,6 +388,30 @@ export const usersApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    convertToLocalAccount: builder.mutation<
+      void,
+      { userId: string; newPassword: string }
+    >({
+      queryFn: async ({ userId, newPassword }) => {
+        try {
+          const request: ConvertToLocalAccountRequest = { newPassword }
+          const data = await getUsersClient().convertToLocalAccount(
+            userId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg.userId },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserIdentityHistory, id: arg.userId },
+      ],
+    }),
+
     getUserOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -427,5 +452,6 @@ export const {
   useCancelTenantMigrationMutation,
   useStageProviderMigrationMutation,
   useCancelProviderMigrationMutation,
+  useConvertToLocalAccountMutation,
   useGetUserOptionsQuery,
 } = usersApi
