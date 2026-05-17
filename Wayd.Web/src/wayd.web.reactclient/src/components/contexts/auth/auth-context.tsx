@@ -331,12 +331,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   ) {
     return (
       <AuthContext.Provider value={authContext}>
-        <div
-          className={styles.changePasswordBackground}
-          style={
-            { '--auth-bg-color': token.colorBgContainer } as React.CSSProperties
-          }
-        >
+        <div className={styles.changePasswordBackground}>
           <ChangePasswordForm
             required
             onFormComplete={() => {

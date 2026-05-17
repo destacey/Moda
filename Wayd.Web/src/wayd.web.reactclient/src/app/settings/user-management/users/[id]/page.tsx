@@ -73,14 +73,7 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
 
   const tabs = [
     { key: UserDetailsTabs.Details, tab: 'Details' },
-    ...(isEntraUser
-      ? [
-          {
-            key: UserDetailsTabs.IdentityHistory,
-            tab: 'Identity History',
-          },
-        ]
-      : []),
+    { key: UserDetailsTabs.IdentityHistory, tab: 'Identity History' },
   ]
 
   const fullName = userData
