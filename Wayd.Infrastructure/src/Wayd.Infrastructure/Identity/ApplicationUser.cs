@@ -22,6 +22,15 @@ public class ApplicationUser : IdentityUser
     /// </summary>
     public string? PendingMigrationTenantId { get; set; }
 
+    /// <summary>
+    /// Staged cross-provider migration target. When set, the user's next login via
+    /// the named provider triggers a transactional rebind: the active
+    /// <see cref="UserIdentity"/> row is deactivated and a new row for the target
+    /// provider is inserted, preserving the user's <c>Id</c> and all downstream FKs.
+    /// Cleared on completion or admin cancellation.
+    /// </summary>
+    public string? PendingMigrationProviderId { get; set; }
+
     public bool MustChangePassword { get; set; }
 
     public string? RefreshToken { get; set; }

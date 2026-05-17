@@ -203,6 +203,153 @@ internal partial class UserService
         return candidate;
     }
 
+    /// <summary>
+    /// Resolves a user from a validated GenericOidc token. Handles the pending
+    /// provider migration case and finds existing identities by (provider, sub).
+    /// Does not create new users — GenericOidc user provisioning is a follow-up.
+    /// </summary>
+    public async Task<(string Id, string? EmployeeId)?> ResolveFromGenericOidcPrincipalAsync(
+        string providerName,
+        ClaimsPrincipal principal,
+        CancellationToken cancellationToken)
+    {
+        // Standard OIDC subject claim
+        var subject = principal.FindFirstValue("sub");
+        if (string.IsNullOrWhiteSpace(subject))
+        {
+            _logger.LogError("GenericOidc token from provider {Provider} is missing the 'sub' claim.", providerName);
+            throw new InternalServerException("Token missing subject claim.");
+        }
+
+        // Email for migration matching; standard OIDC email claim
+        var email = principal.FindFirstValue(ClaimTypes.Email)
+            ?? principal.FindFirstValue("email");
+
+        // Reject an explicitly unverified email — some providers issue tokens
+        // with email_verified=false for addresses the user hasn't confirmed.
+        // Treating such a claim as a trusted account binding would let an attacker
+        // register with someone else's email and take over any pending migration
+        // staged for that address. Absent email_verified is accepted (well-behaved
+        // providers that always verify simply omit the claim).
+        var emailVerifiedClaim = principal.FindFirstValue("email_verified");
+        if (emailVerifiedClaim is not null &&
+            emailVerifiedClaim.Equals("false", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning(
+                "Provider migration skipped for provider {Provider}: email_verified=false on token.",
+                providerName);
+            email = null; // treat as no email — rebind won't fire
+        }
+
+        // GenericOidc providers are single-tenant per row — no tid claim; tenant
+        // is implicit from the provider configuration itself. Store null to keep
+        // the schema consistent with how single-tenant rows are represented.
+        var identity = await _userIdentityStore.FindActive(providerName, tenantId: null, subject);
+        if (identity is not null)
+        {
+            return (identity.User!.Id, identity.User.EmployeeId?.ToString());
+        }
+
+        // No active identity for this provider + subject. Check for a staged
+        // provider migration — an admin may have marked this user to switch to
+        // this provider, in which case we rebind on this first login.
+        var migrated = await TryApplyPendingProviderMigration(providerName, providerTenantId: null, subject, email);
+        if (migrated is not null)
+        {
+            return (migrated.Id, migrated.EmployeeId?.ToString());
+        }
+
+        // User not found — new-user provisioning for GenericOidc is not yet
+        // implemented. Return null so the caller can reject with an appropriate
+        // message rather than creating a partial user record.
+        return null;
+    }
+
+    /// <summary>
+    /// If a user has <c>PendingMigrationProviderId == providerName</c> and an email
+    /// matching the signed-in token, atomically:
+    ///   1. Deactivate their active <see cref="UserIdentity"/> row (UnlinkReason = ProviderRelinked).
+    ///   2. Insert a new active row with (providerName, providerTenantId, subject).
+    ///   3. Update <c>LoginProvider</c> to the new provider and clear <c>PendingMigrationProviderId</c>.
+    /// Returns the user on success; null if no migration was staged or no match found.
+    /// The user's <c>Id</c> is preserved, so all downstream FKs remain valid.
+    /// </summary>
+    /// <remarks>
+    /// Internal (rather than private) so unit tests can exercise the rebind decision
+    /// directly.
+    /// </remarks>
+    internal async Task<ApplicationUser?> TryApplyPendingProviderMigration(
+        string providerName,
+        string? providerTenantId,
+        string subject,
+        string? email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return null;
+        }
+
+        // Match on email (case-insensitive) to scope the lookup. The admin staged
+        // the migration on a specific user; email is the cross-provider identifier
+        // we can reliably compare at login time.
+        var normalized = email.ToUpperInvariant();
+        var candidate = await _userManager.Users
+            .FirstOrDefaultAsync(u =>
+                u.PendingMigrationProviderId == providerName &&
+                u.LoginProvider != LoginProviders.Wayd &&
+                (u.NormalizedUserName == normalized || u.NormalizedEmail == normalized));
+
+        if (candidate is null)
+        {
+            return null;
+        }
+
+        var now = _dateTimeProvider.Now;
+
+        await _userIdentityStore.ExecuteInTransaction(async ct =>
+        {
+            await _userIdentityStore.DeactivateAllActive(candidate.Id, now, UserIdentityUnlinkReasons.ProviderRelinked, ct);
+
+            await _userIdentityStore.Add(new UserIdentity
+            {
+                Id = Guid.NewGuid(),
+                UserId = candidate.Id,
+                Provider = providerName,
+                ProviderTenantId = providerTenantId,
+                ProviderSubject = subject,
+                IsActive = true,
+                LinkedAt = now,
+            }, ct);
+
+            candidate.LoginProvider = providerName;
+            candidate.PendingMigrationProviderId = null;
+            var updateResult = await _userManager.UpdateAsync(candidate);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to apply pending provider migration for user {candidate.Id}: {errors}");
+            }
+        });
+
+        // If the user was previously a local account, clear the password hash now
+        // that the Wayd identity is deactivated. The hash is unreachable at login
+        // (TokenService gates on an active Wayd identity), but removing it makes
+        // the intent explicit and prevents a future bug if that gate ever moves.
+        if (candidate.PasswordHash is not null)
+        {
+            await _userManager.RemovePasswordAsync(candidate);
+        }
+
+        _logger.LogInformation(
+            "Provider migration completed for user {UserId}: rebound to provider {Provider} (subject {Subject}).",
+            candidate.Id, providerName, subject);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(candidate.Id, _dateTimeProvider.Now));
+
+        return candidate;
+    }
+
     private async Task<ApplicationUser> CreateOrUpdateFromPrincipalAsync(ClaimsPrincipal principal, bool isFirstUser)
     {
         string principalObjectId = principal.GetObjectId() ?? throw new InternalServerException("Principal ObjectId is missing or null.");

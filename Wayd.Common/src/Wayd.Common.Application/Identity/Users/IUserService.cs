@@ -40,6 +40,17 @@ public interface IUserService : ITransientService
 
     Task<(string Id, string? EmployeeId)> GetOrCreateFromPrincipalAsync(ClaimsPrincipal principal);
 
+    /// <summary>
+    /// Resolves a user from a validated GenericOidc token principal. Unlike the
+    /// Entra path this does not provision new users — it handles the pending
+    /// provider migration case and looks up existing identities. Returns null if
+    /// the user cannot be resolved (new user, no pending migration).
+    /// </summary>
+    Task<(string Id, string? EmployeeId)?> ResolveFromGenericOidcPrincipalAsync(
+        string providerName,
+        ClaimsPrincipal principal,
+        CancellationToken cancellationToken);
+
     Task UpdateAsync(UpdateUserCommand command, string userId);
 
     Task<Result<string>> CreateAsync(CreateUserCommand command, CancellationToken cancellationToken);
@@ -65,6 +76,12 @@ public interface IUserService : ITransientService
     Task<Result> StageTenantMigration(StageTenantMigrationCommand command, CancellationToken cancellationToken);
 
     Task<Result> CancelTenantMigration(string userId, CancellationToken cancellationToken);
+
+    Task<Result> StageProviderMigration(StageProviderMigrationCommand command, CancellationToken cancellationToken);
+
+    Task<Result> CancelProviderMigration(string userId, CancellationToken cancellationToken);
+
+    Task<Result> ConvertToLocalAccount(ConvertToLocalAccountCommand command, CancellationToken cancellationToken);
 
     Task<List<UserIdentityDto>> GetIdentityHistory(string userId, CancellationToken cancellationToken);
 }

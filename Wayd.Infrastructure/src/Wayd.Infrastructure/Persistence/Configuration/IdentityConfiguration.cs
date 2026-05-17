@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Wayd.Common.Application.Identity.Users;
 using Wayd.Common.Domain.Employees;
-using Wayd.Common.Domain.Identity;
 
 namespace Wayd.Infrastructure.Persistence.Configuration;
 
@@ -26,6 +24,8 @@ public class ApplicationUserConfig : IEntityTypeConfiguration<ApplicationUser>
         builder.Property(u => u.LoginProvider).HasMaxLength(50).IsRequired();
 
         builder.Property(u => u.PendingMigrationTenantId).HasMaxLength(100);
+
+        builder.Property(u => u.PendingMigrationProviderId).HasMaxLength(50);
 
         builder.Property(u => u.MustChangePassword).HasDefaultValue(false);
 

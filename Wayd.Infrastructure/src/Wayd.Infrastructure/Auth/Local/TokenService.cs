@@ -121,24 +121,33 @@ internal class TokenService(
         // there — no special-case for Entra config here anymore.
         var principal = await _oidcTokenValidator.Validate(command.Provider, command.SubjectToken, cancellationToken);
 
-        // User provisioning for non-Entra providers needs claim mappings that
-        // Entra's GetOrCreateFromPrincipalAsync doesn't have (sub-claim subject,
-        // no tid, different display-name claims, no Microsoft Graph). That work
-        // is tracked as a follow-up; until then, reject GenericOidc exchanges at
-        // this boundary so we fail explicitly instead of silently mis-provisioning.
-        if (!string.Equals(command.Provider, LoginProviders.MicrosoftEntraId, StringComparison.Ordinal))
+        string userId;
+        if (string.Equals(command.Provider, LoginProviders.MicrosoftEntraId, StringComparison.Ordinal))
         {
-            _logger.LogWarning(
-                "Token exchange rejected: provider {Provider} validated but user provisioning for non-Entra providers is not yet implemented.",
-                command.Provider);
-            throw new UnauthorizedException("Invalid token.");
+            // Entra path: handles UserIdentity lookup, null-tid upgrade, new-user
+            // creation, first-user-is-admin, and pending tenant migration.
+            (userId, _) = await _userService.GetOrCreateFromPrincipalAsync(principal);
         }
+        else
+        {
+            // GenericOidc path: resolves existing identities and applies pending
+            // cross-provider migrations. Full new-user provisioning is a follow-up
+            // (tracked separately) — unknown users are rejected explicitly here
+            // rather than silently mis-provisioned.
+            var resolved = await _userService.ResolveFromGenericOidcPrincipalAsync(
+                command.Provider, principal, cancellationToken);
 
-        // Reuse the existing principal-based user resolution. That path handles
-        // UserIdentity lookup, the null-tid upgrade, new-user creation, and the
-        // first-user-is-admin case — unchanged from the MSAL middleware flow
-        // this endpoint replaced.
-        var (userId, _) = await _userService.GetOrCreateFromPrincipalAsync(principal);
+            if (resolved is null)
+            {
+                _logger.LogWarning(
+                    "Token exchange rejected: provider {Provider} token validated but no matching user found. " +
+                    "New-user provisioning for non-Entra providers is not yet implemented.",
+                    command.Provider);
+                throw new UnauthorizedException("No account found for this identity. Contact an administrator.");
+            }
+
+            userId = resolved.Value.Id;
+        }
 
         var user = await _userManager.FindByIdAsync(userId)
             ?? throw new UnauthorizedException("Invalid token.");

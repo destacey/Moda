@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Graph;
 using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.OidcProviders;
 
 namespace Wayd.Infrastructure.Identity;
 
@@ -20,7 +21,8 @@ internal partial class UserService(
     ISender sender,
     IDateTimeProvider dateTimeProvider,
     ICurrentUser currentUser,
-    IUserIdentityStore userIdentityStore) : IUserService
+    IUserIdentityStore userIdentityStore,
+    IOidcProviderRegistry oidcProviderRegistry) : IUserService
 {
     private readonly ILogger<UserService> _logger = logger;
     private readonly SignInManager<ApplicationUser> _signInManager = signInManager;
@@ -33,6 +35,7 @@ internal partial class UserService(
     private readonly ICurrentUser _currentUser = currentUser;
     private readonly IDateTimeProvider _dateTimeProvider = dateTimeProvider;
     private readonly IUserIdentityStore _userIdentityStore = userIdentityStore;
+    private readonly IOidcProviderRegistry _oidcProviderRegistry = oidcProviderRegistry;
 
     public async Task<IReadOnlyList<UserDetailsDto>> SearchAsync(UserListFilter filter, CancellationToken cancellationToken)
     {
@@ -199,6 +202,144 @@ internal partial class UserService(
         await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
 
         _logger.LogInformation("Tenant migration canceled for user {UserId}.", user.Id);
+        return Result.Success();
+    }
+
+    public async Task<Result> StageProviderMigration(StageProviderMigrationCommand command, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        // Can't migrate to the same provider — that's a tenant migration (or a no-op)
+        if (string.Equals(user.LoginProvider, command.TargetProviderId, StringComparison.OrdinalIgnoreCase))
+            return Result.Failure("Target provider is the same as the user's current provider.");
+
+        // Target provider must be a known, enabled OIDC provider
+        var targetProvider = await _oidcProviderRegistry.GetByName(command.TargetProviderId, cancellationToken);
+        if (targetProvider is null)
+            return Result.Failure($"Provider '{command.TargetProviderId}' does not exist.");
+        if (!targetProvider.IsEnabled)
+            return Result.Failure($"Provider '{command.TargetProviderId}' is disabled.");
+
+        if (!await _userIdentityStore.ExistsActive(user.Id, user.LoginProvider, cancellationToken))
+            return Result.Failure("User has no active identity to migrate.");
+
+        // Last-write-wins semantics match the tenant migration pattern.
+        user.PendingMigrationProviderId = command.TargetProviderId;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to stage provider migration for user {UserId}: {Errors}", user.Id, errors);
+            return Result.Failure(errors);
+        }
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation(
+            "Provider migration staged for user {UserId}: target provider {ProviderId}.",
+            user.Id, command.TargetProviderId);
+        return Result.Success();
+    }
+
+    public async Task<Result> CancelProviderMigration(string userId, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (user.PendingMigrationProviderId is null)
+        {
+            // Idempotent: same semantics as CancelTenantMigration
+            return Result.Success();
+        }
+
+        user.PendingMigrationProviderId = null;
+        var result = await _userManager.UpdateAsync(user);
+        if (!result.Succeeded)
+        {
+            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+            _logger.LogError("Failed to cancel provider migration for user {UserId}: {Errors}", user.Id, errors);
+            return Result.Failure(errors);
+        }
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation("Provider migration canceled for user {UserId}.", userId);
+        return Result.Success();
+    }
+
+    public async Task<Result> ConvertToLocalAccount(ConvertToLocalAccountCommand command, CancellationToken cancellationToken)
+    {
+        var user = await _userManager.Users.FirstOrDefaultAsync(u => u.Id == command.UserId, cancellationToken);
+        if (user is null)
+            throw new NotFoundException("User Not Found.");
+
+        if (user.LoginProvider == LoginProviders.Wayd)
+            return Result.Failure("User is already a local account.");
+
+        // Validate the password before entering the transaction so a bad password
+        // returns a clean Result.Failure without touching the database.
+        foreach (var validator in _userManager.PasswordValidators)
+        {
+            var validationResult = await validator.ValidateAsync(_userManager, user, command.NewPassword);
+            if (!validationResult.Succeeded)
+            {
+                var errors = string.Join(", ", validationResult.Errors.Select(e => e.Description));
+                return Result.Failure(errors);
+            }
+        }
+
+        // Run deactivate + add local identity + set password + update user in one
+        // transaction. Any failure rolls back all steps — without this we could
+        // deactivate the OIDC identity then fail to set the password, locking the
+        // user out of both paths.
+        await _userIdentityStore.ExecuteInTransaction(async ct =>
+        {
+            await _userIdentityStore.DeactivateAllActive(
+                user.Id, _dateTimeProvider.Now, UserIdentityUnlinkReasons.ProviderRelinked, ct);
+
+            await _userIdentityStore.Add(new UserIdentity
+            {
+                Id = Guid.NewGuid(),
+                UserId = user.Id,
+                Provider = LoginProviders.Wayd,
+                ProviderTenantId = null,
+                ProviderSubject = user.Id,
+                IsActive = true,
+                LinkedAt = _dateTimeProvider.Now,
+            }, ct);
+
+            // Reset any existing password hash before setting the new one so
+            // this works regardless of whether the user previously had a password
+            // (e.g. was on Wayd, migrated to OIDC, now converting back).
+            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var passwordResult = await _userManager.ResetPasswordAsync(user, token, command.NewPassword);
+            if (!passwordResult.Succeeded)
+            {
+                var errors = string.Join(", ", passwordResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to set password for user {user.Id} during local conversion: {errors}");
+            }
+
+            user.LoginProvider = LoginProviders.Wayd;
+            user.MustChangePassword = true;
+            user.PendingMigrationProviderId = null;
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join(", ", updateResult.Errors.Select(e => e.Description));
+                throw new InternalServerException(
+                    $"Failed to update user {user.Id} during local conversion: {errors}");
+            }
+        }, cancellationToken);
+
+        await _events.PublishAsync(new ApplicationUserUpdatedEvent(user.Id, _dateTimeProvider.Now));
+
+        _logger.LogInformation(
+            "User {UserId} converted from {Provider} to a local account.",
+            user.Id, user.LoginProvider);
         return Result.Success();
     }
 
