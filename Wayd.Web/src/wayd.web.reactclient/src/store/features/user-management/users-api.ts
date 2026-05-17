@@ -3,6 +3,7 @@ import {
   AssignUserRolesRequest,
   CreateUserRequest,
   ManageRoleUsersRequest,
+  StageProviderMigrationRequest,
   StageTenantMigrationRequest,
   UserDetailsDto,
   UserIdentityDto,
@@ -345,6 +346,47 @@ export const usersApi = apiSlice.injectEndpoints({
       ],
     }),
 
+    stageProviderMigration: builder.mutation<
+      void,
+      { userId: string; targetProviderId: string }
+    >({
+      queryFn: async ({ userId, targetProviderId }) => {
+        try {
+          const request: StageProviderMigrationRequest = { targetProviderId }
+          const data = await getUsersClient().stageProviderMigration(
+            userId,
+            request,
+          )
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, arg) => [
+        { type: QueryTags.User, id: arg.userId },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserIdentityHistory, id: arg.userId },
+      ],
+    }),
+
+    cancelProviderMigration: builder.mutation<void, string>({
+      queryFn: async (userId) => {
+        try {
+          const data = await getUsersClient().cancelProviderMigration(userId)
+          return { data }
+        } catch (error) {
+          console.error('API Error:', error)
+          return { error }
+        }
+      },
+      invalidatesTags: (result, error, userId) => [
+        { type: QueryTags.User, id: userId },
+        { type: QueryTags.User, id: 'LIST' },
+        { type: QueryTags.UserIdentityHistory, id: userId },
+      ],
+    }),
+
     getUserOptions: builder.query<BaseOptionType[], void>({
       queryFn: async () => {
         try {
@@ -383,5 +425,7 @@ export const {
   useGetUserIdentityHistoryQuery,
   useStageTenantMigrationMutation,
   useCancelTenantMigrationMutation,
+  useStageProviderMigrationMutation,
+  useCancelProviderMigrationMutation,
   useGetUserOptionsQuery,
 } = usersApi

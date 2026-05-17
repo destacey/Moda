@@ -10,14 +10,17 @@ import { App, Card, MenuProps } from 'antd'
 import BasicBreadcrumb from '@/src/components/common/basic-breadcrumb'
 import useAuth from '@/src/components/contexts/auth'
 import {
+  useCancelProviderMigrationMutation,
   useCancelTenantMigrationMutation,
   useGetUserQuery,
 } from '@/src/store/features/user-management/users-api'
+import { useGetOidcProvidersQuery } from '@/src/store/features/user-management/oidc-providers-api'
 import { useMessage } from '@/src/components/contexts/messaging'
 import {
   EditUserForm,
   ManageUserRolesForm,
   ResetPasswordForm,
+  StageProviderMigrationForm,
   StageTenantMigrationForm,
   useUserAccountActions,
   UserDetails,
@@ -39,6 +42,8 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const [openManageUserRolesForm, setOpenManageUserRolesForm] = useState(false)
   const [openResetPasswordForm, setOpenResetPasswordForm] = useState(false)
   const [openStageMigrationForm, setOpenStageMigrationForm] = useState(false)
+  const [openStageProviderMigrationForm, setOpenStageProviderMigrationForm] =
+    useState(false)
 
   const { hasPermissionClaim } = useAuth()
   const canUpdateUser = hasPermissionClaim('Permissions.Users.Update')
@@ -47,12 +52,22 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
   const { getAccountActionMenuItems } = useUserAccountActions()
   const { data: userData, isLoading, error } = useGetUserQuery(id)
   const [cancelTenantMigration] = useCancelTenantMigrationMutation()
+  const [cancelProviderMigration] = useCancelProviderMigrationMutation()
+  const { data: oidcProviders = [] } = useGetOidcProvidersQuery()
   const { modal } = App.useApp()
   const messageApi = useMessage()
 
   const isLocalUser = userData?.loginProvider === 'Wayd'
   const isEntraUser = userData?.loginProvider === 'MicrosoftEntraId'
+  const isOidcUser = !isLocalUser
   const hasPendingMigration = !!userData?.pendingMigrationTenantId
+  const hasPendingProviderMigration = !!userData?.pendingMigrationProviderId
+  // Only show "Change Identity Provider" when more than one OIDC provider is configured
+  const enabledOidcProviders = oidcProviders.filter((p) => p.isEnabled)
+  const canChangeProvider =
+    isOidcUser &&
+    enabledOidcProviders.length > 1 &&
+    enabledOidcProviders.some((p) => p.name !== userData?.loginProvider)
 
   const tabs = [
     { key: UserDetailsTabs.Details, tab: 'Details' },
@@ -132,6 +147,44 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
                   messageApi.error(
                     err?.data?.detail ??
                       'Failed to cancel the pending migration.',
+                  )
+                }
+              },
+            })
+          },
+        })
+      }
+    }
+    if (canUpdateUser && canChangeProvider) {
+      secondaryItems.push({
+        key: 'change-provider',
+        label: hasPendingProviderMigration
+          ? 'Replace Pending Provider Migration'
+          : 'Change Identity Provider',
+        onClick: () => setOpenStageProviderMigrationForm(true),
+      })
+      if (hasPendingProviderMigration) {
+        secondaryItems.push({
+          key: 'cancel-provider-migration',
+          label: 'Cancel Pending Provider Migration',
+          onClick: () => {
+            modal.confirm({
+              title: 'Cancel Pending Provider Migration',
+              content: `Cancel the pending provider migration for ${fullName}?`,
+              okText: 'Cancel Migration',
+              okButtonProps: { danger: true },
+              cancelText: 'Keep Pending',
+              onOk: async () => {
+                try {
+                  const result = await cancelProviderMigration(userData.id)
+                  if ('error' in result) {
+                    throw result.error
+                  }
+                  messageApi.success('Pending provider migration canceled.')
+                } catch (err: any) {
+                  messageApi.error(
+                    err?.data?.detail ??
+                      'Failed to cancel the pending provider migration.',
                   )
                 }
               },
@@ -233,6 +286,16 @@ const UserDetailsPage = (props: { params: Promise<{ id: string }> }) => {
           currentPendingTenantId={userData.pendingMigrationTenantId}
           onFormComplete={() => setOpenStageMigrationForm(false)}
           onFormCancel={() => setOpenStageMigrationForm(false)}
+        />
+      )}
+      {openStageProviderMigrationForm && (
+        <StageProviderMigrationForm
+          userId={userData.id}
+          userName={fullName}
+          currentLoginProvider={userData.loginProvider}
+          currentPendingProviderId={userData.pendingMigrationProviderId}
+          onFormComplete={() => setOpenStageProviderMigrationForm(false)}
+          onFormCancel={() => setOpenStageProviderMigrationForm(false)}
         />
       )}
     </>
