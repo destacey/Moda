@@ -21,6 +21,7 @@ import { AuthProvider } from '../components/contexts/auth'
 import { MessageProvider } from '../components/contexts/messaging'
 import LoginPage from './login/page'
 import LogoutPage from './logout/page'
+import SetupPage from './setup/page'
 import { usePathname, useRouter } from 'next/navigation'
 import { isAuthActive } from '../services/clients'
 import ReleaseCleanup from '../components/release-cleanup'
@@ -122,13 +123,18 @@ const AuthGate = ({ children }: PropsWithChildren) => {
     pathname &&
     pathname !== '/' &&
     pathname !== '/login' &&
-    pathname !== '/logout'
+    pathname !== '/logout' &&
+    pathname !== '/setup'
   ) {
     sessionStorage.setItem(RETURN_URL_KEY, pathname)
   }
 
   if (pathname === '/logout') {
     return <LogoutPage />
+  }
+
+  if (pathname === '/setup') {
+    return <SetupPage />
   }
 
   return <LoginPage />
