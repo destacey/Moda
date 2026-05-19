@@ -1,0 +1,80 @@
+---
+title: First-Run Setup
+description: How to create the first administrator account on a fresh Wayd deployment.
+sidebar_position: 4
+audience: [developer, operator]
+---
+
+# First-Run Setup
+
+When Wayd starts with an empty database it generates a one-time **bootstrap token** and prints it to the application log. This token lets you create the first administrator account without any pre-existing credentials — solving the chicken-and-egg problem of needing an admin to configure identity providers.
+
+Once an admin account exists the token is invalidated and the setup page returns 404.
+
+## Step 1 — Start the application
+
+Run Wayd using any of the [standard options](./installation.mdx#run-the-application). On first boot you will see a message like this in the logs:
+
+```
+============================================================
+ WAYD FIRST-RUN SETUP
+============================================================
+ No users exist. Use the token below to create the first
+ admin account.
+
+ UI:    <your-app-url>/setup
+ API:   POST /api/auth/setup
+
+ Token: <bootstrap-token>
+
+ This token is valid for the lifetime of this process only.
+ Restart the application to generate a new token.
+============================================================
+```
+
+Copy the token value — you will need it in the next step.
+
+## Step 2 — Complete setup
+
+Navigate to `<your-app-url>/setup` in a browser. The page will not load (404) if setup has already been completed.
+
+Fill in the form:
+
+| Field | Notes |
+| --- | --- |
+| **Setup token** | Paste the token from the server log |
+| **First name / Last name** | Your name |
+| **Email** | Used as your login username |
+| **Password** | Must be at least 8 characters, with at least one uppercase letter, one lowercase letter, and one digit |
+| **Confirm password** | Must match exactly |
+
+Click **Create admin account**. On success you are logged in immediately as an administrator with no forced password change.
+
+## Step 3 — Configure authentication
+
+With your admin account you can now:
+
+- **Add an identity provider** — Settings → Identity Providers. Lets your team log in via Microsoft Entra ID or another OIDC provider. See [Configuration → Identity providers](./configuration.mdx#identity-providers-db-managed).
+- **Invite users** — Settings → Users → Create user.
+
+:::tip Token expired?
+The bootstrap token lives only in memory. If you restart the application before completing setup, a new token is generated and printed again.
+:::
+
+:::note API alternative
+If you prefer to complete setup without a browser, POST directly to the API:
+
+```bash
+curl -X POST <api-url>/api/auth/setup \
+  -H "Content-Type: application/json" \
+  -d '{
+    "token": "<bootstrap-token>",
+    "firstName": "Admin",
+    "lastName": "User",
+    "email": "admin@example.com",
+    "password": "YourPassword1"
+  }'
+```
+
+A successful response returns a Wayd JWT + refresh token identical to a normal login response.
+:::
