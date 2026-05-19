@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Wayd.Common.Application.Identity.Bootstrap;
 using Wayd.Infrastructure.Auth.AzureAd;
+using Wayd.Infrastructure.Auth.Bootstrap;
 using Wayd.Infrastructure.Auth.Local;
 using Wayd.Infrastructure.Auth.Oidc;
 using Wayd.Infrastructure.Auth.Permissions;
@@ -14,6 +16,9 @@ internal static class ConfigureServices
 {
     internal static IServiceCollection AddAuth(this IServiceCollection services, IConfiguration config, IHostEnvironment environment)
     {
+        services.AddSingleton<BootstrapTokenService>();
+        services.AddSingleton<IBootstrapTokenService>(sp => sp.GetRequiredService<BootstrapTokenService>());
+
         return services
             .AddCurrentUser()
             .AddPermissions()

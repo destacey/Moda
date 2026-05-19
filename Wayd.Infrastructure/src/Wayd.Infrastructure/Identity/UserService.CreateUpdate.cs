@@ -478,7 +478,7 @@ internal partial class UserService
             EmployeeId = command.EmployeeId,
             PhoneNumber = command.PhoneNumber,
             LoginProvider = command.LoginProvider,
-            MustChangePassword = command.LoginProvider == LoginProviders.Wayd,
+            MustChangePassword = command.LoginProvider == LoginProviders.Wayd && command.MustChangePassword,
         };
 
         // User creation, role assignment, and the Wayd identity row must land

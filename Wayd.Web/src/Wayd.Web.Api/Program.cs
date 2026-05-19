@@ -6,6 +6,7 @@ using Wayd.Common.Application;
 using Wayd.Common.Application.Interfaces;
 using Wayd.Goals.Application;
 using Wayd.Infrastructure;
+using Wayd.Infrastructure.Auth;
 using Wayd.Infrastructure.Common;
 using Wayd.Links;
 using Wayd.Organization.Application;
@@ -74,6 +75,7 @@ try
     var app = builder.Build();
 
     await app.Services.InitializeDatabases();
+    await app.Services.RunBootstrapCheck();
 
     app.UseInfrastructure(builder.Configuration);
     app.MapDefaultEndpoints();

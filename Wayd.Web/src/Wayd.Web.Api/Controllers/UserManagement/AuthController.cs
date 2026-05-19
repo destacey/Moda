@@ -1,5 +1,9 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Wayd.Common.Application.Identity;
+using Wayd.Common.Application.Identity.Bootstrap;
 using Wayd.Common.Application.Identity.Tokens;
+using Wayd.Web.Api.Extensions;
+using Wayd.Web.Api.Models.UserManagement.Users;
 
 namespace Wayd.Web.Api.Controllers.UserManagement;
 
@@ -7,9 +11,14 @@ namespace Wayd.Web.Api.Controllers.UserManagement;
 [ApiVersionNeutral]
 [ApiController]
 [AllowAnonymous]
-public class AuthController(ITokenService tokenService) : ControllerBase
+public class AuthController(
+    ITokenService tokenService,
+    IBootstrapTokenService bootstrapTokenService,
+    IUserService userService) : ControllerBase
 {
     private readonly ITokenService _tokenService = tokenService;
+    private readonly IBootstrapTokenService _bootstrapTokenService = bootstrapTokenService;
+    private readonly IUserService _userService = userService;
 
     [HttpPost("login")]
     [OpenApiOperation("Authenticate with username and password.", "")]
@@ -52,5 +61,50 @@ public class AuthController(ITokenService tokenService) : ControllerBase
         // future secrets are deliberately not exposed here.
         var response = await _tokenService.GetAuthProviders(cancellationToken);
         return Ok(response);
+    }
+
+    [HttpPost("setup")]
+    [OpenApiOperation("Create the first admin user using the one-time bootstrap token.", "")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<TokenResponse>> Setup(SetupRequest request, CancellationToken cancellationToken)
+    {
+        if (!_bootstrapTokenService.IsActive)
+            return Conflict(ProblemDetailsExtensions.ForConflict("Setup has already been completed.", HttpContext));
+
+        if (!_bootstrapTokenService.TryConsume(request.Token))
+            return BadRequest(ProblemDetailsExtensions.ForBadRequest("Invalid setup token.", HttpContext));
+
+        // Double-check that no users exist — prevents a race where two concurrent
+        // setup requests both pass the token check before one consumes it.
+        var userCount = await _userService.GetCountAsync(cancellationToken);
+        if (userCount > 0)
+            return Conflict(ProblemDetailsExtensions.ForConflict("Setup has already been completed.", HttpContext));
+
+        var createResult = await _userService.CreateAsync(new CreateUserCommand
+        {
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            LoginProvider = LoginProviders.Wayd,
+            Password = request.Password,
+            MustChangePassword = false,
+        }, cancellationToken);
+
+        if (createResult.IsFailure)
+            return BadRequest(createResult.ToBadRequestObject(HttpContext));
+
+        var userId = createResult.Value;
+
+        await _userService.AssignRolesAsync(
+            new AssignUserRolesCommand(userId, [ApplicationRoles.Admin]),
+            cancellationToken);
+
+        var token = await _tokenService.GetTokenAsync(
+            new LoginCommand(request.Email, request.Password),
+            cancellationToken);
+
+        return Ok(token);
     }
 }

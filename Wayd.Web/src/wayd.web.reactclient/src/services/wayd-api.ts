@@ -774,6 +774,75 @@ export class AuthClient {
         }
         return Promise.resolve<AuthProvidersResponse>(null as any);
     }
+
+    /**
+     * Create the first admin user using the one-time bootstrap token.
+     */
+    setup(request: SetupRequest, cancelToken?: CancelToken): Promise<TokenResponse> {
+        let url_ = this.baseUrl + "/api/auth/setup";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(request);
+
+        let options_: AxiosRequestConfig = {
+            data: content_,
+            method: "POST",
+            url: url_,
+            headers: {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            cancelToken
+        };
+
+        return this.instance.request(options_).catch((_error: any) => {
+            if (isAxiosError(_error) && _error.response) {
+                return _error.response;
+            } else {
+                throw _error;
+            }
+        }).then((_response: AxiosResponse) => {
+            return this.processSetup(_response);
+        });
+    }
+
+    protected processSetup(response: AxiosResponse): Promise<TokenResponse> {
+        const status = response.status;
+        let _headers: any = {};
+        if (response.headers && typeof response.headers === "object") {
+            for (const k in response.headers) {
+                if (response.headers.hasOwnProperty(k)) {
+                    _headers[k] = response.headers[k];
+                }
+            }
+        }
+        if (status === 200) {
+            const _responseText = response.data;
+            let result200: any = null;
+            let resultData200  = _responseText;
+            result200 = resultData200;
+            return Promise.resolve<TokenResponse>(result200);
+
+        } else if (status === 400) {
+            const _responseText = response.data;
+            let result400: any = null;
+            let resultData400  = _responseText;
+            result400 = resultData400;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result400);
+
+        } else if (status === 409) {
+            const _responseText = response.data;
+            let result409: any = null;
+            let resultData409  = _responseText;
+            result409 = resultData409;
+            return throwException("A server side error occurred.", status, _responseText, _headers, result409);
+
+        } else if (status !== 200 && status !== 204) {
+            const _responseText = response.data;
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+        }
+        return Promise.resolve<TokenResponse>(null as any);
+    }
 }
 
 export class OidcProvidersClient {
@@ -26118,6 +26187,14 @@ export interface OidcProviderInfo {
     authority: string;
     clientId: string;
     scopes: string[];
+}
+
+export interface SetupRequest {
+    token: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
 }
 
 export interface OidcProviderListItemDto {
