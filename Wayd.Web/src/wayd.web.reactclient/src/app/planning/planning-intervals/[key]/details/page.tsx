@@ -161,6 +161,9 @@ const PlanningIntervalDetailsPage = (props: {
     setOpenManageTeamsForm(false)
     if (wasSaved) {
       refetchPlanningInterval()
+      if (teamsQueryEnabled) {
+        refetchTeams()
+      }
     }
   }
 
