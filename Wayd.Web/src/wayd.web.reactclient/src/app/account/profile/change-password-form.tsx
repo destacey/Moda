@@ -108,6 +108,9 @@ const ChangePasswordForm = ({
           rules={[
             { required: true, message: 'Please enter a new password.' },
             { min: 8, message: 'Password must be at least 8 characters.' },
+            { pattern: /[A-Z]/, message: 'Password must contain at least one uppercase letter.' },
+            { pattern: /[a-z]/, message: 'Password must contain at least one lowercase letter.' },
+            { pattern: /[0-9]/, message: 'Password must contain at least one digit.' },
             ({ getFieldValue }) => ({
               validator(_, value) {
                 if (!value || getFieldValue('currentPassword') !== value) {

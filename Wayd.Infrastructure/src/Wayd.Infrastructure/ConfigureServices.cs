@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Wayd.Infrastructure.FeatureManagement;
 using Wayd.Infrastructure.Logging;
 using Wayd.Infrastructure.OpenTelemetry;
@@ -126,6 +127,17 @@ public static class ConfigureServices
 
         await scope.ServiceProvider.GetRequiredService<IDatabaseInitializer>()
             .InitializeDatabase(cancellationToken);
+    }
+
+    /// <summary>
+    /// Must be called after <see cref="InitializeDatabases"/>.
+    /// Generates and logs a one-time setup token when no users exist.
+    /// </summary>
+    public static async Task RunBootstrapCheck(this IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        var tokenService = services.GetRequiredService<Wayd.Infrastructure.Auth.Bootstrap.BootstrapTokenService>();
+        var logger = services.GetRequiredService<ILogger<Wayd.Infrastructure.Auth.Bootstrap.BootstrapTokenService>>();
+        await Wayd.Infrastructure.Auth.Bootstrap.BootstrapService.RunAsync(services, tokenService, logger, cancellationToken);
     }
 
     public static IApplicationBuilder UseInfrastructure(this IApplicationBuilder builder, IConfiguration config) =>

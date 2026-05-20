@@ -22,6 +22,10 @@ Wayd supports two authentication paths:
 - **Local (username + password)** — always available, configured per-deployment via JWT signing settings.
 - **Identity providers (OIDC)** — Microsoft Entra ID and any standards-compliant OIDC provider (Google, Okta, Auth0, Keycloak, …). Providers are stored in the database and managed by admins through the Settings UI; no app restart is needed to add, edit, enable, or disable one.
 
+:::tip First deployment?
+If this is a fresh deployment with no users yet, see [First-Run Setup](./first-run-setup.mdx) to create the initial administrator account before configuring identity providers.
+:::
+
 ### Identity providers (DB-managed)
 
 Each row in the `Identity.OidcProviders` table is one configured provider — its discovery `Authority`, public `ClientId`, expected token `Audience`, scopes, and (for Entra) the allowed-tenant list. The token-exchange endpoint resolves provider metadata from this table on every request, with a short cache TTL and explicit invalidation on admin writes.

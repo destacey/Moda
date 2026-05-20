@@ -260,6 +260,59 @@
         }
       }
     },
+    "/api/auth/setup": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Create the first admin user using the one-time bootstrap token.",
+        "operationId": "Auth_Setup",
+        "requestBody": {
+          "x-name": "request",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetupRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/user-management/oidc-providers": {
       "get": {
         "tags": [
@@ -22117,6 +22170,34 @@
             "items": {
               "type": "string"
             }
+          }
+        }
+      },
+      "SetupRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "token",
+          "firstName",
+          "lastName",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         }
       },

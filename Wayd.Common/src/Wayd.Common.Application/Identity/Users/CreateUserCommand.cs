@@ -9,6 +9,7 @@ public sealed record CreateUserCommand
     public Guid? EmployeeId { get; set; }
     public string LoginProvider { get; set; } = null!;
     public string? Password { get; set; }
+    public bool MustChangePassword { get; set; } = true;
 }
 
 public sealed class CreateUserCommandValidator : CustomValidator<CreateUserCommand>
