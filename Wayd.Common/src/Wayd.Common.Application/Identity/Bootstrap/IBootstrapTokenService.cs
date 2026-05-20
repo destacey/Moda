@@ -11,8 +11,14 @@ public interface IBootstrapTokenService
     bool IsActive { get; }
 
     /// <summary>
-    /// Validates the supplied token and, if valid, consumes it (preventing reuse).
+    /// Validates the supplied token without consuming it.
     /// Returns false if no token is active or the token does not match.
     /// </summary>
-    bool TryConsume(string token);
+    bool Validate(string token);
+
+    /// <summary>
+    /// Invalidates the active token, preventing any further use.
+    /// Should be called after setup completes successfully.
+    /// </summary>
+    void Consume();
 }

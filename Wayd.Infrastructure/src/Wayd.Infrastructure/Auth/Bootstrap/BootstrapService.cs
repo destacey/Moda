@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -20,8 +21,7 @@ internal static class BootstrapService
         using var scope = services.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
-        var userCount = userManager.Users.Count();
-        if (userCount > 0)
+        if (await userManager.Users.AnyAsync(cancellationToken))
             return;
 
         var token = tokenService.Generate();

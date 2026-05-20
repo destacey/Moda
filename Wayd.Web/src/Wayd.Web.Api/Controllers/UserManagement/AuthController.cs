@@ -73,7 +73,7 @@ public class AuthController(
         if (!_bootstrapTokenService.IsActive)
             return Conflict(ProblemDetailsExtensions.ForConflict("Setup has already been completed.", HttpContext));
 
-        if (!_bootstrapTokenService.TryConsume(request.Token))
+        if (!_bootstrapTokenService.Validate(request.Token))
             return BadRequest(ProblemDetailsExtensions.ForBadRequest("Invalid setup token.", HttpContext));
 
         // Double-check that no users exist — prevents a race where two concurrent
@@ -100,6 +100,11 @@ public class AuthController(
         await _userService.AssignRolesAsync(
             new AssignUserRolesCommand(userId, [ApplicationRoles.Admin]),
             cancellationToken);
+
+        // Consume the token only after successful user creation so a failed
+        // attempt (e.g. validation error, duplicate email) doesn't force the
+        // operator to restart the application to get a new token.
+        _bootstrapTokenService.Consume();
 
         var token = await _tokenService.GetTokenAsync(
             new LoginCommand(request.Email, request.Password),

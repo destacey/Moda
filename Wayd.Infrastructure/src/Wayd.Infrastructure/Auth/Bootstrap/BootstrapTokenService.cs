@@ -5,8 +5,9 @@ namespace Wayd.Infrastructure.Auth.Bootstrap;
 
 /// <summary>
 /// Singleton. Holds a one-time bootstrap token in memory, generated only when
-/// the database has no users. The token is consumed on first successful use and
-/// is never persisted or logged in full — only printed to stdout on startup.
+/// the database has no users. The token is consumed on first successful use.
+/// It is printed in full to the application log on startup — operators should
+/// be aware it may be captured by any configured log sinks (Seq, App Insights, etc.).
 /// </summary>
 internal sealed class BootstrapTokenService : IBootstrapTokenService
 {
@@ -16,7 +17,8 @@ internal sealed class BootstrapTokenService : IBootstrapTokenService
 
     /// <summary>
     /// Generates and stores the bootstrap token. Must be called once from the
-    /// startup path when user count is confirmed to be zero.
+    /// startup path when user count is confirmed to be zero. The returned value
+    /// is printed to the application log and may be captured by configured log sinks.
     /// </summary>
     internal string Generate()
     {
@@ -26,19 +28,16 @@ internal sealed class BootstrapTokenService : IBootstrapTokenService
         return _token;
     }
 
-    public bool TryConsume(string token)
+    public bool Validate(string token)
     {
         if (_token is null)
             return false;
 
         // Constant-time comparison to prevent timing attacks.
-        var match = CryptographicOperations.FixedTimeEquals(
+        return CryptographicOperations.FixedTimeEquals(
             System.Text.Encoding.UTF8.GetBytes(token),
             System.Text.Encoding.UTF8.GetBytes(_token));
-
-        if (match)
-            _token = null;
-
-        return match;
     }
+
+    public void Consume() => _token = null;
 }
