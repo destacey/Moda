@@ -15,13 +15,14 @@ import { SearchOutlined } from '@ant-design/icons'
 import { Flex, Input, Modal, Typography } from 'antd'
 import { ChangeEvent, useState } from 'react'
 import { ColDef } from 'ag-grid-community'
+import { CustomCellRendererProps } from 'ag-grid-react'
 import {
   AgGridTransfer,
   asDeletableColDefs,
   asDraggableColDefs,
 } from '@/src/components/common/grid/ag-grid-transfer'
 import { useMessage } from '@/src/components/contexts/messaging'
-import { workItemKeyComparator } from '@/src/components/common/work'
+import { workItemKeyComparator, WorkItemTagsCell } from '@/src/components/common/work'
 import { isApiError, type ApiError } from '@/src/utils'
 
 const { Text } = Typography
@@ -74,6 +75,15 @@ const workItemColDefs: ColDef<WorkItemListDto>[] = [
     headerName: 'Project',
     width: 200,
   },
+  {
+    field: 'tags',
+    headerName: 'Tags',
+    width: 200,
+    valueGetter: (params) => params.data?.tags?.join(', ') ?? '',
+    cellRenderer: (params: CustomCellRendererProps<WorkItemListDto>) => (
+      <WorkItemTagsCell tags={params.data?.tags} />
+    ),
+  },
 ]
 
 const leftColDefs = [...asDraggableColDefs(workItemColDefs)]
@@ -83,7 +93,8 @@ const defaultSort = (a: WorkItemListDto, b: WorkItemListDto) => {
 }
 
 const defaultColDef: ColDef = {
-  filter: false,
+  filter: true,
+  floatingFilter: true,
 }
 
 const ManagePlanningIntervalObjectiveWorkItemsForm = ({

@@ -9,6 +9,7 @@ import {
   ExportOutlined,
 } from '@ant-design/icons'
 import { Button, Flex } from 'antd'
+import { WorkItemTagsCell } from '@/src/components/common/work'
 import treeGridStyles from '@/src/components/common/tree-grid/tree-grid.module.css'
 import { TreeGrid } from '@/src/components/common/tree-grid'
 import type { TreeGridColumnMeta } from '@/src/components/common/tree-grid'
@@ -222,6 +223,17 @@ const getColumns = (
     filterFn: 'includesString',
     sortingFn: 'text',
     cell: ({ row }) => <AssignedToCell item={row.original} />,
+  },
+  {
+    id: 'tags',
+    accessorFn: (row) => row.tags?.join(', ') ?? '',
+    header: 'Tags',
+    size: 200,
+    enableGlobalFilter: true,
+    enableColumnFilter: true,
+    filterFn: 'includesString',
+    sortingFn: 'text',
+    cell: ({ row }) => <WorkItemTagsCell tags={row.original.tags} />,
   },
   ...(!hideProjectColumn
     ? [
