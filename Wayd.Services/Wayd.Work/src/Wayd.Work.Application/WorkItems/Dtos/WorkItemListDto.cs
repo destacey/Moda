@@ -33,6 +33,7 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
     public Instant Created { get; set; }
     public Instant? Activated { get; set; }
     public Instant? Done { get; set; }
+    public List<string> Tags { get; set; } = [];
 
     public double? CycleTime => Activated.HasValue && Done.HasValue && !Activated.Value.Equals(Done.Value) && StatusCategory?.Id == DoneStatusCategoryId
         ? (Done.Value - Activated.Value).ToTimeSpan().TotalDays
@@ -53,7 +54,8 @@ public sealed record WorkItemListDto : IMapFrom<WorkItem>
                     : null)
             .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}")
             .Map(dest => dest.Activated, src => src.ActivatedTimestamp)
-            .Map(dest => dest.Done, src => src.DoneTimestamp);
+            .Map(dest => dest.Done, src => src.DoneTimestamp)
+            .Map(dest => dest.Tags, src => src.Tags.Select(t => t.Value).ToList());
     }
 }
 

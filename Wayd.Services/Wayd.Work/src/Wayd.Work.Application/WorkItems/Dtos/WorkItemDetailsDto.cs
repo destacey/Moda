@@ -33,6 +33,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
     public WorkProjectNavigationDto? Project { get; set; }
     public string? ExternalViewWorkItemUrl { get; set; }
     public double? StoryPoints { get; set; }
+    public List<string> Tags { get; set; } = [];
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -50,6 +51,7 @@ public sealed record WorkItemDetailsDto : IMapFrom<WorkItem>
                 : src.ParentProject != null
                     ? src.ParentProject
                     : null)
-            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}")
+            .Map(dest => dest.Tags, src => src.Tags.Select(t => t.Value).ToList());
     }
 }

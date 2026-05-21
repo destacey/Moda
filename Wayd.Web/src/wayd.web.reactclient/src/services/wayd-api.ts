@@ -27112,6 +27112,7 @@ export interface WorkItemListDto {
     created: Date;
     activated?: Date | undefined;
     done?: Date | undefined;
+    tags: string[];
     cycleTime?: number | undefined;
 }
 
@@ -28601,6 +28602,7 @@ export interface WorkItemDetailsDto {
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
     storyPoints?: number | undefined;
+    tags: string[];
 }
 
 export interface WorkItemProjectInfoDto {

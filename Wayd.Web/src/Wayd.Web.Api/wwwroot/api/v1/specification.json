@@ -25795,7 +25795,8 @@
           "statusCategory",
           "id",
           "stackRank",
-          "created"
+          "created",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -25888,6 +25889,12 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "cycleTime": {
             "type": "number",
@@ -31965,7 +31972,8 @@
           "statusCategory",
           "id",
           "created",
-          "lastModified"
+          "lastModified",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -32084,6 +32092,12 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
