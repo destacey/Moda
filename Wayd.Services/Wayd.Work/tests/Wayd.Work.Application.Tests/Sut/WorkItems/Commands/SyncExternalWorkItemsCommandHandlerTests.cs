@@ -246,6 +246,83 @@ public class SyncExternalWorkItemsCommandHandlerTests : IDisposable
         exception.Message.Should().Be("Database error");
     }
 
+    [Fact]
+    public async Task Handle_WithTags_CreatesWorkItemSuccessfully()
+    {
+        // Arrange
+        var workspaceId = Guid.NewGuid();
+        var workProcessId = Guid.NewGuid();
+
+        var workProcess = CreateWorkProcessWithSchemes("User Story", "New");
+
+        var workspace = _workspaceFaker
+            .AsExternal()
+            .WithId(workspaceId)
+            .WithWorkProcessId(workProcessId)
+            .Generate();
+
+        var externalWorkItem = _externalWorkItemFaker
+            .WithWorkType("User Story")
+            .WithWorkStatus("New")
+            .WithTags("Backend", "Q2", "Performance")
+            .Generate();
+
+        var updatedWorkProcess = _workProcessFaker
+            .WithId(workProcessId)
+            .WithSchemes([.. workProcess.Schemes])
+            .Generate();
+
+        _fakeWorkDbContext.AddWorkspace(workspace);
+        _fakeWorkDbContext.AddWorkProcess(updatedWorkProcess);
+
+        var command = CreateCommand(workspaceId, [externalWorkItem]);
+
+        // Act
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _fakeWorkDbContext.SaveChangesCallCount.Should().BeGreaterThan(0);
+    }
+
+    [Fact]
+    public async Task Handle_WithNoTags_CreatesWorkItemSuccessfully()
+    {
+        // Arrange
+        var workspaceId = Guid.NewGuid();
+        var workProcessId = Guid.NewGuid();
+
+        var workProcess = CreateWorkProcessWithSchemes("User Story", "New");
+
+        var workspace = _workspaceFaker
+            .AsExternal()
+            .WithId(workspaceId)
+            .WithWorkProcessId(workProcessId)
+            .Generate();
+
+        var externalWorkItem = _externalWorkItemFaker
+            .WithWorkType("User Story")
+            .WithWorkStatus("New")
+            .Generate();
+
+        var updatedWorkProcess = _workProcessFaker
+            .WithId(workProcessId)
+            .WithSchemes([.. workProcess.Schemes])
+            .Generate();
+
+        _fakeWorkDbContext.AddWorkspace(workspace);
+        _fakeWorkDbContext.AddWorkProcess(updatedWorkProcess);
+
+        var command = CreateCommand(workspaceId, [externalWorkItem]);
+
+        // Act
+        var result = await _handler.Handle(command, TestContext.Current.CancellationToken);
+
+        // Assert
+        result.IsSuccess.Should().BeTrue();
+        _fakeWorkDbContext.SaveChangesCallCount.Should().BeGreaterThan(0);
+    }
+
     #region Helper Methods
 
     private SyncExternalWorkItemsCommand CreateCommand(

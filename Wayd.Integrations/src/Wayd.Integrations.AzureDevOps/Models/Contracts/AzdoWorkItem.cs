@@ -23,4 +23,5 @@ public sealed record AzdoWorkItem : IExternalWorkItem
     public string? ExternalTeamIdentifier { get; set; }
     public int? IterationId { get; set; }
     public double? StoryPoints { get; set; }
+    public IReadOnlyCollection<string> Tags { get; set; } = [];
 }

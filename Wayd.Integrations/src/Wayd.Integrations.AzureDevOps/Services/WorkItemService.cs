@@ -45,7 +45,8 @@ internal sealed class WorkItemService(string organizationUrl, string token, stri
                 "Microsoft.VSTS.Common.StackRank",
                 "Microsoft.VSTS.Scheduling.StoryPoints",
                 "Microsoft.VSTS.Common.ActivatedDate",
-                "Microsoft.VSTS.Common.ClosedDate"
+                "Microsoft.VSTS.Common.ClosedDate",
+                "System.Tags"
             ];
 
             var workitems = await _workItemClient.GetWorkItems(projectName, workItemIds, fields, cancellationToken).ConfigureAwait(false);
