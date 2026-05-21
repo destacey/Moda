@@ -4,6 +4,8 @@ import { WaydGrid } from '@/src/components/common'
 import { SprintBacklogItemDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useMemo } from 'react'
+import { CustomCellRendererProps } from 'ag-grid-react'
+import { WorkItemTagsCell } from '@/src/components/common/work'
 import {
   workItemKeyComparator,
   workStatusCategoryComparator,
@@ -93,6 +95,15 @@ const SprintBacklogGrid = (props: SprintBacklogGridProps) => {
       headerName: 'Project',
       width: 300,
       cellRenderer: ProjectLinkCellRenderer,
+    },
+    {
+      field: 'tags',
+      headerName: 'Tags',
+      width: 200,
+      valueGetter: (params) => params.data?.tags?.join(', ') ?? '',
+      cellRenderer: (params: CustomCellRendererProps<SprintBacklogItemDto>) => (
+        <WorkItemTagsCell tags={params.data?.tags} />
+      ),
     },
   ], [hideTeamColumn, hideSprintColumn])
 

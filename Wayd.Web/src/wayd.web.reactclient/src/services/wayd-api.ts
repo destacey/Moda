@@ -27112,6 +27112,7 @@ export interface WorkItemListDto {
     created: Date;
     activated?: Date | undefined;
     done?: Date | undefined;
+    tags: string[];
     cycleTime?: number | undefined;
 }
 
@@ -27916,6 +27917,7 @@ export interface SprintBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+    tags: string[];
     cycleTime?: number | undefined;
 }
 
@@ -28601,6 +28603,7 @@ export interface WorkItemDetailsDto {
     project?: WorkProjectNavigationDto | undefined;
     externalViewWorkItemUrl?: string | undefined;
     storyPoints?: number | undefined;
+    tags: string[];
 }
 
 export interface WorkItemProjectInfoDto {
@@ -28948,6 +28951,7 @@ export interface WorkItemBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+    tags: string[];
 }
 
 export enum WorkStatusCategory {

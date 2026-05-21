@@ -15,12 +15,13 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
     private readonly List<WorkItemDependency> _outboundDependencyHistory = []; // source links
     private readonly List<WorkItemDependency> _inboundDependencyHistory = []; // target links
     private readonly List<WorkItemReference> _referenceLinks = [];
+    private readonly List<WorkItemTag> _tags = [];
 
     //private readonly List<WorkItemRevision> _history = [];
 
     private WorkItem() { }
 
-    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier)
+    private WorkItem(WorkItemKey key, string title, Guid workspaceId, int? externalId, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier, List<WorkItemTag>? tags)
     {
         Key = key;
         Title = title;
@@ -39,6 +40,7 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
         StackRank = stackRank;
         StoryPoints = storyPoints;
         IterationId = iterationId;
+        if (tags != null) _tags.AddRange(tags.Distinct());
 
         ActivatedTimestamp = activatedTimestamp;
         DoneTimestamp = doneTimestamp;
@@ -146,6 +148,8 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
 
     public Instant? DoneTimestamp { get; private set; }
 
+    public IReadOnlyCollection<WorkItemTag> Tags => _tags.AsReadOnly();
+
     public WorkItemExtended? ExtendedProps { get; private set; }
 
     public IReadOnlyCollection<WorkItemDependency> OutboundDependencies => _outboundDependencyHistory.AsReadOnly();
@@ -180,7 +184,7 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
     /// <param name="doneTimestamp"></param>
     /// <param name="extendedProps"></param>
     /// <exception cref="InvalidOperationException"></exception>
-    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps)
+    public void Update(string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, WorkItemExtended? extendedProps, List<WorkItemTag>? tags = null)
     {
         if (extendedProps != null && Id != extendedProps.Id)
         {
@@ -202,6 +206,8 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
         StackRank = stackRank;
         StoryPoints = storyPoints;
         IterationId = iterationId;
+        _tags.Clear();
+        if (tags != null) _tags.AddRange(tags.Distinct());
 
         var result = UpdateParent(parentInfo, workType);
         if (result.IsFailure)
@@ -363,7 +369,7 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
         return Result.Success();
     }
 
-    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier)
+    public static WorkItem CreateExternal(Workspace workspace, int externalId, string title, WorkType workType, int statusId, WorkStatusCategory statusCategory, IWorkItemParentInfo? parentInfo, Guid? teamId, Instant created, Guid? createdById, Instant lastModified, Guid? lastModifiedById, Guid? assignedToId, int? priority, double stackRank, double? storyPoints, Guid? iterationId, Instant? activatedTimestamp, Instant? doneTimestamp, string? externalTeamIdentifier, List<WorkItemTag>? tags = null)
     {
         Guard.Against.Null(workspace, nameof(workspace));
         Guard.Against.Null(workType, nameof(workType));
@@ -374,7 +380,7 @@ public sealed class WorkItem : BaseAuditableEntity, IHasWorkspace, IHasOptionalW
         }
 
         var key = new WorkItemKey(workspace.Key, externalId);
-        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, iterationId, activatedTimestamp, doneTimestamp, externalTeamIdentifier);
+        return new WorkItem(key, title, workspace.Id, externalId, workType, statusId, statusCategory, parentInfo, teamId, created, createdById, lastModified, lastModifiedById, assignedToId, priority, stackRank, storyPoints, iterationId, activatedTimestamp, doneTimestamp, externalTeamIdentifier, tags);
 
         //var result = workspace.AddWorkItem(workItem);  // this is handled in the handler for performance reasons
     }

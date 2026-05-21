@@ -11,3 +11,4 @@ export {
   workItemKeyComparator,
   workStatusCategoryComparator,
 } from './work-item-utils'
+export { default as WorkItemTagsCell } from './work-item-tags-cell'

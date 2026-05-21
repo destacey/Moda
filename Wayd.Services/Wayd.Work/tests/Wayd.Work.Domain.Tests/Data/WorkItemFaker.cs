@@ -74,6 +74,7 @@ public class WorkItemFaker : PrivateConstructorFaker<WorkItem>
 
         RuleFor(x => x.ActivatedTimestamp, activatedTimestamp);
         RuleFor(x => x.DoneTimestamp, doneTimestamp);
+        RuleFor("_tags", f => new List<WorkItemTag>());
     }
 }
 
@@ -157,6 +158,18 @@ public static class WorkItemFakerExtensions
         faker.RuleFor(x => x.ActivatedTimestamp, activated);
         faker.RuleFor(x => x.DoneTimestamp, done);
 
+        return faker;
+    }
+
+    public static WorkItemFaker WithExternalId(this WorkItemFaker faker, int externalId)
+    {
+        faker.RuleFor(x => x.ExternalId, externalId);
+        return faker;
+    }
+
+    public static WorkItemFaker WithTags(this WorkItemFaker faker, params string[] tags)
+    {
+        faker.RuleFor("_tags", f => tags.Select(t => new WorkItemTag(t)).ToList());
         return faker;
     }
 }

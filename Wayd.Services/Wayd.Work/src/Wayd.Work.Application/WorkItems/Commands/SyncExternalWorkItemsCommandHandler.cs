@@ -5,6 +5,7 @@ using Wayd.Common.Domain.Enums.Work;
 using Wayd.Work.Application.Persistence;
 using Wayd.Work.Application.WorkItems.Dtos;
 using Wayd.Work.Domain.Interfaces;
+using Wayd.Work.Domain.Models;
 
 namespace Wayd.Work.Application.WorkItems.Commands;
 
@@ -225,7 +226,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 iterationId,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
-                                externalWorkItem.ExternalTeamIdentifier
+                                externalWorkItem.ExternalTeamIdentifier,
+                                [.. externalWorkItem.Tags.Select(t => new WorkItemTag(t))]
                             );
                             newWorkItems.Add(workItem);
 
@@ -251,7 +253,8 @@ internal sealed class SyncExternalWorkItemsCommandHandler(IWorkDbContext workDbC
                                 iterationId,
                                 externalWorkItem.ActivatedTimestamp,
                                 externalWorkItem.DoneTimestamp,
-                                CreateExtendedPropsIfNeeded(workItem.Id, externalWorkItem.ExternalTeamIdentifier)
+                                CreateExtendedPropsIfNeeded(workItem.Id, externalWorkItem.ExternalTeamIdentifier),
+                                [.. externalWorkItem.Tags.Select(t => new WorkItemTag(t))]
                             );
 
                             syncLog.ItemUpdated();

@@ -20,4 +20,5 @@ public interface IExternalWorkItem
     string? ExternalTeamIdentifier { get; }
     int? IterationId { get; }
     double? StoryPoints { get; }
+    IReadOnlyCollection<string> Tags { get; }
 }

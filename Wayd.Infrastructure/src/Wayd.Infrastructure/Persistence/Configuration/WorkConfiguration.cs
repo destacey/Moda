@@ -175,6 +175,14 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
         builder.Property(w => w.ActivatedTimestamp);
         builder.Property(w => w.DoneTimestamp);
 
+        builder.OwnsMany(w => w.Tags, t =>
+        {
+            t.ToJson();
+            t.UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+        builder.Navigation(w => w.Tags)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(w => w.Tags).Metadata.SetField("_tags");
 
         // Relationships
         builder.HasOne(w => w.Type)

@@ -143,4 +143,10 @@ public static class ExternalWorkItemFakerExtensions
         faker.RuleFor(x => x.StoryPoints, storyPoints);
         return faker;
     }
+
+    public static ExternalWorkItemFaker WithTags(this ExternalWorkItemFaker faker, params string[] tags)
+    {
+        faker.RuleFor(x => x.Tags, tags);
+        return faker;
+    }
 }

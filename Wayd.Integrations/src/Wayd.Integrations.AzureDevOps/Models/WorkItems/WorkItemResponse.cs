@@ -56,6 +56,9 @@ internal static class WorkItemResponseExtensions
             ExternalTeamIdentifier = iteration.Identifier.ToString(),
             IterationId = workItem.Fields.IterationId,
             StoryPoints = storyPoints,
+            Tags = string.IsNullOrWhiteSpace(workItem.Fields.Tags)
+                ? []
+                : [.. workItem.Fields.Tags.Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)],
         };
     }
 

@@ -2,7 +2,7 @@
 
 import { WorkItemDetailsDto } from '@/src/services/wayd-api'
 import { SprintLink } from '@/src/components/common/planning'
-import { Descriptions } from 'antd'
+import { Descriptions, Space, Tag } from 'antd'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import WorkItemSteps from './work-item-steps'
@@ -98,6 +98,15 @@ const WorkItemDetails = ({ workItem }: WorkItemDetailsProps) => {
         <Item label="Updated">
           {dayjs(workItem.lastModified).format('MMM D, YYYY @ h:mm A')}
         </Item>
+        {workItem.tags && workItem.tags.length > 0 && (
+          <Item label="Tags">
+            <Space wrap size={[4, 4]}>
+              {workItem.tags.map((tag) => (
+                <Tag key={tag}>{tag}</Tag>
+              ))}
+            </Space>
+          </Item>
+        )}
       </Descriptions>
       <br />
       <WorkItemSteps workItem={workItem} />
