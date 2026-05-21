@@ -30,6 +30,7 @@ public sealed record WorkItemBacklogItemDto : IMapFrom<WorkItem>
     // This is used to set the rank of the work items in the backlog
     public double StackRank { get; set; }
     public double? StoryPoints { get; set; }
+    public List<string> Tags { get; set; } = [];
 
     public void ConfigureMapping(TypeAdapterConfig config)
     {
@@ -45,6 +46,7 @@ public sealed record WorkItemBacklogItemDto : IMapFrom<WorkItem>
                 : src.ParentProject != null
                     ? src.ParentProject
                     : null)
-            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}");
+            .Map(dest => dest.ExternalViewWorkItemUrl, src => src.Workspace.ExternalViewWorkItemUrlTemplate == null ? null : $"{src.Workspace.ExternalViewWorkItemUrlTemplate}{src.ExternalId}")
+            .Map(dest => dest.Tags, src => src.Tags.Select(t => t.Value).ToList());
     }
 }

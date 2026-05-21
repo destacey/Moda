@@ -29063,7 +29063,8 @@
           "id",
           "created",
           "rank",
-          "stackRank"
+          "stackRank",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -29160,6 +29161,12 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           },
           "cycleTime": {
             "type": "number",
@@ -33397,7 +33404,8 @@
           "id",
           "created",
           "rank",
-          "stackRank"
+          "stackRank",
+          "tags"
         ],
         "properties": {
           "id": {
@@ -33489,6 +33497,12 @@
             "type": "number",
             "format": "double",
             "nullable": true
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

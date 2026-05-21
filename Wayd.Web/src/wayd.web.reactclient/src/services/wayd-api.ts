@@ -27917,6 +27917,7 @@ export interface SprintBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+    tags: string[];
     cycleTime?: number | undefined;
 }
 
@@ -28950,6 +28951,7 @@ export interface WorkItemBacklogItemDto {
     externalViewWorkItemUrl?: string | undefined;
     stackRank: number;
     storyPoints?: number | undefined;
+    tags: string[];
 }
 
 export enum WorkStatusCategory {
