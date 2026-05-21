@@ -180,6 +180,9 @@ public class WorkItemConfig : IEntityTypeConfiguration<WorkItem>
             t.ToJson();
             t.UsePropertyAccessMode(PropertyAccessMode.Field);
         });
+        builder.Navigation(w => w.Tags)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+        builder.Navigation(w => w.Tags).Metadata.SetField("_tags");
 
         // Relationships
         builder.HasOne(w => w.Type)

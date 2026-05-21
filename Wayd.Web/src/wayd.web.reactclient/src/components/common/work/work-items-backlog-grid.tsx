@@ -1,10 +1,7 @@
 'use client'
 
 import { WaydGrid } from '@/src/components/common'
-import {
-  SprintBacklogItemDto,
-  WorkItemBacklogItemDto,
-} from '@/src/services/wayd-api'
+import { WorkItemBacklogItemDto } from '@/src/services/wayd-api'
 import { ColDef } from 'ag-grid-community'
 import { useMemo } from 'react'
 import {
@@ -95,7 +92,7 @@ const WorkItemsBacklogGrid = (props: WorkItemsBacklogGridProps) => {
         width: 200,
         valueGetter: (params) => params.data?.tags?.join(', ') ?? '',
         cellRenderer: (
-          params: CustomCellRendererProps<SprintBacklogItemDto>,
+          params: CustomCellRendererProps<WorkItemBacklogItemDto>,
         ) => <WorkItemTagsCell tags={params.data?.tags} />,
       },
     ],
